@@ -11,3 +11,58 @@
 /* Independent part controls: there is no cabinet-wide open action. */
 .opening-controls{margin-top:12px;padding-top:12px;border-top:1px solid #dce4d0;width:100%}.opening-controls-label{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:8px;letter-spacing:.7px;color:#7e956a;line-height:1.5;margin-bottom:8px}.opening-controls-label>span{font-size:8px;letter-spacing:0;color:#99a68b;white-space:nowrap}.opening-parts-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;max-height:190px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#c7d6b7 transparent;padding:2px}.opening-parts-grid>button{min-width:0;display:flex;align-items:center;gap:6px;padding:8px 7px;border:1px solid #d0ddc2;background:#f6f9f0;color:#81966d;border-radius:4px;font-size:9px;text-align:start;line-height:1.4}.opening-parts-grid>button>span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.opening-parts-grid>button>i{height:5px;width:5px;border:1px solid #bccbad;border-radius:50%;flex-shrink:0}.opening-parts-grid>button.open{background:#e6efda;border-color:#97b47e;color:#537637}.opening-parts-grid>button.active-part{outline:1px solid #6d9057;outline-offset:1px}.opening-parts-grid>button:hover{background:#e7efdd;color:#507737}.selection-card>div{width:285px;max-width:100%;min-width:0}.selection-card .opening-controls{margin-top:6px;padding-top:9px}.selection-card .cabinet-open-actions>button:first-child{padding:7px 11px}.selection-card .cabinet-open-actions>button.cabinet-spec-link{padding:7px 9px}.selected-spec-section .opening-controls{margin-bottom:16px}.scene-toolbelt button:disabled{opacity:.4}.scene-toolbelt button:disabled:hover{background:none}.model-surface>canvas{cursor:grab}.opening-parts-grid>button svg{flex-shrink:0}
 @media(max-width:760px){.selection-card{width:300px;max-width:calc(100% - 72px)}.selection-card>div{width:100%}.opening-controls-label{font-size:7px;letter-spacing:0}.opening-controls-label>span{font-size:6px}.opening-parts-grid{gap:5px;max-height:144px}.opening-parts-grid>button{padding:8px 6px;gap:4px;font-size:8px;min-height:32px}.opening-parts-grid>button>svg{height:11px;width:11px}.selection-card .cabinet-open-actions{gap:7px}.selected-spec-section .opening-controls-label{font-size:10px}.selected-spec-section .opening-controls-label>span{font-size:9px}.selected-spec-section .opening-parts-grid>button{font-size:11px;padding:11px 8px}.selected-spec-section .opening-parts-grid{max-height:none}}
+
+/* Half-transparent cabinet controls leave the inspected geometry visible. */
+.selection-card.glass-cabinet-panel {
+ background:rgba(250,252,246,.5);
+ backdrop-filter:blur(4px);
+ -webkit-backdrop-filter:blur(4px);
+ border-color:rgba(129,151,111,.45);
+ align-items:flex-start;
+ gap:12px;
+}
+.glass-cabinet-panel .selection-card-content{gap:6px;}
+.cabinet-panel-body{display:flex;flex-direction:column;gap:5px;min-width:0;}
+.cabinet-panel-dimensions{font-size:10px;color:#506448;line-height:1.6;}
+.glass-cabinet-panel small{color:#506448;}
+.glass-cabinet-panel strong{color:#344c2b;}
+.glass-cabinet-panel .opening-controls{border-color:rgba(108,133,87,.3);}
+.glass-cabinet-panel .opening-controls-label{color:#4c663e;}
+.glass-cabinet-panel .opening-controls-label>span{color:#607453;}
+.glass-cabinet-panel .opening-parts-grid>button{background:rgba(248,251,242,.5);border-color:rgba(134,158,113,.55);color:#3f5c32;}
+.glass-cabinet-panel .opening-parts-grid>button.open{background:rgba(209,230,187,.6);border-color:#779c5e;color:#2d5020;}
+.glass-cabinet-panel .opening-parts-grid>button:hover{background:rgba(225,239,209,.85);}
+.glass-cabinet-panel .cabinet-open-actions>button{background:rgba(238,245,227,.55);color:#3d5e2c;border-color:rgba(123,150,100,.55);}
+.glass-cabinet-panel .cabinet-open-actions>button:not(.cabinet-spec-link){background:rgba(57,84,45,.9);color:white;}
+.selection-card-tools{display:flex;flex-direction:column;gap:5px;flex-shrink:0;margin-top:-3px;}
+.selection-card-tools .icon-button{width:27px;height:27px;color:#35572a;border-radius:4px;}
+.selection-card-tools .cabinet-panel-toggle{background:rgba(226,238,213,.65);border:1px solid rgba(115,145,90,.5);}
+.selection-card-tools .icon-button:hover{background:rgba(215,232,197,.9);}
+.selection-card-tools .icon-button:focus-visible{outline:2px solid #537b3d;outline-offset:2px;}
+.glass-cabinet-panel.is-minimized{padding:10px 12px;gap:9px;}
+.glass-cabinet-panel.is-minimized .selection-card-content{width:205px;gap:5px;}
+.selection-card .minimized-panel-hint{font-size:8px;color:#506448;line-height:1.7;}
+.appliance-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+.appliance-cards article{padding:17px;border:1px solid #d8e3cc;border-radius:6px;background:#f2f6eb;min-width:0;}
+.appliance-cards article>small{font-size:8px;letter-spacing:1.3px;color:#869875;}
+.appliance-cards h4{font-size:16px;color:#506e3c;font-weight:500;margin:10px 0 8px;direction:ltr;text-align:start;}
+.appliance-cards article>p{font-size:10px;line-height:1.8;color:#7b8d68;margin:0 0 14px;}
+.appliance-cards dl{margin:0;}
+.appliance-cards dl>div{border-top:1px solid #dce5d1;padding:10px 0;display:flex;flex-direction:column;gap:5px;}
+.appliance-cards dt{font-size:9px;color:#859574;}
+.appliance-cards dd{font-size:11px;color:#526f40;margin:0;line-height:1.7;}
+.appliance-source-links{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:15px;}
+.appliance-source-links .text-link{font-size:9px;}
+.appliance-fit-note{display:flex;align-items:flex-start;gap:10px;padding:16px;background:#eeeedf;border:1px solid #e0dfc7;border-radius:5px;margin-top:12px;}
+.appliance-fit-note>svg{flex-shrink:0;color:#8c8f62;}
+.appliance-fit-note strong{font-size:11px;font-weight:500;color:#737d4c;}
+.appliance-fit-note p{font-size:10px;color:#818b62;line-height:1.9;margin:8px 0 0;}
+@media(max-width:760px){
+ .selection-card.glass-cabinet-panel{gap:7px;padding:11px 9px;}
+ .glass-cabinet-panel.is-minimized{width:250px;max-width:calc(100% - 72px);}
+ .glass-cabinet-panel.is-minimized .selection-card-content{width:auto;flex:1;}
+ .selection-card-tools .icon-button{width:27px;height:27px;}
+ .cabinet-panel-dimensions{font-size:9px;}
+ .appliance-cards{grid-template-columns:1fr;}
+ .appliance-cards article{padding:15px;}
+}

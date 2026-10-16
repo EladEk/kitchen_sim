@@ -40,7 +40,7 @@ export const DEFAULTS={base:'chalk',upper:'chalk',stone:'taj',hardware:'black',f
 export const PRESETS={original:{base:'chalk',upper:'chalk',stone:'calacatta',hardware:'black'},oak:{base:'oak',upper:'chalk',stone:'taj',hardware:'brass'},warm:{base:'linen',upper:'chalk',stone:'taj',hardware:'brass'}};
 export function getModule(id){ return [...LONG,...SHORT,...UPPERS,...ISLAND_UNITS].find(m=>m.id===id); }
 export function clearance(island=ISLAND){return {workAisle:island.z-ROOM.counterDepth,returnAisle:island.x-ROOM.counterDepth};}
-export function snapshot(settings){return {schema:1,modelRevision:3,plan:'Anise drawing 167968 + technical order 168947 · 15 October 2026',units:'mm',dimensions:{room:ROOM,island:ISLAND,window:WINDOW},settings};}
+export function snapshot(settings){return {schema:1,modelRevision:5,plan:'Anise drawing 167968 + technical order 168947 + Siemens EX875LYV1E / Elica BOXIN LX 90 sheets',units:'mm',dimensions:{room:ROOM,island:ISLAND,window:WINDOW},settings};}
 
 export const ALL_CABINETS=[...LONG.filter(m=>m.type!=='panel'),...SHORT.filter(m=>m.type!=='corner'),...UPPERS,...ISLAND_UNITS];
 export const OPENABLE_IDS=ALL_CABINETS.map(m=>m.id);

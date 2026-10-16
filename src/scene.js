@@ -3,6 +3,8 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 import { ROOM,LONG,SHORT,UPPERS,ISLAND,ISLAND_UNITS,WINDOW,MATERIALS,STONES } from './model.mjs';
 import {ORDER} from './specifications.mjs';
 import {getOpening,normalizeOpenParts} from './openings.mjs';
+import {HOB,HOOD} from './appliances.mjs';
+import {createBoxinHood} from './hood.js';
 const M=0.001;
 function seeded(seed){return ()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};}
 export function materialTexture(kind,color){
@@ -58,7 +60,7 @@ export function createKitchen(settings){
   part(box(9,y+h/2,zStart+depth/2,18,h,depth,material,null,parent),'carcass-side');
   part(box(w-9,y+h/2,zStart+depth/2,18,h,depth,material,null,parent),'carcass-side');
   box(w/2,y+9,zStart+depth/2,w-36,18,depth,material,null,parent);
-  if(!openTop)box(w/2,y+h-9,zStart+depth/2,w-36,18,depth,material,null,parent);else for(const zz of [zStart+35,zStart+depth-35])box(w/2,y+h-9,zz,w-36,18,60,material,null,parent);
+  if(!openTop)box(w/2,y+h-9,zStart+depth/2,w-36,18,depth,material,null,parent);else for(const zz of [zStart+14,zStart+depth-14])box(w/2,y+h-9,zz,w-36,18,28,material,null,parent);
   box(w/2,y+h/2,zStart+4,w-36,h-36,8,material,null,parent);
  }
  function shelf(parent,w,y,depth=550,zStart=20){part(box(w/2,y,zStart+depth/2,w-38,18,depth,interior,null,parent),'shelf');}
@@ -170,7 +172,7 @@ export function createKitchen(settings){
    return;
   }
   const tall=['oven','pantry'].includes(m.type),bodyH=tall?2280:754;
-  if(m.type==='dishwasher')shell(p,m.w,0,874,570,0,steel);else shell(p,m.w,120,bodyH,590,0,interior,m.type==='sink');
+  if(m.type==='dishwasher')shell(p,m.w,0,874,570,0,steel);else shell(p,m.w,120,bodyH,590,0,interior,['sink','hob'].includes(m.type));
   if(m.type!=='dishwasher')box(m.w/2,60,270,m.w-2,120,510,plinth,null,p);
   front(m,p,m.w,bodyH,120,m.type,base,m.id);
  }
@@ -182,21 +184,57 @@ export function createKitchen(settings){
  const sinkX=1910,sinkW=560,sinkD=430,sinkZ=315;
  const topShape=new THREE.Shape();topShape.moveTo(0,0);topShape.lineTo(4850,0);topShape.lineTo(4850,620);topShape.lineTo(620,620);topShape.lineTo(620,1660);topShape.lineTo(0,1660);topShape.closePath();
  const cut=new THREE.Path();cut.moveTo(sinkX-sinkW/2,sinkZ-sinkD/2);cut.lineTo(sinkX-sinkW/2,sinkZ+sinkD/2);cut.lineTo(sinkX+sinkW/2,sinkZ+sinkD/2);cut.lineTo(sinkX+sinkW/2,sinkZ-sinkD/2);cut.closePath();topShape.holes.push(cut);
- const topGeo=new THREE.ExtrudeGeometry(topShape,{depth:topH,bevelEnabled:false,curveSegments:1});topGeo.rotateX(Math.PI/2);topGeo.scale(M,M,M);topGeo.translate(0,ROOM.worktop*M,0);const topUV=topGeo.attributes.uv;for(let i=0;i<topUV.count;i++)topUV.setXY(i,topUV.getX(i)/1800,topUV.getY(i)/1800);resources.push(topGeo);const countertop=new THREE.Mesh(topGeo,stone);countertop.castShadow=true;countertop.receiveShadow=true;group.add(countertop);
+ const hobX=LONG.find(m=>m.id===HOB.cabinetId).x+450,hobCut=new THREE.Path(),cw=HOB.cutout.previewWidth,cd=HOB.cutout.previewDepth;
+ hobCut.moveTo(hobX-cw/2,HOB.centerZ-cd/2);hobCut.lineTo(hobX-cw/2,HOB.centerZ+cd/2);hobCut.lineTo(hobX+cw/2,HOB.centerZ+cd/2);hobCut.lineTo(hobX+cw/2,HOB.centerZ-cd/2);hobCut.closePath();topShape.holes.push(hobCut);
+ const topGeo=new THREE.ExtrudeGeometry(topShape,{depth:topH,bevelEnabled:false,curveSegments:1});topGeo.rotateX(Math.PI/2);topGeo.scale(M,M,M);topGeo.translate(0,ROOM.worktop*M,0);const topUV=topGeo.attributes.uv;for(let i=0;i<topUV.count;i++)topUV.setXY(i,topUV.getX(i)/1800,topUV.getY(i)/1800);resources.push(topGeo);const countertop=new THREE.Mesh(topGeo,stone);countertop.castShadow=true;countertop.receiveShadow=true;part(countertop,'worktop');group.add(countertop);
  const sinkParent=moduleGroups.get('sink');const bowlX=350;
  box(bowlX,782,sinkZ,sinkW,16,sinkD,steel,'sink',sinkParent);
  box(bowlX-sinkW/2+4,841,sinkZ,8,125,sinkD,steel,'sink',sinkParent);box(bowlX+sinkW/2-4,841,sinkZ,8,125,sinkD,steel,'sink',sinkParent);box(bowlX,841,sinkZ-sinkD/2+4,sinkW,125,8,steel,'sink',sinkParent);box(bowlX,841,sinkZ+sinkD/2-4,sinkW,125,8,steel,'sink',sinkParent);cylinder(bowlX,793,sinkZ,27,5,metal,sinkParent);
  const faucetCurve=new THREE.CatmullRomCurve3([new THREE.Vector3(bowlX*M,.914,.055),new THREE.Vector3(bowlX*M,1.14,.055),new THREE.Vector3(bowlX*M,1.2,.15),new THREE.Vector3(bowlX*M,1.14,.26)]);const fgeo=new THREE.TubeGeometry(faucetCurve,24,.009,8,false);resources.push(fgeo);const tap=new THREE.Mesh(fgeo,metal);tap.castShadow=true;sinkParent.add(tap);cylinder(bowlX,.93/M,55,18,35,metal,sinkParent);box(bowlX+30,952,55,45,6,10,metal,sinkParent);
- // Cooktop styling is illustrative; the 900 mm housing is fixed to the plan.
- const hobParent=moduleGroups.get('hob');box(450,919,310,800,10,480,black,'hob',hobParent,true);
- for(const [dx,dz,r] of [[-240,-110,74],[235,-110,68],[-235,105,62],[230,110,91]]){
-  const ring=new THREE.RingGeometry((r-1.5)*M,r*M,48);resources.push(ring);const mesh=new THREE.Mesh(ring,mat('#676d67'));mesh.rotation.x=-Math.PI/2;mesh.position.set((450+dx)*M,.925,(310+dz)*M);hobParent.add(mesh);
+ // Siemens EX875LYV1E: actual 812 × 520 × 51 mm envelope. Underside details
+ // and the selected 780 × 500 mm cutout are a fit illustration, not fabrication data.
+ const hobParent=moduleGroups.get(HOB.cabinetId),hobTop=ROOM.worktop+HOB.glassHeight;
+ const cooktopGlass=part(box(450,ROOM.worktop+HOB.glassHeight/2,HOB.centerZ,HOB.width,HOB.glassHeight,HOB.depth,black,HOB.cabinetId,hobParent,true),'cooktop-glass');
+ cooktopGlass.userData.model=HOB.model;
+ part(box(450,ROOM.worktop-(HOB.height-HOB.glassHeight)/2,HOB.centerZ,750,HOB.height-HOB.glassHeight,490,black,HOB.cabinetId,hobParent),'cooktop-body');
+ for(const x of [450-HOB.width/2+2,450+HOB.width/2-2])box(x,915,HOB.centerZ,3,6,HOB.depth,steel,HOB.cabinetId,hobParent);
+ const print=mat('#7c847e',{roughness:.6});
+ for(const cx of [215,685]){
+  // Two linked 400 × 230 mm FlexInduction zones, each with two cooking areas.
+  for(const xx of [cx-115,cx+115])box(xx,hobTop+.3,270,1.5,.6,400,print,null,hobParent);
+  for(const zz of [70,270,470])box(cx,hobTop+.3,zz,230,.6,1.5,print,null,hobParent);
+  for(let i=0;i<12;i++)box(cx-86+i*15,hobTop+.4,535,7,.8,2,print,null,hobParent);
  }
- for(let i=0;i<6;i++)box(390+i*23,925,510,8,1,3,steel,null,hobParent);
+ for(const xx of [410,490])for(const zz of [170,370])box(xx,hobTop+.3,zz,45,.6,1.5,print,null,hobParent);
+ // Built-in BOXIN LX in the 900 mm cabinet above the hob. Everything is
+ // parented to that cabinet, so inspection reveals the motor and duct as well.
+ function hoodCabinet(p,m){
+  const start=270,depth=ROOM.upperDepth,inner=m.w-36;
+  for(const x of [9,m.w-9])part(box(x,1950,start+depth/2,18,900,depth,interior,null,p),'carcass-side');
+  box(m.w/2,1950,start+4,inner,864,8,interior,null,p);
+  const rear=start+depth-HOOD.depth,ductZ=rear+HOOD.ductRearOffset;
+  function perforatedShelf(y,kind){
+   const shape=new THREE.Shape();shape.moveTo(18,start+8);shape.lineTo(m.w-18,start+8);shape.lineTo(m.w-18,start+depth-8);shape.lineTo(18,start+depth-8);shape.closePath();
+   const hole=new THREE.Path();hole.absarc(m.w/2,ductZ,HOOD.shelfHoleDiameter/2,0,Math.PI*2,true);shape.holes.push(hole);
+   const geometry=new THREE.ExtrudeGeometry(shape,{depth:18,bevelEnabled:false,curveSegments:40});geometry.rotateX(Math.PI/2);geometry.translate(0,y+9,0);geometry.scale(M,M,M);resources.push(geometry);
+   const board=part(new THREE.Mesh(geometry,interior),kind);board.castShadow=board.receiveShadow=true;p.add(board);
+  }
+  perforatedShelf(2391,'hood-top-panel');perforatedShelf(2100,'hood-shelf');
+  const hood=createBoxinHood({box,cylinder,part,mat,resources,settings,steel,black});
+  const bottom=ROOM.upperBottom-HOOD.trimHeight;
+  hood.position.set(m.w/2*M,bottom*M,rear*M);p.add(hood);
+  // The real collar ends at 361.3 mm; the pipe beyond it is the illustrated
+  // installation route and is deliberately outside the product envelope.
+  const ductBottom=bottom+HOOD.totalHeight,ductTop=2400;
+  const ductGeo=new THREE.CylinderGeometry(HOOD.ductDiameter*M/2,HOOD.ductDiameter*M/2,(ductTop-ductBottom)*M,64,1,true);resources.push(ductGeo);
+  const duct=part(new THREE.Mesh(ductGeo,mat('#b0b7b2',{metalness:.65,roughness:.42,side:THREE.DoubleSide})),'hood-duct');duct.position.set(m.w/2*M,(ductBottom+ductTop)/2*M,ductZ*M);p.add(duct);
+  // Pick targets include the custom punched fascia and diamond filter planes.
+  hood.traverse(o=>{if(o.isMesh){o.userData.id=m.id;if(!picks.includes(o))picks.push(o);}});
+ }
  // Upper fronts have their own 320 mm depth and preserve the 1090 mm setback.
  UPPERS.forEach(m=>{
   const p=new THREE.Group();p.userData.cabinetId=m.id;moduleGroups.set(m.id,p);p.position.set(m.x*M,0,(-ROOM.depth+ROOM.upperDepth)*M);group.add(p);
-  shell(p,m.w,1500,900,320,270);for(let i=1;i<=m.shelves;i++)shelf(p,m.w,1500+i*300,280,290);
+  if(m.id===HOOD.cabinetId)hoodCabinet(p,m);else {shell(p,m.w,1500,900,320,270);for(let i=1;i<=m.shelves;i++)shelf(p,m.w,1500+i*300,280,290);}
   front(m,p,m.w,900,1500,'upper',upper,m.id);
  });
  box(2970,2500,160,3760,200,340,wall);
@@ -223,7 +261,7 @@ export function createKitchen(settings){
  const sun=new THREE.DirectionalLight(settings.light==='day'?'#fff5df':'#f3cf9d',settings.light==='day'?3.2:1.4);sun.position.set(3,6,5);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-5;sun.shadow.camera.right=5;sun.shadow.camera.top=5;sun.shadow.camera.bottom=-5;sun.shadow.normalBias=.025;sun.shadow.bias=-.0001;group.add(sun);
  const fill=new THREE.DirectionalLight('#e7edf1',settings.light==='day'?1:.45);fill.position.set(-3,3,1);group.add(fill);
  if(settings.led){
-  const ledmat=mat('#ffdda4',{emissive:'#ffcb77',emissiveIntensity:2});box(2970,1494,300,3750,4,12,ledmat);
+  const ledmat=mat('#ffdda4',{emissive:'#ffcb77',emissiveIntensity:2});for(const [a,b] of [[1095,3470],[4370,4845]])box((a+b)/2,1494,300,b-a,4,12,ledmat);
   for(const x of [1.65,2.65,3.65,4.55]){const l=new THREE.PointLight('#ffd9a1',settings.intensity/100*.7,2.5,2);l.position.set(x,1.42,.37);group.add(l);}
  }
  const dimensionGroup=new THREE.Group();group.add(dimensionGroup);dimensionGroup.visible=settings.dimensions;

@@ -3,12 +3,14 @@ import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {createKitchen} from './scene.js';
 import {FloorPlan} from './PlanViews.jsx';
+import {appliancePlacement,HOOD} from './appliances.mjs';
 const CAMERAS={perspective:{pos:[7.25,4.6,7.7],target:[2.6,1.05,1.05]},front:{pos:[2.75,2.0,8.9],target:[2.75,1.18,.4]},island:{pos:[5.1,2.6,.9],target:[3.4,.9,1.95]}};
 export const ModelView=forwardRef(function ModelView({settings,onSelect,onPartClick,cameraPreset='perspective',cameraRequest=0},ref){
  const host=useRef(),runtime=useRef(),model=useRef(),select=useRef(onSelect),partClick=useRef(onPartClick),labels=useRef([]),wasInspecting=useRef(false),roomPose=useRef(null);const [failed,setFailed]=useState(false);select.current=onSelect;partClick.current=onPartClick;
  useImperativeHandle(ref,()=>({
   zoom(dir){const r=runtime.current;if(!r)return;const delta=r.camera.position.clone().sub(r.controls.target).multiplyScalar(dir>0?.85:1.18);r.camera.position.copy(r.controls.target.clone().add(delta));r.controls.update();},
   home(){const r=runtime.current;if(!r)return;if(r.fitInspection){r.fitInspection();return;}const p=CAMERAS.perspective;r.camera.position.set(...p.pos);r.controls.target.set(...p.target);r.controls.update();},
+  hoodDetail(){const r=runtime.current;if(!r||!model.current?.moduleGroups.has(HOOD.cabinetId))return;const fit=appliancePlacement();r.controls.target.set(fit.hoodX*.001,fit.hoodBottom*.001,(fit.hoodRear+HOOD.depth/2)*.001);r.camera.position.copy(r.controls.target).add(new THREE.Vector3(.32,-.54,.86));r.controls.minDistance=.35;r.controls.maxPolarAngle=Math.PI*.9;r.controls.update();},
   capture(){const r=runtime.current;if(!r)return null;r.renderer.render(r.scene,r.camera);return r.renderer.domElement.toDataURL('image/png');}
  }));
  useEffect(()=>{
@@ -45,10 +47,10 @@ export const ModelView=forwardRef(function ModelView({settings,onSelect,onPartCl
     const bounds=new THREE.Box3().setFromObject(unit),center=bounds.getCenter(new THREE.Vector3()),size=bounds.getSize(new THREE.Vector3());
     const front=new THREE.Vector3(0,0,1).applyQuaternion(unit.getWorldQuaternion(new THREE.Quaternion())),right=new THREE.Vector3(1,0,0).applyQuaternion(unit.getWorldQuaternion(new THREE.Quaternion()));
     const distance=Math.max(size.y*2.2,size.x*2.1,1.7)*(r.camera.aspect<1?1.15:1);
-    r.controls.target.copy(center);r.camera.position.copy(center).addScaledVector(front,distance).addScaledVector(right,distance*.18);r.camera.position.y+=distance*.25;r.controls.minDistance=.55;r.controls.maxDistance=8;r.controls.update();
+    r.controls.target.copy(center);r.camera.position.copy(center).addScaledVector(front,distance).addScaledVector(right,distance*.18);r.camera.position.y+=distance*.25;r.controls.minDistance=.55;r.controls.maxDistance=8;r.controls.maxPolarAngle=Math.PI*.9;r.controls.update();
    };r.fitInspection();
   }else if(wasInspecting.current){
-   wasInspecting.current=false;r.fitInspection=null;r.controls.minDistance=2;r.controls.maxDistance=15;
+   wasInspecting.current=false;r.fitInspection=null;r.controls.minDistance=2;r.controls.maxDistance=15;r.controls.maxPolarAngle=Math.PI/2-.02;
    if(roomPose.current){r.camera.position.copy(roomPose.current.position);r.controls.target.copy(roomPose.current.target);}else{r.camera.position.set(...CAMERAS[cameraPreset].pos);r.controls.target.set(...CAMERAS[cameraPreset].target);}r.controls.update();
   }
  },[settings.inspection,settings.selected]);
