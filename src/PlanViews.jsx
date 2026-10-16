@@ -1,0 +1,44 @@
+import React from 'react';
+import {LONG,SHORT,UPPERS,ISLAND,ISLAND_UNITS,ROOM,WINDOW,MATERIALS,STONES} from './model.mjs';
+const C={ink:'#45564c',line:'#9b9f94',faint:'#c8c9be'};
+const textStyle={fontFamily:'Arial, sans-serif',fontSize:70,fill:C.ink};
+function Dim({x1,y1,x2,y2,label,vertical=false,small=false}){return <g className="svg-dimension"><path d={`M${x1},${y1} L${x2},${y2}`} fill="none" stroke={C.line} strokeWidth="4"/>{[[x1,y1],[x2,y2]].map(([x,y],i)=><path key={i} d={`M${x-22},${y+22}l44,-44`} stroke={C.ink} strokeWidth="5"/>)}<text x={(x1+x2)/2+(vertical?-65:0)} y={(y1+y2)/2+(vertical?0:-35)} textAnchor="middle" transform={vertical?`rotate(-90 ${(x1+x2)/2-65} ${(y1+y2)/2})`:undefined} style={{...textStyle,fontSize:small?55:70}}>{label}</text></g>;}
+function Unit({m,x,y,w,h,fill,selected,onSelect,label}){return <g role="button" tabIndex="0" aria-label={m.name} onClick={()=>onSelect(m.id)} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();onSelect(m.id);}}} className="plan-unit"><rect x={x} y={y} width={w} height={h} fill={selected===m.id?'#9fb5a2':fill} stroke={selected===m.id?'#496a55':'#8b9083'} strokeWidth={selected===m.id?14:5}/>{label&&<text x={x+w/2} y={y+h/2+22} textAnchor="middle" style={{...textStyle,fontSize:Math.min(62,w*.12)}}>{label}</text>}</g>;}
+export function FloorPlan({settings,onSelect,zoom=1}){
+ const b=MATERIALS.find(x=>x.id===settings.base)?.color||'#ddd9cf';const stone=STONES.find(x=>x.id===settings.stone)?.color||'#ddd5c2';const h=settings.lang==='he';
+ return <svg className="architectural-plan" viewBox="-650 -650 6850 4600" aria-label={h?'תוכנית מטבח בקנה מידה':'Kitchen floor plan to scale'} style={{transform:`scale(${zoom})`}}><defs><pattern id="planGrid" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M100 0H0V100" fill="none" stroke="#d1d1c6" strokeWidth="2" opacity=".38"/></pattern><pattern id="hatch" width="35" height="35" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line y2="35" stroke="#a6aa9f" strokeWidth="7"/></pattern></defs><rect x="-650" y="-650" width="6850" height="4600" fill="url(#planGrid)"/>
+ <path d="M-80,3300 V-80 H5450" fill="none" stroke="#abb0a4" strokeWidth="150"/><path d="M-80,3300 V-80 H5450" fill="none" stroke="url(#hatch)" strokeWidth="140"/>
+ <rect x="610" y="-155" width="390" height="155" fill="#e2ece4" stroke="#63776c" strokeWidth="6"/><path d="M610,-77H1000 M805,-155V0" stroke="#63776c" strokeWidth="6"/>
+ <path d="M0,0H4850V620H620V1660H0Z" fill={stone} stroke="#6f776b" strokeWidth="7"/>
+ {LONG.filter(m=>m.type!=='panel'&&m.type!=='corner').map(m=><Unit key={m.id} m={m} x={m.x+5} y={5} w={m.w-10} h={m.type==='oven'?610:580} fill={m.type==='oven'?b:stone} selected={settings.selected} onSelect={onSelect} label={settings.labels?(h?m.he:m.name.split(' · ')[0]):null}/>)}
+ {SHORT.filter(m=>m.type!=='corner').map(m=><Unit key={m.id} m={m} x={5} y={m.z+5} w={['fridge','pantry'].includes(m.type)?660:580} h={m.w-10} fill={['fridge','pantry'].includes(m.type)?b:stone} selected={settings.selected} onSelect={onSelect} label={settings.labels?(h?m.he:m.type==='fridge'?'Fridge':m.type==='pantry'?'Pantry':null):null}/>)}
+ <rect x="1630" y="100" width="560" height="430" rx="65" fill="#e7ece5" stroke="#6e7f73" strokeWidth="10"/><circle cx="1910" cy="315" r="20" fill="#829186"/><path d="M1910 50V180" stroke="#53695b" strokeWidth="15"/>
+ <rect x="3480" y="70" width="800" height="480" rx="15" fill="#3d4941"/>{[[-240,-110,74],[235,-110,68],[-235,105,62],[230,110,91]].map(([x,z,r],i)=><circle key={i} cx={3880+x} cy={310+z} r={r} fill="none" stroke="#adb6a8" strokeWidth="5"/>)}
+ <rect x={ISLAND.x} y={ISLAND.z} width="2440" height="900" rx="7" fill={stone} stroke="#637364" strokeWidth="8"/>
+ {ISLAND_UNITS.map(m=><Unit key={m.id} m={m} x={m.x} y={ISLAND.z+20} w={m.w-5} h="590" fill={b} selected={settings.selected} onSelect={onSelect} label={settings.labels?`${m.w}`:null}/>)}
+ {[0,1,2,3].map(i=><g key={i}><ellipse cx={ISLAND.x+340+i*585} cy={ISLAND.z+1160} rx="177" ry="155" fill="#b6b5a5" stroke="#687665" strokeWidth="8"/><path d={`M${ISLAND.x+190+i*585},${ISLAND.z+1260}q150,100 300,0`} fill="none" stroke="#687665" strokeWidth="16"/></g>)}
+ <Dim x1={0} y1={-390} x2={5450} y2={-390} label="5,450 mm"/><Dim x1={-390} y1={0} x2={-390} y2={3300} vertical label="3,300 mm"/>
+ <Dim x1={2180} y1={ISLAND.z+1510} x2={4620} y2={ISLAND.z+1510} label="2,440 mm"/><Dim x1={4820} y1={1600} x2={4820} y2={2500} vertical label="900 mm*" small/>
+ {settings.dimensions&&<><Dim x1={5030} y1={620} x2={5030} y2={1600} vertical label="≈ 980" small/>{LONG.filter(m=>m.w>30).map(m=><text key={m.id} x={m.x+m.w/2} y="770" textAnchor="middle" style={{...textStyle,fontSize:52}}>{m.w}</text>)}<Dim x1={0} y1={3650} x2={2180} y2={3650} label="≈ 2,180 mm" small/></>}
+ <g transform="translate(5400,3050)"><circle r="180" fill="none" stroke="#b1b5a9" strokeWidth="5"/><path d="M0 -125L-38 25L0 4L38 25Z" fill="#667b6a"/><text y="135" textAnchor="middle" style={{...textStyle,fontSize:40}}>PLAN</text></g>
+ </svg>;
+}
+export function Elevation({settings,onSelect,wall='long',zoom=1}){
+ const b=MATERIALS.find(x=>x.id===settings.base)?.color,u=MATERIALS.find(x=>x.id===settings.upper)?.color,s=STONES.find(x=>x.id===settings.stone)?.color;const modules=wall==='long'?LONG:SHORT;const width=wall==='long'?5450:3300;
+ const xFor=m=>wall==='long'?m.x:3300-m.z-m.w;
+ const h=settings.lang==='he';
+ const face=(m,x,y,w,hh,type)=>{const parts=['drawers','hob'].includes(type)?3:type==='sink'?2:1;return <g key={m.id}><Unit m={m} x={x} y={y} w={w} h={hh} fill={b} selected={settings.selected} onSelect={onSelect}/>{Array.from({length:parts-1},(_,i)=>type==='sink'?<line key={i} x1={x+w/2} x2={x+w/2} y1={y} y2={y+hh} stroke="#7d8377" strokeWidth="5"/>:<line key={i} x1={x} x2={x+w} y1={y+hh*(i===0?.25:.625)} y2={y+hh*(i===0?.25:.625)} stroke="#7d8377" strokeWidth="5"/>)}{settings.labels&&<text x={x+w/2} y={y+hh/2} textAnchor="middle" style={{...textStyle,fontSize:50}}>{h?m.he:m.type==='sink'?'Sink':m.type==='hob'?'Cooktop':m.type==='dishwasher'?'Dishwasher':m.type==='oven'?'Oven':m.type==='pantry'?'Pantry':m.type==='fridge'?'Fridge':''}</text>}</g>;};
+ return <svg className="architectural-plan elevation" viewBox={`-500 -500 ${width+1000} 3550`} style={{transform:`scale(${zoom})`}} aria-label={`${wall} wall elevation to scale`}><path d={`M-150 2600H${width+150}`} stroke="#7c8678" strokeWidth="12"/><rect x="0" y="0" width={width} height="2600" fill="#e7e5dc"/>
+ {modules.filter(m=>m.type!=='panel').map(m=>{const x=xFor(m);return <g key={m.id}>
+ {m.type==='fridge'?<><rect x={x} y="200" width="1040" height="600" fill={u} stroke="#7d8377" strokeWidth="6"/><rect x={x+25} y="810" width="990" height="1650" fill="#b4b9b0" stroke="#7d8377" strokeWidth="6"/><path d={`M${x+520} 820V2440`} stroke="#657265" strokeWidth="10"/><path d={`M${x+60} 2500H${x+980}m-920 20h920m-920 20h920`} stroke="#6c7669" strokeWidth="8"/></>:face(m,x,2600-m.h,m.w,m.h-120,m.type)}
+ {m.type==='oven'&&<><path d={`M${x} 732h600M${x} 1726h600M${x} 2103h600`} fill="none" stroke="#7d8377" strokeWidth="5"/><rect x={x+18} y="1132" width={m.w-36} height="594" fill="#29332d" stroke="#6c7568" strokeWidth="5"/><rect x={x+45} y="1240" width={m.w-90} height="370" fill="#4c5850"/><rect x={x+65} y="1210" width={m.w-130} height="16" fill="#a4a99e"/></>}
+ {m.type==='pantry'&&<line x1={x} x2={x+m.w} y1="940" y2="940" stroke="#7d8377" strokeWidth="5"/>}
+ {m.type==='hob'&&<rect x={x+50} y="1677" width="800" height="11" fill="#29332d"/>}
+ {m.type==='sink'&&<path d={`M${x+350} 1695V1450q0,-65 65,-65t65,65v25`} fill="none" stroke="#586b5a" strokeWidth="15"/>}
+ </g>;})}
+ {wall==='long'?<><rect x="0" y="1688" width="4850" height="38" fill={s} stroke="#7d8377" strokeWidth="4"/>{UPPERS.map(m=><g key={m.id}><Unit m={m} x={m.x} y="200" w={m.w} h="900" fill={u} selected={settings.selected} onSelect={onSelect}/>{m.doors===2&&<line x1={m.x+m.w/2} x2={m.x+m.w/2} y1="200" y2="1100" stroke="#7d8377" strokeWidth="5"/>}</g>)}<rect x="1090" width="3760" height="200" fill="#dedfd5"/><rect x="610" y="500" width="390" height="1000" fill="#bfd2c4" stroke="#6d7f70" strokeWidth="15"/><line x1="805" x2="805" y1="500" y2="1500" stroke="#6d7f70" strokeWidth="10"/></>:<rect x="1640" y="1688" width="1660" height="38" fill={s} stroke="#7d8377" strokeWidth="4"/>}
+ <rect x="0" y="2480" width={width} height="120" fill="#a1a6a1"/>
+ <Dim x1={0} y1={-240} x2={width} y2={-240} label={`${width.toLocaleString('en-US')} mm`}/><Dim x1={-270} y1={0} x2={-270} y2={2600} vertical label="2,600 mm"/>
+ {modules.filter(m=>m.w>30).map(m=><Dim key={m.id} x1={xFor(m)} y1={2810} x2={xFor(m)+m.w} y2={2810} label={String(m.w)} small/>)}
+ </svg>;
+}

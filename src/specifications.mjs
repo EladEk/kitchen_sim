@@ -1,0 +1,40 @@
+// Factual transcription of the uploaded technical order. This is deliberately
+// separate from drawing geometry: conflicting order dimensions never resize it.
+export const ORDER={number:'168947',drawing:'167968',date:'15.10.2026',laminate:'ZA01SM',interior:'Graphite grey',interiorHe:'אפור גרפיט',interiorPreview:'#4b4f52',lowerHandle:'Integral_D_ZAFRAN+FOR',upperHandle:'Touch',plinthHeight:120,plinthFinish:'Aluminium-look',carcass:'Plywood',back:'Plywood',drawerBase:'White coated board',drawerHardware:'Anise',hinges:'Blum soft-close',islandBackThickness:18};
+export const SPEC_SOURCES=[
+ {id:'order-materials',name:'Order · materials',he:'הזמנה · חומרים',page:1},
+ {id:'order-pantry',name:'Order · pantry & return',he:'הזמנה · מזווה והקיר הקצר',page:2},
+ {id:'order-base',name:'Order · sink & bases',he:'הזמנה · כיור ותחתונים',page:3},
+ {id:'order-oven',name:'Order · drawers & oven',he:'הזמנה · מגירות ותנור',page:4},
+ {id:'order-uppers-a',name:'Order · upper units A',he:'הזמנה · עליונים א׳',page:5},
+ {id:'order-uppers-b',name:'Order · upper units B',he:'הזמנה · עליונים ב׳',page:6},
+ {id:'order-island',name:'Order · island drawers',he:'הזמנה · מגירות האי',page:7}
+];
+export const SPEC_CONFLICTS=[
+ {id:'upper-width',source:'order-uppers-a',en:'Upper item 16: the description says 100 cm, but the numeric width column says 900 mm. The drawing specifies 1,000 mm. The model keeps 1,000 mm.',he:'עליון פריט 16: התיאור מציין 100 ס״מ, אך בעמודת הרוחב רשום 900 מ״מ. השרטוט מציין 1,000 מ״מ. המודל שומר 1,000 מ״מ.'},
+ {id:'return-60',source:'order-pantry',en:'Return-wall 600 mm unit: the technical order describes a pull-out with one front; the drawing is annotated with three drawer fronts. The drawing front layout is retained.',he:'יחידת 600 מ״מ בקיר הקצר: ההזמנה מתארת נשלף בחזית אחת; בשרטוט מסומנות שלוש חזיתות מגירה. חלוקת החזיתות של השרטוט נשמרת.'},
+ {id:'fridge-upper',source:'order-materials',en:'Above-fridge unit: the order lists a 1,000 × 500 mm body; the elevation shows a 1,040 mm refrigerator zone and a 600 mm upper zone. The drawing envelope is retained; fillers and the final body size need confirmation.',he:'מעל המקרר: בהזמנה גוף 1,000 × 500 מ״מ; בחזית אזור מקרר 1,040 מ״מ ואזור עליון 600 מ״מ. מעטפת השרטוט נשמרת; המילואות ומידת הגוף הסופית דורשות אישור.'},
+ {id:'basket-width',source:'order-uppers-b',en:'Island basket unit: the cabinet width is 400 mm, while the basket line lists 410 mm. Three baskets are confirmed, but their fitting dimensions need confirmation. The cabinet remains 400 mm.',he:'יחידת סלסלות באי: רוחב הארון 400 מ״מ, אך בשורת הסלסלות מופיע 410 מ״מ. מספר הסלסלות — שלוש — מאומת; מידות ההתקנה דורשות אישור. הארון נשאר 400 מ״מ.'},
+ {id:'pantry-layout',source:'order-pantry',en:'Pantry: five shelves are listed as the original/default configuration, and four high drawers are listed separately without dimensions. Their exact allocation and final shelf arrangement are not specified. Opening the pantry shows the default shelf layout as an illustration.',he:'מזווה: חמישה מדפים רשומים כפריסה המקורית, וארבע מגירות גבוהות מופיעות בנפרד ללא מידות. השיוך המדויק וסידור המדפים הסופי אינם מוגדרים. בפתיחת המזווה מוצגת פריסת המדפים המקורית להמחשה.'}
+];
+const SPEC={
+ 'pantry':{source:'order-pantry',item:'2–3',en:'600 × 2,280 × 590 mm body; two Touch doors. Five shelves in the original configuration; final shelf/drawer allocation unresolved.',he:'גוף 600 × 2,280 × 590 מ״מ; שתי דלתות Touch. חמישה מדפים בפריסה המקורית; שיוך המדפים והמגירות הסופי טרם הוכרע.',status:'conflict'},
+ 'drawers-60':{source:'order-pantry',item:'4',en:'600 × 754 × 590 mm body. Three external drawer fronts follow the drawing; order describes a single-front pull-out.',he:'גוף 600 × 754 × 590 מ״מ. שלוש חזיתות חיצוניות לפי השרטוט; ההזמנה מתארת נשלף בחזית אחת.',status:'conflict'},
+ 'mixer':{source:'order-pantry',item:'5–6',en:'400 × 754 × 590 mm body, left hinge. A mixer-lift mechanism is listed on page 3; its assignment here follows the drawing annotation. Lift shape and travel are illustrative.',he:'גוף 400 × 754 × 590 מ״מ, ציר שמאל. מנגנון הרמה למיקסר רשום בעמוד 3; השיוך לכאן לפי ההערה בשרטוט. צורת המנגנון ומהלכו להמחשה.',status:'inferred'},
+ 'corner':{source:'order-base',item:'7',en:'Corner return: 660 × 754 × 590 mm. Overall corner placement follows the drawing.',he:'יחידת פינה: 660 × 754 × 590 מ״מ. מיקום הפינה לפי השרטוט.',status:'confirmed'},
+ 'drawers-90':{source:'order-base',item:'8',en:'900 × 754 × 590 mm; three drawers: two high, one low. Integral_D_ZAFRAN+FOR profile.',he:'900 × 754 × 590 מ״מ; שלוש מגירות: שתי גבוהות ואחת נמוכה. פרופיל Integral_D_ZAFRAN+FOR.',status:'confirmed'},
+ 'sink':{source:'order-base',item:'9',en:'700 × 754 × 590 mm sink body; two doors with integrated profile handles.',he:'גוף כיור 700 × 754 × 590 מ״מ; שתי דלתות עם פרופיל אינטגרלי.',status:'confirmed'},
+ 'dishwasher':{source:'order-base',item:'10',en:'600 × 874 mm integrated dishwasher front; 590 mm appliance zone. Front extends to the plinth; appliance internals are illustrative.',he:'חזית מדיח אינטגרלי 600 × 874 מ״מ; אזור מכשיר בעומק 590 מ״מ. החזית יורדת עד הצוקל; פנים המכשיר להמחשה.',status:'confirmed'},
+ 'storage-57':{source:'order-oven',item:'11',en:'570 × 754 × 590 mm; one right-hinged external door and two high internal drawers.',he:'570 × 754 × 590 מ״מ; דלת חיצונית אחת בציר ימין ושתי מגירות פנימיות גבוהות.',status:'confirmed'},
+ 'hob':{source:'order-oven',item:'12',en:'900 × 754 × 590 mm; three drawers: two high, one low. Cooktop cutout and appliance dimensions remain illustrative.',he:'900 × 754 × 590 מ״מ; שלוש מגירות: שתי גבוהות ואחת נמוכה. פתח הכיריים ומידות המכשיר עדיין להמחשה.',status:'confirmed'},
+ 'pullout':{source:'order-oven',item:'13',en:'500 × 754 × 590 mm; one external front, one high and one low internal drawer / bottle level.',he:'500 × 754 × 590 מ״מ; חזית חיצונית אחת, מגירה פנימית גבוהה ונמוכה / מפלס בקבוקים.',status:'confirmed'},
+ 'oven':{source:'order-oven',item:'14',en:'600 × 2,280 × 590 mm body; two lower drawers, oven, HL lift-up compartment and upper door. Internal drawers: two. Exact horizontal split heights are illustrative.',he:'גוף 600 × 2,280 × 590 מ״מ; שתי מגירות תחתונות, תנור, קלפה HL ודלת עליונה. שתי מגירות פנימיות. גובה קווי החלוקה המדויק להמחשה.',status:'confirmed'},
+ 'fridge':{source:'order-materials',item:'1',en:'Two Touch doors above the refrigerator. Order body: 1,000 × 500 × 590 mm; drawing envelope retained pending reconciliation.',he:'שתי דלתות Touch מעל המקרר. גוף בהזמנה: 1,000 × 500 × 590 מ״מ; מעטפת השרטוט נשמרת עד ליישוב ההבדל.',status:'conflict'},
+ 'island-0':{source:'order-uppers-b',item:'20',en:'400 × 754 × 590 mm cabinet; three pull-out wire baskets and one left-hinged front. Basket width is inconsistent in the order; fittings shown schematically.',he:'ארון 400 × 754 × 590 מ״מ; שלוש סלסלות רשת נשלפות וחזית בציר שמאל. רוחב הסלסלות אינו עקבי בהזמנה; הפרזול מוצג סכמטית.',status:'conflict'},
+ 'island-1':{source:'order-uppers-b',item:'21',en:'1,000 × 754 × 590 mm; three drawers: two high, one low. Island rear panel: 2,400 × 754 × 18 mm, order page 7.',he:'1,000 × 754 × 590 מ״מ; שלוש מגירות: שתי גבוהות ואחת נמוכה. גב האי: 2,400 × 754 × 18 מ״מ, עמוד 7 בהזמנה.',status:'confirmed'},
+ 'island-2':{source:'order-island',item:'22–23',en:'1,000 × 754 × 590 mm; three drawers: two high, one low. Rear panel thickness: 18 mm.',he:'1,000 × 754 × 590 מ״מ; שלוש מגירות: שתי גבוהות ואחת נמוכה. עובי גב האי: 18 מ״מ.',status:'confirmed'}
+};
+export function getSpecification(id){
+ if(id?.startsWith('upper-')){const n=Number(id.split('-')[1]);return {source:n<3?'order-uppers-a':'order-uppers-b',item:String(15+n),status:n===1?'conflict':'confirmed',en:`900 mm tall × 320 mm deep; ${n===0||n===4?'one Touch door':'two Touch doors'}; two original shelves.${n===1?' Width follows the 1,000 mm drawing, not the conflicting 900 mm order column.':''}`,he:`גובה 900 ועומק 320 מ״מ; ${n===0||n===4?'דלת Touch אחת':'שתי דלתות Touch'}; שני מדפים במפרט המקורי.${n===1?' הרוחב לפי 1,000 מ״מ בשרטוט, ולא עמודת 900 מ״מ הסותרת בהזמנה.':''}`};}
+ return SPEC[id]||null;
+}
