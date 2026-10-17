@@ -36,11 +36,11 @@ export const STONES = [
  {id:'calacatta',name:'Calacatta',he:'קלקטה',color:'#edebe4'},
  {id:'basalt',name:'Basalt',he:'בזלת',color:'#535653'}
 ];
-export const DEFAULTS={base:'chalk',upper:'chalk',stone:'taj',hardware:'black',floor:'warm',light:'day',intensity:70,led:true,dimensions:false,labels:false,openParts:[],selected:null,view:'perspective',lang:'en'};
+export const DEFAULTS={base:'chalk',upper:'chalk',stone:'taj',hardware:'black',floor:'harash',light:'day',intensity:70,led:true,dimensions:false,labels:false,openParts:[],selected:null,view:'perspective',lang:'en'};
 export const PRESETS={original:{base:'chalk',upper:'chalk',stone:'calacatta',hardware:'black'},oak:{base:'oak',upper:'chalk',stone:'taj',hardware:'brass'},warm:{base:'linen',upper:'chalk',stone:'taj',hardware:'brass'}};
 export function getModule(id){ return [...LONG,...SHORT,...UPPERS,...ISLAND_UNITS].find(m=>m.id===id); }
 export function clearance(island=ISLAND){return {workAisle:island.z-ROOM.counterDepth,returnAisle:island.x-ROOM.counterDepth};}
-export function snapshot(settings){return {schema:1,modelRevision:5,plan:'Anise drawing 167968 + technical order 168947 + Siemens EX875LYV1E / Elica BOXIN LX 90 sheets',units:'mm',dimensions:{room:ROOM,island:ISLAND,window:WINDOW},settings};}
+export function snapshot(settings){return {schema:1,modelRevision:7,plan:'Anise drawing 167968 + technical order 168947 + Siemens EX875LYV1E / Elica BOXIN LX 90 sheets + Harash MI402439 floor / VR001221 tap',units:'mm',dimensions:{room:ROOM,island:ISLAND,window:WINDOW},settings};}
 
 export const ALL_CABINETS=[...LONG.filter(m=>m.type!=='panel'),...SHORT.filter(m=>m.type!=='corner'),...UPPERS,...ISLAND_UNITS];
 export const OPENABLE_IDS=ALL_CABINETS.map(m=>m.id);

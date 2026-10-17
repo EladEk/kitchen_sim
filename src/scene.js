@@ -30,10 +30,11 @@ export function createKitchen(settings){
  }
  function cylinder(x,y,z,r,h,material,parent=group){const geo=new THREE.CylinderGeometry(r*M,r*M,h*M,24);resources.push(geo);const mesh=new THREE.Mesh(geo,material);mesh.position.set(x*M,y*M,z*M);mesh.castShadow=true;parent.add(mesh);return mesh;}
  // A cutaway room, with an actual opening for the narrow window.
- box(2725,-55,1640,5900,100,3740,mat(settings.floor==='cool'?'#d0d1ca':'#d4cec1'));
- const tileLine=new THREE.LineBasicMaterial({color:settings.floor==='cool'?'#b8bcb6':'#bcb5a8',transparent:true,opacity:.45});resources.push(tileLine);
- for(let x=-200;x<5700;x+=900){const geo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(x*M,-.002,-.2),new THREE.Vector3(x*M,-.002,3.51)]);resources.push(geo);group.add(new THREE.Line(geo,tileLine));}
- for(let z=-200;z<3600;z+=900){const geo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-.2,-.002,z*M),new THREE.Vector3(5.7,-.002,z*M)]);resources.push(geo);group.add(new THREE.Line(geo,tileLine));}
+ const floorMesh=box(2725,-55,1640,5900,100,3740,mat(settings.floor==='harash'?'#e8e7e0':settings.floor==='cool'?'#d0d1ca':'#d4cec1'));if(settings.floor==='harash'){floorMesh.userData.productId='dry-floor';floorMesh.userData.tile=[1,1];}
+ const tileLine=new THREE.LineBasicMaterial({color:settings.floor==='harash'?'#bfc3b8':settings.floor==='cool'?'#b8bcb6':'#bcb5a8',transparent:true,opacity:.45});resources.push(tileLine);
+ const tileStep=settings.floor==='harash'?1000:900,tileOrigin=settings.floor==='harash'?0:-200;
+ for(let x=tileOrigin;x<5700;x+=tileStep){const geo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(x*M,-.002,-.2),new THREE.Vector3(x*M,-.002,3.51)]);resources.push(geo);group.add(new THREE.Line(geo,tileLine));}
+ for(let z=tileOrigin;z<3600;z+=tileStep){const geo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-.2,-.002,z*M),new THREE.Vector3(5.7,-.002,z*M)]);resources.push(geo);group.add(new THREE.Line(geo,tileLine));}
  box(-75,1300,1650,150,2600,3450,wall);
  const hole=WINDOW;
  box(hole.x/2,1300,-75,hole.x,2600,150,wall);
@@ -190,7 +191,8 @@ export function createKitchen(settings){
  const sinkParent=moduleGroups.get('sink');const bowlX=350;
  box(bowlX,782,sinkZ,sinkW,16,sinkD,steel,'sink',sinkParent);
  box(bowlX-sinkW/2+4,841,sinkZ,8,125,sinkD,steel,'sink',sinkParent);box(bowlX+sinkW/2-4,841,sinkZ,8,125,sinkD,steel,'sink',sinkParent);box(bowlX,841,sinkZ-sinkD/2+4,sinkW,125,8,steel,'sink',sinkParent);box(bowlX,841,sinkZ+sinkD/2-4,sinkW,125,8,steel,'sink',sinkParent);cylinder(bowlX,793,sinkZ,27,5,metal,sinkParent);
- const faucetCurve=new THREE.CatmullRomCurve3([new THREE.Vector3(bowlX*M,.914,.055),new THREE.Vector3(bowlX*M,1.14,.055),new THREE.Vector3(bowlX*M,1.2,.15),new THREE.Vector3(bowlX*M,1.14,.26)]);const fgeo=new THREE.TubeGeometry(faucetCurve,24,.009,8,false);resources.push(fgeo);const tap=new THREE.Mesh(fgeo,metal);tap.castShadow=true;sinkParent.add(tap);cylinder(bowlX,.93/M,55,18,35,metal,sinkParent);box(bowlX+30,952,55,45,6,10,metal,sinkParent);
+ const tapSteel=mat('#b5bdb7',{metalness:.65,roughness:.42});
+ const faucetCurve=new THREE.CatmullRomCurve3([new THREE.Vector3(bowlX*M,.914,.055),new THREE.Vector3(bowlX*M,1.14,.055),new THREE.Vector3(bowlX*M,1.2,.15),new THREE.Vector3(bowlX*M,1.14,.26)]);const fgeo=new THREE.TubeGeometry(faucetCurve,24,.009,8,false);resources.push(fgeo);const tap=new THREE.Mesh(fgeo,tapSteel);tap.userData.productId='kitchen-tap';tap.userData.sku='VR001221';tap.castShadow=true;sinkParent.add(tap);cylinder(bowlX,.93/M,55,18,35,tapSteel,sinkParent);box(bowlX+30,952,55,45,6,10,tapSteel,sinkParent);cylinder(bowlX,1125,260,14,55,tapSteel,sinkParent);box(bowlX,1130,275,9,18,3,black,sinkParent);
  // Siemens EX875LYV1E: actual 812 × 520 × 51 mm envelope. Underside details
  // and the selected 780 × 500 mm cutout are a fit illustration, not fabrication data.
  const hobParent=moduleGroups.get(HOB.cabinetId),hobTop=ROOM.worktop+HOB.glassHeight;

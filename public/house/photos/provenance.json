@@ -1,0 +1,58 @@
+{
+  "source": "Owner attachments in this conversation",
+  "dimensions": "Not a calibrated survey",
+  "items": [
+    {
+      "original": "01-277867.jpg",
+      "sha256": "54623a8f2aff0953b9edb6d31309bd483c3da52b8a4537ea8e370954219afdc7",
+      "preview": "photo-1.jpg"
+    },
+    {
+      "original": "02-277869.jpg",
+      "sha256": "8612447eb12b1915d3d99813fb6472dec0b2cb074a3c0a48f2fe448653a8209c",
+      "preview": "photo-2.jpg"
+    },
+    {
+      "original": "03-277875.jpg",
+      "sha256": "9477791812668761f2534ef287864aa0b94823a2a8cf1a74d919d35cf1f08650",
+      "preview": "photo-3.jpg"
+    },
+    {
+      "original": "04-277878.jpg",
+      "sha256": "1a6d541b91236221135651e21b3380eadec13e4939a5314e182253d39c15a2f5",
+      "preview": "photo-4.jpg"
+    },
+    {
+      "original": "05-277877.jpg",
+      "sha256": "2767a0941996303561e2c85ed5863401b7f703ef2bdc16b3574c9a41c704d8ce",
+      "preview": "photo-5.jpg"
+    },
+    {
+      "original": "06-277882.jpg",
+      "sha256": "e1d572703923420639fa149f950490af64e5e34ae38d22046973c37b0dc7ea95",
+      "preview": "photo-6.jpg"
+    },
+    {
+      "original": "07-277886.jpg",
+      "sha256": "250a55efe02f5766c613904f08485c0b655651a5a4ca24411a3a5810f8110c26",
+      "preview": "photo-7.jpg"
+    },
+    {
+      "original": "08-277887.jpg",
+      "sha256": "83f6d690764c5c54f41468597c227e26e3c57291d1f8077e89e97ab66f715500",
+      "preview": "photo-8.jpg"
+    },
+    {
+      "original": "09-277893.jpg",
+      "sha256": "5a65d983e3d2007645d102e1e96f60e1990c60873ad8d516aaed879701aa2de3",
+      "preview": "photo-9.jpg"
+    },
+    {
+      "original": "277904.mp4",
+      "sha256": "f29792fe1aa136a45b9902e9328698468627c4c8209e6a805a462de800108d45",
+      "durationSeconds": 32.332896,
+      "preview": "walkthrough.mp4",
+      "previewEncoding": "H.264/AAC, 540x960, original audio retained, reduced size"
+    }
+  ]
+}

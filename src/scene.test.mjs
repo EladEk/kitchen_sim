@@ -8,6 +8,10 @@ import {HOB,HOOD,appliancePlacement} from './appliances.mjs';
 // Material painting is intentionally mocked. Geometry is the real Three.js scene.
 const context=new Proxy({}, {get:(obj,key)=>obj[key]||(()=>{}),set:(obj,key,v)=>(obj[key]=v,true)});
 globalThis.document={createElement:()=>({width:512,height:512,getContext:()=>context})};
+test('detailed kitchen uses the Harash 100 cm floor and brushed VR001221 tap independently of handle finish',()=>{
+ const scene=createKitchen({...DEFAULTS,floor:'harash',hardware:'black'});let floor,tap;scene.group.traverse(o=>{if(o.userData.productId==='dry-floor')floor=o;if(o.userData.productId==='kitchen-tap')tap=o;});
+ assert(floor);assert.deepEqual(floor.userData.tile,[1,1]);assert(tap);assert.equal(tap.userData.sku,'VR001221');assert(tap.material.metalness>.6);assert(tap.material.color.r>.3);scene.dispose();
+});
 test('both closed daylight and open evening scenes build finite metric geometry',()=>{
  for(const settings of [DEFAULTS,{...DEFAULTS,base:'oak',upper:'sage',stone:'basalt',light:'evening',openParts:OPENING_IDS,dimensions:true,selected:'island-1'}]){
   const scene=createKitchen(settings);scene.group.updateMatrixWorld(true);assert.ok(scene.picks.length>50);let meshes=0;
