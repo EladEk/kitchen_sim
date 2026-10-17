@@ -10,6 +10,11 @@ export function buildGardenArchitecture({group,box,mat,settings,mode}){
  for(const run of L.fence.runs){
   const p=node(run.id),vertical=run.a[0]===run.b[0],cx=(run.a[0]+run.b[0])/2,cz=(run.a[1]+run.b[1])/2;
   const beam=(y,h,thickness,material,part)=>{const m=box(cx,y,cz,vertical?thickness:run.length,h,vertical?run.length:thickness,material,p,data(run.id));m.userData.part=part;return m;};
+  if(run.style==='shared-wall'){
+   beam((L.fence.height-.035)/2,L.fence.height-.035,.12,mat('#c9bd9e'),'existing-neighbour-wall');
+   beam(L.fence.height-.0175,.035,.16,mat('#e0d9c8'),'neighbour-stone-coping');
+   continue;
+  }
   beam(L.fence.curb/2,L.fence.curb,.08,stone,'fence-stone-base');
   for(let i=0;i<10;i++)beam(L.fence.curb+.005+L.fence.slat/2+i*(L.fence.slat+L.fence.gap),L.fence.slat,.025,grey,'horizontal-fence-slat');
   const count=Math.ceil(run.length/L.fence.maxSpacing);

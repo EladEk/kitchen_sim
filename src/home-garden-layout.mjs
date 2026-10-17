@@ -11,7 +11,7 @@ export function createGardenLayout(point){
  const fenceRuns=[
   {id:'fence-west',he:'גדר מערבית',en:'West fence',a:[plot.minX,plot.minZ],b:[plot.minX,plot.maxZ]},
   {id:'fence-south',he:'גדר דרומית',en:'South fence',a:[plot.minX,plot.maxZ],b:[plot.maxX,plot.maxZ]},
-  {id:'fence-east',he:'גדר מזרחית',en:'East fence',a:[plot.maxX,plot.maxZ],b:[plot.maxX,plot.minZ]},
+  {id:'fence-east',he:'הקיר עם השכן',en:'Neighbour boundary wall',style:'shared-wall',a:[plot.maxX,plot.maxZ],b:[plot.maxX,plot.minZ]},
   {id:'fence-north',he:'גדר לצד היציאה',en:'Fence beside the terrace',a:[plot.minX,plot.minZ],b:[northEnd,plot.minZ]}
  ].map(run=>({...run,length:Math.hypot(run.b[0]-run.a[0],run.b[1]-run.a[1])}));
  const fence={height:1.5,curb:.3,panel:1.2,slat:.11,gap:.01,post:.06,maxSpacing:.8,color:'#696d6d',runs:fenceRuns};
@@ -26,10 +26,12 @@ export function createGardenLayout(point){
   {id:'upper-balcony',he:'המרפסת הקיימת שמעל',en:'Existing upstairs balcony',dimensions:[upper.maxZ-upper.minZ,upper.maxX-upper.minX,.2],bottom:2.75,source:'garden-design',page:4,
    noteHe:'קו השפה לפי קו הקומה שמעל בתוכנית; צורת המעקה והחזית לפי תמונות החוץ. גובה התחתית, עובי התקרה ופרטי המעקה משוערים. הפרגולה החדשה מכסה רק את רוחב הריצוף הקיים.',
    noteEn:'The front edge follows the plan’s upper-floor line; fascia and railing follow exterior photos. Soffit height, slab thickness and railing details are assumed. The new pergola covers only the existing terrace width.'},
-  ...fenceRuns.map(run=>({id:run.id,he:run.he,en:run.en,dimensions:[run.length,.06,fence.height],dimensionLabels:[['אורך המקטע','Run length'],['עובי משוער','Assumed thickness'],['גובה כולל','Overall height']],
+  ...fenceRuns.map(run=>run.style==='shared-wall'?{id:run.id,he:run.he,en:run.en,dimensions:[run.length,.12,fence.height],dimensionLabels:[['אורך המקטע','Run length'],['עובי משוער','Assumed thickness'],['גובה משוער','Assumed height']],planned:false,source:'service-yard',page:3,originLabel:['קיר קיים לפי הצילום · מידות משוערות','Photo-observed wall · assumed dimensions'],
+   noteHe:'קיר ההפרדה עם השכן מופיע בתמונת חצר השירות: טיח בהיר וקופינג אבן. הקו בתוכנית נשמר, והמחסן המוצע עומד לאורכו. הגובה המוצג 150 ס״מ ועובי 12 ס״מ הם הנחות תצוגה; התמונות אינן מדידה של הקיר.',
+   noteEn:'The service-yard photo shows a pale rendered neighbour boundary with stone coping. Its plan line is retained and the proposed shed runs alongside it. Displayed 150 cm height and 12 cm thickness are assumptions; the photographs do not measure the wall.'}:({id:run.id,he:run.he,en:run.en,dimensions:[run.length,.06,fence.height],dimensionLabels:[['אורך המקטע','Run length'],['עובי משוער','Assumed thickness'],['גובה כולל','Overall height']],
    metrics:[{he:'שלבי הגדר מעל הבסיס',en:'Panel above base',value:fence.panel,unit:'m'},{he:'בסיס אבן משוער',en:'Assumed stone base',value:fence.curb,unit:'m'}],source:'garden-design',page:5,
    noteHe:'גובה כולל 150 ס״מ מהריצוף: פנל 120 ס״מ מעל בסיס אבן משוער של 30 ס״מ. שלבי מודולינה אופקיים ברוחב 11 ס״מ, אפור 1200 מגורען לפי הדוגמה. תוואי הגדר הקיים נשמר; אורך 37 מ׳ בהצעה אינו מדידה מאומתת של כל ההיקף.',
    noteEn:'Overall 150 cm above paving: a 120 cm panel on an assumed 30 cm stone base. Horizontal 11 cm Modolina profiles, textured grey 1200 per your example. Existing boundary runs are retained; the quote’s 37 m is not a verified full-perimeter measurement.'}))
- ].map(e=>({...e,roomId:'terrace',planned:e.id!=='upper-balcony',dimensionsInferred:true}));
+ ].map(e=>({...e,roomId:'terrace',planned:e.planned??(e.id!=='upper-balcony'),dimensionsInferred:true}));
  return {paving,finished,pergola,balcony,bounds:b,upper,posts,fence,width,depth,pavingArea:width*(p.maxX-p.minX),pergolaArea:width*depth,elements};
 }

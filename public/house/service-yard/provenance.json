@@ -1,0 +1,50 @@
+{
+  "source": "house-plan.pdf",
+  "sourceSha256": "c170670c7e5c4ba376b9102e3ee3cc3ac7db0029aee979e7bf6238814e0d8782",
+  "notes": "Unmodified crop previews. Chamber centre traced from symbol outer ring: [1183.97,868.17,1240.81,925.01] PDF points. Legend identifies sewage/drainage chamber; physical lid diameter remains unknown.",
+  "items": [
+    {
+      "page": 1,
+      "sourcePage": 1,
+      "cropPdfPoints": [
+        900,
+        350,
+        1300,
+        1060
+      ],
+      "preview": "reference-1.jpg",
+      "sha256": "6c39ebd77faae18ac3666df391fbdc09f398749f82e4b3a6117ef4c235005f58"
+    },
+    {
+      "page": 2,
+      "sourcePage": 1,
+      "cropPdfPoints": [
+        10,
+        305,
+        180,
+        520
+      ],
+      "preview": "reference-2.jpg",
+      "sha256": "f117bd7a61608804b0de786bf6f7855928a5aab7074de7b192b4d0d87f09ec7c"
+    },
+    {
+      "page": 3,
+      "kind": "owner-photo",
+      "original": "01-273512.jpg",
+      "originalSha256": "0afb11f68da01f48df1e4e440090f909515aa0e9f12f219023f4d4b799036171",
+      "preview": "reference-3.jpg",
+      "sha256": "2e272822ff37ab1c870d2eb33845f815a2b71f014e1b68196b09b01dc7310d82",
+      "lidVisuallyConfirmed": false
+    },
+    {
+      "page": 4,
+      "kind": "owner-photo",
+      "original": "02-273513.jpg",
+      "originalSha256": "53ceb96bc8f9850d087fccc650b7ef748289daa0637d7c5cfec3a2bf6725ae20",
+      "preview": "reference-4.jpg",
+      "sha256": "5fea9becaef457e9c74d88f0dd67d44217dda0c8aa0e8279d4c70406edd9a027",
+      "lidVisuallyConfirmed": false
+    }
+  ],
+  "photoAssessment": "No chamber lid can be confidently identified in either owner photo. Sand and the foreground railing obscure the ground. Plan-symbol location is retained; photographs do not establish a new chamber centre or diameter."
+}

@@ -1,0 +1,50 @@
+{
+  "sourceSha256": "c170670c7e5c4ba376b9102e3ee3cc3ac7db0029aee979e7bf6238814e0d8782",
+  "items": [
+    {
+      "page": 1,
+      "file": "reference-1.jpg",
+      "originalFile": "01-277901.jpg",
+      "sha256": "ac4d369f82d63482fdb167b7b635865b2e989f83ec124bedb1cd863e6d97fa30",
+      "originalSha256": "ac4d369f82d63482fdb167b7b635865b2e989f83ec124bedb1cd863e6d97fa30",
+      "metricScale": false
+    },
+    {
+      "page": 2,
+      "file": "reference-2.jpg",
+      "originalFile": "02-277902.jpg",
+      "sha256": "b887457dcd7323f505de8513ebf0625f822ebec8b420d7bdba6b49a448f4a906",
+      "originalSha256": "b887457dcd7323f505de8513ebf0625f822ebec8b420d7bdba6b49a448f4a906",
+      "metricScale": false
+    },
+    {
+      "page": 3,
+      "file": "reference-3.jpg",
+      "originalFile": "03-290216.jpg",
+      "sha256": "caee4506c5fae6216751cf2365d3d6bdffdc7815f59b21981c2c7e94b4755088",
+      "originalSha256": "caee4506c5fae6216751cf2365d3d6bdffdc7815f59b21981c2c7e94b4755088",
+      "metricScale": false
+    },
+    {
+      "page": 4,
+      "file": "reference-4.jpg",
+      "originalFile": "02-273513.jpg",
+      "sha256": "53ceb96bc8f9850d087fccc650b7ef748289daa0637d7c5cfec3a2bf6725ae20",
+      "originalSha256": "53ceb96bc8f9850d087fccc650b7ef748289daa0637d7c5cfec3a2bf6725ae20",
+      "metricScale": false
+    },
+    {
+      "page": 5,
+      "file": "reference-5.jpg",
+      "cropPdfPoints": [
+        1060,
+        330,
+        1300,
+        580
+      ],
+      "sha256": "a67da5008396bd506d94ac0ab057223a2af0a94fe8a13263e6ceb5b6933af88e"
+    }
+  ],
+  "acModelsIdentified": false,
+  "measuredAcSizes": false
+}

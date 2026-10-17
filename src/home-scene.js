@@ -6,6 +6,8 @@ import {claddingHeight,DOUBLE_GLAZED_IDS} from './home-building-spec.mjs';
 import {SHUTTER_COVERS} from './home-photo-reference.mjs';
 import {buildObservedArchitecture} from './home-observed-scene.js';
 import {buildGardenArchitecture} from './home-garden-scene.js';
+import {buildServiceYard} from './service-yard-scene.js';
+import {buildExteriorDetails} from './home-exterior-scene.js';
 import {LONG,SHORT,UPPERS,ISLAND,ISLAND_UNITS,MATERIALS,STONES,DEFAULTS} from './model.mjs';
 
 export function createHomeScene(settings,{mode='overview',selectedRoom='living',kitchenSettings=DEFAULTS}={}){
@@ -28,7 +30,7 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
  function roomMaterial(id){const value=settings.rooms[id]||settings.rooms.living;return value?.wall==='ordered-mona'?'#e9e5db':HOME_FINISHES.find(f=>f.id===value?.wall)?.color||'#e9e5db';}
  const green=mat('#90a17b');floor(PLOT,green,-.035);floor(PUBLIC_ENTRY,mat('#b9b9af'),-.01);floor(HOUSE_OUTLINE,mat('#d8d3c5'),0);
  if(mode==='walk'){const ceiling=floor(HOUSE_OUTLINE,offwhite,HOUSE.height);ceiling.userData.part='illustrative-ceiling';}
- floor(SERVICE_APRON,mat('#c7c7b8'),.004);
+
  function roomFloor(room,poly,parent,data){
   const f=FLOOR_FINISHES.find(f=>f.id===settings.rooms[room.id]?.floor)||FLOOR_FINISHES[0],m=floor(poly,mat(f.color),.008,parent,data);m.userData.floorFinish=f.id;m.userData.tile=f.tile||null;m.userData.productId=f.productId;
   const b=polygonBounds(poly),pts=[],sx=f.tile?.[0]||(f.id==='oak'?.16:.8),sz=f.tile?.[1]||.8;
@@ -41,6 +43,8 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
  const gardenGroups=buildGardenArchitecture({group,box,mat,settings,mode}),pavingGroup=new THREE.Group();
  pavingGroup.userData={buildingId:'garden-paving',planned:true,dimensionsInferred:true};roomGroups.get('terrace').add(pavingGroup);gardenGroups.set('garden-paving',pavingGroup);
  roomFloor(ROOMS.find(r=>r.id==='terrace'),GARDEN_LAYOUT.paving,pavingGroup,{action:'building',buildingId:'garden-paving',roomId:'terrace'});
+ for(const [id,p] of buildServiceYard({group,box,cylinder,floor,lines,mat,resources,motions,settings,mode}))gardenGroups.set(id,p);
+ for(const [id,p] of buildExteriorDetails({group,box,cylinder,floor,lines,mat,resources,settings,mode}))gardenGroups.set(id,p);
  for(const def of GARDEN_PLANTS){const p=new THREE.Group();p.userData.plantId=def.id;group.add(p);plant(def.position[0],def.position[1],def.size,p);}
  // One construction opening per host door; a secondary leaf shares its hole.
  // Opening heights follow the RG/RG1 table, while sill/ceiling heights are assumed.
@@ -91,7 +95,7 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
    }
   }else{
    const sign=d.hinge==='end'?-1:1,pivot=new THREE.Group(),openTarget=(d.swing||-1)*Math.PI*.48;pivot.position.x=-sign*d.width/2;pivot.rotation.y=isOpen?openTarget:0;p.add(pivot);motions.push({id:`door:${d.id}`,object:pivot,property:'y',axis:'rotation',target:pivot.rotation.y,openTarget});
-   box(sign*d.width/2,h/2,0,d.width-.045,h-.025,d.id==='safe'?.065:.035,d.material==='steel'?mat('#c0c7bd'):offwhite,pivot,data,.009);box(sign*(d.width-.12),h*.48,.035,.095,.018,.04,steel,pivot,data);
+   box(sign*d.width/2,h/2,0,d.width-.045,h-.025,d.id==='safe'?.065:.035,d.material==='steel'?mat(d.id==='service-exit'?'#3e4946':'#c0c7bd'):offwhite,pivot,data,.009);box(sign*(d.width-.12),h*.48,.035,.095,.018,.04,steel,pivot,data);
   }
  }
  // Curtain outside the glass; the photographed dark access cover faces inside.

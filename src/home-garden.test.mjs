@@ -42,7 +42,7 @@ test('roof visibility preserves supports, all openings, and permanent features w
   assert(!parts(hidden).includes('pergola-shade-profile'));assert(!parts(hidden).includes('upper-balcony-slab'));assert(!parts(hidden).includes('upper-balcony-edge'));
   assert.equal(parts(hidden).filter(s=>s==='pergola-post').length,4);assert.equal(hidden.furnitureGroups.size,0);
   assert.equal(hidden.doorGroups.size,visible.doorGroups.size);assert.deepEqual(hidden.motions.filter(m=>m.id.startsWith('door:')).map(m=>[m.id,m.target]),visible.motions.filter(m=>m.id.startsWith('door:')).map(m=>[m.id,m.target]));
-  for(const run of L.fence.runs){const p=hidden.gardenGroups.get(run.id);p.updateWorldMatrix(true,true);near(bounds(p).max.y,1.5);const slats=p.children.filter(o=>o.userData.part==='horizontal-fence-slat');assert.equal(slats.length,10);for(const slat of slats){near(slat.geometry.parameters.height,.11);assert(slat.geometry.parameters.width>1||slat.geometry.parameters.depth>1,'slats run horizontally');}}
+  for(const run of L.fence.runs){const p=hidden.gardenGroups.get(run.id);p.updateWorldMatrix(true,true);near(bounds(p).max.y,1.5);const slats=p.children.filter(o=>o.userData.part==='horizontal-fence-slat');assert.equal(slats.length,run.style==='shared-wall'?0:10);if(run.style==='shared-wall')assert(p.children.some(o=>o.userData.part==='existing-neighbour-wall'));for(const slat of slats){near(slat.geometry.parameters.height,.11);assert(slat.geometry.parameters.width>1||slat.geometry.parameters.depth>1,'slats run horizontally');}}
  }finally{visible.dispose();hidden.dispose();}
 });
 
