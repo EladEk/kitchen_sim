@@ -1,0 +1,114 @@
+{
+  "source": "Owner attachments in this conversation",
+  "notes": "Previews are resized only. Original uploads are unchanged. Example dimensions do not establish as-built dimensions.",
+  "references": [
+    {
+      "page": 1,
+      "original": "01-IMG_20261017_143057.jpg",
+      "originalSha256": "14482abb38de65fc988a3023b53637ad1a92e279f7ea9be822f6ca06e9a626ef",
+      "originalSize": [
+        1536,
+        1152
+      ],
+      "preview": "reference-1.jpg",
+      "previewSha256": "287eca1838214f02afbd90f054b240ddf188f4184373169ba1ef1fc12f09bcdd",
+      "kind": "existing-condition-photo"
+    },
+    {
+      "page": 2,
+      "original": "02-IMG_20261017_141723.jpg",
+      "originalSha256": "03ca7d129d2ef4ada6e67f853a74ae7c8e80d17b15f8edd90ddc1e62f35420d8",
+      "originalSize": [
+        1536,
+        1152
+      ],
+      "preview": "reference-2.jpg",
+      "previewSha256": "ab96d0213c07cae24ae4d5b6d177838fca4e6a8e3eae655d8a64615fbc5205aa",
+      "kind": "existing-condition-photo"
+    },
+    {
+      "page": 3,
+      "original": "03-IMG_20261017_141725.jpg",
+      "originalSha256": "f53ca08f75f07fca08dfb22a1816e1972212d1e8769bf9a44b123667a6450b69",
+      "originalSize": [
+        1536,
+        1152
+      ],
+      "preview": "reference-3.jpg",
+      "previewSha256": "91954d9ef9194d25ab9ab84be3ac25bc0f3ede67ff2d9965a9a01952653eb629",
+      "kind": "existing-condition-photo"
+    },
+    {
+      "page": 4,
+      "original": "04-IMG_20261017_141731.jpg",
+      "originalSha256": "6dd83902cf96eb458c6765f15d841dbf69d58be7195103067fef22a46493ba65",
+      "originalSize": [
+        1536,
+        1152
+      ],
+      "preview": "reference-4.jpg",
+      "previewSha256": "787da7f8dc54dff99f4d95b3ab13f9f8bee41cc11bd893f7f3b8add2240fd958",
+      "kind": "existing-condition-photo"
+    },
+    {
+      "page": 5,
+      "original": "01-Screenshot_2026-10-17-19-18-15-752_com.android.chrome.jpg",
+      "originalSha256": "c90305fa57effebb5c5240d64a221df5e1818bffe5f1ba0ac1219619444fb282",
+      "originalSize": [
+        709,
+        1536
+      ],
+      "preview": "reference-5.jpg",
+      "previewSha256": "805d321239696ee92e2ee5c46b05fee54c067980c98292ef65e79e560898949e",
+      "kind": "design-example"
+    },
+    {
+      "page": 6,
+      "original": "03-Screenshot_2026-10-17-19-18-30-313_com.android.chrome.jpg",
+      "originalSha256": "108f7563b04262b6be8c4de226a955f062d8b2f323023a363fad56fb1165c70c",
+      "originalSize": [
+        709,
+        1536
+      ],
+      "preview": "reference-6.jpg",
+      "previewSha256": "1df7a2f4162a1f06fd744deeaef6666ac335b2323dbc6b1e16991d45d4270036",
+      "kind": "design-example"
+    },
+    {
+      "page": 7,
+      "original": "05-Screenshot_2026-10-17-19-19-32-202_com.android.chrome.jpg",
+      "originalSha256": "675376aed18e48b400115201e5d5b49120f0d9a223baef314fe6445e764ffc50",
+      "originalSize": [
+        709,
+        1536
+      ],
+      "preview": "reference-7.jpg",
+      "previewSha256": "8ee706021a07493eff29b7ad83ca71e956469df8edabc11d7032dd422134fd73",
+      "kind": "design-example"
+    },
+    {
+      "page": 8,
+      "original": "06-Screenshot_2026-10-17-19-19-34-405_com.android.chrome.jpg",
+      "originalSha256": "3761bf0aee90cdd04e4c79b7e230bec1c7c7ff25caaadf67894284089f7dfaa0",
+      "originalSize": [
+        709,
+        1536
+      ],
+      "preview": "reference-8.jpg",
+      "previewSha256": "53c9bfcba6f5e1b72dc72d0475413af06a45953dd8f8091507445d64a678be7f",
+      "kind": "design-example"
+    },
+    {
+      "page": 9,
+      "original": "08-Screenshot_2026-10-17-19-19-39-890_com.android.chrome.jpg",
+      "originalSha256": "f4a7a8bdfeb512fc0afb773cff56420dba11888b2107f26be8a06ffa93d34fe6",
+      "originalSize": [
+        709,
+        1536
+      ],
+      "preview": "reference-9.jpg",
+      "previewSha256": "a959934dc12ef7d82688f8d1b041226862008209b20e462f43c680cc661bb3d3",
+      "kind": "design-example"
+    }
+  ]
+}

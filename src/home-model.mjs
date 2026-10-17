@@ -1,5 +1,6 @@
 import {OUTDOOR_KITCHEN} from './home-products.mjs';
 import {OPENING_SCHEDULE,DOOR_HANDINGS,SHUTTER_IDS} from './home-building-spec.mjs';
+import {createGardenLayout} from './home-garden-layout.mjs';
 // Traced from the attached RG1 plan, page 1 (1318 × 1120 PDF points).
 // The nominal 1:50 scale is 0.017638889 metres/PDF point. Printed room
 // dimensions are retained separately: several finish-size labels are 5–7 cm
@@ -9,7 +10,9 @@ export const PLAN_ORIGIN=[606,45.7];
 export const point=(x,z)=>[(x-PLAN_ORIGIN[0])*PLAN_SCALE,(z-PLAN_ORIGIN[1])*PLAN_SCALE];
 const polygon=a=>a.map(p=>point(...p));
 const rect=(x0,z0,x1,z1)=>[[x0,z0],[x1,z0],[x1,z1],[x0,z1]];
-export const HOUSE={height:2.75,eyeHeight:1.62,playerRadius:.17,source:'/house/house-plan.pdf',image:'/house/house-plan.jpg',revision:12,scale:50};
+export const HOUSE={height:2.75,eyeHeight:1.62,playerRadius:.17,source:'/house/house-plan.pdf',image:'/house/house-plan.jpg',revision:13,scale:50};
+export const GARDEN_LAYOUT=createGardenLayout(point);
+export const gardenElement=id=>GARDEN_LAYOUT.elements.find(e=>e.id===id);
 export const HOUSE_OUTLINE=polygon([[671.22,37.2],[1141.74,37.2],[1141.74,159.1],[1269.3,159.1],[1269.3,366.04],[1187.1,366.04],[1187.1,451.06],[1087.92,451.06],[1087.92,717.52],[1002.84,717.52],[1002.84,938.62],[589.02,938.62],[589.02,297.98],[671.22,297.98]]);
 export const PLOT=polygon(rect(273.84,42.28,1277.82,1032.94));
 export const PUBLIC_ENTRY=polygon(rect(1141.74,42.28,1277.82,159.1));
@@ -133,21 +136,22 @@ export function furnitureParts(f){
 export const ALL_HOME_PARTS=FURNITURE.flatMap(furnitureParts);
 export const HOME_FINISHES=[{id:'ordered-mona',he:'מונה 25×75','en':'Mona 25×75',color:'#c1c4c0',tile:[.75,.25],productId:'wet-wall'},{id:'ivory',he:'שנהב',en:'Ivory',color:'#e9e5db'},{id:'sand',he:'חול',en:'Sand',color:'#ccbfa8'},{id:'sage',he:'מרווה',en:'Sage',color:'#a4b09a'},{id:'clay',he:'חרס',en:'Clay',color:'#c3a28e'},{id:'slate',he:'אפור',en:'Slate',color:'#99a5a7'}];
 export const FLOOR_FINISHES=[{id:'ordered-white',he:'שיק לבן מט 100×100',en:'Chic white 100×100',color:'#e8e7e0',tile:[1,1],productId:'dry-floor'},{id:'ordered-wet',he:'קלסיקו אפור 30×30',en:'Classico grey 30×30',color:'#a4a6a3',tile:[.3,.3],productId:'wet-floor'},{id:'ordered-terrace',he:'הביטאט דאון 15×60',en:'Habitat Dawn 15×60',color:'#b2a58e',tile:[.15,.6],productId:'terrace-floor'},{id:'stone',he:'אבן בהירה',en:'Light stone',color:'#d9d3c5'},{id:'oak',he:'אלון',en:'Oak',color:'#b89a73'},{id:'warm',he:'אבן חמה',en:'Warm stone',color:'#c5b39a'}];
-export const HOME_DEFAULTS={schema:2,lang:'he',light:'day',cutaway:true,labels:true,furniture:true,openDoors:['patio'],openParts:[],closedShutters:[],rooms:{},showGarden:true};
+export const HOME_DEFAULTS={schema:2,lang:'he',light:'day',cutaway:true,labels:true,furniture:true,pergolaRoof:true,openDoors:['patio'],openParts:[],closedShutters:[],rooms:{},showGarden:true};
 export function normalizeHomeSettings(value={}){
  if(!value||typeof value!=='object')value={};
  const validDoors=new Set(DOORS.map(d=>d.id)),validParts=new Set(ALL_HOME_PARTS.map(p=>p.id)),rooms={};
  const current=value.schema===2;
  for(const r of ROOMS){const v=value.rooms?.[r.id]||{},wet=['bathroom','ensuite','powder'].includes(r.id),floorDefault=r.id==='terrace'?'ordered-terrace':wet||r.id==='laundry'?'ordered-wet':'ordered-white';rooms[r.id]={wall:current&&HOME_FINISHES.some(f=>f.id===v.wall)?v.wall:wet?'ordered-mona':HOME_FINISHES.some(f=>f.id===v.wall)?v.wall:'ivory',floor:current&&FLOOR_FINISHES.some(f=>f.id===v.floor)?v.floor:floorDefault,wood:['oak','white','dark'].includes(v.wood)?v.wood:'oak'};}
 
- return {...HOME_DEFAULTS,lang:value.lang==='en'?'en':'he',light:value.light==='evening'?'evening':'day',cutaway:typeof value.cutaway==='boolean'?value.cutaway:true,labels:value.labels!==false,furniture:value.furniture!==false,openDoors:[...new Set((Array.isArray(value.openDoors)?value.openDoors:HOME_DEFAULTS.openDoors).filter(x=>validDoors.has(x)))],openParts:[...new Set((Array.isArray(value.openParts)?value.openParts:[]).filter(x=>validParts.has(x)))],closedShutters:[...new Set((Array.isArray(value.closedShutters)?value.closedShutters:[]).filter(id=>SHUTTER_IDS.includes(id)))],rooms};
+ return {...HOME_DEFAULTS,lang:value.lang==='en'?'en':'he',light:value.light==='evening'?'evening':'day',cutaway:typeof value.cutaway==='boolean'?value.cutaway:true,labels:value.labels!==false,furniture:value.furniture!==false,pergolaRoof:value.pergolaRoof!==false,openDoors:[...new Set((Array.isArray(value.openDoors)?value.openDoors:HOME_DEFAULTS.openDoors).filter(x=>validDoors.has(x)))],openParts:[...new Set((Array.isArray(value.openParts)?value.openParts:[]).filter(x=>validParts.has(x)))],closedShutters:[...new Set((Array.isArray(value.closedShutters)?value.closedShutters:[]).filter(id=>SHUTTER_IDS.includes(id)))],rooms};
 }
 export function insidePolygon(p,poly){let inside=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++){const [xi,zi]=poly[i],[xj,zj]=poly[j];if(((zi>p[1])!==(zj>p[1]))&&p[0]<(xj-xi)*(p[1]-zi)/(zj-zi)+xi)inside=!inside;}return inside;}
 export function polygonBounds(poly){return {minX:Math.min(...poly.map(p=>p[0])),maxX:Math.max(...poly.map(p=>p[0])),minZ:Math.min(...poly.map(p=>p[1])),maxZ:Math.max(...poly.map(p=>p[1]))};}
-export function roomAt(p){return ROOMS.filter(r=>!['garden','outdoor'].includes(r.kind)).find(r=>insidePolygon(p,r.polygon))?.id||(insidePolygon(p,TERRACE)?'terrace':insidePolygon(p,PLOT)&&!insidePolygon(p,HOUSE_OUTLINE)?'garden':'hall');}
+export function roomAt(p){return ROOMS.filter(r=>!['garden','outdoor'].includes(r.kind)).find(r=>insidePolygon(p,r.polygon))?.id||(insidePolygon(p,GARDEN_LAYOUT.finished)?'terrace':insidePolygon(p,PLOT)&&!insidePolygon(p,HOUSE_OUTLINE)?'garden':'hall');}
 const boxForWall=(wall,a,b)=>{const v=Math.abs(wall.a[0]-wall.b[0])<.001;return v?{minX:wall.a[0]-wall.thickness/2,maxX:wall.a[0]+wall.thickness/2,minZ:a,maxZ:b}:{minX:a,maxX:b,minZ:wall.a[1]-wall.thickness/2,maxZ:wall.a[1]+wall.thickness/2};};
 export function collisionBoxes(openDoors=[],withFurniture=true,closedShutters=[]){
  const opened=new Set(openDoors),result=[];
+ for(const p of GARDEN_LAYOUT.posts)result.push({minX:p.x-p.size/2,maxX:p.x+p.size/2,minZ:p.z-p.size/2,maxZ:p.z+p.size/2,pergolaPostId:p.id});
  for(const w of WALLS){const vertical=Math.abs(w.a[0]-w.b[0])<.001,low=vertical?w.a[1]:w.a[0],high=vertical?w.b[1]:w.b[0];let start=low;
   for(const d of DOORS.filter(d=>d.wallId===w.id&&!d.hostDoorId).sort((a,b)=>a.start-b.start)){
    if(d.start>start)result.push(boxForWall(w,start,d.start));

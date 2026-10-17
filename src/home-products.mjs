@@ -1,4 +1,5 @@
 import {PHOTO_SOURCE} from './home-photo-reference.mjs';
+import {GARDEN_SOURCE} from './home-garden-reference.mjs';
 // Transcription of the PDFs attached by the owner. Product codes and
 // dimensions are facts from those documents; no retail images or CAD are implied.
 export const HOUSE_SOURCES=[
@@ -7,7 +8,7 @@ export const HOUSE_SOURCES=[
  {id:'hercules',he:'מטבח חוץ הרקולס',en:'Hercules outdoor kitchen',pdf:'/house/hercules.pdf',image:'/house/hercules.jpg'},
  {id:'apartment-spec',he:'מפרט הדירה — RG/RG1',en:'Apartment specification — RG/RG1',pdf:'/house/apartment-spec.pdf',image:'/house/apartment-spec-16.jpg',pages:[11,12,16,17,26,30,31,32,33,34],imagePrefix:'/house/apartment-spec-'},
  {id:'building-plan',he:'תוכנית הבניין — קומת גן',en:'Building plan — ground floor',pdf:'/house/building-plan.pdf',image:'/house/building-plan-3.jpg',pages:[2,3],imagePrefix:'/house/building-plan-'},
- PHOTO_SOURCE
+ PHOTO_SOURCE,GARDEN_SOURCE
 ];
 export const OUTDOOR_KITCHEN={width:3.1,depth:.7,sinkWidth:.8,grillWidth:1.5,fridgeWidth:.8,height:.9,heightInferred:true,source:'hercules',page:1};
 const dry=['living','kitchen','bedroom-a','bedroom-b','master','bedroom-c','safe-room','hall'],wet=['bathroom','ensuite','powder','laundry'];

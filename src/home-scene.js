@@ -1,10 +1,11 @@
 import * as THREE from 'three';
 import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
-import {HOUSE,HOUSE_OUTLINE,PLOT,TERRACE,SERVICE_APRON,PUBLIC_ENTRY,ROOMS,WALLS,DOORS,WINDOWS,SHUTTERS,FURNITURE,GARDEN_PLANTS,HOME_FINISHES,FLOOR_FINISHES,KITCHEN_ANCHOR,point,polygonBounds,insidePolygon,roomAt,openingPoint} from './home-model.mjs';
+import {HOUSE,HOUSE_OUTLINE,PLOT,TERRACE,SERVICE_APRON,PUBLIC_ENTRY,ROOMS,WALLS,DOORS,WINDOWS,SHUTTERS,FURNITURE,GARDEN_PLANTS,HOME_FINISHES,FLOOR_FINISHES,KITCHEN_ANCHOR,GARDEN_LAYOUT,point,polygonBounds,insidePolygon,roomAt,openingPoint} from './home-model.mjs';
 import {buildOutdoorKitchen} from './outdoor-kitchen.js';
 import {claddingHeight,DOUBLE_GLAZED_IDS} from './home-building-spec.mjs';
 import {SHUTTER_COVERS} from './home-photo-reference.mjs';
 import {buildObservedArchitecture} from './home-observed-scene.js';
+import {buildGardenArchitecture} from './home-garden-scene.js';
 import {LONG,SHORT,UPPERS,ISLAND,ISLAND_UNITS,MATERIALS,STONES,DEFAULTS} from './model.mjs';
 
 export function createHomeScene(settings,{mode='overview',selectedRoom='living',kitchenSettings=DEFAULTS}={}){
@@ -28,19 +29,18 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
  const green=mat('#90a17b');floor(PLOT,green,-.035);floor(PUBLIC_ENTRY,mat('#b9b9af'),-.01);floor(HOUSE_OUTLINE,mat('#d8d3c5'),0);
  if(mode==='walk'){const ceiling=floor(HOUSE_OUTLINE,offwhite,HOUSE.height);ceiling.userData.part='illustrative-ceiling';}
  floor(SERVICE_APRON,mat('#c7c7b8'),.004);
- for(const room of ROOMS){if(room.kind==='garden')continue;const p=new THREE.Group();p.userData.roomId=room.id;group.add(p);roomGroups.set(room.id,p);
-  const f=FLOOR_FINISHES.find(f=>f.id===settings.rooms[room.id]?.floor)||FLOOR_FINISHES[0],m=floor(room.polygon,mat(f.color),.008,p,{action:'room',roomId:room.id});m.userData.floorFinish=f.id;m.userData.tile=f.tile||null;m.userData.productId=f.productId;
-  const b=polygonBounds(room.polygon),pts=[],sx=f.tile?.[0]||(f.id==='oak'?.16:.8),sz=f.tile?.[1]||.8;
-  for(let x=Math.ceil(b.minX/sx)*sx;x<b.maxX;x+=sx)for(let z=b.minZ;z<b.maxZ;z+=.08){if(insidePolygon([x,z+.04],room.polygon))pts.push([x,.009,z],[x,.009,Math.min(z+.08,b.maxZ)]);}
-  if(f.id!=='oak')for(let z=Math.ceil(b.minZ/sz)*sz;z<b.maxZ;z+=sz)for(let x=b.minX;x<b.maxX;x+=.08){if(insidePolygon([x+.04,z],room.polygon))pts.push([x,.009,z],[Math.min(x+.08,b.maxX),.009,z]);}
-  lines(pts,f.id==='oak'?'#7b674d':'#8c9188',f.productId?.includes('floor')?.32:.23,p);
+ function roomFloor(room,poly,parent,data){
+  const f=FLOOR_FINISHES.find(f=>f.id===settings.rooms[room.id]?.floor)||FLOOR_FINISHES[0],m=floor(poly,mat(f.color),.008,parent,data);m.userData.floorFinish=f.id;m.userData.tile=f.tile||null;m.userData.productId=f.productId;
+  const b=polygonBounds(poly),pts=[],sx=f.tile?.[0]||(f.id==='oak'?.16:.8),sz=f.tile?.[1]||.8;
+  // Both existing and added paving use the same world-origin tile grid.
+  for(let x=Math.ceil(b.minX/sx)*sx;x<b.maxX;x+=sx)for(let z=b.minZ;z<b.maxZ;z+=.08){if(insidePolygon([x,z+.04],poly))pts.push([x,.009,z],[x,.009,Math.min(z+.08,b.maxZ)]);}
+  if(f.id!=='oak')for(let z=Math.ceil(b.minZ/sz)*sz;z<b.maxZ;z+=sz)for(let x=b.minX;x<b.maxX;x+=.08){if(insidePolygon([x+.04,z],poly))pts.push([x,.009,z],[Math.min(x+.08,b.maxX),.009,z]);}
+  lines(pts,f.id==='oak'?'#7b674d':'#8c9188',f.productId?.includes('floor')?.32:.23,parent);
  }
- // Exterior perimeter is a visualization of the garden boundary, not a claimed
- // fence specification. The upper-floor projection is deliberately not a wall.
- const pb=polygonBounds(PLOT),boundary=mat('#c0baa6');
- for(const x of [pb.minX,pb.maxX])box(x,.42,(pb.minZ+pb.maxZ)/2,.1,.84,pb.maxZ-pb.minZ,boundary);
- box((pb.minX+pb.maxX)/2,.42,pb.maxZ,pb.maxX-pb.minX,.84,.1,boundary);
- const patioLeft=point(662.7,42.28)[0];box((pb.minX+patioLeft)/2,.42,pb.minZ,patioLeft-pb.minX,.84,.1,boundary);
+ for(const room of ROOMS){if(room.kind==='garden')continue;const p=new THREE.Group();p.userData.roomId=room.id;group.add(p);roomGroups.set(room.id,p);roomFloor(room,room.polygon,p,{action:'room',roomId:room.id});}
+ const gardenGroups=buildGardenArchitecture({group,box,mat,settings,mode}),pavingGroup=new THREE.Group();
+ pavingGroup.userData={buildingId:'garden-paving',planned:true,dimensionsInferred:true};roomGroups.get('terrace').add(pavingGroup);gardenGroups.set('garden-paving',pavingGroup);
+ roomFloor(ROOMS.find(r=>r.id==='terrace'),GARDEN_LAYOUT.paving,pavingGroup,{action:'building',buildingId:'garden-paving',roomId:'terrace'});
  for(const def of GARDEN_PLANTS){const p=new THREE.Group();p.userData.plantId=def.id;group.add(p);plant(def.position[0],def.position[1],def.size,p);}
  // One construction opening per host door; a secondary leaf shares its hole.
  // Opening heights follow the RG/RG1 table, while sill/ceiling heights are assumed.
@@ -182,5 +182,5 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
  const light=mode==='walk'||settings.light==='evening';const hemi=new THREE.HemisphereLight('#fff6e3','#a2ad9a',settings.light==='evening'?1.3:2.5);group.add(hemi);
  const sun=new THREE.DirectionalLight(settings.light==='evening'?'#e8bf86':'#fff1d7',settings.light==='evening'?1.1:3);sun.position.set(-8,20,-5);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-15;sun.shadow.camera.right=15;sun.shadow.camera.top=16;sun.shadow.camera.bottom=-16;sun.shadow.camera.far=65;sun.shadow.normalBias=.04;sun.shadow.bias=-.0002;group.add(sun);
  if(light)for(const room of ROOMS.filter(r=>!['garden','outdoor','hall','kitchen'].includes(r.kind))){const [x,z]=room.walk,l=new THREE.PointLight('#ffe0b4',1.4,7,1.5);l.position.set(x,2.45,z);group.add(l);cylinder(x,2.68,z,.17,.04,offwhite);}
- return {group,picks,motions,roomGroups,furnitureGroups,doorGroups,shutterGroups,buildingGroups,wallHeight,dispose(){group.traverse(o=>{if(o.isLight&&o.shadow)o.shadow.dispose();});resources.forEach(r=>r.dispose?.());}};
+ return {group,picks,motions,roomGroups,furnitureGroups,doorGroups,shutterGroups,buildingGroups,gardenGroups,wallHeight,dispose(){group.traverse(o=>{if(o.isLight&&o.shadow)o.shadow.dispose();});resources.forEach(r=>r.dispose?.());}};
 }
