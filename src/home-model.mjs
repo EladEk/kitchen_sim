@@ -1,8 +1,12 @@
 import {OUTDOOR_KITCHEN} from './home-products.mjs';
+import {orderedFloor,orderedFloorForRoom} from './ordered-flooring.mjs';
 import {OPENING_SCHEDULE,DOOR_HANDINGS,SHUTTER_IDS} from './home-building-spec.mjs';
 import {createGardenLayout} from './home-garden-layout.mjs';
 import {createServiceYard} from './service-yard-layout.mjs';
 import {createExteriorLayout} from './home-exterior-layout.mjs';
+import {createElectricalLayout} from './home-electrical.mjs';
+import {createWaterLayout} from './home-water.mjs';
+import {FINISH_SCHEDULE_VERSION,roomHasOrderedCladding} from './home-finish-schedule.mjs';
 // Traced from the attached RG1 plan, page 1 (1318 × 1120 PDF points).
 // The nominal 1:50 scale is 0.017638889 metres/PDF point. Printed room
 // dimensions are retained separately: several finish-size labels are 5–7 cm
@@ -12,7 +16,7 @@ export const PLAN_ORIGIN=[606,45.7];
 export const point=(x,z)=>[(x-PLAN_ORIGIN[0])*PLAN_SCALE,(z-PLAN_ORIGIN[1])*PLAN_SCALE];
 const polygon=a=>a.map(p=>point(...p));
 const rect=(x0,z0,x1,z1)=>[[x0,z0],[x1,z0],[x1,z1],[x0,z1]];
-export const HOUSE={height:2.75,eyeHeight:1.62,playerRadius:.17,source:'/house/house-plan.pdf',image:'/house/house-plan.jpg',revision:16,scale:50};
+export const HOUSE={height:2.75,eyeHeight:1.62,playerRadius:.17,source:'/house/house-plan.pdf',image:'/house/house-plan.jpg',revision:29,scale:50};
 export const GARDEN_LAYOUT=createGardenLayout(point);
 export const EXTERIOR_LAYOUT=createExteriorLayout(point);
 export const SERVICE_YARD=createServiceYard(point);
@@ -92,6 +96,8 @@ export const WINDOWS=[
  opening('kitchen-window','kitchen-south',1204.14,1255.14,['kitchen'],'חלון המטבח','window',1.1,1),
  opening('utility-window','utility-east',400,431.2,['laundry'],'חלון השירות','window',1.2,.9)
 ];
+export const ELECTRICAL_LAYOUT=createElectricalLayout(point,WALLS,{kitchenAnchor:KITCHEN_ANCHOR});
+export const electricalPoint=id=>ELECTRICAL_LAYOUT.points.find(p=>p.id===id);
 export function openingPoint(o){const w=WALLS.find(w=>w.id===o.wallId);return o.vertical?[w.a[0],(o.start+o.end)/2]:[(o.start+o.end)/2,w.a[1]];}
 export const SHUTTERS=SHUTTER_IDS.map(id=>({id,opening:[...DOORS,...WINDOWS].find(o=>o.id===id)}));
 
@@ -119,7 +125,13 @@ export const FURNITURE=[
  furniture('washing-machine','laundry','washer',[1160,386],.6,.6,.85,-Math.PI/2),furniture('dryer','laundry','washer',[1160,422],.6,.6,.85,-Math.PI/2),
  furniture('terrace-table','terrace','dining',[535,143],1.8,.9,.75),
  {...furniture('outdoor-kitchen','garden','outdoor-kitchen',[297.65,176.08],OUTDOOR_KITCHEN.width,OUTDOOR_KITCHEN.depth,OUTDOOR_KITCHEN.height,Math.PI/2),products:['hercules'],ordered:true}
-];
+].map(f=>{
+ // Resize toward the room, preserving each fixture's original wall anchor.
+ const d=f.kind==='wall-toilet'?.52:f.id==='guest-basin'?.29:f.d,delta=(d-f.d)/2;
+ return {...f,d,position:[f.position[0]+Math.sin(f.rotation)*delta,f.position[1]+Math.cos(f.rotation)*delta],...(f.kind==='wall-toilet'?{dimensionSources:{depth:'catalogue'},cataloguePage:26}:{}),...(f.id==='guest-basin'?{w:.33,dimensionSources:{width:'catalogue',depth:'catalogue'},cataloguePage:27}:{}),...(f.kind==='vanity'?{wallHung:true,bottom:.38,storage:f.id==='ensuite-vanity'?'drawers':'doors',cataloguePage:f.id==='ensuite-vanity'?32:31}:{})};
+});
+export const WATER_LAYOUT=createWaterLayout({point,walls:WALLS,furniture:FURNITURE,kitchenAnchor:KITCHEN_ANCHOR,openings:[...DOORS,...WINDOWS]});
+export const waterPoint=id=>WATER_LAYOUT.points.find(p=>p.id===id);
 // The plant at the northern/right end of the outdoor kitchen was removed in R08.
 export const GARDEN_PLANTS=[
  {id:'west-middle',position:[PLOT[0][0]+.7,6.4],size:1.3},
@@ -132,22 +144,27 @@ export function furnitureParts(f){
  if(!f)return [];
  const item=(key,he,en)=>({id:`${f.id}:${key}`,key,he,en});
  if(['wardrobe','office-cabinet'].includes(f.kind))return [item('left','דלת שמאל','Left door'),item('right','דלת ימין','Right door'),item('drawer-0','מגירה עליונה','Upper drawer'),item('drawer-1','מגירה תחתונה','Lower drawer')];
- if(f.kind==='vanity')return [item('left','דלת שמאל','Left door'),item('right','דלת ימין','Right door')];
+ if(f.kind==='vanity')return f.storage==='drawers'?[item('drawer-0','מגירה עליונה','Upper drawer'),item('drawer-1','מגירה תחתונה','Lower drawer')]:[item('left','דלת שמאל','Left door'),item('right','דלת ימין','Right door')];
  if(f.kind==='outdoor-kitchen')return [['sink-left','דלת כיור שמאל','Sink left door'],['sink-right','דלת כיור ימין','Sink right door'],['grill-left','דלת גריל שמאל','Grill left door'],['grill-right','דלת גריל ימין','Grill right door'],['grill-drawer-0','מגירת גריל עליונה','Grill upper drawer'],['grill-drawer-1','מגירת גריל תחתונה','Grill lower drawer'],['storage','דלת אחסון ליד המקרר','Storage beside fridge'],['fridge','דלת המקרר','Fridge door'],['grill-lid','מכסה הגריל','Grill lid']].map(([key,he,en])=>item(key,he,en));
  if(f.kind==='console')return [0,1,2].map(i=>item(`drawer-${i}`,`מגירה ${i+1}`,`Drawer ${i+1}`));
  return [];
 }
 export const ALL_HOME_PARTS=[...FURNITURE.flatMap(furnitureParts),...SERVICE_YARD.parts];
-export const HOME_FINISHES=[{id:'ordered-mona',he:'מונה 25×75','en':'Mona 25×75',color:'#c1c4c0',tile:[.75,.25],productId:'wet-wall'},{id:'ivory',he:'שנהב',en:'Ivory',color:'#e9e5db'},{id:'sand',he:'חול',en:'Sand',color:'#ccbfa8'},{id:'sage',he:'מרווה',en:'Sage',color:'#a4b09a'},{id:'clay',he:'חרס',en:'Clay',color:'#c3a28e'},{id:'slate',he:'אפור',en:'Slate',color:'#99a5a7'}];
-export const FLOOR_FINISHES=[{id:'ordered-white',he:'שיק לבן מט 100×100',en:'Chic white 100×100',color:'#e8e7e0',tile:[1,1],productId:'dry-floor'},{id:'ordered-wet',he:'קלסיקו אפור 30×30',en:'Classico grey 30×30',color:'#a4a6a3',tile:[.3,.3],productId:'wet-floor'},{id:'ordered-terrace',he:'הביטאט דאון 15×60',en:'Habitat Dawn 15×60',color:'#b2a58e',tile:[.15,.6],productId:'terrace-floor'},{id:'stone',he:'אבן בהירה',en:'Light stone',color:'#d9d3c5'},{id:'oak',he:'אלון',en:'Oak',color:'#b89a73'},{id:'warm',he:'אבן חמה',en:'Warm stone',color:'#c5b39a'}];
-export const HOME_DEFAULTS={schema:2,lang:'he',light:'day',cutaway:true,labels:true,furniture:true,pergolaRoof:true,shedRoof:true,openDoors:['patio'],openParts:[],closedShutters:[],rooms:{},showGarden:true};
+export const HOME_FINISHES=[{id:'ordered-mona',he:'מונה 25×75','en':'Mona 25×75',color:'#b2ada9',tile:[.75,.25],productId:'wet-wall'},{id:'ivory',he:'שנהב',en:'Ivory',color:'#e9e5db'},{id:'sand',he:'חול',en:'Sand',color:'#ccbfa8'},{id:'sage',he:'מרווה',en:'Sage',color:'#a4b09a'},{id:'clay',he:'חרס',en:'Clay',color:'#c3a28e'},{id:'slate',he:'אפור',en:'Slate',color:'#99a5a7'}];
+export const FLOOR_FINISHES=[
+ ...[['ordered-white','dry-floor','שיק גרניט לבן מט 100×100','Chic matte white 100×100'],['ordered-wet','wet-floor','קלסיקו אפור 30×30','Classico grey 30×30'],['ordered-terrace','terrace-floor','הביטאט דאון 15×60','Habitat Dawn 15×60']].map(([id,productId,he,en])=>({id,he,en,color:orderedFloor(productId).color,tile:orderedFloor(productId).tile,productId})),
+ {id:'stone',he:'אבן בהירה',en:'Light stone',color:'#d9d3c5'},{id:'oak',he:'אלון',en:'Oak',color:'#b89a73'},{id:'warm',he:'אבן חמה',en:'Warm stone',color:'#c5b39a'}
+];
+export const wallFinishesForRoom=id=>HOME_FINISHES.filter(f=>f.id!=='ordered-mona'||roomHasOrderedCladding(id));
+export const HOME_DEFAULTS={schema:2,finishScheduleVersion:FINISH_SCHEDULE_VERSION,lang:'he',light:'day',cutaway:true,labels:true,furniture:true,pergolaRoof:true,shedRoof:true,openDoors:['patio'],openParts:[],closedShutters:[],rooms:{},showGarden:true,showElectrical:true,showWater:true,renderQuality:'realistic',cleanView:false,electricalInferred:true};
 export function normalizeHomeSettings(value={}){
  if(!value||typeof value!=='object')value={};
  const validDoors=new Set(DOORS.map(d=>d.id)),validParts=new Set(ALL_HOME_PARTS.map(p=>p.id)),rooms={};
  const current=value.schema===2;
- for(const r of ROOMS){const v=value.rooms?.[r.id]||{},wet=['bathroom','ensuite','powder'].includes(r.id),floorDefault=r.id==='terrace'?'ordered-terrace':wet||r.id==='laundry'?'ordered-wet':'ordered-white';rooms[r.id]={wall:current&&HOME_FINISHES.some(f=>f.id===v.wall)?v.wall:wet?'ordered-mona':HOME_FINISHES.some(f=>f.id===v.wall)?v.wall:'ivory',floor:current&&FLOOR_FINISHES.some(f=>f.id===v.floor)?v.floor:floorDefault,wood:['oak','white','dark'].includes(v.wood)?v.wood:'oak'};}
+ const migratedParts=(Array.isArray(value.openParts)?value.openParts:[]).map(id=>({'ensuite-vanity:left':'ensuite-vanity:drawer-0','ensuite-vanity:right':'ensuite-vanity:drawer-1'})[id]||id);
+ for(const r of ROOMS){const v=value.rooms?.[r.id]||{},wet=roomHasOrderedCladding(r.id),floorDefault=orderedFloorForRoom(r.id),validWall=wallFinishesForRoom(r.id).some(f=>f.id===v.wall);rooms[r.id]={wall:current&&validWall?v.wall:wet?'ordered-mona':validWall?v.wall:'ivory',floor:current&&FLOOR_FINISHES.some(f=>f.id===v.floor)?v.floor:floorDefault,wood:['oak','white','dark'].includes(v.wood)?v.wood:'oak'};}
 
- return {...HOME_DEFAULTS,lang:value.lang==='en'?'en':'he',light:value.light==='evening'?'evening':'day',cutaway:typeof value.cutaway==='boolean'?value.cutaway:true,labels:value.labels!==false,furniture:value.furniture!==false,pergolaRoof:value.pergolaRoof!==false,shedRoof:value.shedRoof!==false,openDoors:[...new Set((Array.isArray(value.openDoors)?value.openDoors:HOME_DEFAULTS.openDoors).filter(x=>validDoors.has(x)))],openParts:[...new Set((Array.isArray(value.openParts)?value.openParts:[]).filter(x=>validParts.has(x)))],closedShutters:[...new Set((Array.isArray(value.closedShutters)?value.closedShutters:[]).filter(id=>SHUTTER_IDS.includes(id)))],rooms};
+ return {...HOME_DEFAULTS,lang:value.lang==='en'?'en':'he',light:value.light==='evening'?'evening':'day',cutaway:typeof value.cutaway==='boolean'?value.cutaway:true,labels:value.labels!==false,furniture:value.furniture!==false,pergolaRoof:value.pergolaRoof!==false,shedRoof:value.shedRoof!==false,showElectrical:value.showElectrical!==false,showWater:value.showWater!==false,renderQuality:value.renderQuality==='light'?'light':'realistic',cleanView:value.cleanView===true,electricalInferred:value.electricalInferred!==false,openDoors:[...new Set((Array.isArray(value.openDoors)?value.openDoors:HOME_DEFAULTS.openDoors).filter(x=>validDoors.has(x)))],openParts:[...new Set(migratedParts.filter(x=>validParts.has(x)))],closedShutters:[...new Set((Array.isArray(value.closedShutters)?value.closedShutters:[]).filter(id=>SHUTTER_IDS.includes(id)))],rooms};
 }
 export function insidePolygon(p,poly){let inside=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++){const [xi,zi]=poly[i],[xj,zj]=poly[j];if(((zi>p[1])!==(zj>p[1]))&&p[0]<(xj-xi)*(p[1]-zi)/(zj-zi)+xi)inside=!inside;}return inside;}
 export function polygonBounds(poly){return {minX:Math.min(...poly.map(p=>p[0])),maxX:Math.max(...poly.map(p=>p[0])),minZ:Math.min(...poly.map(p=>p[1])),maxZ:Math.max(...poly.map(p=>p[1]))};}

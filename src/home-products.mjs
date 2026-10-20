@@ -2,6 +2,9 @@ import {PHOTO_SOURCE} from './home-photo-reference.mjs';
 import {GARDEN_SOURCE} from './home-garden-reference.mjs';
 import {SERVICE_SOURCE} from './service-yard-layout.mjs';
 import {EXTERIOR_SOURCE} from './home-exterior-layout.mjs';
+import {ELECTRICAL_SOURCE} from './home-electrical.mjs';
+import {OWNER_PRODUCTS_SOURCE} from './owner-product-references.mjs';
+import {HARASH_CATALOG_SOURCE,catalogueMatch} from './harash-catalog.mjs';
 // Transcription of the PDFs attached by the owner. Product codes and
 // dimensions are facts from those documents; no retail images or CAD are implied.
 export const HOUSE_SOURCES=[
@@ -10,12 +13,12 @@ export const HOUSE_SOURCES=[
  {id:'hercules',he:'מטבח חוץ הרקולס',en:'Hercules outdoor kitchen',pdf:'/house/hercules.pdf',image:'/house/hercules.jpg'},
  {id:'apartment-spec',he:'מפרט הדירה — RG/RG1',en:'Apartment specification — RG/RG1',pdf:'/house/apartment-spec.pdf',image:'/house/apartment-spec-16.jpg',pages:[11,12,16,17,26,30,31,32,33,34],imagePrefix:'/house/apartment-spec-'},
  {id:'building-plan',he:'תוכנית הבניין — קומת גן',en:'Building plan — ground floor',pdf:'/house/building-plan.pdf',image:'/house/building-plan-3.jpg',pages:[2,3],imagePrefix:'/house/building-plan-'},
- PHOTO_SOURCE,GARDEN_SOURCE,SERVICE_SOURCE,EXTERIOR_SOURCE
+ HARASH_CATALOG_SOURCE,PHOTO_SOURCE,GARDEN_SOURCE,SERVICE_SOURCE,EXTERIOR_SOURCE,ELECTRICAL_SOURCE,OWNER_PRODUCTS_SOURCE
 ];
 export const OUTDOOR_KITCHEN={width:3.1,depth:.7,sinkWidth:.8,grillWidth:1.5,fridgeWidth:.8,height:.9,heightInferred:true,source:'hercules',page:1};
 const dry=['living','kitchen','bedroom-a','bedroom-b','master','bedroom-c','safe-room','hall'],wet=['bathroom','ensuite','powder','laundry'];
 export const HOME_PRODUCTS=[
- {id:'dry-floor',sku:'MI402439',he:'שיק גרניט לבן מט',en:'Chic matte white porcelain',rooms:dry,source:'harash',page:1,size:'100 × 100 cm',dimensions:[1,1],noteHe:'מידת האריח והגוון הרשום לפי ההזמנה. הטקסטורה והגוון במסך להמחשה.',noteEn:'Tile size and stated finish follow the schedule. On-screen shade and texture are illustrative.'},
+ {id:'dry-floor',sku:'MI402439',he:'שיק גרניט לבן מט',en:'Chic matte white porcelain',rooms:dry,source:'harash',page:1,size:'100 × 100 cm',dimensions:[1,1],referenceImage:'/materials/owner-products/MI402439-tile.jpg',noteHe:'המק״ט והמידה מאומתים גם במדבקת האריח שצירפת. הטקסטורה בתלת־ממד נדגמת מהצילום שלך, כולל הנקודות הבהירות והמראה המגוון. הגוון מושפע מתאורת המקור וההדמיה; קנה המידה של הגרגרים משוער.',noteEn:'SKU and size also match your photographed tile label. The 3D texture samples your photo, retaining its light flecks and varied pattern. Shade depends on source/scene lighting; grain scale is estimated.'},
  {id:'wet-floor',sku:'YUCLCE33',he:'קלסיקו סמנט / אפור R10',en:'Classico cement / grey R10',rooms:wet,source:'harash',page:2,size:'30 × 30 cm',dimensions:[.3,.3]},
  {id:'shower-floor',sku:'YUCLAC33',he:'קלסיקו סמנט R11 — פינת מקלחת',en:'Classico cement R11 — shower floor',rooms:['ensuite'],source:'harash',page:4,size:'33 × 30 cm',dimensions:[.33,.3]},
  {id:'terrace-floor',sku:'EGEHDA15',he:'אגא / דורה הביטאט דאון R10',en:'Ege / Dora Habitat Dawn R10',rooms:['terrace'],source:'harash',page:2,size:'15 × 60 cm',dimensions:[.15,.6]},
@@ -31,9 +34,13 @@ export const HOME_PRODUCTS=[
  {id:'hand-shower',sku:'VRN00416 + VRN00011',he:'מוט דרור 416/418 ונקודת מים עגולה — ניקל',en:'Dror 416/418 rail and round outlet — nickel',rooms:['bathroom','ensuite'],source:'harash',page:3,size:'Nickel'},
  {id:'shower-head',sku:'VR001833 + VR000239',he:'ורד ראש מקלחת עגול וזרוע מהקיר',en:'Vered round shower head and wall arm',rooms:['ensuite'],source:'harash',page:4,size:'Ø20 cm · arm 35 cm',dimensions:[.2,.35]},
  {id:'guest-basin',sku:'ST0000SO',he:'סניטק כיור סוניק / אמון / כספי + חור',en:'Sanitec Sonic / Amon / Caspi basin with tap hole',rooms:['powder'],source:'harash',page:5,size:'כיור ללא ארון · basin only',ambiguous:true,noteHe:'במסמך מופיעים כמה שמות חלופיים ללא מידות. מוצג כיור תלוי ללא ארון תחתון; צורתו ומידותיו להמחשה.',noteEn:'The line lists alternative names without dimensions. A wall basin is shown without a cabinet; form and size are illustrative.'},
- {id:'kitchen-tap',sku:'VR001221',he:'ורד ברז נשלף 1221 — 2 מצבים, מוברש',en:'Vered 1221 pull-out tap — 2 modes, brushed',rooms:['kitchen'],source:'harash',page:5,size:'Brushed · pull-out',noteHe:'דגם, פעולה וגימור לפי ההזמנה; צורת הגוף והגובה להמחשה. בקערת המטבח מופיעים זיכוי ושורה ללא תיאור דגם; אין זיהוי של כיור חלופי שנבחר.',noteEn:'Model, operation and finish follow the order; body shape and height are illustrative. The bowl section contains a credit and an undescribed line; no selected replacement sink is identified.'},
+ {id:'kitchen-sink',sku:'SCHOCK VEGAS 70 · Casablanca 98',he:'SCHOCK / Aquatop וגאס 70 — קזבלנקה',en:'SCHOCK / Aquatop Vegas 70 — Casablanca',rooms:['kitchen'],source:'ordered-product-photos',page:3,size:'69 × 52 × 22 cm · nominal',dimensions:[.69,.52,.22],referenceImage:'/materials/owner-products/vegas-70-casablanca.jpg',noteHe:'בחירת הדגם והגוון לפי ההבהרה והצילום שלך. מידת 69×52 לפי צילום המוצר; גומא מאשרת עומק 22 ס״מ, התקנה שטוחה והתאמה לארון 70 ס״מ. גאומטריית הקערה ופתח ההמחשה אינם תבנית יצרן לחיתוך.',noteEn:'Model and colour follow your clarification and screenshot. The screenshot lists 69×52 cm; Goma confirms 22 cm depth, flush mounting and the 70 cm cabinet. Bowl geometry and the preview opening are not a factory cutting template.'},
+ {id:'kitchen-tap',sku:'VR001221',he:'ורד ברז נשלף 1221 — 2 מצבים, מוברש',en:'Vered 1221 pull-out tap — 2 modes, brushed',rooms:['kitchen'],source:'harash',page:5,size:'Brushed · pull-out',noteHe:'דגם, פעולה וגימור לפי ההזמנה; צורת הגוף והגובה להמחשה. הכיור הוחלף לפי ההבהרה שלך ל־SCHOCK Vegas 70 קזבלנקה 98.',noteEn:'Model, operation and finish follow the order; body shape and height are illustrative. The sink now follows your explicit SCHOCK Vegas 70 Casablanca 98 selection.'},
  {id:'hercules',sku:'GUSTO HERCULES',he:'מטבח חוץ הרקולס — שחור',en:'Gusto Hercules outdoor kitchen — black',rooms:['garden','terrace'],source:'hercules',page:1,size:'80 + 150 + 80 = 310 cm · depth ≈70 cm',dimensions:[3.1,.7],noteHe:'כיור 80, גריל 150 עם 6 להבות, מבער אחורי וכירת צד, יחידת מקרר ואחסון 80 ס״מ. גובה 90 ס״מ, מידות המכשירים הפנימיות, צירים וחלוקת המדפים להמחשה.',noteEn:'80 cm sink, 150 cm six-burner grill with rear burner and side hob, 80 cm fridge/storage. Assumed 90 cm height, internal appliance dimensions, hinges and shelf layout are illustrative.'}
-];
+].map(p=>{
+ const catalogue=catalogueMatch(p.id),keepOwnerNote=['dry-floor','kitchen-sink','hercules'].includes(p.id);
+ return {...p,...(p.id==='guest-basin'?{ambiguous:false,size:'33 × 29 cm',dimensions:[.33,.29]}:{}),...(p.id==='toilet'?{size:'Depth 52 cm · wall hung',dimensions:[.52]}:{}),...(p.id==='bath-vanity'?{he:'VISION גבריאל / רנגלר — בחירה לא מאומתת',en:'VISION Gabriel / Wrangler — unresolved selection'}:{}),catalogue,...(catalogue&&!keepOwnerNote?{noteHe:catalogue.noteHe,noteEn:catalogue.noteEn}:{})};
+});
 export const productsForRoom=id=>HOME_PRODUCTS.filter(p=>p.rooms.includes(id));
 export const productById=id=>HOME_PRODUCTS.find(p=>p.id===id);
-export const productSource=p=>`${HOUSE_SOURCES.find(s=>s.id===p.source).pdf}#page=${p.page}`;
+export const productSource=p=>{const source=HOUSE_SOURCES.find(s=>s.id===p.source);return source?.pdf?`${source.pdf}#page=${p.page}`:p.referenceImage||source?.references?.find(r=>r.page===p.page)?.image||source?.image;};

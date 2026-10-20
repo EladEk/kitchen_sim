@@ -1,4 +1,4 @@
-// Observations from the owner's nine photographs and 32-second walkthrough.
+// Observations from the owner's ten photographs and 32-second walkthrough.
 // Photographs establish appearance and relative placement, not measured sizes.
 // The document-derived walls, opening dimensions and owner's layout stay authoritative.
 export const PHOTO_REFERENCES=[
@@ -10,16 +10,17 @@ export const PHOTO_REFERENCES=[
  {page:6,file:'06-277882.jpg',he:'חדר הורים — מחיצה והנמכה',en:'Main bedroom partition and ceiling drop',noteHe:'המחיצה ליד הרחצה והנמכה באזור הכניסה מאשרות את המבנה בצורת ר׳.',noteEn:'The en-suite partition and entrance ceiling drop confirm the L-shaped arrangement.'},
  {page:7,file:'07-277886.jpg',he:'חדר — פרטי החלון',en:'Bedroom window details',noteHe:'מסגרת, מסילות ומכסה תריס כהים. גובה האדן נשאר משוער.',noteEn:'Dark frame, tracks and shutter access cover. Sill height remains assumed.'},
  {page:8,file:'08-277887.jpg',he:'תקריב חלון ושקעים',en:'Window and outlets close-up',noteHe:'תקריב גוון הפרופילים והפנל בתחתית הקיר. הגימורים שנבחרו במפרט נשמרו.',noteEn:'Profile color and wall skirting close-up. The ordered finishes are retained.'},
- {page:9,file:'09-277893.jpg',he:'ממ״ד — חלון ומערכת סינון',en:'Safe-room window and air filter',noteHe:'יחידת סינון לבנה מותקנת מעל החלון; נראים שלבי חוץ. הדגם והמידות אינם קריאים.',noteEn:'A white filtration unit is mounted above the window; exterior slats are visible. Model and dimensions are unreadable.'}
+ {page:9,file:'09-277893.jpg',he:'ממ״ד — חלון ומערכת סינון',en:'Safe-room window and air filter',noteHe:'יחידת סינון לבנה מותקנת מעל החלון; נראים שלבי חוץ. הדגם והמידות אינם קריאים.',noteEn:'A white filtration unit is mounted above the window; exterior slats are visible. Model and dimensions are unreadable.'},
+ {page:11,file:'277903.jpg',image:'/house/electrical/kitchen-hall-277903.jpg',he:'מיזוג — המטבח וכניסת המסדרון',en:'HVAC — kitchen and hall entrance',noteHe:'הגריל הגדול נמצא בבליטה מעל כניסת המסדרון; גריל קטן יותר לאורך המטבח ובקר ביניהם. המידות והגבהים משוערים.',noteEn:'The large grille sits in the deeper projection above the hall entrance, with a smaller work-run grille and controller between them. Sizes and heights remain estimated.'}
 ];
-export const PHOTO_SOURCE={id:'site-photos',kind:'photos',he:'תמונות וסרטון הבית',en:'House photos & video',pages:[1,2,3,4,5,6,7,8,9,10],imagePrefix:'/house/photos/photo-',video:'/house/photos/walkthrough.mp4',poster:'/house/photos/video-poster.jpg'};
+export const PHOTO_SOURCE={id:'site-photos',kind:'photos',he:'תמונות וסרטון הבית',en:'House photos & video',pages:[1,2,3,4,5,6,7,8,9,10,11],imagePrefix:'/house/photos/photo-',video:'/house/photos/walkthrough.mp4',poster:'/house/photos/video-poster.jpg'};
 export const SHUTTER_COVERS={
  'bed-a-window':{height:.26,page:3},'bed-b-window':{height:.26,page:4},
  'master-window':{height:.26,page:7},'bed-c-window':{height:.26,page:7},
  patio:{height:.22,page:10,second:3}
 };
 export const OBSERVED_ELEMENTS=[
- {id:'kitchen-hvac',roomId:'kitchen',kind:'kitchen-bulkhead',he:'הנמכת מיזוג ושני גרילים',en:'HVAC bulkhead & two grilles',dimensions:[5.45,.55,.33],bottom:2.42,page:1,noteHe:'ההנמכה והגרילים נראים בצילום. גובה, עומק, מידות הגרילים ומיקומם לאורך הקיר נאמדו; אין תוכנית מיזוג מדודה.',noteEn:'The bulkhead and grilles are visible. Height, depth, grille sizes and positions are estimated; no measured HVAC plan is available.'},
+ {id:'kitchen-hvac',roomId:'kitchen',kind:'kitchen-bulkhead',he:'מיזוג — גריל מטבח, גריל מסדרון ובקר',en:'HVAC — kitchen grille, hall grille and controller',dimensions:[6.55,1,.33],bottom:2.42,page:11,noteHe:'ההנמכה עוקבת לאורך המטבח ומעמיקה מעל כניסת המסדרון. הגריל הגדול מעל הפתח, הגריל הקטן לאורך קיר המטבח והבקר ביניהם לפי צילום 277903 והסרטון. תוואי המדרגה נתמך בתוכנית; עומק, תחתית, גרילים ובקר במידות משוערות.',noteEn:'The work-run bulkhead projects deeper over the hall mouth. The large grille is above the entrance, the smaller grille along the kitchen and the controller between them, following 277903 and the video. The plan supports the return; depth, underside, grille and controller sizes remain estimates.'},
  {id:'hall-ceiling',roomId:'hall',kind:'hall-ceiling',he:'הנמכת תקרת המסדרון',en:'Lowered hall ceiling',dimensions:[2.25,6.2,.29],bottom:2.46,page:10,second:5,noteHe:'הסרטון מציג תקרה מונמכת במסדרון. המתאר עוקב אחרי המסדרון בתוכנית; גובה התחתית ועובי ההנמכה משוערים.',noteEn:'The video shows a lowered hall ceiling. Its outline follows the plan; underside height and depth are assumed.'},
  {id:'master-ceiling',roomId:'master',kind:'master-ceiling',he:'הנמכה בכניסה לחדר ההורים',en:'Main-bedroom entrance ceiling drop',dimensions:[1.7,1.9,.33],bottom:2.42,page:6,noteHe:'מעל אזור הכניסה שליד רחצת ההורים. תחום ההנמכה וגובהה נאמדו מהתמונה ומהסרטון.',noteEn:'Above the entrance beside the en suite. Its extent and height are estimated from the photo and video.'},
  {id:'safe-air-filter',roomId:'safe-room',kind:'safe-filter',he:'מערכת סינון מעל חלון הממ״ד',en:'Air filter above the safe-room window',dimensions:[.48,.22,.4],bottom:2.17,page:9,noteHe:'המיקום מעל החלון מאומת בצילום. הגוף מוצג להמחשה במידות משוערות, ללא זיהוי דגם או פרטי התקנה.',noteEn:'Placement above the window is photo-confirmed. Body dimensions are illustrative; model and installation details are unknown.'}

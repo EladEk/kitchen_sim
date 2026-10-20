@@ -66,3 +66,120 @@
  .appliance-cards{grid-template-columns:1fr;}
  .appliance-cards article{padding:15px;}
 }
+
+.kitchen-electrical-check{display:flex;gap:8px;align-items:center;font-size:12px;color:#506448;margin:14px 0}.kitchen-electrical-check input{accent-color:#44778a}.kitchen-electrical-sidebar>p,.kitchen-electrical-panel-body>p{font-size:11px;line-height:1.8;color:#6d7b63}.kitchen-electrical-list{display:grid;gap:5px;margin:12px 0}.kitchen-electrical-list button{display:flex;align-items:center;gap:7px;padding:9px;border:1px solid #dae2d0;border-radius:5px;background:#eff4e8;text-align:start;font-size:11px}.kitchen-electrical-list button>span{flex:1}.kitchen-electrical-list bdi{font:600 11px Arial,sans-serif}.kitchen-electrical-panel{z-index:12}.kitchen-electrical-panel .selection-card-content{min-width:0;max-width:295px}.kitchen-electrical-panel-body dl{display:flex;gap:20px;margin:13px 0}.kitchen-electrical-panel-body dt{font-size:10px;color:#78876b}.kitchen-electrical-panel-body dd{font-size:12px;color:#405738;margin:5px 0}.kitchen-electrical-panel .selection-card-tools{display:flex;flex-direction:column;gap:5px}.kitchen-electrical-plan g[role=button],.kitchen-electrical-elevation g[role=button]{cursor:pointer}.kitchen-electrical-plan g[role=button]:focus-visible circle,.kitchen-electrical-elevation g[role=button]:focus-visible circle{stroke:#203c47;stroke-width:16}.projection-labels .electrical-label{font:600 10px/1 Arial,sans-serif;background:#fffdf2dd;color:#436b7a;padding:4px 5px;border:1px solid #a8b9b4;border-radius:4px;box-shadow:0 2px 5px #273e2812}.scene-toolbelt button[aria-pressed=true]{color:#31677f}.kitchen-electrical-panel .text-link{display:inline-flex;align-items:center;gap:6px}
+@media(max-width:700px){.kitchen-electrical-panel .selection-card-content{max-width:220px}.kitchen-electrical-panel-body>p{font-size:10px}.kitchen-electrical-panel-body dl{gap:12px}.projection-labels .electrical-label{font-size:8px;padding:3px}.scene-toolbelt{max-width:calc(100% - 24px);flex-wrap:wrap}.scene-toolbelt button{gap:4px}.scene-toolbelt button>span{font-size:9px}}
+.app .scene-toolbelt>button:first-child>span{display:inline}
+
+/* Revision 19 — large point targets and a synchronized source comparison. */
+.app.electrical-active{min-height:800px}
+.app .scene-toolbelt{z-index:9}
+.app .scene-toolbelt>button{min-height:44px;min-width:40px}
+.app .scene-toolbelt .electrical-compare-tool{color:#315f75}
+.app .scene-toolbelt .electrical-compare-tool>span{display:inline;font-size:11px}
+.app .scene-toolbelt>button:first-child>span{font-size:11px}
+.electrical-visible .camera-presets{display:none}
+.electrical-quick-picker{position:absolute;z-index:8;top:145px;left:25px;display:flex;gap:8px;align-items:center;max-width:calc(100% - 50px);padding:5px 8px;background:#fbfdf6ee;border:1px solid #c2d3c1;border-radius:6px;direction:inherit;backdrop-filter:blur(5px)}
+.electrical-quick-picker>span{font-size:11px;white-space:nowrap}
+.electrical-quick-picker select{font:13px/1.5 Arial,sans-serif;min-height:44px;max-width:310px;min-width:0;border:1px solid #b0c6b0;background:#fff;color:#294830;border-radius:5px;padding:6px}
+.kitchen-electrical-list>button{min-height:44px;font-size:12px}
+.kitchen-electrical-list>button[aria-pressed=true]{background:#dae7dc;border-color:#73937e}
+.kitchen-electrical-panel.selection-card{background:#f9fcf3f2;backdrop-filter:blur(8px);min-width:290px}
+.kitchen-electrical-panel.selection-card small{font-size:11px;letter-spacing:.2px}
+.kitchen-electrical-panel.selection-card strong{font-size:14px;line-height:1.5}
+.kitchen-electrical-panel .selection-card-tools .icon-button{height:44px;width:44px}
+.electrical-compare-button{min-height:44px;background:#315f75;color:white;border-radius:5px;padding:8px 12px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px}
+.electrical-plan-wrap .kitchen-electrical-plan text,.electrical-plan-wrap .kitchen-electrical-elevation text{display:none}
+.modal.electrical-comparison-modal{width:min(1320px,96vw);height:92dvh;max-height:92dvh}
+.electrical-comparison-modal>header h2{font-size:22px;line-height:1.4}
+.electrical-comparison-modal>header .icon-button{min-height:44px;min-width:44px}
+.kitchen-electrical-comparison{flex:1 1 auto;min-height:0;overflow:auto;padding:16px 22px;color:#2c473b}
+.electrical-comparison-picker{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.electrical-comparison-picker label{font-size:13px;font-weight:600}
+.electrical-comparison-picker select{flex:1;min-width:140px;min-height:44px;padding:8px;font:14px/1.4 Arial,sans-serif;border:1px solid #b5c9b4;border-radius:6px;color:#2b4734;background:#fff}
+.electrical-comparison-picker>button{height:44px;width:44px;display:grid;place-items:center;border:1px solid #b5c9b4;border-radius:6px;background:#eef3e7}
+.electrical-comparison-identity{display:flex;align-items:center;gap:12px;margin:14px 0}
+.electrical-comparison-identity>bdi{padding:9px;border-radius:6px;color:white;font:700 18px/1.3 Arial,sans-serif}
+.electrical-comparison-identity>div{display:flex;flex-direction:column;gap:3px}
+.electrical-comparison-identity strong{font-size:15px;font-weight:600}
+.electrical-comparison-identity span{font-size:12px;color:#657d6b}
+.electrical-comparison-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+.electrical-comparison-grid>section{border:1px solid #cdd8c7;background:#f0f3e9;border-radius:8px;overflow:hidden;min-width:0}
+.electrical-comparison-grid>section>header{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:58px;padding:8px 12px;border-bottom:1px solid #d1dbca}
+.electrical-comparison-grid>section>header>strong{font-size:14px;white-space:nowrap}
+.electrical-comparison-grid>section>header>span{font-size:12px;color:#607761}
+.electrical-comparison-photo-tabs{display:flex;flex-wrap:wrap;gap:4px}
+.electrical-comparison-photo-tabs>button{min-height:44px;padding:6px 8px;font-size:12px;border:1px solid #b7cbb2;border-radius:5px;background:#fafcf5}
+.electrical-comparison-photo-tabs>button[aria-pressed=true]{background:#d4e4d0;color:#26462b;border-color:#709768}
+.electrical-comparison-elevation{height:420px;position:relative;direction:ltr}
+.electrical-comparison-elevation .architectural-plan.elevation{padding:18px 8px}
+.electrical-comparison-model-footer{padding:10px 12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12px;border-top:1px solid #d1dbca}
+.electrical-comparison-model-footer>button{min-height:44px;display:flex;gap:7px;align-items:center;padding:7px 10px;background:#345c43;color:white;border-radius:5px;font-size:12px}
+.electrical-comparison-source .electrical-photo-viewer{padding:10px}
+.electrical-comparison-file{padding:0 12px 10px;margin:0;font:11px/1.7 Arial,sans-serif;color:#5f7366}
+.electrical-comparison-note{font:12px/1.7 Arial,sans-serif;color:#526c58;margin:12px 0 0}
+@media(max-width:1100px){.electrical-quick-picker{top:146px}.electrical-comparison-grid{gap:10px}.electrical-comparison-grid>section>header{flex-wrap:wrap}.kitchen-electrical-comparison{padding:12px}.electrical-comparison-elevation{height:360px}}
+@media(max-width:760px){
+ .app.electrical-active{min-height:810px}
+ .electrical-quick-picker{left:12px;right:12px;max-width:none;top:176px;padding:3px 6px}
+ .electrical-quick-picker>span{display:none}
+ .electrical-quick-picker select{width:100%;max-width:none}
+ .app .scene-toolbelt{left:12px;right:12px;max-width:none;top:71px;gap:3px}
+ .app .scene-toolbelt>button{min-height:44px;padding:6px}
+ .app .scene-toolbelt>button:first-child,.app .scene-toolbelt .electrical-compare-tool{flex:1;justify-content:center}
+ .app .scene-toolbelt>button .tool-separator{display:none}
+ .kitchen-electrical-panel.selection-card{min-width:0;max-width:calc(100% - 75px)}
+ .kitchen-electrical-panel.selection-card strong{font-size:13px}
+ .kitchen-electrical-panel .selection-card-tools{gap:2px}
+ .kitchen-electrical-panel .selection-card-tools .icon-button{height:36px;width:36px}
+ .modal.electrical-comparison-modal{height:96dvh;max-height:96dvh;width:100%}
+ .electrical-comparison-modal>header{padding:12px!important}
+ .electrical-comparison-modal>header h2{font-size:17px;margin-top:6px}
+ .electrical-comparison-picker label{width:100%;font-size:12px}
+ .electrical-comparison-picker select{font-size:12px}
+ .electrical-comparison-grid{grid-template-columns:1fr}
+ .electrical-comparison-elevation{height:265px}
+ .electrical-comparison-identity strong{font-size:13px}
+ .electrical-comparison-grid>section>header{min-height:48px}
+}
+
+.electrical-relocation-note{font:12px/1.7 Arial,sans-serif;margin:0;padding:0 12px 12px;color:#795a2d}
+
+/* Revision 20: keep electrical controls outside the model instead of covering it. */
+.viewer.electrical-visible{display:flex;flex-direction:column}
+.viewer.electrical-visible>.viewer-top{position:static;order:0;min-height:60px;padding:12px 16px;flex-shrink:0}
+.viewer.electrical-visible>.scene-toolbelt{position:static;order:1;margin:0 12px 8px;max-width:none;align-self:flex-start;flex-shrink:0;flex-wrap:wrap;box-shadow:none;background:#f8faf3;border-color:#dce3d6}
+.viewer.electrical-visible>.scene-container{position:relative;inset:auto;order:3;flex:1;min-height:270px}
+.viewer.electrical-visible>.viewer-bottom{position:static;order:4;padding:10px 12px;margin:0;min-height:60px;flex-shrink:0;gap:10px;background:#f8faf3;border-top:1px solid #e0e6d8}
+.viewer.electrical-visible>.viewer-bottom .gesture-hint{display:none}
+.viewer.electrical-visible>.viewer-bottom .view-switch{margin:auto}
+.viewer.electrical-visible>.electrical-view-controls{order:2;margin:0 12px 8px;flex-shrink:0}
+.electrical-view-controls{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;min-width:0;padding:5px 9px;background:#f7f9f1;border:1px solid #dce3d6;border-radius:5px;font:12px/1.4 Arial,sans-serif}
+.electrical-view-controls label{display:flex;align-items:center;gap:7px;min-height:40px}
+.electrical-view-controls input[type=checkbox]{width:16px;height:16px;accent-color:#5d7d66;margin:0;cursor:pointer}
+.electrical-view-controls select{min-height:40px;padding:5px 7px;min-width:0;max-width:100%;border:1px solid #c8d5c4;border-radius:5px;background:#fff;color:#395340;font:12px/1.4 Arial,sans-serif}
+.electrical-view-controls .electrical-point-picker{flex:1;min-width:150px;max-width:340px;text-overflow:ellipsis}
+.kitchen-electrical-sidebar>.electrical-view-controls{padding:7px;margin:8px 0}
+.kitchen-electrical-sidebar .electrical-cabinet-picker{flex:1}
+.kitchen-electrical-sidebar .electrical-cabinet-picker select{flex:1}
+.electrical-fixture-glyph{cursor:pointer;outline:none}
+.electrical-fixture-glyph:focus-visible>rect{stroke:#3f7657;stroke-width:9px}
+.kitchen-electrical-comparison>.electrical-view-controls{margin-bottom:12px}
+.viewer.electrical-visible .zoom-controls{bottom:82px}
+.app.electrical-active{min-height:850px}
+@media(max-width:760px){
+ .app.electrical-active{min-height:890px}
+ .viewer.electrical-visible>.viewer-top{min-height:54px;padding:10px 12px}
+ .viewer.electrical-visible>.scene-toolbelt{align-self:stretch;margin:0 8px 6px;max-width:none;padding:3px}
+ .viewer.electrical-visible>.scene-toolbelt>button{min-width:34px;min-height:40px;padding:5px}
+ .viewer.electrical-visible>.scene-toolbelt>button:first-child,.viewer.electrical-visible>.scene-toolbelt .electrical-compare-tool{flex:1}
+ .viewer.electrical-visible>.electrical-view-controls{margin:0 8px 6px;padding:4px 7px;gap:2px 10px}
+ .viewer.electrical-visible>.electrical-view-controls .electrical-point-picker{flex-basis:100%;max-width:none}
+ .viewer.electrical-visible>.scene-container{min-height:270px}
+ .viewer.electrical-visible>.viewer-bottom{padding:9px 6px;min-height:54px}
+ .viewer.electrical-visible>.viewer-bottom .model-units{display:none}
+ .viewer.electrical-visible>.mobile-customize{position:static;order:5;align-self:flex-end;margin:0 8px 7px;height:32px;flex-shrink:0}
+ .electrical-view-controls .electrical-labels-toggle{flex:1}
+ .electrical-view-controls .electrical-cabinet-picker{flex:1;white-space:nowrap}
+ .electrical-view-controls .electrical-cabinet-picker select{flex:1}
+}

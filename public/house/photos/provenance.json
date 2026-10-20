@@ -53,6 +53,11 @@
       "durationSeconds": 32.332896,
       "preview": "walkthrough.mp4",
       "previewEncoding": "H.264/AAC, 540x960, original audio retained, reduced size"
+    },
+    {
+      "original": "277903.jpg",
+      "sha256": "0bd685a44f701cd686e02f07694f72cc4fc00657d588d1ccbc85a0ca5dfb9fe1",
+      "preview": "../electrical/kitchen-hall-277903.jpg"
     }
   ]
 }

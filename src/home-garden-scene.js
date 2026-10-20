@@ -1,11 +1,11 @@
 import * as THREE from 'three';
 import {GARDEN_LAYOUT} from './home-model.mjs';
 
-export function buildGardenArchitecture({group,box,mat,settings,mode}){
+export function buildGardenArchitecture({group,box,mat,surface=(kind,color,options)=>mat(color,options),settings,mode}){
  const groups=new Map(),L=GARDEN_LAYOUT,b=L.bounds,full=mode==='walk'||!settings.cutaway;
  const node=id=>{const p=new THREE.Group(),e=L.elements.find(e=>e.id===id);p.userData={buildingId:id,source:e.source,page:e.page,dimensionsInferred:true,planned:e.planned};group.add(p);groups.set(id,p);return p;};
  const data=id=>({action:'building',buildingId:id});
- const cream=mat('#e6dfcc',{roughness:.53,metalness:.22}),stone=mat('#c6c0af'),grey=mat(L.fence.color,{roughness:.57,metalness:.25});
+ const cream=mat('#e6dfcc',{roughness:.53,metalness:.22}),stone=surface('limestone','#c6c0af'),grey=mat(L.fence.color,{roughness:.57,metalness:.25});
  // Retain the same boundary segments. The quoted 37 m is not used to resize the plot.
  for(const run of L.fence.runs){
   const p=node(run.id),vertical=run.a[0]===run.b[0],cx=(run.a[0]+run.b[0])/2,cz=(run.a[1]+run.b[1])/2;

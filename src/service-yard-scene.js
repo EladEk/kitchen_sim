@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import {SERVICE_YARD} from './home-model.mjs';
 
-export function buildServiceYard({group,box,cylinder,floor,lines,mat,resources,motions,settings,mode}){
+export function buildServiceYard({group,box,cylinder,floor,lines,mat,surface=(kind,color,options)=>mat(color,options),resources,motions,settings,mode}){
  const {manhole:m,shed:s}=SERVICE_YARD,groups=new Map(),full=mode==='walk'||!settings.cutaway,open=new Set(settings.openParts);
  const node=id=>{const p=new THREE.Group();p.userData={buildingId:id,source:'service-yard',dimensionsInferred:true};group.add(p);groups.set(id,p);return p;};
  const chamber=node(m.id),tag={action:'building',buildingId:m.id},steel=mat('#77817c',{metalness:.5,roughness:.6}),cover=mat('#7c8581',{roughness:.8});
@@ -15,9 +15,9 @@ export function buildServiceYard({group,box,cylinder,floor,lines,mat,resources,m
  const windowReserve=node(SERVICE_YARD.safeWindow.id),wp=SERVICE_YARD.safeWindow.polygon;
  floor(wp,mat('#8eafb5',{transparent:true,opacity:.16,depthWrite:false}),.002,windowReserve,{action:'building',buildingId:SERVICE_YARD.safeWindow.id});
  lines(wp.flatMap((a,i)=>{const b=wp[(i+1)%wp.length];return [[a[0],.018,a[1]],[b[0],.018,b[1]]];}),'#789da4',.6,windowReserve);
- const shed=node(s.id),shedTag={action:'building',buildingId:s.id},wall=mat('#d9dcce'),trim=mat('#68776d',{metalness:.15}),inside=mat('#eceae0');
+ const shed=node(s.id),shedTag={action:'building',buildingId:s.id},wall=surface('paint','#d9dcce'),trim=mat('#68776d',{metalness:.15}),inside=mat('#eceae0');
  const cx=(s.minX+s.maxX)/2,cz=(s.minZ+s.maxZ)/2,h=full?s.h-.06:.8;
- floor(s.polygon,mat('#c8c7bc'),.01,shed,shedTag);
+ floor(s.polygon,surface('cement','#c8c7bc'),.01,shed,shedTag);
  for(const x of [s.minX+s.wall/2,s.maxX-s.wall/2])box(x,h/2,cz,s.wall,h,s.d,wall,shed,{...shedTag,part:'shed-wall'});
  box(cx,h/2,s.maxZ-s.wall/2,s.w,h,s.wall,wall,shed,{...shedTag,part:'shed-wall'});
  const door=s.door,left=door.x-door.width/2,right=door.x+door.width/2;

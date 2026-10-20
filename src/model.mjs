@@ -1,3 +1,4 @@
+import {FINISH_SCHEDULE_VERSION} from './home-finish-schedule.mjs';
 // All dimensions in millimetres, transcribed from Anise order 167968, 15.10.2026.
 // x follows the 5450 wall; z follows the 3300 return; y is height.
 export const ROOM = { long: 5450, short: 3300, height: 2600, depth: 590, counterDepth: 620, plinth: 120, body: 754, worktop: 912, upperBottom: 1500, upperHeight: 900, upperDepth: 320 };
@@ -36,7 +37,7 @@ export const STONES = [
  {id:'calacatta',name:'Calacatta',he:'קלקטה',color:'#edebe4'},
  {id:'basalt',name:'Basalt',he:'בזלת',color:'#535653'}
 ];
-export const DEFAULTS={base:'chalk',upper:'chalk',stone:'taj',hardware:'black',floor:'harash',light:'day',intensity:70,led:true,dimensions:false,labels:false,openParts:[],selected:null,view:'perspective',lang:'en'};
+export const DEFAULTS={finishScheduleVersion:FINISH_SCHEDULE_VERSION,base:'chalk',upper:'chalk',stone:'taj',hardware:'black',floor:'harash',light:'day',intensity:70,led:true,dimensions:false,labels:false,openParts:[],selected:null,showElectrical:false,showWater:true,renderQuality:'realistic',cleanView:false,showElectricalLabels:false,cabinetVisibility:'solid',view:'perspective',lang:'en'};
 export const PRESETS={original:{base:'chalk',upper:'chalk',stone:'calacatta',hardware:'black'},oak:{base:'oak',upper:'chalk',stone:'taj',hardware:'brass'},warm:{base:'linen',upper:'chalk',stone:'taj',hardware:'brass'}};
 export function getModule(id){ return [...LONG,...SHORT,...UPPERS,...ISLAND_UNITS].find(m=>m.id===id); }
 export function clearance(island=ISLAND){return {workAisle:island.z-ROOM.counterDepth,returnAisle:island.x-ROOM.counterDepth};}

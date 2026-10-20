@@ -1,0 +1,68 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {spawnSync} from 'node:child_process';
+import * as THREE from 'three';
+import {prepareFloorPhoto,PHOTO_LIGHTING_GAIN_LIMIT} from './floor-photo-preparation.mjs';
+import {createSurfacePalette} from './surface-materials.mjs';
+import {ORDERED_FLOORS} from './ordered-flooring.mjs';
+import {configureSurfaceRenderer} from './scene-environment.js';
+import {FLOOR_SHADER_COMMON} from './floor-material.mjs';
+
+const decode=v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4;};
+const encode=v=>Math.round(255*(v<=.0031308?v*12.92:1.055*v**(1/2.4)-.055));
+
+test('photo preparation reduces broad lighting falloff, preserves fine flecks and colour ratios, and never edits input pixels',()=>{
+ const size=64,pixels=new Uint8Array(size*size*4);
+ for(let y=0;y<size;y++)for(let x=0;x<size;x++){
+  const i=(y*size+x)*4,light=1+(y/(size-1)-.5)*.22,fleck=(x+y)%2?.035:-.035;
+  pixels.set([encode((.35+fleck)*light),encode((.31+fleck)*light),encode((.27+fleck)*light),255],i);
+ }
+ const original=new Uint8Array(pixels),result=prepareFloorPhoto(pixels,size),rows=data=>Array.from({length:size},(_,y)=>{let sum=0;for(let x=0;x<size;x++)sum+=decode(data[(y*size+x)*4]);return sum/size;});
+ const before=rows(pixels),after=rows(result.color);assert(Math.abs(after.at(-1)-after[0])<Math.abs(before.at(-1)-before[0])*.15);
+ let fineBefore=0,fineAfter=0,averageBefore=0,averageAfter=0;
+ for(let i=0;i<pixels.length;i+=4){
+  for(let c=0;c<3;c++){const gain=decode(result.color[i+c])/decode(pixels[i+c]);assert(gain>=1-PHOTO_LIGHTING_GAIN_LIMIT-.015&&gain<=1+PHOTO_LIGHTING_GAIN_LIMIT+.015);}
+  assert(Math.abs(decode(result.color[i])/decode(result.color[i+2])-decode(pixels[i])/decode(pixels[i+2]))<.03,'neutral illumination correction retains the photographed colour ratios');
+  averageBefore+=pixels[i];averageAfter+=result.color[i];
+  if((i/4)%size<size-1){fineBefore+=Math.abs(pixels[i]-pixels[i+4]);fineAfter+=Math.abs(result.color[i]-result.color[i+4]);}
+ }
+ assert(fineAfter>fineBefore*.95&&fineAfter<fineBefore*1.05,'real small flecks must not be blurred away');assert(Math.abs(averageAfter-averageBefore)/(size*size)<1);assert.deepEqual(pixels,original);assert.equal(result.lightingCorrection.calibrated,false);
+ const uniform=new Uint8Array(16*16*4);for(let i=0;i<uniform.length;i+=4)uniform.set([166,154,141,255],i);assert.deepEqual(prepareFloorPhoto(uniform,16).color,uniform);
+});
+
+test('actual ordered materials use non-mirrored photographic tiles, matte dielectric reflection and physical joints without affecting wall decor',()=>{
+ const resources=[],surface=createSurfacePalette(resources);
+ try{
+  for(const [id,p] of Object.entries(ORDERED_FLOORS)){
+   const material=surface(p.kind,p.color,{productId:id}),shader={uniforms:{},vertexShader:THREE.ShaderLib.physical.vertexShader,fragmentShader:THREE.ShaderLib.physical.fragmentShader};material.onBeforeCompile(shader);
+   assert(material.isMeshPhysicalMaterial);assert.equal(material.clearcoat,0);assert(material.specularIntensity<1);assert.equal(material.bumpScale,0);assert.equal(material.map.wrapS,THREE.ClampToEdgeWrapping);assert.equal(material.map.anisotropy,16);assert.equal(material.userData.floorRendering.mirrored,false);
+   assert.deepEqual(shader.uniforms.floorTileMetres.value.toArray(),p.tile);assert.equal(shader.uniforms.floorJointMetres.value,id==='terrace-floor'?.003:.002);assert.equal(shader.uniforms.floorQuarterTurns.value,p.tile[0]===p.tile[1]?4:2);assert(shader.fragmentShader.includes('textureGrad(map,floorSourceUV,floorDx,floorDy)'));assert(shader.fragmentShader.includes('floorRelief'));assert(shader.fragmentShader.includes('roughnessFactor=mix(roughnessFactor,.98,floorJoint)'));
+  }
+  const wall=surface('cement','#b2ada9',{productId:'wet-wall'});assert(!wall.isMeshPhysicalMaterial);assert.equal(wall.userData.floorRendering,undefined);
+ }finally{resources.forEach(r=>r.dispose());}
+ const renderer={};configureSurfaceRenderer(renderer);assert.equal(renderer.toneMapping,THREE.NeutralToneMapping);assert.equal(renderer.toneMappingExposure,1);assert.equal(renderer.outputColorSpace,THREE.SRGBColorSpace);
+ for(const name of ['HomeView.jsx','ModelView.jsx']){const code=readFileSync(new URL(name,import.meta.url),'utf8');assert(code.includes('configureSurfaceRenderer(renderer)'));assert(!code.includes('ACESFilmicToneMapping'));}
+});
+
+function expand(source){
+ source=source.replace(/^[ \t]*#include +<([\w\d./]+)>/gm,(_,name)=>expand(THREE.ShaderChunk[name]));
+ source=source.replace(/NUM_[A-Z_]+|UNION_CLIPPING_PLANES/g,name=>({NUM_DIR_LIGHTS:1,NUM_HEMI_LIGHTS:1,NUM_DIR_LIGHT_SHADOWS:1})[name]??0);
+ return source.replace(/#pragma unroll_loop_start\s+for\s*\(\s*int\s+i\s*=\s*(\d+)\s*;\s*i\s*<\s*(\d+)\s*;\s*i\s*\+\+\s*\)\s*{([\s\S]+?)}\s+#pragma unroll_loop_end/g,(_,start,end,body)=>Array.from({length:end-start},(_,j)=>body.replace(/\[\s*i\s*\]/g,`[${+start+j}]`).replace(/UNROLLED_LOOP_INDEX/g,+start+j)).join(''));
+}
+
+test('the complete patched Three physical shaders compile/link on native GLES3 and physical joints retain their subpixel coverage',t=>{
+ const resources=[],surface=createSurfacePalette(resources),material=surface('porcelain','#fff',{productId:'dry-floor'}),shader={uniforms:{},vertexShader:THREE.ShaderLib.physical.vertexShader,fragmentShader:THREE.ShaderLib.physical.fragmentShader};material.onBeforeCompile(shader);
+ const common=`precision highp float;\nprecision highp int;\n#define HIGH_PRECISION\n#define PHYSICAL\n#define USE_MAP\n#define USE_ROUGHNESSMAP\n#define USE_BUMPMAP\n#define USE_SHADOWMAP\n#define SHADOWMAP_TYPE_PCF_SOFT\n#define MAP_UV uv\n#define BUMPMAP_UV uv\n#define ROUGHNESSMAP_UV uv\n`;
+ const vertex=`#version 300 es\n#define attribute in\n#define varying out\n#define texture2D texture\n${common}\nuniform mat4 modelMatrix,modelViewMatrix,projectionMatrix,viewMatrix;\nuniform mat3 normalMatrix;\nuniform vec3 cameraPosition;\nuniform bool isOrthographic;\nin vec3 position,normal;\nin vec2 uv;\n`;
+ const fragment=`#version 300 es\n#define varying in\n#define texture2D texture\n#define texture2DGradEXT textureGrad\n#define texture2DLodEXT textureLod\n#define textureCube texture\n#define gl_FragColor pc_fragColor\nlayout(location=0) out highp vec4 pc_fragColor;\n${common}\nuniform mat4 viewMatrix;\nuniform vec3 cameraPosition;\nuniform bool isOrthographic;\n${THREE.ShaderChunk.colorspace_pars_fragment}\nvec4 linearToOutputTexel(vec4 v){return sRGBTransferOETF(v);}\nfloat luminance(vec3 c){return dot(c,vec3(.2126,.7152,.0722));}\n`;
+ const programs=[{vertex:vertex+expand(shader.vertexShader),fragment:fragment+expand(shader.fragmentShader)}];
+ const environment='#define DOUBLE_SIDED\n#define USE_ENVMAP\n#define ENVMAP_TYPE_CUBE_UV\n#define ENVMAP_MODE_REFLECTION\n#define CUBEUV_TEXEL_WIDTH .00130208333\n#define CUBEUV_TEXEL_HEIGHT .0009765625\n#define CUBEUV_MAX_MIP 8.0\n';
+ programs.push({vertex:vertex.replace(common,common+environment)+expand(shader.vertexShader),fragment:fragment.replace(common,common+environment)+expand(shader.fragmentShader)});
+ // Keep the sampling/coverage helper exact, rather than duplicating its maths.
+ const input={programs,common:FLOOR_SHADER_COMMON};
+ const result=spawnSync('python',['qa/check-floor-gpu.py'],{cwd:new URL('../',import.meta.url),input:JSON.stringify(input),encoding:'utf8',timeout:30000,maxBuffer:1000000});resources.forEach(r=>r.dispose());
+ if(result.error?.code==='ENOENT'){t.skip('Native shader check needs Python and EGL');return;}
+ if(result.status===77){t.skip(result.stdout.trim());return;}
+ assert.equal(result.status,0,result.stderr||result.stdout||String(result.error));const checked=JSON.parse(result.stdout);assert.equal(checked.linked,2);assert.deepEqual(checked.coverage,[255,128,0,26]);assert.equal(checked.rotations,true);
+});

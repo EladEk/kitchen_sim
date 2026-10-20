@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import {HOUSE,ROOMS,WINDOWS,WALLS,KITCHEN_ANCHOR,openingPoint,point} from './home-model.mjs';
 import {OBSERVED_ELEMENTS} from './home-photo-reference.mjs';
+import {createKitchenHvac} from './kitchen-hvac.js';
 
 // Permanent, photo-observed fittings remain visible when furniture is hidden.
 // All vertical sizes below are explicit estimates, independent of plan x/z.
@@ -14,13 +15,7 @@ export function buildObservedArchitecture({group,box,cylinder,mat,resources,wall
   const white=mat('#efeee8'),[w,d,h]=e.dimensions;
   if(e.kind==='kitchen-bulkhead'){
    p.position.set(KITCHEN_ANCHOR[0],0,KITCHEN_ANCHOR[1]);p.rotation.y=Math.PI;
-   box(w/2,e.bottom+h/2,d/2-.05,w,h,d,white,p,data);
-   for(const [x,width] of [[4.65,1.05],[2.05,.46]]){
-    const grille=new THREE.Group();grille.position.set(x,e.bottom+h*.51,d-.047);grille.userData.part='hvac-grille';p.add(grille);
-    box(0,0,0,width,.19,.014,white,grille,data);
-    box(0,0,.008,width-.035,.16,.009,mat('#323a3b'),grille,data);
-    for(let y=-.067;y<=.07;y+=.013)box(0,y,.015,width-.045,.005,.008,mat('#8d9492'),grille,data);
-   }
+   const hvac=createKitchenHvac({box,mat,data});for(const child of [...hvac.children])p.add(child);
   }else if(e.kind==='hall-ceiling'||e.kind==='master-ceiling'){
    const poly=e.kind==='hall-ceiling'?ROOMS.find(r=>r.id==='hall').polygon:[[719.4,635.32],[815.76,635.32],[815.76,743.02],[719.4,743.02]].map(v=>point(...v));
    const shape=new THREE.Shape();poly.forEach(([x,z],i)=>i?shape.lineTo(x,z):shape.moveTo(x,z));shape.closePath();

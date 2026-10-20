@@ -14,6 +14,7 @@ export function CabinetPanel({selected,spec,openParts,activePart,inspecting,lang
    <strong>{he?selected.he:selected.name}</strong>
    {collapsed?<span className="minimized-panel-hint">{t('Click parts in 3D · restore for controls','לחצו על החלק בתלת־ממד · הרחיבו לכפתורים')}</span>:<div id="cabinet-opening-panel" className="cabinet-panel-body">
     <span className="cabinet-panel-dimensions" dir="ltr">{selected.w.toLocaleString()} × {selected.h.toLocaleString()} × {selected.d} mm <em>W × H × D</em></span>
+    {selected.id==='sink'&&<span className="cabinet-sink-model">SCHOCK Vegas 70 · {t('Casablanca 98','קזבלנקה 98')} · <bdi>69 × 52 × 22 cm</bdi></span>}
     <OpeningControls cabinetId={selected.id} openParts={openParts} activePart={activePart} onToggle={onToggle} lang={lang}/>
     <div className="cabinet-open-actions">
      {!inspecting&&<button onClick={()=>onInspect(selected.id)}><Eye size={12}/>{t('Inspect cabinet','מבט פנימה')}</button>}

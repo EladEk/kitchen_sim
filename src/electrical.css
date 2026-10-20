@@ -1,0 +1,44 @@
+/* Shared evidence viewer. Its dimensions do not depend on a gallery/modal's flex basis. */
+.electrical-callouts{position:absolute;inset:0;z-index:4;pointer-events:none;overflow:hidden;direction:ltr}
+/* The 44 px hit area stays accessible; only the small ID chip is painted. */
+.electrical-callout{position:absolute!important;z-index:2;display:grid!important;place-items:center!important;transform:translate(-50%,-50%);width:44px!important;min-width:44px!important;height:44px!important;min-height:44px!important;padding:0!important;border:0!important;border-radius:5px!important;background:transparent!important;color:var(--point-color)!important;box-shadow:none!important;pointer-events:auto;touch-action:manipulation;cursor:pointer;line-height:1!important;transition:none!important}
+.electrical-callout-face{display:flex;align-items:center;justify-content:center;min-width:28px;height:20px;padding:2px 4px;border:1px solid #9aaca780;border-radius:4px;background:#ffffffe0;box-shadow:0 1px 3px #26382e12}
+.electrical-callout bdi{font:600 10px/1 Arial,sans-serif!important;letter-spacing:0!important;min-width:0!important}
+.electrical-callout small{display:none!important}
+.electrical-callout.is-selected .electrical-callout-face{border-color:var(--point-color);background:#f7fbf4;color:var(--point-color);box-shadow:0 0 0 1px var(--point-color)}
+.electrical-callout:hover .electrical-callout-face{background:white;border-color:var(--point-color)}
+.electrical-callout:focus-visible{outline:2px solid #315b48!important;outline-offset:0!important}
+.electrical-callout-lines{position:absolute;inset:0;width:100%;height:100%;overflow:visible;z-index:1;pointer-events:none}
+.electrical-callout-lines line{stroke:currentColor;stroke-width:.8;opacity:.5}
+.electrical-callout-lines circle{fill:currentColor;stroke:#fff;stroke-width:1}
+.electrical-plan-wrap{position:relative;width:100%;height:100%;min-width:0;min-height:0;direction:ltr}
+.electrical-photo-viewer{width:100%;min-width:0;line-height:1.5;direction:inherit}
+.electrical-photo-tools{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 8px}
+.electrical-photo-tools>button,.electrical-photo-tools>a{min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:7px 10px;border:1px solid #c5d3c3;border-radius:6px;background:#f9fcf4;font:500 12px/1.4 Arial,sans-serif;color:#35523c}
+.electrical-photo-tools>button[aria-pressed=true]{background:#dce9db;border-color:#739375}
+.electrical-photo-tools>a{margin-inline-start:auto}
+.electrical-photo-frame{position:relative;width:100%;min-height:120px;overflow:hidden;isolation:isolate;background:#e1e5df;border:1px solid #c1cec1;border-radius:7px;direction:ltr}
+.electrical-photo-scene{position:absolute;line-height:0}
+.electrical-photo-scene>img{display:block!important;width:100%!important;max-width:none!important;height:auto!important;max-height:none!important;margin:0!important;object-fit:initial!important;border:0!important;border-radius:0!important}
+.electrical-photo-outline{position:absolute;z-index:1;border:2px solid var(--point-color);box-shadow:0 0 0 1px #fff9;pointer-events:none}
+.electrical-photo-outline.is-selected{border:3px solid #ffdc51;outline:2px solid #293c51;background:#ffdf5535;box-shadow:0 0 0 4px white;z-index:2}
+.electrical-photo-outline.is-inferred{border-style:dashed}
+.electrical-photo-caption{font:500 13px/1.6 Arial,sans-serif;color:#293f48;margin:10px 0 0}
+.electrical-photo-caption>bdi{font-weight:700}
+.electrical-photo-status{font:12px/1.5 Arial,sans-serif;color:#5d6e64;margin:5px 0}
+.electrical-photo-error{padding:10px;border:1px solid #ad7561;background:#fff3e9;color:#713c2e;font:13px/1.6 Arial,sans-serif}
+.electrical-photo-error>button,.electrical-photo-error>a{display:inline-flex;align-items:center;min-height:44px;padding:7px 12px;text-decoration:underline}
+.hs-electrical-gallery .electrical-photo-viewer{max-width:900px;margin:0 auto}
+.hs-electrical-gallery{flex:1 1 auto!important;min-height:220px!important}
+.hs-electrical-source-list>button{min-height:44px}
+.electrical-video-review{margin:12px 0;padding:10px;border:1px solid #d6dfd0;border-radius:7px;background:#f5f7f1}.electrical-video-review>summary{font-size:12px;cursor:pointer;color:#47624d;line-height:1.7}.electrical-video-review>div{margin-top:10px;border-top:1px solid #dce4d6;padding-top:8px}.electrical-video-review strong{font-size:11px}.electrical-video-review p{font-size:11px!important;line-height:1.7!important;margin:5px 0!important}.electrical-video-review .hs-text-link{min-height:36px;display:inline-flex;margin-inline-end:12px;align-items:center;gap:4px}
+
+/* Shared quiet service colors; device names remain optional. */
+.services-color-key{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;font-size:10px;color:#68706a;width:100%;padding:2px 0}
+.services-color-key span{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.services-color-key i{width:7px;height:7px;border-radius:50%;display:inline-block}
+.water-point-details{font-size:12px;line-height:1.7;color:#5f6c66;overflow-wrap:anywhere}
+.water-point-details>p{margin:8px 0}.water-point-status{color:#237cd7;font-weight:600}
+.water-point-details .electrical-photo-viewer{margin-top:10px}
+.water-plan-markers g[role=button]{cursor:pointer;outline:none}
+.water-plan-markers g[role=button]:focus circle{stroke:#123c6b;stroke-width:2}

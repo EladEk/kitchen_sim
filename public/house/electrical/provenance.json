@@ -1,0 +1,118 @@
+{
+  "sourceVideoSha256": "f29792fe1aa136a45b9902e9328698468627c4c8209e6a805a462de800108d45",
+  "sourceVideoDurationSeconds": 32.332896,
+  "items": [
+    {
+      "file": "frame-2.5.jpg",
+      "second": 2.5,
+      "source": "277904.mp4",
+      "sha256": "bb79a9bd92f3515679b92ec9803665c93f2a72f02fdd44758267ac0dbff86e4c"
+    },
+    {
+      "file": "frame-3.jpg",
+      "second": 3,
+      "source": "277904.mp4",
+      "sha256": "f4d9291c492ad8d1e62de06f4327c740efd0e2b8ca4fd2aa173871fe7d4fbb63"
+    },
+    {
+      "file": "frame-4.5.jpg",
+      "second": 4.5,
+      "source": "277904.mp4",
+      "sha256": "3d10a1665339ae7bbfb38a4973654740ded08f21b89135d903ad52aebe3e0ed3"
+    },
+    {
+      "file": "frame-7.5.jpg",
+      "second": 7.5,
+      "source": "277904.mp4",
+      "sha256": "a56e04df18aba7903959d232eaffed22c0c072503cdf6896f672cb60c05ff76b"
+    },
+    {
+      "file": "frame-9.5.jpg",
+      "second": 9.5,
+      "source": "277904.mp4",
+      "sha256": "729f78066b07bed7aadd590b4f257e2fccdaa00be0b8fcf1fb59067a412995c9"
+    },
+    {
+      "file": "frame-17.5.jpg",
+      "second": 17.5,
+      "source": "277904.mp4",
+      "sha256": "d4ac0c4c7b39c96d77880531239b48d7fa5062669c0e962e319cc526eb04292f"
+    },
+    {
+      "file": "frame-19.5.jpg",
+      "second": 19.5,
+      "source": "277904.mp4",
+      "sha256": "a9691cf785a3557c49cb13e267016074daaf2fab08944535907180594f20ce5c"
+    },
+    {
+      "file": "frame-22.5.jpg",
+      "second": 22.5,
+      "source": "277904.mp4",
+      "sha256": "15fb1bd408948e31fa17459288c4cb5ddc2de453b4519404f8d5ee5475883f1e"
+    },
+    {
+      "file": "terrace.jpg",
+      "original": "01-IMG_20261017_143057.jpg",
+      "sha256": "14482abb38de65fc988a3023b53637ad1a92e279f7ea9be822f6ca06e9a626ef"
+    },
+    {
+      "file": "kitchen-hall-277903.jpg",
+      "original": "277903.jpg",
+      "width": 1536,
+      "height": 1152,
+      "sha256": "0bd685a44f701cd686e02f07694f72cc4fc00657d588d1ccbc85a0ca5dfb9fe1",
+      "reviewRevision": 28
+    },
+    {
+      "file": "frame-15.jpg",
+      "second": 15,
+      "source": "277904.mp4",
+      "sha256": "76ea9ac102c6d47744f742ee77d7e679286df85a5eaf2f7d9ccb6f8295c99548",
+      "reviewRevision": 29
+    },
+    {
+      "file": "frame-16.5.jpg",
+      "second": 16.5,
+      "source": "277904.mp4",
+      "sha256": "4b7433d4ad2992f2de3b340ea7924e0f5449a1b899d4347d14f1482f154d2b5e",
+      "reviewRevision": 29
+    },
+    {
+      "file": "frame-24.jpg",
+      "second": 24,
+      "source": "277904.mp4",
+      "sha256": "9b5a9e170e6fc30d7c16e7e5411eba151bba40aeca35c8961275e08fe1c40df3",
+      "reviewRevision": 29
+    },
+    {
+      "file": "frame-28.jpg",
+      "second": 28,
+      "source": "277904.mp4",
+      "sha256": "fa03067302b052eefaa32b5a1b36e64be77529e4d53b8015049acbc2c17de47e",
+      "reviewRevision": 29
+    }
+  ],
+  "metricSurvey": false,
+  "additionalReview": {
+    "uploadedVideoFile": "walkthrough.mp4",
+    "portableVideoSha256": "f7326c3dd4f89d954a961f9e2f537a91a6d84d9acf118144579437e5a79e74a3",
+    "matchesExistingPortableVideo": true,
+    "durationSeconds": 32.333333,
+    "reviewRevision": 28
+  },
+  "fullResolutionReview": {
+    "source": "277904.mp4",
+    "sha256": "f29792fe1aa136a45b9902e9328698468627c4c8209e6a805a462de800108d45",
+    "encodedSize": [
+      1920,
+      1080
+    ],
+    "displayRotationDegrees": -90,
+    "displaySize": [
+      1080,
+      1920
+    ],
+    "reviewRevision": 29,
+    "metricSurvey": false
+  }
+}
