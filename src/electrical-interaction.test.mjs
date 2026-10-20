@@ -7,12 +7,13 @@ import {spawnSync} from 'node:child_process';
 import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import {rolldown} from 'rolldown';
+import postcss from 'postcss';
 import * as THREE from 'three';
 import {KITCHEN_ELECTRICAL_POINTS as P,kitchenElectricalSelection,kitchenElectricalPageSelection,kitchenElectricalFocusSettings} from './kitchen-electrical.mjs';
 import {ELECTRICAL_EXCLUSIONS} from './home-electrical.mjs';
 import {layoutElectricalCallouts,electricalPhotoCrop,electricalPhotoAnchors} from './electrical-ui.mjs';
-import {DEFAULTS,getModule} from './model.mjs';
-import {WATER_LAYOUT,normalizeHomeSettings} from './home-model.mjs';
+import {DEFAULTS,getModule,WINDOW} from './model.mjs';
+import {ROOMS,FURNITURE,editableFurniture,WATER_LAYOUT,normalizeHomeSettings,getFurniture} from './home-model.mjs';
 import {SERVICE_COLORS} from './service-colors.mjs';
 import {HOME_PRODUCTS} from './home-products.mjs';
 import {catalogueSource} from './harash-catalog.mjs';
@@ -25,7 +26,7 @@ import {ELECTRICAL_ROOM_REVIEWS} from './electrical-video-review.mjs';
 const root=fileURLToPath(new URL('../',import.meta.url)),cache=join(root,'node_modules/.cache');
 await mkdir(cache,{recursive:true});const temp=await mkdtemp(join(cache,'electrical-ui-'));
 after(()=>rm(temp,{recursive:true,force:true}));
-const exports={WalkingControls:'WalkingControls.jsx',HoldButton:'WalkingControls.jsx',KitchenElectricalCompare:'KitchenElectricalCompare.jsx',ElectricalMarkerButtons:'ElectricalCallouts.jsx',ElectricalPhoto:'ElectricalPhoto.jsx',HomeSources:'HomeProducts.jsx',ProductCards:'HomeProducts.jsx',CatalogueMatch:'CatalogueMatch.jsx',KitchenElectricalViewControls:'KitchenElectrical.jsx',FloorPlan:'PlanViews.jsx',Elevation:'PlanViews.jsx',ModelView:'ModelView.jsx',HomePlan:'HomePlan.jsx',WaterPointDetails:'WaterPoints.jsx',WaterGlyph:'WaterPoints.jsx',KitchenElectricalPanel:'KitchenElectrical.jsx',RenderControls:'RenderControls.jsx',VrControls:'VrControls.jsx',FloorSpecification:'FloorSpecification.jsx',FloorSchedule:'FloorSchedule.jsx',SinkSpecification:'SinkSpecification.jsx',ElectricalFacts:'HomeElectrical.jsx',SceneRestoreControls:'SceneInterface.jsx',SceneUiLayer:'SceneInterface.jsx',restoreInterfaceOnEscape:'SceneInterface.jsx'};
+const exports={HomeFurnitureEditor:'HomeWorkspaceControls.jsx',HomeViewChooser:'HomeWorkspaceControls.jsx',HomePrimaryActions:'HomeWorkspaceControls.jsx',furnitureEditorSelection:'HomeWorkspaceControls.jsx',FurniturePositionControls:'FurniturePositionControls.jsx',WalkingControls:'WalkingControls.jsx',HoldButton:'WalkingControls.jsx',KitchenElectricalCompare:'KitchenElectricalCompare.jsx',ElectricalMarkerButtons:'ElectricalCallouts.jsx',ElectricalPhoto:'ElectricalPhoto.jsx',HomeSources:'HomeProducts.jsx',ProductCards:'HomeProducts.jsx',CatalogueMatch:'CatalogueMatch.jsx',KitchenElectricalViewControls:'KitchenElectrical.jsx',FloorPlan:'PlanViews.jsx',Elevation:'PlanViews.jsx',ModelView:'ModelView.jsx',HomePlan:'HomePlan.jsx',WaterPointDetails:'WaterPoints.jsx',WaterGlyph:'WaterPoints.jsx',KitchenElectricalPanel:'KitchenElectrical.jsx',RenderControls:'RenderControls.jsx',VrControls:'VrControls.jsx',FloorSpecification:'FloorSpecification.jsx',FloorSchedule:'FloorSchedule.jsx',SinkSpecification:'SinkSpecification.jsx',ElectricalFacts:'HomeElectrical.jsx',SceneRestoreControls:'SceneInterface.jsx',SceneUiLayer:'SceneInterface.jsx',restoreInterfaceOnEscape:'SceneInterface.jsx'};
 const input=Object.entries(exports).map(([name,file])=>`export {${name}} from ${JSON.stringify(join(root,'src',file))};`).join('\n')+`\nexport {default as KitchenApp} from ${JSON.stringify(join(root,'src/KitchenApp.jsx'))};\nexport {default as HomeApp} from ${JSON.stringify(join(root,'src/HomeApp.jsx'))};`;
 const bundler=await rolldown({input:'electrical:test',platform:'node',external:id=>/^(react|react-dom|three)(\/|$)/.test(id),transform:{jsx:'react-jsx'},plugins:[{name:'component-tests',resolveId(id){if(id==='electrical:test')return '\0entry';if(id.endsWith('.css'))return '\0css'},load(id){if(id==='\0entry')return input;if(id==='\0css')return ''}}]});
 const output=await bundler.generate({format:'esm'});await bundler.close();
@@ -64,11 +65,13 @@ test('hide-all keeps walking arrows and restore available while hiding other con
     const nodes=uiNodes(render(UI.HomeApp,{initialMode:mode})),controls=visibleUiControls(nodes),scene=nodes.find(n=>hasClass(n,mode==='plan'?'hs-plan-stage':'hs-model'));
     assert(scene&&!scene.hidden,`${mode}: the house remains mounted and visible`);
     if(cleanView){assert.equal(controls.length,mode==='walk'?5:1,`${mode}: only restore and walking arrows remain`);assert.equal(controls.filter(n=>'data-scene-ui-restore' in n.attrs).length,1);}
-    else{assert(controls.length>10);assert(!controls.some(n=>'data-scene-ui-restore' in n.attrs));}
-    for(const c of ['hs-header','hs-sidebar','hs-footer','hs-stage-top','hs-display-dock'])assert.equal(nodes.find(n=>hasClass(n,c)).hidden,cleanView,`${mode}: ${c}`);
+    else{assert.equal(controls.length,mode==='walk'?11:7,'two selectors and three primary actions, plus header and optional walking arrows');assert(!controls.some(n=>'data-scene-ui-restore' in n.attrs));}
+    for(const c of ['hs-header','hs-footer','hs-simple-topbar','hs-simple-actions'])assert.equal(nodes.find(n=>hasClass(n,c)).hidden,cleanView,`${mode}: ${c}`);
+    for(const c of ['hs-sidebar','hs-simple-panel'])assert(nodes.find(n=>hasClass(n,c)).hidden,`${c} stays closed until requested`);
     if(mode==='walk'){
      for(const c of ['hs-walk-controls','hs-walk-pad']){const pads=nodes.filter(n=>hasClass(n,c));assert.equal(pads.length,1,'one stable pad in both UI states');assert.equal(pads[0].hidden,false);}
-     for(const c of ['hs-exit-walk','hs-minimap','hs-walk-crosshair','hs-walk-map-slot'])assert.equal(nodes.find(n=>hasClass(n,c)).hidden,cleanView,`walking ${c}`);
+     for(const c of ['hs-exit-walk','hs-minimap','hs-walk-crosshair'])assert(!nodes.some(n=>hasClass(n,c)),`${c} does not crowd the default walk view`);
+     assert(nodes.find(n=>hasClass(n,'hs-walk-map-slot')).hidden,'compact pad never adds a map/caption');
      const arrows=controls.filter(n=>hasClass(n,'hs-hold'));assert.equal(arrows.length,4);assert.deepEqual(arrows.map(n=>n.attrs['aria-label']),lang==='he'?['קדימה','צעד שמאלה','אחורה','צעד ימינה']:['Forward','Step left','Back','Step right']);
     }else assert(!nodes.some(n=>hasClass(n,'hs-walk-controls')));
 
@@ -101,11 +104,129 @@ test('walking arrows keep hold/release/cancel behavior with the interface hidden
  }
 });
 
-test('the overlapping mobile bars and room actions share one flowing dock, including the drawer button',async()=>{
- const nodes=uiNodes(render(UI.HomeApp,{initialRoom:'kitchen'})),dock=nodes.findIndex(n=>hasClass(n,'hs-display-dock'));
- for(const c of ['hs-bottom-options','hs-render-display','hs-room-action','hs-mobile-drawer'])assert(nodes.find(n=>hasClass(n,c)).parents.includes(dock),`${c} participates in the same layout`);
- const css=await readFile(join(root,'src/render-controls.css'),'utf8');assert.match(css,/\.hs-display-dock\{[^}]*display:flex[^}]*flex-direction:column[^}]*gap:8px/);assert.match(css,/\.hs-display-dock \.hs-render-display[^}]*position:static;inset:auto;transform:none/);
- assert.match(css,/\.hs-app \[hidden\],\.app \[hidden\]\{display:none!important\}/,'a hidden layer cannot be revived by a mobile display rule');
+test('furniture movement controls expose all directions, rotation/reset and plan selection at the saved position',()=>{
+ const moves=[],steps=[],item=getFurniture('safe-bed'),tree=UI.FurniturePositionControls({item,lang:'he',step:.1,onStep:n=>steps.push(n),onMove:command=>moves.push(command)});
+ walk(tree,n=>{if(n.type==='button')n.props.onClick();if(n.type==='select')n.props.onChange({target:{value:'.25'}});});
+ assert.deepEqual(moves,[{dx:0,dz:-.1},{dx:-.1,dz:0},{dx:0,dz:.1},{dx:.1,dz:0},{rotate:true},{reset:true}]);assert.deepEqual(steps,[.25]);
+ assert.equal(UI.FurniturePositionControls({item:getFurniture('living-sofa'),lang:'he'}),null);
+ const selected=[],settings=normalizeHomeSettings(),plan=UI.HomePlan({settings,selectedRoom:'safe-room',onFurniture:id=>selected.push(id)}),rects=[];
+ walk(plan,n=>{if(n.props?.['data-furniture-id']===item.id)rects.push(n);});assert.equal(rects.length,1);assert.equal(rects[0].props.role,'button');rects[0].props.onClick({stopPropagation(){}});assert.deepEqual(selected,[item.id]);
+ const clean=UI.HomePlan({settings:{...settings,cleanView:true},selectedRoom:'safe-room',onFurniture:id=>selected.push(id)});walk(clean,n=>{if(n.props?.['data-furniture-id']===item.id){assert.equal(n.props.role,undefined);n.props.onClick({stopPropagation(){}});}});assert.equal(selected.length,1,'clean view never exposes furniture edit targets');
+ const html=render(UI.FurniturePositionControls,{item,lang:'en',onStep(){},onMove(){},error:'door'});assert(html.includes('role="status"'));assert(html.includes('Keep the doorway clear'));
+});
+
+test('the home has one optional panel and three primary actions, with a focused furniture editor',()=>{
+ const old=globalThis.localStorage;
+ try{
+  for(const lang of ['he','en'])for(const panel of ['rooms','options','furniture']){
+   globalThis.localStorage={getItem:()=>JSON.stringify(normalizeHomeSettings({lang}))};
+   const html=render(UI.HomeApp,{initialRoom:'safe-room',initialMode:'walk',initialPanel:panel}),nodes=uiNodes(html),panels=nodes.filter(n=>hasClass(n,'hs-simple-panel')&&!n.hidden);
+   assert.equal(panels.length,1);assert.equal(panels[0].attrs['data-active-panel'],panel);
+   for(const [name,visible] of [['hs-sidebar',panel==='rooms'],['hs-simple-options',panel==='options'],['hs-simple-editor',panel==='furniture']])assert.equal(!nodes.find(n=>hasClass(n,name)).hidden,visible,`${panel}: only the chosen panel content is visible`);
+   assert(!nodes.some(n=>hasClass(n,'hs-display-dock')||hasClass(n,'hs-space-title')),'no legacy overlapping title/dock');
+   const walking=nodes.find(n=>hasClass(n,'hs-walk-controls'));if(walking)assert(walking.hidden,'walking pad yields to a panel');
+   if(panel==='furniture'){
+    const plan=nodes.find(n=>hasClass(n,'hs-plan')),items=nodes.filter(n=>'data-furniture-id' in n.attrs);
+    assert.equal(plan.attrs['data-furniture-edit'],'true');assert.equal(plan.attrs.role,'group');
+    assert(items.every(n=>getFurniture(n.attrs['data-furniture-id']).roomId==='safe-room'));
+    const group=nodes.findIndex(n=>hasClass(n,'hs-furniture-picker')),choices=nodes.filter(n=>n.tag==='button'&&n.parents.includes(group));
+    assert.equal(choices.length,3);assert.equal(choices.filter(n=>n.attrs['aria-pressed']==='true').length,1);
+    assert(html.includes(lang==='he'?'10 ס״מ בכל לחיצה':'10 cm per press'));
+    assert(!visibleUiControls(nodes).some(n=>n.attrs['aria-label']===(lang==='he'?'צעד הזזה':'Movement step')),'fixed arrow step needs no extra dropdown');
+    assert(!nodes.some(n=>n.attrs['data-electrical-id']&&!n.hidden));
+   }
+  }
+ }finally{globalThis.localStorage=old;}
+});
+
+test('furniture entry chooses an editable bedroom and makes room/item selection explicit',()=>{
+ const chosen=[],moves=[],room='safe-room',bed=getFurniture('safe-bed'),settings=normalizeHomeSettings();
+ for(const r of ROOMS){const next=UI.furnitureEditorSelection(r.id);assert(editableFurniture(getFurniture(next.itemId)));if(FURNITURE.some(f=>f.roomId===r.id&&editableFurniture(f)))assert.equal(next.roomId,r.id);}
+ assert.equal(UI.furnitureEditorSelection('living',bed.id).itemId,bed.id);
+ const editor=UI.HomeFurnitureEditor({settings,roomId:room,itemId:bed.id,lang:'he',onSelect:id=>chosen.push(id),onMove:v=>moves.push(v)});
+ walk(editor,n=>{if(n.type==='button')n.props.onClick();if(n.type===UI.FurniturePositionControls)walk(UI.FurniturePositionControls(n.props),c=>{if(c.type==='button')c.props.onClick();});});
+ assert.deepEqual(chosen,FURNITURE.filter(f=>f.roomId===room&&editableFurniture(f)).map(f=>f.id));
+ assert.deepEqual(moves,[{dx:0,dz:-.1},{dx:-.1,dz:0},{dx:0,dz:.1},{dx:.1,dz:0},{rotate:true},{reset:true}]);
+ const selected=[],tree=UI.HomeViewChooser({mode:'plan',roomId:room,editing:true,lang:'he',onRoom:id=>selected.push(id),onMode(){throw Error('editor has no view switch');}});
+ walk(tree,n=>{if(n.type==='select'){assert.equal(n.props['aria-label'],'בחירת חדר');n.props.onChange({target:{value:'bedroom-a'}});}});assert.deepEqual(selected,['bedroom-a']);
+ const namesOff=normalizeHomeSettings({labels:true}),namesOn=normalizeHomeSettings({...namesOff,showRoomNames:true});
+ assert.equal(namesOff.showRoomNames,false);assert.equal(namesOn.showRoomNames,true);assert.equal(namesOn.labels,true,'old saved label preference is retained independently');
+});
+
+test('actual home CSS reserves separate scene, toolbar and panel rows at phone, tablet and desktop sizes',async()=>{
+ const css=postcss.parse((await Promise.all(['src/home.css','src/render-controls.css','src/home-workspace.css'].map(file=>readFile(join(root,file),'utf8')))).join('\n'));
+ const value=(nodes,index,property,width,height)=>{
+  let winner={weight:-1,value:undefined};
+  const simple=(i,s)=>i>=0&&/^(\.[\w-]+)+$/.test(s)&&s.slice(1).split('.').every(c=>hasClass(nodes[i],c));
+  const matches=(i,tokens,t)=>{if(!simple(i,tokens[t]))return false;if(!t)return true;const parents=nodes[i].parents;if(tokens[t-1]==='>')return parents.length>0&&matches(parents.at(-1),tokens,t-2);return parents.some(p=>matches(p,tokens,t-1));};
+  css.walkRules(rule=>{
+   for(let p=rule.parent;p;p=p.parent)if(p.type==='atrule'&&p.name==='media'){
+    const bounds=[...p.params.matchAll(/(min|max)-(width|height):\s*(\d+)px/g)];
+    if(!bounds.length||bounds.some(([,kind,axis,n])=>kind==='min'?(axis==='width'?width:height)<Number(n):(axis==='width'?width:height)>Number(n)))return;
+   }
+   for(const selector of rule.selectors){const tokens=selector.trim().replaceAll('>',' > ').split(/\s+/);if(!matches(index,tokens,tokens.length-1))continue;const specificity=(selector.match(/\.[\w-]+/g)||[]).length;rule.walkDecls(property,decl=>{const weight=specificity+(decl.important?1000:0);if(weight>=winner.weight)winner={weight,value:decl.value};});}
+  });return winner.value;
+ };
+ const old=globalThis.localStorage;
+ try{
+  for(const panel of [null,'rooms','options','furniture'])for(const mode of ['overview','room','walk','plan'])for(const cleanView of [false,true]){
+   globalThis.localStorage={getItem:()=>JSON.stringify(normalizeHomeSettings({cleanView}))};
+   const nodes=uiNodes(render(UI.HomeApp,{initialMode:mode,initialPanel:panel})),index=name=>nodes.findIndex(n=>hasClass(n,name));
+   for(const [width,height] of [[320,640],[393,852],[768,1024],[932,430],[1280,800]]){
+    assert.equal(value(nodes,index('hs-stage'),'display',width,height),'grid');
+    const scene=index(mode==='plan'||panel==='furniture'?'hs-plan-stage':'hs-model');
+    assert.equal(value(nodes,scene,'position',width,height),'relative');assert.equal(value(nodes,scene,'grid-row',width,height),cleanView?'1':'2');
+    if(!cleanView){
+     assert.equal(value(nodes,index('hs-simple-topbar'),'grid-row',width,height),'1');
+     assert.equal(value(nodes,index('hs-simple-panel'),'grid-row',width,height),panel&&width>=900?'2':'3');
+     assert.equal(value(nodes,index('hs-simple-actions'),'grid-row',width,height),panel&&width>=900?'3':'4');
+    }
+    assert.equal(value(nodes,index('hs-sidebar'),'position',width,height),'static');
+    const pad=index('hs-walk-controls');if(pad>=0){assert.equal(value(nodes,pad,'position',width,height),'relative');assert.equal(value(nodes,pad,'grid-row',width,height),cleanView?'1':'2');}
+   }
+  }
+ }finally{globalThis.localStorage=old;}
+ assert.match(css.toString(),/\.hs-app \[hidden\],\.app \[hidden\]\{display:none!important\}/,'native hidden wins over mobile display rules');
+});
+
+test('actual kitchen CSS keeps toolbars in flow at phone, tablet and desktop widths despite the hide-all wrapper',async()=>{
+ const css=postcss.parse((await Promise.all(['src/styles.css','src/render-controls.css','src/kitchen-viewer-layout.css'].map(file=>readFile(join(root,file),'utf8')))).join('\n'));
+ // Match class-only selectors against the real rendered ancestor tree. This
+ // checks the cascade that previously missed controls inside SceneUiLayer;
+ // it does not substitute for browser pixel/layout verification.
+ const matches=(nodes,index,selector)=>{
+  const tokens=selector.trim().replaceAll('>',' > ').split(/\s+/),simple=(i,s)=>/^(\.[\w-]+)+$/.test(s)&&s.slice(1).split('.').every(c=>hasClass(nodes[i],c));
+  const visit=(i,t)=>{if(!simple(i,tokens[t]))return false;if(t===0)return true;const parents=nodes[i].parents;if(tokens[t-1]==='>')return parents.length>0&&visit(parents.at(-1),t-2);return parents.some(p=>visit(p,t-1));};
+  return visit(index,tokens.length-1);
+ };
+ const value=(nodes,index,property,width)=>{
+  let winner={weight:-1,value:undefined};
+  css.walkRules(rule=>{
+   for(let parent=rule.parent;parent;parent=parent.parent)if(parent.type==='atrule'&&parent.name==='media'){
+    const bounds=[...parent.params.matchAll(/(min|max)-width:\s*(\d+)px/g)];
+    if(!bounds.length||bounds.some(([,kind,n])=>kind==='min'?width<Number(n):width>Number(n)))return;
+   }
+   for(const selector of rule.selectors){if(!matches(nodes,index,selector))continue;const specificity=(selector.match(/\.[\w-]+/g)||[]).length;
+    rule.walkDecls(property,decl=>{const weight=specificity+(decl.important?1000:0);if(weight>=winner.weight)winner={weight,value:decl.value};});
+   }
+  });return winner.value;
+ };
+ const old=globalThis.localStorage;
+ try{
+  for(const lang of ['he','en'])for(const view of ['perspective','plan','elevation','return'])for(const showElectrical of [false,true]){
+   globalThis.localStorage={getItem:()=>JSON.stringify({modelRevision:7,settings:{...DEFAULTS,lang,view,showElectrical,cleanView:false}})};
+   const nodes=uiNodes(render(UI.KitchenApp,{})),scene=nodes.findIndex(n=>hasClass(n,'scene-container'));
+   for(const width of [320,393,768,1280]){
+    for(const name of ['viewer-top','scene-toolbelt','kitchen-render-display','zoom-controls','viewer-bottom','mobile-customize']){
+     const index=nodes.findIndex(n=>hasClass(n,name));assert.equal(value(nodes,index,'position',width),'static',`${lang}/${view}/${showElectrical}/${width}: ${name} reserves its own space`);
+    }
+    assert.equal(value(nodes,scene,'position',width),'relative','the model occupies its own layout row');
+    assert.equal(value(nodes,scene,'grid-row',width),'2');
+    for(const [name,row] of [['kitchen-top-controls','1'],['kitchen-bottom-controls','3']])assert.equal(value(nodes,nodes.findIndex(n=>hasClass(n,name)),'grid-row',width),row);
+    if(showElectrical&&width<=760){const index=nodes.findIndex(n=>hasClass(n,'electrical-view-controls'));assert.equal(value(nodes,index,'display',width),'grid');assert.equal(value(nodes,index,'grid-template-columns',width),'repeat(2,minmax(0,1fr))');}
+   }
+  }
+ }finally{globalThis.localStorage=old;}
 });
 
 test('Escape restores the interface before the walk/inspection exit handlers and hiding labels preserves the saved settings',()=>{
@@ -218,7 +339,7 @@ test('the clean-view controls expose all cabinet modes, keep optional names off,
 test('cabinet visibility affects only the furnishings in both diagram views and survives actual app restore',()=>{
  for(const mode of ['solid','translucent','hidden']){
   const settings={...DEFAULTS,lang:'he',showElectrical:true,cabinetVisibility:mode};
-  for(const Component of [UI.FloorPlan,UI.Elevation]){const html=render(Component,{settings,onSelect(){},onElectricalSelect(){}});assert(html.includes(mode==='hidden'?'style="opacity:1;display:none"':mode==='translucent'?'style="opacity:0.24"':'style="opacity:1"'));assert(html.includes('class="electrical-fixture-glyph"'));assert(html.includes('width="390"'),'window stays in the drawing');}
+  for(const Component of [UI.FloorPlan,UI.Elevation]){const html=render(Component,{settings,onSelect(){},onElectricalSelect(){}});assert(html.includes(mode==='hidden'?'style="opacity:1;display:none"':mode==='translucent'?'style="opacity:0.24"':'style="opacity:1"'));assert(html.includes('class="electrical-fixture-glyph"'));assert(html.includes(`width="${WINDOW.width}"`),'window stays in the drawing');}
   const old=globalThis.localStorage;globalThis.localStorage={getItem:()=>JSON.stringify({modelRevision:7,settings})};
   try{const html=render(UI.KitchenApp,{});assert(html.includes(`value="${mode}" selected=""`));assert(html.includes('שמות הנקודות'));assert(!html.includes('electrical-quick-picker'));}finally{globalThis.localStorage=old;}
  }
@@ -258,7 +379,7 @@ test('the same corrected kitchen water point is selected in the real source phot
 test('render-quality and clean-view controls work in both apps and saved preferences restore',()=>{
  const changes=[],tree=UI.RenderControls({settings:{lang:'he',renderQuality:'realistic',cleanView:false},onChange:(...v)=>changes.push(v)});walk(tree,n=>{if(n.type==='select')n.props.onChange({target:{value:'light'}});if(n.type==='button')n.props.onClick();});assert.deepEqual(changes,[['renderQuality','light'],['cleanView',true]]);
  const old=globalThis.localStorage;try{globalThis.localStorage={getItem:()=>JSON.stringify({modelRevision:7,settings:{...DEFAULTS,lang:'he',renderQuality:'light',cleanView:true}})};const kitchen=render(UI.KitchenApp,{});assert(kitchen.includes('is-clean'));assert(kitchen.includes('value="light" selected=""'));assert(kitchen.includes('הצגת הפקדים'));
- globalThis.localStorage={getItem:()=>JSON.stringify({schema:2,lang:'he',renderQuality:'light',cleanView:true})};const home=render(UI.HomeApp,{});assert(home.includes('hs-app is-clean'));assert(home.includes('value="light" selected=""'));assert(home.includes('הצגת הפקדים'));}finally{globalThis.localStorage=old;}
+ globalThis.localStorage={getItem:()=>JSON.stringify({schema:2,lang:'he',renderQuality:'light',cleanView:true})};const home=render(UI.HomeApp,{});assert(uiNodes(home).some(n=>hasClass(n,'hs-app')&&hasClass(n,'is-clean')));assert(home.includes('value="light" selected=""'));assert(home.includes('הצגת הפקדים'));}finally{globalThis.localStorage=old;}
 });
 
 test('Oculus VR entry reflects real support/busy/error states, starts only on click, and appears only in 3D views',()=>{

@@ -1,0 +1,55 @@
+/* Each control region reserves its actual height, including wrapped rows.
+   SceneUiLayer uses display:contents, but still exists in the selector tree. */
+.app.kitchen-app{min-height:0}
+.kitchen-app .workspace{min-height:0}
+.viewer.kitchen-viewer{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(270px,1fr) auto;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+.viewer.kitchen-viewer>.scene-container{position:relative;inset:auto;grid-column:1;grid-row:2;order:0;flex:initial;min-height:270px}
+.kitchen-top-controls,.kitchen-bottom-controls{grid-column:1;display:flex;flex-direction:column;gap:8px;min-width:0;padding:10px;background:#f8faf3;position:relative;z-index:9}
+.kitchen-top-controls{grid-row:1;border-bottom:1px solid #e0e6d8}
+.kitchen-bottom-controls{grid-row:3;border-top:1px solid #e0e6d8;padding-bottom:max(10px,env(safe-area-inset-bottom))}
+.kitchen-top-controls>.viewer-top{position:static;inset:auto;min-height:36px;padding:0;flex-shrink:0}
+.kitchen-top-controls .viewer-title,.kitchen-top-controls .viewer-title>div{min-width:0}
+.kitchen-top-controls .viewer-title strong{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kitchen-top-controls .viewer-top-actions{flex-shrink:0}
+.kitchen-top-controls .viewer-top-actions .icon-button{width:44px;height:44px}
+.kitchen-toolbar-row,.kitchen-navigation-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;min-width:0}
+.kitchen-toolbar-row>.scene-toolbelt{position:static;inset:auto;max-width:100%;min-width:0;margin:0;flex:1 1 290px;flex-wrap:wrap;box-shadow:none}
+.kitchen-toolbar-row>.scene-toolbelt>button{min-height:44px;min-width:40px}
+.kitchen-toolbar-row>.scene-toolbelt>button:first-child,.kitchen-toolbar-row>.scene-toolbelt>.electrical-compare-tool{flex:1;justify-content:center}
+.kitchen-toolbar-row>.camera-presets,.kitchen-toolbar-row>.return-to-room{position:static;inset:auto;flex-shrink:0;margin:0;min-height:36px}
+.kitchen-top-controls>.electrical-view-controls{margin:0;min-width:0;gap:6px 12px}
+.kitchen-top-controls .electrical-labels-toggle{flex:0 1 auto;min-width:0}
+.kitchen-top-controls .electrical-labels-toggle>span{min-width:0;white-space:normal;overflow-wrap:anywhere}
+.kitchen-top-controls .electrical-labels-toggle>input{flex-shrink:0}
+.kitchen-top-controls .electrical-cabinet-picker{min-width:0}
+.kitchen-top-controls .electrical-point-picker{min-width:0;flex:1 1 220px;max-width:100%;width:100%}
+.kitchen-top-controls .services-color-key{flex-wrap:wrap;min-width:0}
+.kitchen-bottom-controls>.kitchen-render-display{position:static;inset:auto;max-width:100%;width:100%;margin:0}
+.kitchen-bottom-controls .render-controls{justify-content:center;box-shadow:none}
+.kitchen-navigation-row>.zoom-controls{position:static;inset:auto;display:flex;flex-direction:row;align-items:center;flex-shrink:0}
+.kitchen-navigation-row>.zoom-controls>button{width:44px;height:44px}
+.kitchen-navigation-row>.zoom-controls>span{width:1px;height:20px;margin:0 3px}
+.kitchen-navigation-row>.mobile-customize{position:static;inset:auto;margin:0;min-height:44px;height:auto;padding:8px 12px;font-size:11px}
+.kitchen-bottom-controls>.viewer-bottom{position:static;inset:auto;min-width:0;margin:0;padding:0;flex-wrap:wrap;gap:8px}
+.kitchen-bottom-controls .view-switch{max-width:100%;min-width:0;flex-wrap:wrap;justify-content:center}
+.kitchen-bottom-controls .view-switch>button{min-height:44px;flex:1 1 auto;justify-content:center}
+.kitchen-bottom-controls .gesture-hint{display:none}
+/* Inspectors stay inside the model row, clear of both control regions. */
+.kitchen-scene-overlays{grid-column:1;grid-row:2;align-self:end;justify-self:start;position:relative;z-index:7;display:flex;flex-direction:column;gap:8px;min-height:0;max-height:100%;width:min(360px,100%);padding:10px;overflow-y:auto;pointer-events:none}
+.kitchen-scene-overlays:empty{display:none}
+.kitchen-scene-overlays>.selection-card{position:static;inset:auto;pointer-events:auto;max-width:100%;min-width:0;margin:0;flex-shrink:0}
+.app.kitchen-app.is-clean .viewer.kitchen-viewer{grid-template-rows:minmax(0,1fr);overflow:hidden}
+.app.kitchen-app.is-clean .viewer.kitchen-viewer>.scene-container{position:absolute;inset:0;min-height:0;grid-row:1}
+@media(max-width:760px){
+ .kitchen-top-controls,.kitchen-bottom-controls{padding-inline:8px;gap:6px}
+ .kitchen-top-controls>.electrical-view-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 10px;padding:6px 8px}
+ .kitchen-top-controls .electrical-labels-toggle{min-height:44px}
+ .kitchen-top-controls .electrical-cabinet-picker,.kitchen-top-controls .electrical-point-picker,.kitchen-top-controls .services-color-key{grid-column:1 / -1}
+ .kitchen-top-controls .electrical-cabinet-picker>select{flex:1;min-width:0;min-height:44px}
+ .kitchen-top-controls .electrical-point-picker{width:100%;max-width:100%;min-height:44px}
+ .kitchen-toolbar-row>.scene-toolbelt{flex-basis:100%}
+ .kitchen-toolbar-row>.return-to-room{min-height:44px}
+ .kitchen-bottom-controls .model-units{display:none}
+ .kitchen-bottom-controls .view-switch{width:100%}
+ .kitchen-bottom-controls .view-switch>button{font-size:10px;padding:8px;white-space:normal}
+}

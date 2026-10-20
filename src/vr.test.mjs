@@ -16,12 +16,12 @@ class Session extends THREE.EventDispatcher{
  async requestReferenceSpace(type){if(this.localOnly&&type==='local-floor')throw Error('no floor');return {type};}
  async end(){this.ended++;this.dispatchEvent({type:'end'});}
 }
-function fixture({localOnly=false,request,supported=true,environment={},start={position:[2,0,4],yaw:0},move,onSelect,getModel}={}){
+function fixture({localOnly=false,request,supported=true,environment={},start={position:[2,0,4],yaw:0},move,canTeleport,onSelect,getModel}={}){
  const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(44,1.4,.06,120);camera.position.set(10,15,20);camera.rotation.set(.1,.6,.03);const parent=new THREE.Group();parent.add(camera);scene.add(parent);
  const controls={enabled:true,target:new THREE.Vector3(3,.5,8)},controllers=[new THREE.Group(),new THREE.Group()],grips=[new THREE.Group(),new THREE.Group()],sessions=[],states=[],requests=[],system=new THREE.EventDispatcher();
  system.isSessionSupported=async()=>supported;system.requestSession=(type,options)=>{requests.push({type,options});if(request)return request();const s=new Session({localOnly});sessions.push(s);return Promise.resolve(s);};
  const xr={enabled:false,isPresenting:false,setFramebufferScaleFactor(){},setFoveation(){},getController:i=>controllers[i],getControllerGrip:i=>grips[i],setReferenceSpaceType(type){this.type=type;},async setSession(s){this.session=s;this.isPresenting=true;s.addEventListener('end',()=>{this.isPresenting=false;this.session=null;});},setReferenceSpace(space){this.space=space;},getReferenceSpace(){return this.space;}};
- const renderer={xr,shadowMap:{enabled:true}},runtime=createVrRuntime({renderer,scene,camera,controls,getStart:()=>start,getModel,move,onSelect,onState:s=>states.push(s),environment:{isSecureContext:true,navigator:{xr:system},...environment}});
+ const renderer={xr,shadowMap:{enabled:true}},runtime=createVrRuntime({renderer,scene,camera,controls,getStart:()=>start,getModel,move,canTeleport,onSelect,onState:s=>states.push(s),environment:{isSecureContext:true,navigator:{xr:system},...environment}});
  return {runtime,scene,camera,parent,controls,controllers,grips,sessions,states,requests,system,renderer};
 }
 const frame=({x=0,y=1.65,z=0,yaw=0}={})=>({getViewerPose:()=>({transform:{position:{x,y,z},orientation:new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),yaw)}})});
@@ -65,6 +65,20 @@ test('the real kitchen VR starting point and movement clear the cabinets, island
  for(const openParts of [[],['dishwasher:door','island-1:drawer-0','sink:door-left']]){
   const model=createKitchen({...DEFAULTS,openParts});try{const nav=createKitchenVrNavigation(model);assert(nav.canStand(nav.start));for(const delta of [[0,-8],[8,0],[-8,0],[0,8]]){const p=nav.move(nav.start,delta);assert(nav.canStand(p));assert(p[0]>=.17&&p[0]<=5.28&&p[1]>=.17&&p[1]<=3.13);}}finally{model.dispose();}
  }
+});
+
+test('VR floor targets teleport into the kitchen work aisle and reject occupied floors without changing eye height',async()=>{
+ const model=createKitchen({...DEFAULTS}),nav=createKitchenVrNavigation(model),f=fixture({start:{position:[4.95,0,2.9],yaw:0},getModel:()=>model,canTeleport:p=>nav.canStand(p),move:nav.move});
+ try{
+  await f.runtime.ready;await f.runtime.start();f.runtime.update(0,frame());
+  const controller=f.controllers[0],target=new THREE.Vector3(4.95,-.005,1.1),origin=new THREE.Vector3(4.95,1.2,2.9);
+  controller.position.set(0,1.2,0);controller.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,-1),target.clone().sub(origin).normalize());
+  f.runtime.update(120,frame());assert(f.scene.getObjectsByProperty('name','vr-floor-target').some(m=>m.visible),'a clear floor landing is marked in the headset');
+  controller.dispatchEvent({type:'select'});near(f.runtime.pose().x,target.x);near(f.runtime.pose().z,target.z);near(f.runtime.pose().y,1.65);
+  const before=f.runtime.pose();controller.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,-1),new THREE.Vector3(3.4,0,2).sub(new THREE.Vector3(4.95,1.2,1.1)).normalize());f.scene.updateMatrixWorld(true);controller.dispatchEvent({type:'select'});near(f.runtime.pose().x,before.x);near(f.runtime.pose().z,before.z);
+  const p=nav.move([1.2,1.1],[3.7,0]);assert(p[0]>4.8&&Math.abs(p[1]-1.1)<.001,'joystick walking can traverse the whole closed-front work aisle');
+  await f.runtime.end();await settle();assert(f.scene.getObjectsByProperty('name','vr-floor-target').every(m=>!m.visible));
+ }finally{f.runtime.dispose();assert.equal(f.scene.getObjectsByProperty('name','vr-floor-target').length,0);model.dispose();}
 });
 
 test('controller rays open an actual kitchen front and stop at an opaque wall instead of selecting through it',async()=>{

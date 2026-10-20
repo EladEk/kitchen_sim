@@ -14,13 +14,20 @@ export function vrSurfaceHit(root,raycaster){
  return raycaster.intersectObject(root,true).find(h=>h.object.isMesh&&objectVisible(h.object)&&!['electrical-annotation-hit','electrical-highlight'].includes(h.object.userData.part)&&(Array.isArray(h.object.material)?h.object.material:[h.object.material]).some(m=>m?.visible!==false&&m?.opacity>=.2))||null;
 }
 
-export function createVrRuntime({renderer,scene,camera,controls,getStart,move,onSelect,onState=()=>{},getModel=()=>null,environment=globalThis}){
+export function createVrRuntime({renderer,scene,camera,controls,getStart,move,canTeleport,onSelect,onState=()=>{},getModel=()=>null,environment=globalThis}){
  const xr=renderer.xr,system=environment.navigator?.xr,rig=new THREE.Group(),ray=new THREE.Raycaster(),resources=[],controllers=[],bindings=[];
  let state={status:'checking'},session=null,pending=null,disposed=false,saved=null,calibrate=true,startPose=null,lastTime=null,lastRayTime=-Infinity,turnHeld=false,exitHeld=false,floor=true;
  const headLocal=new THREE.Vector3(),headOrientation=new THREE.Quaternion(),headWorld=new THREE.Vector3(),forward=new THREE.Vector3(),right=new THREE.Vector3();
  rig.name='vr-player-rig';xr.enabled=true;xr.setFramebufferScaleFactor?.(.9);xr.setFoveation?.(1);
  const emit=(status,reason)=>{state={status,...(reason?{reason}:{})};if(!disposed)onState(state);};
  const permitted=()=>environment.isSecureContext!==false&&(environment.document?.permissionsPolicy||environment.document?.featurePolicy)?.allowsFeature?.('xr-spatial-tracking')!==false;
+ const landing=hit=>hit?.object.userData.navigationSurface&&hit.distance<=6&&canTeleport?.([hit.point.x,hit.point.z])?[hit.point.x,hit.point.z]:null;
+ function teleport(target){
+  if(!target||calibrate)return;
+  rig.updateMatrixWorld(true);headWorld.copy(headLocal).applyMatrix4(rig.matrixWorld);
+  rig.position.x+=target[0]-headWorld.x;rig.position.z+=target[1]-headWorld.z;
+  rig.updateMatrixWorld(true);headWorld.copy(headLocal).applyMatrix4(rig.matrixWorld);
+ }
  async function probe(){
   if(disposed||session)return state;
   if(!permitted()){emit('unsupported',environment.isSecureContext===false?'https':'policy');return state;}
@@ -30,7 +37,7 @@ export function createVrRuntime({renderer,scene,camera,controls,getStart,move,on
  }
  const deviceChange=()=>{void probe();};system?.addEventListener?.('devicechange',deviceChange);
  function restore(){
-  const s=session;session=null;lastTime=null;lastRayTime=-Infinity;turnHeld=exitHeld=false;rig.removeFromParent();
+  const s=session;session=null;lastTime=null;lastRayTime=-Infinity;turnHeld=exitHeld=false;rig.removeFromParent();controllers.forEach(c=>{c.marker.visible=false;});
   if(saved){camera.removeFromParent();saved.parent?.add(camera);camera.position.copy(saved.position);camera.quaternion.copy(saved.quaternion);camera.scale.copy(saved.scale);camera.rotation.order=saved.order;if(renderer.shadowMap)renderer.shadowMap.enabled=saved.shadows;
    Object.assign(camera,saved.projection);camera.updateProjectionMatrix();camera.updateMatrixWorld(true);controls.target.copy(saved.target);controls.enabled=saved.enabled;saved=null;}
   s?.removeEventListener('end',onEnd);if(!disposed)emit('ready');
@@ -39,10 +46,12 @@ export function createVrRuntime({renderer,scene,camera,controls,getStart,move,on
  for(let i=0;i<2;i++){
   const controller=xr.getController(i),grip=xr.getControllerGrip(i),geometry=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3(0,0,-1)]),material=new THREE.LineBasicMaterial({color:i?'#91c5ff':'#d4efbc'}),line=new THREE.Line(geometry,material);
   line.name='vr-pointer';line.scale.z=4;line.userData.vrHelper=true;controller.add(line);resources.push(geometry,material);
+  const markerGeo=new THREE.RingGeometry(.13,.17,32),markerMat=new THREE.MeshBasicMaterial({color:'#55bf78',side:THREE.DoubleSide,depthWrite:false}),marker=new THREE.Mesh(markerGeo,markerMat);
+  marker.name='vr-floor-target';marker.rotation.x=-Math.PI/2;marker.visible=false;scene.add(marker);resources.push(markerGeo,markerMat);
   // Local lightweight grip; no device-profile/CDN downloads are required.
   const bodyGeo=new THREE.CylinderGeometry(.022,.018,.1,12),bodyMat=new THREE.MeshStandardMaterial({color:'#e4e7e1',roughness:.7}),body=new THREE.Mesh(bodyGeo,bodyMat);body.rotation.x=Math.PI/2;body.userData.vrHelper=true;grip.add(body);resources.push(bodyGeo,bodyMat);
-  const select=()=>{if(!session||!xr.isPresenting)return;getModel()?.group.updateWorldMatrix(true,true);controller.updateWorldMatrix(true,false);ray.ray.origin.setFromMatrixPosition(controller.matrixWorld);ray.ray.direction.set(0,0,-1).transformDirection(controller.matrixWorld);const hit=vrSurfaceHit(getModel()?.group,ray);if(hit)onSelect?.(hit.object.userData,hit);};
-  controller.addEventListener('select',select);bindings.push(()=>{controller.removeEventListener('select',select);controller.remove(line);grip.remove(body);});controllers.push({controller,grip,line});rig.add(controller,grip);
+  const select=()=>{if(!session||!xr.isPresenting)return;getModel()?.group.updateWorldMatrix(true,true);controller.updateWorldMatrix(true,false);ray.ray.origin.setFromMatrixPosition(controller.matrixWorld);ray.ray.direction.set(0,0,-1).transformDirection(controller.matrixWorld);const hit=vrSurfaceHit(getModel()?.group,ray),target=landing(hit);if(target)teleport(target);else if(hit&&!hit.object.userData.navigationSurface)onSelect?.(hit.object.userData,hit);};
+  controller.addEventListener('select',select);bindings.push(()=>{controller.removeEventListener('select',select);controller.remove(line);grip.remove(body);marker.removeFromParent();});controllers.push({controller,grip,line,marker});rig.add(controller,grip);
  }
  async function start(){
   if(disposed)return null;if(session)return session;if(pending)return pending;
@@ -80,7 +89,7 @@ export function createVrRuntime({renderer,scene,camera,controls,getStart,move,on
   // Pointer feedback is sampled at 10 Hz; trigger selection always raycasts
   // immediately. Head tracking and movement remain at the headset frame rate.
   if(time-lastRayTime>100){lastRayTime=time;getModel()?.group.updateWorldMatrix(true,true);
-  for(const {controller,line} of controllers){controller.updateWorldMatrix(true,false);ray.ray.origin.setFromMatrixPosition(controller.matrixWorld);ray.ray.direction.set(0,0,-1).transformDirection(controller.matrixWorld);const hit=vrSurfaceHit(getModel()?.group,ray);line.scale.z=hit?Math.min(6,hit.distance):4;}}
+  for(const {controller,line,marker} of controllers){controller.updateWorldMatrix(true,false);ray.ray.origin.setFromMatrixPosition(controller.matrixWorld);ray.ray.direction.set(0,0,-1).transformDirection(controller.matrixWorld);const hit=vrSurfaceHit(getModel()?.group,ray),target=landing(hit);line.scale.z=hit?Math.min(6,hit.distance):4;marker.visible=!!target;if(target)marker.position.set(target[0],hit.point.y+.012,target[1]);}}
   if(input.exit&&!exitHeld){exitHeld=true;void end();}else if(!input.exit)exitHeld=false;
  }
  const ready=probe();

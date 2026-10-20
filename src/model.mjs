@@ -23,7 +23,9 @@ export const SHORT = [
 export const UPPERS = [480,1000,900,900,480].map((w,i,a)=>({id:'upper-'+i,name:'Touch upper cabinet',he:'ארון עליון Touch',w,x:1090+a.slice(0,i).reduce((n,c)=>n+c,0),wall:'long',type:'upper',h:900,d:320,doors:w>600?2:1,shelves:2,hinge:i===0||i===4?'right':'left'}));
 export const ISLAND = { x:2180, z:1600, width:2440, depth:900, baseWidth:2400, baseDepth:590, height:912, xSource:'Estimated from the scaled countertop drawing', zSource:'Estimated from the scaled countertop drawing' };
 export const ISLAND_UNITS = [400,1000,1000].map((w,i,a)=>({id:'island-'+i,name:i===0?'Island · three wire baskets':'Island · three drawers',he:i===0?'אי · שלוש סלסלות רשת':'אי · שלוש מגירות',w,x:ISLAND.x+20+a.slice(0,i).reduce((n,c)=>n+c,0),wall:'island',type:i===0?'baskets':'drawers',h:754,d:590,baskets:i===0?3:0,hinge:'left'}));
-export const WINDOW = { x:610, width:390, sill:1100, height:1000, approximate:true };
+// RG1 opening stations place the window about 100–1000 mm from the corner.
+// The apartment opening schedule specifies 900 × 1250 mm; sill remains estimated.
+export const WINDOW = { x:100, width:900, sill:1100, height:1250, approximate:true, source:'RG1 plan + apartment specification p16', sillInferred:true };
 export const MATERIALS = [
  { id:'chalk',name:'Chalk',he:'לבן גיר',color:'#e4e1d9' },
  { id:'linen',name:'Linen',he:'פשתן',color:'#c9c2b5' },

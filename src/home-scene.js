@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
-import {HOUSE,HOUSE_OUTLINE,PLOT,TERRACE,SERVICE_APRON,PUBLIC_ENTRY,ROOMS,WALLS,DOORS,WINDOWS,SHUTTERS,FURNITURE,GARDEN_PLANTS,HOME_FINISHES,FLOOR_FINISHES,KITCHEN_ANCHOR,GARDEN_LAYOUT,WATER_LAYOUT,point,polygonBounds,insidePolygon,roomAt,openingPoint} from './home-model.mjs';
+import {HOUSE,HOUSE_OUTLINE,PLOT,TERRACE,SERVICE_APRON,PUBLIC_ENTRY,ROOMS,WALLS,DOORS,WINDOWS,SHUTTERS,FURNITURE,furnitureForSettings,GARDEN_PLANTS,HOME_FINISHES,FLOOR_FINISHES,KITCHEN_ANCHOR,GARDEN_LAYOUT,WATER_LAYOUT,point,polygonBounds,insidePolygon,roomAt,openingPoint} from './home-model.mjs';
 import {buildOutdoorKitchen} from './outdoor-kitchen.js';
 import {claddingHeight,DOUBLE_GLAZED_IDS} from './home-building-spec.mjs';
 import {SHUTTER_COVERS} from './home-photo-reference.mjs';
@@ -40,7 +40,7 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
  if(mode==='walk'){const ceiling=floor(HOUSE_OUTLINE,offwhite,HOUSE.height);ceiling.userData.part='illustrative-ceiling';}
 
  function roomFloor(room,poly,parent,data){
-  const f=FLOOR_FINISHES.find(f=>f.id===settings.rooms[room.id]?.floor)||FLOOR_FINISHES[0],kind=f.id==='oak'?'wood':f.id==='ordered-wet'?'cement':f.id==='ordered-terrace'?'terrace':'porcelain',m=floor(poly,surface(kind,f.color,{productId:f.productId}),.008,parent,data);m.userData.floorFinish=f.id;m.userData.tile=f.tile||null;m.userData.productId=f.productId;
+  const f=FLOOR_FINISHES.find(f=>f.id===settings.rooms[room.id]?.floor)||FLOOR_FINISHES[0],kind=f.id==='oak'?'wood':f.id==='ordered-wet'?'cement':f.id==='ordered-terrace'?'terrace':'porcelain',m=floor(poly,surface(kind,f.color,{productId:f.productId}),.008,parent,data);m.userData.navigationSurface=true;m.userData.floorFinish=f.id;m.userData.tile=f.tile||null;m.userData.productId=f.productId;
   // Ordered floors shade millimetre-width joints directly on the surface.
   // Keep screen-space guide lines only for the optional trial finishes.
   if(m.material.userData.floorRendering)return;
@@ -214,7 +214,7 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
   }
   p.traverse(o=>{if(o.isMesh&&!o.userData.action){o.userData={...o.userData,action:'furniture',furnitureId:f.id};picks.push(o);}});
  }
- if(settings.furniture)FURNITURE.forEach(furnish);
+ if(settings.furniture)furnitureForSettings(settings).forEach(furnish);
  // Kitchen proxy preserves the exact cabinet chains and island from the existing
  // simulator. Its dedicated route retains the complete detailed mechanisms.
  const kg=new THREE.Group();kg.position.set(KITCHEN_ANCHOR[0],0,KITCHEN_ANCHOR[1]);kg.rotation.y=Math.PI;group.add(kg);

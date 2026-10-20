@@ -36,6 +36,7 @@ export function createKitchen(settings){
  for(let x=tileOrigin;x<5700;x+=tileStep){const geo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(x*M,-.002,-.2),new THREE.Vector3(x*M,-.002,3.51)]);resources.push(geo);group.add(new THREE.Line(geo,tileLine));}
  for(let z=tileOrigin;z<3600;z+=tileStep){const geo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-.2,-.002,z*M),new THREE.Vector3(5.7,-.002,z*M)]);resources.push(geo);group.add(new THREE.Line(geo,tileLine));}
  }
+ floorMesh.userData.navigationSurface=true;
  const visualCeiling=HVAC_PROFILE.top/M;
  box(-75,visualCeiling/2,1650,150,visualCeiling,3450,wall);
  const hole=WINDOW;
@@ -43,11 +44,20 @@ export function createKitchen(settings){
  box((hole.x+hole.width+ROOM.long)/2,visualCeiling/2,-75,ROOM.long-hole.x-hole.width,visualCeiling,150,wall);
  box(hole.x+hole.width/2,hole.sill/2,-75,hole.width,hole.sill,150,wall);
  box(hole.x+hole.width/2,(hole.sill+hole.height+visualCeiling)/2,-75,hole.width,visualCeiling-hole.sill-hole.height,150,wall);
- const windowMat=mat('#c1d4cb',{roughness:.2,emissive:'#adc4b6',emissiveIntensity:settings.light==='day'?.32:.05});
- box(805,1600,-110,390,1000,12,windowMat);
- for(const x of [620,805,990])box(x,1600,-8,15,1000,35,metal);
- for(const y of [1110,2090])box(805,y,-8,390,20,35,metal);
- box(805,1090,20,425,25,100,stone);
+ // Two dark sliding sashes, recessed into the wall with a flush inner face.
+ const windowGroup=new THREE.Group();windowGroup.userData.windowId='kitchen-window';group.add(windowGroup);
+ const frame=mat('#343d3d',{metalness:.3,roughness:.45}),windowMat=mat('#b0c8be',{transparent:true,opacity:.15,roughness:.16,depthWrite:false});
+ const windowBox=(x,y,z,w,h,d,material,part)=>{const mesh=box(x,y,z,w,h,d,material,null,windowGroup);mesh.userData={windowId:'kitchen-window',part};return mesh;};
+ for(let i=0;i<2;i++){
+  const x=hole.x+hole.width*(i+.5)/2,z=i?-38:-62,w=hole.width/2,y=hole.sill+hole.height/2;
+  for(const zz of [-7,7])windowBox(x,y,z+zz,w-44,hole.height-44,4,windowMat,'window-glass').userData.glazing='double';
+  for(const xx of [x-w/2+11,x+w/2-11])windowBox(xx,y,z,22,hole.height-16,24,frame,'window-sash');
+  for(const yy of [hole.sill+11,hole.sill+hole.height-11])windowBox(x,yy,z,w,22,24,frame,'window-sash');
+  windowBox(x+(i?-1:1)*(w/2-35),y,-15,14,125,16,frame,'window-handle');
+ }
+ for(const x of [hole.x+15,hole.x+hole.width-15])windowBox(x,hole.sill+hole.height/2,-45,30,hole.height,90,frame,'window-frame');
+ for(const y of [hole.sill+15,hole.sill+hole.height-15])windowBox(hole.x+hole.width/2,y,-45,hole.width,30,90,frame,'window-frame');
+ windowBox(hole.x+hole.width/2,hole.sill-12,-60,hole.width,24,120,stone,'window-sill');
  const hvacBox=(x,y,z,w,h,d,m,parent,data)=>{const mesh=box(x/M,y/M,z/M,w/M,h/M,d/M,m,null,parent);mesh.userData={...data};return mesh;};
  const hvac=createKitchenHvac({box:hvacBox,mat});group.add(hvac);
  const roomStructure=new Set(group.children);
@@ -192,7 +202,7 @@ export function createKitchen(settings){
  topShape.holes.push(vegasCutoutPath(sinkX,sinkZ));
  const hobX=LONG.find(m=>m.id===HOB.cabinetId).x+450,hobCut=new THREE.Path(),cw=HOB.cutout.previewWidth,cd=HOB.cutout.previewDepth;
  hobCut.moveTo(hobX-cw/2,HOB.centerZ-cd/2);hobCut.lineTo(hobX-cw/2,HOB.centerZ+cd/2);hobCut.lineTo(hobX+cw/2,HOB.centerZ+cd/2);hobCut.lineTo(hobX+cw/2,HOB.centerZ-cd/2);hobCut.closePath();topShape.holes.push(hobCut);
- const topGeo=new THREE.ExtrudeGeometry(topShape,{depth:topH,bevelEnabled:false,curveSegments:12});topGeo.rotateX(Math.PI/2);topGeo.scale(M,M,M);topGeo.translate(0,ROOM.worktop*M,0);const topUV=topGeo.attributes.uv;for(let i=0;i<topUV.count;i++)topUV.setXY(i,topUV.getX(i)/1800,topUV.getY(i)/1800);resources.push(topGeo);const countertop=new THREE.Mesh(topGeo,stone);countertop.castShadow=true;countertop.receiveShadow=true;part(countertop,'worktop');group.add(countertop);
+ const topGeo=new THREE.ExtrudeGeometry(topShape,{depth:topH,bevelEnabled:false,curveSegments:12});topGeo.rotateX(Math.PI/2);topGeo.scale(M,M,M);topGeo.translate(0,ROOM.worktop*M,0);const topUV=topGeo.attributes.uv;for(let i=0;i<topUV.count;i++)topUV.setXY(i,topUV.getX(i)/1800,topUV.getY(i)/1800);resources.push(topGeo);const countertop=new THREE.Mesh(topGeo,stone);countertop.castShadow=true;countertop.receiveShadow=true;part(countertop,'worktop');countertop.userData.navigationBoxes=[{min:[0,(ROOM.worktop-topH)*M,0],max:[4850*M,ROOM.worktop*M,ROOM.counterDepth*M]},{min:[0,(ROOM.worktop-topH)*M,ROOM.counterDepth*M],max:[ROOM.counterDepth*M,ROOM.worktop*M,1660*M]}];group.add(countertop);
  const sinkParent=moduleGroups.get('sink'),bowlX=sinkModule.w/2,vegas=createVegasSink(resources);vegas.position.set(bowlX*M,ROOM.worktop*M,sinkZ*M);sinkParent.add(vegas);vegas.traverse(o=>{if(o.isMesh)picks.push(o);});
  const kitchenTap=createVeredKitchenTap(resources);kitchenTap.position.set(bowlX*M,ROOM.worktop*M,SINK.tapZ*M);sinkParent.add(kitchenTap);kitchenTap.traverse(o=>{if(o.isMesh)picks.push(o);});
 
@@ -285,5 +295,5 @@ export function createKitchen(settings){
  }
  const activePicks=picks.filter(objectVisible),electricalOccluders=[];
  group.traverse(mesh=>{if(mesh.isMesh&&objectVisible(mesh)&&!mesh.userData.electricalId&&opaqueMesh(mesh))electricalOccluders.push(mesh);});
- return {group,picks:activePicks,moduleGroups,openingObjects,electricalGroups,waterGroups,dimensionGroup,serviceGroups:new Map([...electricalGroups,...waterGroups]),furnishingRoots,roomStructure,electricalOccluders,dispose(){group.traverse(o=>{if(o.isLight&&o.shadow)o.shadow.dispose();});resources.forEach(r=>r.dispose?.());}};
+ return {group,windowGroup,picks:activePicks,moduleGroups,openingObjects,electricalGroups,waterGroups,dimensionGroup,serviceGroups:new Map([...electricalGroups,...waterGroups]),furnishingRoots,roomStructure,electricalOccluders,dispose(){group.traverse(o=>{if(o.isLight&&o.shadow)o.shadow.dispose();});resources.forEach(r=>r.dispose?.());}};
 }

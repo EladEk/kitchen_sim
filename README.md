@@ -2,7 +2,7 @@
 
 React + Vite + Three.js whole-house and detailed kitchen simulator. The house follows the attached RG1 floor plan. Kitchen geometry retains the Anise order 167968 drawings and subsequent technical/appliance sheets.
 
-Current revision **31**: Oculus / Meta Quest VR support uses native WebXR stereo, head tracking, controller locomotion and interactive doors/drawers in both 3D viewers. Desktop camera/controls restore after exit. Revision 30's complete interface hiding and mobile dock, revision 29's HVAC/electrical corrections and original material sources are retained.
+Current revision **34**: the home opens with three primary actions and one optional panel at a time. Move furniture opens a focused room plan with direct touch/mouse dragging, item choices and 10 cm arrows. The house retains its ordered materials, kitchen corrections, saved furniture arrangements and native WebXR support.
 
 ## Run
 
@@ -451,3 +451,28 @@ Hide all controls retains the four walking arrows in first-person mode and the e
 The safe-room wardrobe slides approximately 1.13 m south along its existing west wall, with its end panel next to the bed/headboard wall and approximately 20 mm clearance for skirting. Its dimensions, orientation, independent doors/drawers and the bed placement are unchanged. Walking collision bounds and the plan use the same updated furniture position. Checks cover both safe-room door swings, wardrobe openings, bed/window clearance and the route into the room.
 
 Browser/mobile visual QA remains unverified because the managed preview supervisor is unavailable. React visibility/handler checks and actual Three.js geometry/navigation checks cover these changes; the Sites workflow runs the complete suite and production build before publication.
+
+## Revision 33 — kitchen controls, corrected window, VR aisle and movable room furniture
+
+Kitchen controls reserve separate grid rows above and below the model in all four views. Title/fullscreen, wrapped tools, services options, display/VR controls, zoom and view tabs no longer depend on overlapping absolute offsets. On phones, names and water options occupy separate columns, while cabinet visibility, point selection and colour key take complete rows. Short screens can scroll the viewer rather than clip its controls. Inspectors stay within the model row. Hide all and Show controls still work without unmounting the scene. A CSS cascade regression check matches the real rendered ancestor tree at 320, 393, 768 and 1280 px in both languages and all views; it does not claim browser pixel verification.
+
+The detailed kitchen window now follows the architectural opening and apartment opening schedule: 900 × 1250 mm instead of the former 390 × 1000 mm placeholder. Its approximate 100 mm offset from the inside corner follows the RG1 plan stations, and the 1100 mm sill remains an estimate. Plan, elevation and actual wall opening share the same data. Two dark, double-glazed sliding sashes replace the opaque coloured panel; frame and sill remain within the wall plane. Frame colour is independent of the cabinet handles. The existing upper-cabinet origin remains 1090 mm, beyond the window's approximately 1000 mm right edge.
+
+VR navigation previously used the bounding rectangle of the L-shaped countertop, incorrectly blocking the clear working aisle. The countertop now supplies two physical collision boxes matching its two legs. Joystick walking traverses the space between the island and work run. A controller pointed at an accessible floor shows a green ring; pressing its trigger teleports there while preserving tracked eye height. Occupied surfaces and opaque obstructions cannot become destinations. Door/drawer selection and normal desktop camera restoration remain independent. The same floor-target feature uses current home walking obstacles in the whole-home viewer.
+
+Beds, desks and wardrobes in the bedrooms, converted bedroom/home office and safe room have Move and rotate controls. Select furniture in 3D, the floor plan, or Room design → Arrange furniture. Arrows move in plan directions by 5, 10 or 25 cm; Rotate turns 90° and Original position restores the revision-32 default. Moves stay inside the room and reject overlaps with other furniture or the doorway reserve. Overrides save in the existing home settings, survive export/import and Close all, and update the 3D scene, floor plan, minimap and walking/VR obstacles together. Open-front states and ordered finishes are retained. These room-fit checks are illustrative and are not a construction or full door-swing clearance certificate.
+
+Browser/mobile visual QA and physical-headset testing remain unverified because the managed preview supervisor and a headset are unavailable. Automated checks cover actual Three.js openings, source-to-window dimensions, joystick/floor-target movement, furniture persistence/collisions, component controls and the existing regression suite. The production build is run through the Sites workflow.
+
+
+## Revision 34 — one home panel and direct furniture dragging
+
+The home interface has a compact header, room/view selectors and three primary actions: Rooms, Move furniture and Options. The default view has no floating title, inspector, map, legend or render/VR bar. Secondary settings, source photos, save/export, lighting, language, services and VR remain available in Options. Room-name buttons now start hidden under a separate saved Show room names preference, without changing old label settings.
+
+Only one panel can be open: rooms/design, options, furniture editing or item details. It reserves a grid row below the model on phones and a separate column on wider screens. The panel scrolls within its own height; its close button remains reachable. The walking pad is hidden while a panel is open and walking keys/routes pause, so the map, inspector and walking arrows no longer stack. Hide all still leaves the four walking arrows and Show controls available.
+
+Move furniture selects an editable bedroom or safe room and opens that room's enlarged plan. Select Bed, Wardrobe or Desk, then drag its highlighted footprint directly with a finger or mouse. Alternatively use the four 10 cm arrows, Rotate 90° and Original position. Done editing returns to a 3D room view. Selecting an editable item elsewhere offers the same explicit action; dimensions remain collapsed in item details.
+
+Dragging transforms screen coordinates through the actual SVG view matrix, remains stable when React replaces handlers, captures the pointer, and stops on release/cancel/capture loss. The previous room-fit, furniture and doorway checks reject blocked destinations; the last valid placement remains. Error space is reserved so feedback does not resize the plan during a drag. The existing local save/import/export and shared plan/3D/walking/VR obstacle updates are retained.
+
+Validation covers the rendered default controls, single-panel states, focused editor choices/handlers, CSS cascade at 320, 393, 768, 932 and 1280 px including a short landscape viewport, scaled pointer dragging, cancellation and saved positions. These checks are not browser pixel verification. The supported managed preview service is unavailable in this session, so phone/browser visual QA remains unverified; the complete automated suite and production build run before publication.
