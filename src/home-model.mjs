@@ -16,7 +16,7 @@ export const PLAN_ORIGIN=[606,45.7];
 export const point=(x,z)=>[(x-PLAN_ORIGIN[0])*PLAN_SCALE,(z-PLAN_ORIGIN[1])*PLAN_SCALE];
 const polygon=a=>a.map(p=>point(...p));
 const rect=(x0,z0,x1,z1)=>[[x0,z0],[x1,z0],[x1,z1],[x0,z1]];
-export const HOUSE={height:2.75,eyeHeight:1.62,playerRadius:.17,source:'/house/house-plan.pdf',image:'/house/house-plan.jpg',revision:29,scale:50};
+export const HOUSE={height:2.75,eyeHeight:1.62,playerRadius:.17,source:'/house/house-plan.pdf',image:'/house/house-plan.jpg',revision:32,scale:50};
 export const GARDEN_LAYOUT=createGardenLayout(point);
 export const EXTERIOR_LAYOUT=createExteriorLayout(point);
 export const SERVICE_YARD=createServiceYard(point);
@@ -32,7 +32,7 @@ export const ROOMS=[
  room('bedroom-b','חדר שינה 2','Bedroom 2','bedroom',rect(606,470.92,815.76,629.62),[740,558],'365 × 280 cm','bed','הארון ליד הדלת, על המשך קיר הכניסה. שולחן המחשב עבר למיקום הארון הקודם; מיטה 120×190 ס״מ.'),
  room('master','חדר הורים','Main bedroom','bedroom',[[719.4,635.32],[815.76,635.32],[815.76,921.58],[606,921.58],[606,743.02],[719.4,743.02]],[755,790],'365 × 310 cm · אזור שינה','bed','חדר בצורת ר׳ סביב חדר הרחצה הפרטי. נשמר המתאר המקורי.'),
  room('bedroom-c','חדר עבודה','Home office','office',rect(821.46,714.64,985.86,921.58),[902,810],'285 × 360 cm','desk','חדר שינה 3 הוסב לחדר עבודה עם שולחן, כיסא וארון משרד. החלון והקירות נשמרו.'),
- room('safe-room','ממ״ד','Safe room','office',rect(892.32,521.92,1069.74,691.96),[952,590],'308 × 295 cm','shield','מיטה זוגית 140×190 ס״מ במקום הספה, לצד שולחן וארון. הדלת והחלון במיקום התוכנית.'),
+ room('safe-room','ממ״ד','Safe room','office',rect(892.32,521.92,1069.74,691.96),[952,590],'308 × 295 cm','shield','מיטה זוגית 140×190 ס״מ לצד שולחן וארון. דופן הארון צמודה לקיר שבראש המיטה, הרחק מהדלת.'),
  room('bathroom','חדר רחצה','Bathroom','bathroom',[[954.66,368.86],[1011.36,368.86],[1011.36,363.16],[1070.88,363.16],[1070.88,504.88],[954.66,504.88]],[1010,425],'198 × 233 cm','bath','מחובר למסדרון ולאזור השירות, כפי שמופיע בתוכנית.'),
  room('ensuite','רחצת הורים','En suite','bathroom',rect(606,635.32,713.76,737.32),[683,669],'183 × 173 cm','bath','גישה מתוך חדר ההורים. גובה האביזרים והריהוט להמחשה.'),
  room('powder','שירותי אורחים','Guest WC','wc',rect(815.76,312.16,886.62,402.88),[845,372],'118 × 153 cm','bath','שירותים נפרדים בפתח המסדרון.'),
@@ -113,7 +113,11 @@ export const FURNITURE=[
  furniture('bed-b','bedroom-b','bed',[643.42,527.9],1.2,1.9,.48),furniture('wardrobe-b','bedroom-b','wardrobe',[799.6,578],1.7,.55,2.3,-Math.PI/2),furniture('desk-b','bedroom-b','desk',[742,489],.95,.48,.76),
  furniture('master-bed','master','bed',[680,862.88],1.8,2,.5,Math.PI),furniture('master-wardrobe','master','wardrobe',[797,835],2.1,.55,2.3,-Math.PI/2),furniture('master-tv','master','tv',[680,744.4],1.2,.045,.68),
  furniture('wardrobe-c','bedroom-c','office-cabinet',[955,736],1.1,.55,2.3),furniture('desk-c','bedroom-c','desk',[960,850],1.4,.65,.76,-Math.PI/2),furniture('office-chair','bedroom-c','office-chair',[924,850],.58,.58,1.1,Math.PI/2),
- {...furniture('safe-bed','safe-room','bed',[1020,636.11],1.4,1.9,.48,Math.PI),nightstands:false,headboardHeight:.7},furniture('safe-desk','safe-room','desk',[1013,544],1.2,.55,.76),furniture('safe-storage','safe-room','wardrobe',[911,594],1.3,.5,2.2,Math.PI/2),
+ {...furniture('safe-bed','safe-room','bed',[1020,636.11],1.4,1.9,.48,Math.PI),nightstands:false,headboardHeight:.7},
+ furniture('safe-desk','safe-room','desk',[1013,544],1.2,.55,.76),
+ // Slide south along the existing west wall: side panel is 20 mm from the
+ // bed-wall interior face for skirting clearance, away from both door leaves.
+ furniture('safe-storage','safe-room','wardrobe',[911,657.95],1.3,.5,2.2,Math.PI/2),
  {...furniture('bath-tub','bathroom','tub',[1010,485],1.6,.7,.58,Math.PI),products:['tub','bath-mixer','hand-shower']},
  {...furniture('bath-vanity','bathroom','vanity',[979,376],.82,.45,.85),products:['bath-vanity','mirror','basin-tap'],ordered:true},
  {...furniture('bath-toilet','bathroom','wall-toilet',[1032,378.5],.37,.54,.45),products:['toilet']},

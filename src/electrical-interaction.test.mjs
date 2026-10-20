@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {mkdir,mkdtemp,writeFile,rm,readFile} from 'node:fs/promises';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 import {join} from 'node:path';
+import {spawnSync} from 'node:child_process';
 import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import {rolldown} from 'rolldown';
@@ -24,13 +25,98 @@ import {ELECTRICAL_ROOM_REVIEWS} from './electrical-video-review.mjs';
 const root=fileURLToPath(new URL('../',import.meta.url)),cache=join(root,'node_modules/.cache');
 await mkdir(cache,{recursive:true});const temp=await mkdtemp(join(cache,'electrical-ui-'));
 after(()=>rm(temp,{recursive:true,force:true}));
-const exports={KitchenElectricalCompare:'KitchenElectricalCompare.jsx',ElectricalMarkerButtons:'ElectricalCallouts.jsx',ElectricalPhoto:'ElectricalPhoto.jsx',HomeSources:'HomeProducts.jsx',ProductCards:'HomeProducts.jsx',CatalogueMatch:'CatalogueMatch.jsx',KitchenElectricalViewControls:'KitchenElectrical.jsx',FloorPlan:'PlanViews.jsx',Elevation:'PlanViews.jsx',ModelView:'ModelView.jsx',HomePlan:'HomePlan.jsx',WaterPointDetails:'WaterPoints.jsx',WaterGlyph:'WaterPoints.jsx',KitchenElectricalPanel:'KitchenElectrical.jsx',RenderControls:'RenderControls.jsx',FloorSpecification:'FloorSpecification.jsx',FloorSchedule:'FloorSchedule.jsx',SinkSpecification:'SinkSpecification.jsx',ElectricalFacts:'HomeElectrical.jsx'};
+const exports={WalkingControls:'WalkingControls.jsx',HoldButton:'WalkingControls.jsx',KitchenElectricalCompare:'KitchenElectricalCompare.jsx',ElectricalMarkerButtons:'ElectricalCallouts.jsx',ElectricalPhoto:'ElectricalPhoto.jsx',HomeSources:'HomeProducts.jsx',ProductCards:'HomeProducts.jsx',CatalogueMatch:'CatalogueMatch.jsx',KitchenElectricalViewControls:'KitchenElectrical.jsx',FloorPlan:'PlanViews.jsx',Elevation:'PlanViews.jsx',ModelView:'ModelView.jsx',HomePlan:'HomePlan.jsx',WaterPointDetails:'WaterPoints.jsx',WaterGlyph:'WaterPoints.jsx',KitchenElectricalPanel:'KitchenElectrical.jsx',RenderControls:'RenderControls.jsx',VrControls:'VrControls.jsx',FloorSpecification:'FloorSpecification.jsx',FloorSchedule:'FloorSchedule.jsx',SinkSpecification:'SinkSpecification.jsx',ElectricalFacts:'HomeElectrical.jsx',SceneRestoreControls:'SceneInterface.jsx',SceneUiLayer:'SceneInterface.jsx',restoreInterfaceOnEscape:'SceneInterface.jsx'};
 const input=Object.entries(exports).map(([name,file])=>`export {${name}} from ${JSON.stringify(join(root,'src',file))};`).join('\n')+`\nexport {default as KitchenApp} from ${JSON.stringify(join(root,'src/KitchenApp.jsx'))};\nexport {default as HomeApp} from ${JSON.stringify(join(root,'src/HomeApp.jsx'))};`;
 const bundler=await rolldown({input:'electrical:test',platform:'node',external:id=>/^(react|react-dom|three)(\/|$)/.test(id),transform:{jsx:'react-jsx'},plugins:[{name:'component-tests',resolveId(id){if(id==='electrical:test')return '\0entry';if(id.endsWith('.css'))return '\0css'},load(id){if(id==='\0entry')return input;if(id==='\0css')return ''}}]});
 const output=await bundler.generate({format:'esm'});await bundler.close();
 const bundlePath=join(temp,'components.mjs');await writeFile(bundlePath,output.output[0].code);const UI=await import(pathToFileURL(bundlePath));
 const render=(Component,props)=>renderToStaticMarkup(React.createElement(Component,props));
 const walk=(node,visit)=>{if(!node||typeof node!=='object')return;visit(node);React.Children.forEach(node.props?.children,c=>walk(c,visit));};
+// Parse the actual rendered markup, accounting for hidden/inert ancestors.
+// This is a DOM visibility contract check, not a browser layout/screenshot test.
+const uiNodes=html=>{
+ const code=String.raw`import sys,json
+from html.parser import HTMLParser
+class UI(HTMLParser):
+ def __init__(self):
+  super().__init__();self.nodes=[];self.stack=[]
+ def handle_starttag(self,tag,attrs):
+  a=dict(attrs);n={'tag':tag,'attrs':a,'parents':self.stack.copy(),'hidden':'hidden' in a or 'inert' in a or any(self.nodes[i]['hidden'] for i in self.stack)}
+  self.nodes.append(n)
+  if tag not in {'input','img','br','hr','meta','link','source','area','base','col','embed','param','track','wbr'}:self.stack.append(len(self.nodes)-1)
+ def handle_endtag(self,tag):
+  for j in range(len(self.stack)-1,-1,-1):
+   if self.nodes[self.stack[j]]['tag']==tag:self.stack=self.stack[:j];break
+ def handle_startendtag(self,tag,attrs):
+  self.handle_starttag(tag,attrs);self.handle_endtag(tag)
+p=UI();p.feed(sys.stdin.read());print(json.dumps(p.nodes))`;
+ const r=spawnSync('python',['-c',code],{input:html,encoding:'utf8',maxBuffer:8*1024*1024});assert.equal(r.status,0,r.stderr);return JSON.parse(r.stdout);
+};
+const hasClass=(n,c)=>(n.attrs.class||'').split(/\s+/).includes(c);
+const visibleUiControls=nodes=>nodes.filter(n=>!n.hidden&&['button','a','select','input','textarea'].includes(n.tag)&&!n.parents.some(i=>nodes[i].tag==='svg'));
+
+test('hide-all keeps walking arrows and restore available while hiding other controls in every view',()=>{
+ const old=globalThis.localStorage;
+ try{
+  for(const lang of ['he','en'])for(const cleanView of [false,true]){
+   for(const mode of ['overview','room','walk','plan']){
+    globalThis.localStorage={getItem:()=>JSON.stringify({schema:2,...normalizeHomeSettings({lang,cleanView,labels:true,showElectrical:true})})};
+    const nodes=uiNodes(render(UI.HomeApp,{initialMode:mode})),controls=visibleUiControls(nodes),scene=nodes.find(n=>hasClass(n,mode==='plan'?'hs-plan-stage':'hs-model'));
+    assert(scene&&!scene.hidden,`${mode}: the house remains mounted and visible`);
+    if(cleanView){assert.equal(controls.length,mode==='walk'?5:1,`${mode}: only restore and walking arrows remain`);assert.equal(controls.filter(n=>'data-scene-ui-restore' in n.attrs).length,1);}
+    else{assert(controls.length>10);assert(!controls.some(n=>'data-scene-ui-restore' in n.attrs));}
+    for(const c of ['hs-header','hs-sidebar','hs-footer','hs-stage-top','hs-display-dock'])assert.equal(nodes.find(n=>hasClass(n,c)).hidden,cleanView,`${mode}: ${c}`);
+    if(mode==='walk'){
+     for(const c of ['hs-walk-controls','hs-walk-pad']){const pads=nodes.filter(n=>hasClass(n,c));assert.equal(pads.length,1,'one stable pad in both UI states');assert.equal(pads[0].hidden,false);}
+     for(const c of ['hs-exit-walk','hs-minimap','hs-walk-crosshair','hs-walk-map-slot'])assert.equal(nodes.find(n=>hasClass(n,c)).hidden,cleanView,`walking ${c}`);
+     const arrows=controls.filter(n=>hasClass(n,'hs-hold'));assert.equal(arrows.length,4);assert.deepEqual(arrows.map(n=>n.attrs['aria-label']),lang==='he'?['קדימה','צעד שמאלה','אחורה','צעד ימינה']:['Forward','Step left','Back','Step right']);
+    }else assert(!nodes.some(n=>hasClass(n,'hs-walk-controls')));
+
+   }
+   for(const view of ['perspective','plan','elevation','return']){
+    globalThis.localStorage={getItem:()=>JSON.stringify({modelRevision:7,settings:{...DEFAULTS,lang,view,cleanView,dimensions:true,labels:true,showElectricalLabels:true}})};
+    const nodes=uiNodes(render(UI.KitchenApp,{})),controls=visibleUiControls(nodes),scene=nodes.find(n=>hasClass(n,'scene-container'));
+    assert(scene&&!scene.hidden,`${view}: canvas or drawing remains outside the hidden UI layer`);
+    if(cleanView){assert.equal(controls.length,1,`${view}: zoom and camera controls also disappear`);assert('data-scene-ui-restore' in controls[0].attrs);}
+    else assert(controls.length>10);
+    for(const c of ['header','sidebar','page-footer','viewer-top','zoom-controls','viewer-bottom','kitchen-render-display'])assert.equal(nodes.find(n=>hasClass(n,c)).hidden,cleanView,`${view}: ${c}`);
+   }
+  }
+ }finally{globalThis.localStorage=old;}
+});
+
+test('walking arrows keep hold/release/cancel behavior with the interface hidden and the map cannot leak through',()=>{
+ const moves=[],tree=UI.WalkingControls({lang:'he',cleanView:true,minimap:React.createElement('button',{},'Map'),onMove:(...args)=>moves.push(args)}),buttons=[];
+ walk(tree,n=>{if(n.type===UI.HoldButton)buttons.push(UI.HoldButton(n.props));});assert.equal(buttons.length,4);
+ for(const button of buttons){
+  const direction=button.props.className.split('hs-hold-')[1],events=[],event={pointerId:17,preventDefault(){events.push('prevent');},currentTarget:{setPointerCapture(id){events.push(id);}}};
+  for(const end of ['onPointerUp','onPointerCancel','onLostPointerCapture']){
+   button.props.onPointerDown(event);button.props[end]();assert.deepEqual(moves.splice(0),[[direction,true],[direction,false]],`${direction}: ${end} stops movement`);
+  }
+  assert.deepEqual(events,['prevent',17,'prevent',17,'prevent',17]);
+ }
+ for(const cleanView of [true,false]){
+  const nodes=uiNodes(render(UI.WalkingControls,{lang:'en',cleanView,minimap:React.createElement('button',{},'Map'),onMove(){}}));
+  assert.equal(visibleUiControls(nodes).length,cleanView?4:5);assert.equal(nodes.find(n=>n.tag==='span').hidden,cleanView);assert.equal(nodes.find(n=>hasClass(n,'hs-walk-map-slot')).hidden,cleanView);
+ }
+});
+
+test('the overlapping mobile bars and room actions share one flowing dock, including the drawer button',async()=>{
+ const nodes=uiNodes(render(UI.HomeApp,{initialRoom:'kitchen'})),dock=nodes.findIndex(n=>hasClass(n,'hs-display-dock'));
+ for(const c of ['hs-bottom-options','hs-render-display','hs-room-action','hs-mobile-drawer'])assert(nodes.find(n=>hasClass(n,c)).parents.includes(dock),`${c} participates in the same layout`);
+ const css=await readFile(join(root,'src/render-controls.css'),'utf8');assert.match(css,/\.hs-display-dock\{[^}]*display:flex[^}]*flex-direction:column[^}]*gap:8px/);assert.match(css,/\.hs-display-dock \.hs-render-display[^}]*position:static;inset:auto;transform:none/);
+ assert.match(css,/\.hs-app \[hidden\],\.app \[hidden\]\{display:none!important\}/,'a hidden layer cannot be revived by a mobile display rule');
+});
+
+test('Escape restores the interface before the walk/inspection exit handlers and hiding labels preserves the saved settings',()=>{
+ const order=[],state={mode:'walk',position:[4,1.62,9],yaw:.7,openDoors:['bed-b'],openParts:['sink:door-left'],cleanView:true},before=JSON.stringify(state);
+ UI.restoreInterfaceOnEscape({key:'Enter',preventDefault(){throw Error('unexpected')},stopImmediatePropagation(){throw Error('unexpected')}},()=>{throw Error('unexpected')});
+ UI.restoreInterfaceOnEscape({key:'Escape',preventDefault(){order.push('prevent')},stopImmediatePropagation(){order.push('capture')}},()=>{order.push('restore');state.cleanView=false;});
+ assert.deepEqual(order,['prevent','capture','restore']);assert.equal(JSON.stringify({...state,cleanView:true}),before);
+ const settings=normalizeHomeSettings({cleanView:true,labels:true,showElectrical:true,showWater:true}),snapshot=JSON.stringify(settings),html=render(UI.HomePlan,{settings,selectedRoom:'living',onSelect(){}});
+ assert(!html.includes('<text'));assert(!html.includes('electrical-H02'));assert(!html.includes('water-plan-markers'));assert(html.includes('<line'));assert(html.includes('<polygon'));assert.equal(JSON.stringify(settings),snapshot);
+ const restored=render(UI.HomePlan,{settings:{...settings,cleanView:false},selectedRoom:'living',onSelect(){}});assert(restored.includes('<text'));assert(restored.includes('H02'));
+});
 
 test('owner corrections remove K05 everywhere and retain eight sockets plus the separate K09 preparation',()=>{
  assert.deepEqual(P.map(p=>p.label),['K01','K02','K03','K04','K06','K07','K08','K09','K10']);
@@ -173,6 +259,19 @@ test('render-quality and clean-view controls work in both apps and saved prefere
  const changes=[],tree=UI.RenderControls({settings:{lang:'he',renderQuality:'realistic',cleanView:false},onChange:(...v)=>changes.push(v)});walk(tree,n=>{if(n.type==='select')n.props.onChange({target:{value:'light'}});if(n.type==='button')n.props.onClick();});assert.deepEqual(changes,[['renderQuality','light'],['cleanView',true]]);
  const old=globalThis.localStorage;try{globalThis.localStorage={getItem:()=>JSON.stringify({modelRevision:7,settings:{...DEFAULTS,lang:'he',renderQuality:'light',cleanView:true}})};const kitchen=render(UI.KitchenApp,{});assert(kitchen.includes('is-clean'));assert(kitchen.includes('value="light" selected=""'));assert(kitchen.includes('הצגת הפקדים'));
  globalThis.localStorage={getItem:()=>JSON.stringify({schema:2,lang:'he',renderQuality:'light',cleanView:true})};const home=render(UI.HomeApp,{});assert(home.includes('hs-app is-clean'));assert(home.includes('value="light" selected=""'));assert(home.includes('הצגת הפקדים'));}finally{globalThis.localStorage=old;}
+});
+
+test('Oculus VR entry reflects real support/busy/error states, starts only on click, and appears only in 3D views',()=>{
+ for(const lang of ['he','en'])for(const status of ['checking','ready','requesting','presenting','unsupported','error']){
+  let calls=0;const tree=UI.VrControls({state:{status,reason:status==='unsupported'?'policy':status==='error'?'permission':undefined},lang,onToggle:()=>calls++}),buttons=[];
+  walk(tree,n=>{if(n.type==='button')buttons.push(n);});assert.equal(calls,0);assert.equal(buttons.length,1);assert.equal(buttons[0].props.disabled,['checking','requesting','unsupported'].includes(status));assert.equal(buttons[0].props['aria-pressed'],status==='presenting');
+  if(!buttons[0].props.disabled){buttons[0].props.onClick();assert.equal(calls,1);}
+  const html=render(UI.VrControls,{state:{status},lang,onToggle(){}});assert(html.includes('Oculus'));assert(html.includes('WebXR'));assert(!html.includes('undefined'));
+ }
+ const old=globalThis.localStorage;try{
+  globalThis.localStorage={getItem:()=>null};for(const mode of ['overview','room','walk','plan']){const html=render(UI.HomeApp,{initialMode:mode});assert.equal(html.includes('class="vr-controls"'),mode!=='plan');}
+  for(const view of ['perspective','plan','elevation','return']){globalThis.localStorage={getItem:()=>JSON.stringify({modelRevision:7,settings:{...DEFAULTS,view}})};const html=render(UI.KitchenApp,{});assert.equal(html.includes('class="vr-controls"'),view==='perspective');}
+ }finally{globalThis.localStorage=old;}
 });
 
 

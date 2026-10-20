@@ -17,7 +17,7 @@ export function createScenePresentation(renderer,scene,camera){
  let failed=false;
  return {
   resize(width,height){composer.setSize(width,height);aa.material.uniforms.resolution.value.set(1/(width*ratio),1/(height*ratio));},
-  render(quality='realistic',{transparentCabinets=false}={}){if(quality==='light'||failed){renderer.render(scene,camera);return;}ao.enabled=!transparentCabinets;ao.ssaoMaterial.uniforms.cameraProjectionMatrix.value.copy(camera.projectionMatrix);ao.ssaoMaterial.uniforms.cameraInverseProjectionMatrix.value.copy(camera.projectionMatrixInverse);try{composer.render();}catch{failed=true;renderer.setRenderTarget(null);renderer.render(scene,camera);}},
+  render(quality='realistic',{transparentCabinets=false}={}){if(renderer.xr?.isPresenting||quality==='light'||failed){renderer.render(scene,camera);return;}ao.enabled=!transparentCabinets;ao.ssaoMaterial.uniforms.cameraProjectionMatrix.value.copy(camera.projectionMatrix);ao.ssaoMaterial.uniforms.cameraInverseProjectionMatrix.value.copy(camera.projectionMatrixInverse);try{composer.render();}catch{failed=true;renderer.setRenderTarget(null);renderer.render(scene,camera);}},
   dispose(){for(const pass of [render,ao,aa,output])pass.dispose?.();ao.ssaoMaterial.dispose();ao.noiseTexture.dispose();composer.dispose();}
  };
 }

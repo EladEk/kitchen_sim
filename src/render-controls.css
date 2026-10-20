@@ -1,10 +1,31 @@
-.render-controls{display:flex;align-items:center;gap:7px;flex-wrap:wrap;background:#ffffffed;color:#3d4745;border:1px solid #d6dcdb;border-radius:9px;padding:3px 7px;font:12px/1.4 Arial,sans-serif;box-shadow:0 5px 18px #172d3520;backdrop-filter:blur(12px)}
-.render-controls select,.render-controls button{font:inherit!important;color:inherit!important;min-height:38px;border:0!important;border-radius:5px!important;background:transparent!important;display:flex;align-items:center;gap:7px;padding:5px 8px!important;cursor:pointer;box-shadow:none!important}
+.render-controls{display:flex;align-items:center;gap:7px;flex-wrap:wrap;background:#ffffffed;color:#3d4745;border:1px solid #d6dcdb;border-radius:9px;padding:3px 7px;font:12px/1.4 Arial,sans-serif;box-shadow:0 5px 18px #172d3520;backdrop-filter:blur(12px);max-width:100%}
+.render-controls select,.render-controls button{font:inherit!important;color:inherit!important;min-height:40px;border:0!important;border-radius:5px!important;background:transparent!important;display:flex;align-items:center;gap:7px;padding:5px 8px!important;cursor:pointer;box-shadow:none!important}
 .render-controls select{max-width:170px}.render-controls button[aria-pressed=true]{background:#e5edeb!important}
-.hs-render-display{position:absolute;inset-inline-start:25px;bottom:90px;z-index:9}.hs-mode-walk .hs-render-display{inset-inline-start:auto;inset-inline-end:25px;bottom:230px}
-.kitchen-render-display{position:absolute;inset-inline-start:16px;bottom:82px;z-index:6}
-.hs-app.is-clean .hs-sidebar,.hs-app.is-clean .hs-header,.hs-app.is-clean .hs-footer,.hs-app.is-clean .hs-space-title,.hs-app.is-clean .hs-stage-top,.hs-app.is-clean .hs-bottom-options,.hs-app.is-clean .hs-projection-labels,.hs-app.is-clean .hs-stage-tools,.hs-app.is-clean .hs-electrical-legend{display:none!important}
-.hs-app.is-clean{height:100dvh;min-height:480px}.hs-app.is-clean .hs-render-display{inset-inline-start:16px;inset-inline-end:auto;bottom:auto;top:16px}.hs-app.is-clean .hs-inspector{top:80px;max-height:calc(100% - 180px)}
-.app.is-clean>.header,.app.is-clean>.workspace-heading,.app.is-clean .sidebar,.app.is-clean>.page-footer,.app.is-clean .viewer-top,.app.is-clean .viewer-bottom,.app.is-clean .scene-toolbelt,.app.is-clean .electrical-view-controls,.app.is-clean .mobile-customize,.app.is-clean .projection-labels{display:none!important}
-.app.is-clean{height:100dvh;min-height:480px!important;padding:0}.app.is-clean .workspace{padding:0;margin:0;height:100%;gap:0}.app.is-clean .viewer{height:100%;min-height:480px;border:0;border-radius:0}.app.is-clean .viewer>.scene-container{position:absolute;inset:0;min-height:480px}.app.is-clean .camera-presets{display:none}.app.is-clean .kitchen-render-display{top:16px;bottom:auto;inset-inline-start:16px}.app.is-clean .selection-card{top:80px;bottom:auto;max-height:calc(100% - 110px);overflow:auto}
-@media(max-width:700px){.render-controls{font-size:11px;gap:2px}.render-controls select,.render-controls button{min-height:40px}.render-controls>svg{display:none}.hs-render-display{inset-inline-start:13px;bottom:90px}.hs-mode-walk .hs-render-display{inset-inline-end:13px;bottom:230px}.kitchen-render-display{inset-inline-start:10px;bottom:79px}.app.is-clean .workspace,.app.is-clean .viewer{height:100dvh!important}}
+.vr-controls{display:flex;align-items:center;gap:5px;position:relative}.vr-controls button:disabled{opacity:.55;cursor:default}.vr-help{font:11px/1.6 Arial,sans-serif}.vr-help summary{cursor:pointer;min-height:40px;display:flex;align-items:center;padding:5px}.vr-help[open]>div{position:absolute;bottom:calc(100% + 9px);inset-inline-end:0;width:min(320px,calc(100vw - 40px));background:#fffef9;border:1px solid #c7d3c2;border-radius:8px;box-shadow:0 8px 25px #17332130;padding:12px 14px;z-index:25;text-align:start}.vr-help p{font:12px/1.8 Arial,sans-serif!important;margin:4px 0!important}.vr-help [role=status]{color:#8b5331}
+/* One flow layout reserves each row's real height, including wrapped text. */
+.hs-display-dock{position:absolute;inset-inline:16px;bottom:20px;z-index:10;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}
+.hs-display-dock>*{pointer-events:auto;flex-shrink:0;max-width:100%}
+.hs-display-dock .hs-render-display,.hs-display-dock .hs-bottom-options,.hs-display-dock .hs-room-action,.hs-display-dock .hs-mobile-drawer{position:static;inset:auto;transform:none;max-width:100%}
+.hs-mode-walk .hs-display-dock{bottom:230px}
+.kitchen-render-display{position:absolute;inset-inline-start:16px;bottom:82px;z-index:6;max-width:calc(100% - 32px)}
+.scene-ui-layer{display:contents}
+/* Author display rules must never override the native hidden attribute. */
+.hs-app [hidden],.app [hidden]{display:none!important}
+.scene-restore-controls{position:fixed;top:max(12px,env(safe-area-inset-top));inset-inline-end:max(12px,env(safe-area-inset-right));z-index:200;display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;max-width:calc(100% - 24px);padding:9px 13px!important;border:1px solid #bfcbbf!important;border-radius:8px!important;background:#fffffff0!important;color:#314c39!important;box-shadow:0 3px 14px #19392320;font:12px/1.4 Arial,sans-serif;white-space:nowrap;touch-action:manipulation}
+.hs-app.is-clean,.app.is-clean{height:100dvh;min-height:0!important}
+.hs-app.is-clean .hs-workspace{height:100%;min-height:0}
+.hs-app.is-clean .hs-stage{height:100%;min-height:0}
+.hs-app.is-clean .hs-plan-stage{inset:12px}
+.hs-app.is-clean .hs-plan text,.app.is-clean .architectural-plan text,.app.is-clean .svg-dimension,.app.is-clean .electrical-relocation-guide{display:none}
+.app.is-clean .electrical-callouts{display:none!important}
+.app.is-clean{padding:0}
+.app.is-clean .workspace{padding:0;margin:0;height:100%;gap:0;min-height:0}
+.app.is-clean .viewer{height:100%;min-height:0!important;border:0;border-radius:0}
+.app.is-clean .viewer>.scene-container{position:absolute;inset:0;min-height:0}
+@media(max-width:700px){
+ .render-controls{font-size:11px;gap:2px}.render-controls select,.render-controls button{min-height:44px}.render-controls>svg{display:none}
+ .hs-display-dock{inset-inline:13px;bottom:max(17px,env(safe-area-inset-bottom));gap:8px}
+ .hs-mode-walk .hs-display-dock{bottom:230px}
+ .kitchen-render-display{inset-inline-start:10px;bottom:79px;max-width:calc(100% - 20px)}
+ .app.is-clean .workspace,.app.is-clean .viewer{height:100dvh!important}
+}

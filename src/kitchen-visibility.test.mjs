@@ -7,11 +7,26 @@ import {KITCHEN_ELECTRICAL_POINTS as P,kitchenElectricalFocusSettings} from './k
 import {cabinetVisibility,electricalLabelsVisible,kitchenVisibilitySettings,objectVisible} from './kitchen-visibility.mjs';
 import {pickKitchenElectrical} from './electrical-picking.mjs';
 import {closeAllStudioOpenings} from './studio-state.mjs';
+import {applySceneUiVisibility} from './scene-interface.mjs';
+import {createHomeScene} from './home-scene.js';
+import {normalizeHomeSettings} from './home-model.mjs';
 const context=new Proxy({},{get:(o,k)=>o[k]||(()=>{}),set:(o,k,v)=>(o[k]=v,true)});
 globalThis.document={createElement:()=>({width:512,height:512,getContext:()=>context})};
 const cameraFor=(point,from=[2.0,1.3,3.2])=>{const camera=new THREE.PerspectiveCamera(45,360/480,.05,30);camera.position.set(...from);camera.lookAt(...point.position);camera.updateMatrixWorld(true);return camera;};
 const pixelFor=(point,camera)=>{const v=new THREE.Vector3(...point.position).project(camera);return {clientX:(v.x*.5+.5)*360+10,clientY:(-v.y*.5+.5)*480+20};};
 const bounds={left:10,top:20,width:360,height:480};
+
+test('hiding all UI removes 3D annotation rings and dimensions in place, retaining fixtures, model transforms and open fronts',()=>{
+ const settings={...DEFAULTS,showElectrical:true,dimensions:true,openParts:['sink:door-left']},models=[createKitchen(settings),createHomeScene(normalizeHomeSettings(),{mode:'walk'})];
+ try{for(const model of models){
+  model.group.updateMatrixWorld(true);const nodes=[],transforms=new Map(),fixtures=[],annotations=[];
+  model.group.traverse(o=>{nodes.push(o);transforms.set(o,o.matrixWorld.toArray());if(o.userData.part==='electrical-faceplate')fixtures.push(o);if(['electrical-highlight','electrical-annotation-hit'].includes(o.userData.part))annotations.push(o);});assert(fixtures.length>0);assert(annotations.length>0);
+  annotations[0].visible=false;const old=annotations.map(o=>o.visible);
+  applySceneUiVisibility(model,{...settings,cleanView:true});assert(annotations.every(o=>!o.visible));assert(fixtures.every(o=>o.visible));if(model.dimensionGroup)assert.equal(model.dimensionGroup.visible,false);
+  applySceneUiVisibility(model,{...settings,cleanView:true});applySceneUiVisibility(model,{...settings,cleanView:false});assert.deepEqual(annotations.map(o=>o.visible),old,'repeated hiding restores the original visibility exactly');if(model.dimensionGroup)assert.equal(model.dimensionGroup.visible,true);
+  model.group.updateMatrixWorld(true);const after=[];model.group.traverse(o=>{after.push(o);assert.deepEqual(o.matrixWorld.toArray(),transforms.get(o));});assert.deepEqual(after,nodes,'no geometry or opening object is replaced');
+ }}finally{models.forEach(m=>m.dispose());}
+});
 
 test('new and pre-existing saves default to a clean, unlabelled kitchen with normal cabinets',()=>{
  assert.equal(DEFAULTS.showElectricalLabels,false);assert.equal(DEFAULTS.cabinetVisibility,'solid');
