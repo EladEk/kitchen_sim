@@ -1,3 +1,5 @@
+import {EntranceServicesPlan} from './EntranceServices.jsx';
+import {ENTRANCE_SERVICES} from './home-model.mjs';
 import {FurnitureClearanceGuides} from './FurnitureAssistance.jsx';
 import {LightingPlanMarkers} from './HomeLighting.jsx';
 import {FurnitureFrontMarkers,FurnitureRoomServices} from './FurniturePlanGuides.jsx';
@@ -8,7 +10,7 @@ import {ROOMS,WALLS,DOORS,WINDOWS,FURNITURE,furnitureForSettings,editableFurnitu
 
 export function HomePlan({settings,selectedRoom,position,onSelect,onInspect,onFurniture,onFurnitureMove,focusRoom=null,selectedFurnitureId,selectedServiceId,mini=false}){
  const {garden:GARDEN_LAYOUT,service:SERVICE_YARD}=yardForSettings(settings);
- const bounds=polygonBounds(focusRoom?getRoom(focusRoom).polygon:PLOT),margin=focusRoom ? .18 : .5,scale=30;
+ const bounds=polygonBounds(focusRoom?getRoom(focusRoom).polygon:[...PLOT,...ENTRANCE_SERVICES.context.polygon]),margin=focusRoom ? .18 : .5,scale=30;
  const points=poly=>poly.map(p=>p.map(n=>n*scale).join(',')).join(' ');
  const annotations=!mini&&!settings.cleanView&&!focusRoom;
  const he=settings.lang==='he',opened=new Set(settings.openDoors);
@@ -19,6 +21,7 @@ export function HomePlan({settings,selectedRoom,position,onSelect,onInspect,onFu
   <polygon points={points(PLOT)} fill="#ccd6b9" stroke="#a2ad91" strokeWidth="2"/>
   {ROOMS.filter(r=>!focusRoom||r.id===focusRoom).map(r=><polygon key={r.id} points={points(r.polygon)} fill={r.id===selectedRoom?'#b7cbb2':r.kind==='garden'?'#ccd6b9':r.kind==='outdoor'?'#d5c9b4':HOME_FINISHES.find(f=>f.id===settings.rooms[r.id]?.wall)?.color||'#eee9df'} stroke={r.id===selectedRoom?'#4a6a4c':'#c9c3b8'} strokeWidth={r.id===selectedRoom?2:1} tabIndex={mini||focusRoom?-1:0} role={focusRoom?undefined:"button"} aria-label={he?r.he:r.en} onClick={e=>activate(e,r.id)} onKeyDown={e=>activate(e,r.id)}/>)}
   {!focusRoom&&<>
+  <EntranceServicesPlan layout={ENTRANCE_SERVICES} settings={settings} scale={scale} mini={mini} onSelect={id=>onInspect?.(id,true)}/>
   {[EXTERIOR_LAYOUT.porch,EXTERIOR_LAYOUT.court].map(r=><g key={r.id} role="button" tabIndex={mini?-1:0} aria-label={he?(r.id==='service-porch'?'מבואת שירות מקורה — מידות':'מעבר עמוק לחלון המטבח — מידות'):(r.id==='service-porch'?'Covered service porch — dimensions':'Deep kitchen window passage — dimensions')} onClick={e=>feature(e,r.id)} onKeyDown={e=>feature(e,r.id)}><polygon points={points(r.polygon)} fill={r.id==='service-porch'?'#b19a7b':'#c6b492'} stroke="#948774" strokeWidth="1"/>{annotations&&<text x={(r.minX+r.maxX)*scale/2} y={(r.minZ+r.maxZ)*scale/2} textAnchor="middle" fontSize="6" fill="#615343" pointerEvents="none">{r.id==='service-porch'?(he?'מבואה מקורה':'Covered porch'):(he?'מעבר לחלון':'Window court')}</text>}</g>)}
   {EXTERIOR_LAYOUT.units.map(a=><g key={a.id} role="button" tabIndex={mini?-1:0} aria-label={he?a.he:a.en} onClick={e=>feature(e,a.id)} onKeyDown={e=>feature(e,a.id)}>{!settings.cleanView&&<polygon points={points(a.front.polygon)} fill="#bd974f" fillOpacity=".12" stroke="#a78748" strokeDasharray="3 2" strokeWidth=".7"/>}<rect x={a.body.minX*scale} y={a.body.minZ*scale} width={(a.body.maxX-a.body.minX)*scale} height={a.w*scale} fill="#eef0e5" stroke="#778579" strokeWidth="1"/>{annotations&&<text x={(a.body.maxX+.65)*scale} y={a.z*scale} textAnchor="middle" fontSize="6" fill="#766034" pointerEvents="none">{he?'מזגן · פנוי':'AC · clear'}</text>}</g>)}
   <polygon points={points(GARDEN_LAYOUT.paving)} fill={selectedRoom==='terrace'?'#b7cbb2':'#d5c9b4'} stroke={selectedRoom==='terrace'?'#4a6a4c':'#c9c3b8'} strokeWidth="1" tabIndex={mini?-1:0} role="button" aria-label={he?'המשך הריצוף למרפסת':'Terrace paving extension'} onClick={e=>activate(e,'terrace')} onKeyDown={e=>activate(e,'terrace')}/>

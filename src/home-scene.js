@@ -1,3 +1,4 @@
+import {buildEntranceServices} from './entrance-services-scene.js';
 import {buildLightingPoints} from './home-lighting-scene.js';
 import * as THREE from 'three';
 import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
@@ -126,6 +127,7 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
   for(const xx of [-o.width/2,o.width/2])box(xx,height/2,0,.025,height,.04,shutterMat,p,data);
  }
  const buildingGroups=buildObservedArchitecture({group,box,cylinder,mat,resources,wallHeight});
+ for(const [id,p] of buildEntranceServices({group,box,cylinder,floor,mat,resources,motions,picks,settings,mode}))buildingGroups.set(id,p);
  for(const p of buildingGroups.values())if(p.userData.pickMeshes){picks.push(...p.userData.pickMeshes);delete p.userData.pickMeshes;}
  // Room furniture is illustrative and editable through room finishes; it never
  // changes a wall, opening or the plan outline.

@@ -1,3 +1,4 @@
+import {createEntranceServices,entranceCollisionBoxes} from './entrance-services.mjs';
 import {normalizeLightControls} from './lighting-controls.mjs';
 import {createLightingLayout} from './home-lighting.mjs';
 import {normalizeYardDesign,resolveYardDesign,changeYardDesign,defaultYardItem} from './yard-design.mjs';
@@ -19,13 +20,15 @@ export const PLAN_ORIGIN=[606,45.7];
 export const point=(x,z)=>[(x-PLAN_ORIGIN[0])*PLAN_SCALE,(z-PLAN_ORIGIN[1])*PLAN_SCALE];
 const polygon=a=>a.map(p=>point(...p));
 const rect=(x0,z0,x1,z1)=>[[x0,z0],[x1,z0],[x1,z1],[x0,z1]];
-export const HOUSE={height:2.75,eyeHeight:1.62,playerRadius:.17,source:'/house/house-plan.pdf',image:'/house/house-plan.jpg',revision:39,scale:50};
+export const HOUSE={height:2.75,eyeHeight:1.62,playerRadius:.17,source:'/house/house-plan.pdf',image:'/house/house-plan.jpg',revision:41,scale:50};
 export const GARDEN_LAYOUT=createGardenLayout(point);
 export const EXTERIOR_LAYOUT=createExteriorLayout(point);
 export const SERVICE_YARD=createServiceYard(point);
 export const gardenElement=(id,settings)=>{const {garden,service}=yardForSettings(settings);return [...garden.elements,...service.elements,...EXTERIOR_LAYOUT.elements].find(e=>e.id===id);};
 export const HOUSE_OUTLINE=polygon([[671.22,37.2],[1141.74,37.2],[1141.74,159.1],[1269.3,159.1],[1269.3,366.04],[1187.1,366.04],[1187.1,451.06],[1087.92,451.06],[1087.92,717.52],[1002.84,717.52],[1002.84,938.62],[589.02,938.62],[589.02,297.98],[671.22,297.98]]);
 export const PLOT=polygon(rect(273.84,42.28,1277.82,1032.94));
+export const ENTRANCE_SERVICES=createEntranceServices(point);
+export const entryElement=id=>ENTRANCE_SERVICES.cabinets.find(c=>c.id===id);
 export const PUBLIC_ENTRY=polygon(rect(1141.74,42.28,1277.82,159.1));
 const room=(id,he,en,kind,pdf,walkPdf,size,icon,description)=>({id,he,en,kind,polygon:polygon(pdf),walk:point(...walkPdf),size,icon,description});
 export const ROOMS=[
@@ -203,7 +206,7 @@ export function furnitureParts(f){
  if(f.kind==='console')return [0,1,2].map(i=>item(`drawer-${i}`,`מגירה ${i+1}`,`Drawer ${i+1}`));
  return [];
 }
-export const ALL_HOME_PARTS=[...FURNITURE.flatMap(furnitureParts),...SERVICE_YARD.parts];
+export const ALL_HOME_PARTS=[...FURNITURE.flatMap(furnitureParts),...SERVICE_YARD.parts,...ENTRANCE_SERVICES.parts];
 export const HOME_FINISHES=[{id:'ordered-mona',he:'מונה 25×75','en':'Mona 25×75',color:'#b2ada9',tile:[.75,.25],productId:'wet-wall'},{id:'ivory',he:'שנהב',en:'Ivory',color:'#e9e5db'},{id:'sand',he:'חול',en:'Sand',color:'#ccbfa8'},{id:'sage',he:'מרווה',en:'Sage',color:'#a4b09a'},{id:'clay',he:'חרס',en:'Clay',color:'#c3a28e'},{id:'slate',he:'אפור',en:'Slate',color:'#99a5a7'}];
 export const FLOOR_FINISHES=[
  ...[['ordered-white','dry-floor','שיק גרניט לבן מט 100×100','Chic matte white 100×100'],['ordered-wet','wet-floor','קלסיקו אפור 30×30','Classico grey 30×30'],['ordered-terrace','terrace-floor','הביטאט דאון 15×60','Habitat Dawn 15×60']].map(([id,productId,he,en])=>({id,he,en,color:orderedFloor(productId).color,tile:orderedFloor(productId).tile,productId})),
@@ -222,10 +225,10 @@ export function normalizeHomeSettings(value={}){
 }
 export function insidePolygon(p,poly){let inside=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++){const [xi,zi]=poly[i],[xj,zj]=poly[j];if(((zi>p[1])!==(zj>p[1]))&&p[0]<(xj-xi)*(p[1]-zi)/(zj-zi)+xi)inside=!inside;}return inside;}
 export function polygonBounds(poly){return {minX:Math.min(...poly.map(p=>p[0])),maxX:Math.max(...poly.map(p=>p[0])),minZ:Math.min(...poly.map(p=>p[1])),maxZ:Math.max(...poly.map(p=>p[1]))};}
-export function roomAt(p){return ROOMS.filter(r=>!['garden','outdoor'].includes(r.kind)).find(r=>insidePolygon(p,r.polygon))?.id||(insidePolygon(p,GARDEN_LAYOUT.finished)?'terrace':insidePolygon(p,PLOT)&&!insidePolygon(p,HOUSE_OUTLINE)?'garden':'hall');}
+export function roomAt(p){if(insidePolygon(p,ENTRANCE_SERVICES.context.polygon))return 'living';return ROOMS.filter(r=>!['garden','outdoor'].includes(r.kind)).find(r=>insidePolygon(p,r.polygon))?.id||(insidePolygon(p,GARDEN_LAYOUT.finished)?'terrace':insidePolygon(p,PLOT)&&!insidePolygon(p,HOUSE_OUTLINE)?'garden':'hall');}
 const boxForWall=(wall,a,b)=>{const v=Math.abs(wall.a[0]-wall.b[0])<.001;return v?{minX:wall.a[0]-wall.thickness/2,maxX:wall.a[0]+wall.thickness/2,minZ:a,maxZ:b}:{minX:a,maxX:b,minZ:wall.a[1]-wall.thickness/2,maxZ:wall.a[1]+wall.thickness/2};};
 export function collisionBoxes(openDoors=[],withFurniture=true,closedShutters=[],openParts=[],furnitureLayout={},yardDesign={}){
- const {garden,service}=yardForSettings({yardDesign}),opened=new Set(openDoors),result=[];
+ const {garden,service}=yardForSettings({yardDesign}),opened=new Set(openDoors),result=entranceCollisionBoxes(ENTRANCE_SERVICES,openParts);
  for(const p of garden.posts)result.push({minX:p.x-p.size/2,maxX:p.x+p.size/2,minZ:p.z-p.size/2,maxZ:p.z+p.size/2,pergolaPostId:p.id});
  for(const w of WALLS){const vertical=Math.abs(w.a[0]-w.b[0])<.001,low=vertical?w.a[1]:w.a[0],high=vertical?w.b[1]:w.b[0];let start=low;
   for(const d of DOORS.filter(d=>d.wallId===w.id&&!d.hostDoorId).sort((a,b)=>a.start-b.start)){
@@ -252,7 +255,8 @@ export function collisionBoxes(openDoors=[],withFurniture=true,closedShutters=[]
  return result;
 }
 export function canStand(p,boxes,radius=HOUSE.playerRadius){
- const bounds=polygonBounds(PLOT);if(p[0]<bounds.minX+radius||p[0]>bounds.maxX-radius||p[1]<bounds.minZ+radius||p[1]>bounds.maxZ-radius||insidePolygon(p,PUBLIC_ENTRY))return false;
+ const bounds=polygonBounds(PLOT),entry=ENTRANCE_SERVICES.context,inEntry=p[0]>=entry.minX-radius&&p[0]<=entry.maxX-radius&&p[1]>=entry.minZ+radius&&p[1]<=entry.maxZ-radius;
+ if(!inEntry&&(p[0]<bounds.minX+radius||p[0]>bounds.maxX-radius||p[1]<bounds.minZ+radius||p[1]>bounds.maxZ-radius||insidePolygon(p,PUBLIC_ENTRY)))return false;
  for(const b of boxes){const dx=p[0]-Math.max(b.minX,Math.min(b.maxX,p[0])),dz=p[1]-Math.max(b.minZ,Math.min(b.maxZ,p[1]));if(dx*dx+dz*dz<radius*radius)return false;}return true;
 }
 // When all doors close from a doorway, step to the nearest clear spot rather

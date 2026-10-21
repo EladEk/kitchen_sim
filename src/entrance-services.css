@@ -1,0 +1,11 @@
+.entry-service-facts{margin:12px 0;padding:12px;border:1px solid var(--line,#d8dccf);border-radius:12px;background:var(--panel,#fafbf6)}
+.entry-service-facts>summary,.entry-source-compare>summary{display:flex;align-items:center;gap:8px;cursor:pointer;min-height:44px;font-weight:600}
+.entry-service-facts p,.entry-source-compare p{font-size:13px;line-height:1.65;color:#65705f}
+.entry-service-facts button,.entry-service-inspector button{min-height:44px}
+.entry-service-facts>.hs-part-row{width:100%}
+.entry-door-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0}
+.entry-door-controls .hs-part-row{min-width:0;flex-wrap:wrap;justify-content:center}
+.entry-source-compare img{display:block;width:100%;max-height:300px;object-fit:contain;border-radius:8px;background:#e4e4dc}
+.entry-source-compare{border-top:1px solid #d8dccf;margin-top:12px;padding-top:8px}
+.entry-service-inspector h4{margin:16px 0 6px}
+.entry-service-inspector ul{padding-inline-start:20px;line-height:1.7;font-size:13px}

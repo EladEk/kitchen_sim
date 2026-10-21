@@ -40,7 +40,7 @@ test('the safe-room filter is inside, above the protected window, separate from 
    let exterior;scene.group.traverse(o=>{if(o.userData.part==='photo-exterior-slats')exterior=o;});assert(exterior);assert(bounds(exterior).min.z>wall.a[1]+wall.thickness/2,'the visible exterior slats stay outside the glass');
   }finally{scene.dispose();}
  }
- const cutaway=createHomeScene(normalizeHomeSettings({cutaway:true}));try{assert.equal(cutaway.buildingGroups.size,0,'ceiling elements do not obscure the floor plan cutaway');}finally{cutaway.dispose();}
+ const cutaway=createHomeScene(normalizeHomeSettings({cutaway:true}));try{assert.equal([...cutaway.buildingGroups.values()].filter(g=>!g.userData.entryService).length,0,'ceiling elements do not obscure the floor plan cutaway');}finally{cutaway.dispose();}
 });
 
 test('dark photographed shutter covers face indoors while independent curtains stay outdoors',()=>{

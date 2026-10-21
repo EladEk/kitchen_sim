@@ -1,0 +1,50 @@
+{
+  "reviewRevision": 40,
+  "metricSurvey": false,
+  "videoDurationSeconds": 5.644729,
+  "videoInteriorObserved": false,
+  "planSource": "building-plan.pdf",
+  "planPage": 3,
+  "items": [
+    {
+      "file": "298243.jpg",
+      "originalUpload": "01-298243.jpg",
+      "sha256": "7dcc21822ea0600cd16e15ec8a57726ae43bec4fee55d03e4f7f2303826ad230",
+      "displaySize": [
+        1536,
+        1152
+      ]
+    },
+    {
+      "file": "298242.jpg",
+      "originalUpload": "02-298242.jpg",
+      "sha256": "4209fcebd2392b3d8363e4f8a294ee40886f5a627eb3715d9196a84ff5cf3720",
+      "displaySize": [
+        1536,
+        1152
+      ]
+    },
+    {
+      "file": "298241.jpg",
+      "originalUpload": "03-298241.jpg",
+      "sha256": "fc45f50d9ab119f0fd2505e0da3b253696310bc939e0c8cb220e71d872cf7d84",
+      "displaySize": [
+        1152,
+        1536
+      ]
+    },
+    {
+      "file": "298240.mp4",
+      "originalUpload": "298240.mp4",
+      "sha256": "f333a1c3905df4dc6d659b77b6996b096639178c75ddfd59bddd17c39044c94b"
+    }
+  ],
+  "notVerified": [
+    "cabinet dimensions",
+    "tank model/capacity",
+    "unopened bay contents",
+    "hidden routing",
+    "meter/filter/non-return valve presence"
+  ],
+  "placementBasis": "common-side kitchen return, beside existing apartment 4 entrance; approximate offset and cabinet dimensions"
+}

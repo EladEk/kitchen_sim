@@ -8,6 +8,6 @@ export function designEvidence(item,settings={}){
  if(item?.water)return {basis:'plan',position:'estimate',dimensions:'estimate'};
  if(item?.illustrative||item?.kind==='bed'||item?.kind==='desk')return {basis:chosen?'user':item?.ordered?'plan':'estimate',position:item?.userPlacement?'user':'estimate',dimensions:item?.userDimensions?'user':'estimate'};
  if(chosen)return {basis:'user',position:'user',dimensions:'user'};
- if(['site-photos','exterior-details'].includes(item?.source))return {basis:'photo',position:'estimate',dimensions:'estimate'};
+ if(['site-photos','exterior-details','entry-services'].includes(item?.source))return {basis:'photo',position:'estimate',dimensions:'estimate'};
  return {basis:'plan',position:'plan',dimensions:item?.dimensionsInferred?'estimate':'plan'};
 }
