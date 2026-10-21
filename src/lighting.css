@@ -1,0 +1,8 @@
+.hs-lighting-facts{min-width:0}
+.hs-lighting-facts summary{min-height:44px;display:flex;align-items:center;cursor:pointer;font-size:12px;color:#536341}
+.hs-lighting-facts .hs-electrical-point-list>button{min-height:44px}
+.hs-inspector.hs-lighting-inspector{position:static;inset:auto;width:100%;max-width:none;max-height:none;margin:10px 0;border:1px solid #dce0d0;background:#fffdf5;box-shadow:none;backdrop-filter:none}
+.hs-lighting-inspector .hs-inspector-body{min-width:0;overflow-wrap:anywhere}
+.hs-lighting-inspector .hs-inspector-header>div{min-width:0}
+.hs-lighting-inspector .hs-icon-button{width:44px;min-width:44px;height:44px}
+.hs-lighting-inspector .electrical-photo-tools{flex-wrap:wrap}

@@ -13,12 +13,13 @@ import {KITCHEN_ELECTRICAL_POINTS as P,kitchenElectricalSelection,kitchenElectri
 import {ELECTRICAL_EXCLUSIONS} from './home-electrical.mjs';
 import {layoutElectricalCallouts,electricalPhotoCrop,electricalPhotoAnchors} from './electrical-ui.mjs';
 import {DEFAULTS,getModule,WINDOW} from './model.mjs';
-import {ROOMS,FURNITURE,editableFurniture,WATER_LAYOUT,normalizeHomeSettings,getFurniture} from './home-model.mjs';
+import {ROOMS,FURNITURE,ELECTRICAL_LAYOUT,editableFurniture,WATER_LAYOUT,normalizeHomeSettings,getFurniture,editHomeYard,yardForSettings} from './home-model.mjs';
 import {SERVICE_COLORS} from './service-colors.mjs';
 import {HOME_PRODUCTS} from './home-products.mjs';
 import {catalogueSource} from './harash-catalog.mjs';
 import {FLOOR_ORDER_ROWS,floorOrderForRoom,FINISH_SCHEDULE_VERSION} from './home-finish-schedule.mjs';
 import {createKitchen} from './scene.js';
+import {createHomeScene} from './home-scene.js';
 import {ELECTRICAL_ROOM_REVIEWS} from './electrical-video-review.mjs';
 
 // Compile the actual React components for server/handler checks, without a
@@ -26,11 +27,12 @@ import {ELECTRICAL_ROOM_REVIEWS} from './electrical-video-review.mjs';
 const root=fileURLToPath(new URL('../',import.meta.url)),cache=join(root,'node_modules/.cache');
 await mkdir(cache,{recursive:true});const temp=await mkdtemp(join(cache,'electrical-ui-'));
 after(()=>rm(temp,{recursive:true,force:true}));
-const exports={HomeFurnitureEditor:'HomeWorkspaceControls.jsx',HomeViewChooser:'HomeWorkspaceControls.jsx',HomePrimaryActions:'HomeWorkspaceControls.jsx',furnitureEditorSelection:'HomeWorkspaceControls.jsx',FurniturePositionControls:'FurniturePositionControls.jsx',WalkingControls:'WalkingControls.jsx',HoldButton:'WalkingControls.jsx',KitchenElectricalCompare:'KitchenElectricalCompare.jsx',ElectricalMarkerButtons:'ElectricalCallouts.jsx',ElectricalPhoto:'ElectricalPhoto.jsx',HomeSources:'HomeProducts.jsx',ProductCards:'HomeProducts.jsx',CatalogueMatch:'CatalogueMatch.jsx',KitchenElectricalViewControls:'KitchenElectrical.jsx',FloorPlan:'PlanViews.jsx',Elevation:'PlanViews.jsx',ModelView:'ModelView.jsx',HomePlan:'HomePlan.jsx',WaterPointDetails:'WaterPoints.jsx',WaterGlyph:'WaterPoints.jsx',KitchenElectricalPanel:'KitchenElectrical.jsx',RenderControls:'RenderControls.jsx',VrControls:'VrControls.jsx',FloorSpecification:'FloorSpecification.jsx',FloorSchedule:'FloorSchedule.jsx',SinkSpecification:'SinkSpecification.jsx',ElectricalFacts:'HomeElectrical.jsx',SceneRestoreControls:'SceneInterface.jsx',SceneUiLayer:'SceneInterface.jsx',restoreInterfaceOnEscape:'SceneInterface.jsx'};
+const exports={PlanningTools:'PlanningTools.jsx',HistoryButtons:'PlanningTools.jsx',LightControls:'LightControls.jsx',YardWorkspace:'YardWorkspace.jsx',DesignEvidence:'DesignEvidence.jsx',FurnitureAssistance:'FurnitureAssistance.jsx',FurnitureSizeEditor:'FurnitureSizeEditor.jsx',FurnitureFrontMarkers:'FurniturePlanGuides.jsx',FurnitureRoomServices:'FurniturePlanGuides.jsx',ElectricalFixtureGlyph:'KitchenElectrical.jsx',YardPlan:'YardPlan.jsx',HomeYardEditor:'HomeYardEditor.jsx',HomeFurnitureEditor:'HomeWorkspaceControls.jsx',HomeViewChooser:'HomeWorkspaceControls.jsx',HomePrimaryActions:'HomeWorkspaceControls.jsx',furnitureEditorSelection:'HomeWorkspaceControls.jsx',FurniturePositionControls:'FurniturePositionControls.jsx',WalkingControls:'WalkingControls.jsx',HoldButton:'WalkingControls.jsx',KitchenElectricalCompare:'KitchenElectricalCompare.jsx',ElectricalMarkerButtons:'ElectricalCallouts.jsx',ElectricalPhoto:'ElectricalPhoto.jsx',HomeSources:'HomeProducts.jsx',ProductCards:'HomeProducts.jsx',CatalogueMatch:'CatalogueMatch.jsx',KitchenElectricalViewControls:'KitchenElectrical.jsx',FloorPlan:'PlanViews.jsx',Elevation:'PlanViews.jsx',ModelView:'ModelView.jsx',HomePlan:'HomePlan.jsx',WaterPointDetails:'WaterPoints.jsx',WaterGlyph:'WaterPoints.jsx',KitchenElectricalPanel:'KitchenElectrical.jsx',RenderControls:'RenderControls.jsx',VrControls:'VrControls.jsx',FloorSpecification:'FloorSpecification.jsx',FloorSchedule:'FloorSchedule.jsx',SinkSpecification:'SinkSpecification.jsx',ElectricalFacts:'HomeElectrical.jsx',SceneRestoreControls:'SceneInterface.jsx',SceneUiLayer:'SceneInterface.jsx',restoreInterfaceOnEscape:'SceneInterface.jsx'};
 const input=Object.entries(exports).map(([name,file])=>`export {${name}} from ${JSON.stringify(join(root,'src',file))};`).join('\n')+`\nexport {default as KitchenApp} from ${JSON.stringify(join(root,'src/KitchenApp.jsx'))};\nexport {default as HomeApp} from ${JSON.stringify(join(root,'src/HomeApp.jsx'))};`;
 const bundler=await rolldown({input:'electrical:test',platform:'node',external:id=>/^(react|react-dom|three)(\/|$)/.test(id),transform:{jsx:'react-jsx'},plugins:[{name:'component-tests',resolveId(id){if(id==='electrical:test')return '\0entry';if(id.endsWith('.css'))return '\0css'},load(id){if(id==='\0entry')return input;if(id==='\0css')return ''}}]});
 const output=await bundler.generate({format:'esm'});await bundler.close();
-const bundlePath=join(temp,'components.mjs');await writeFile(bundlePath,output.output[0].code);const UI=await import(pathToFileURL(bundlePath));
+for(const chunk of output.output)await writeFile(join(temp,chunk.fileName),chunk.type==='chunk'?chunk.code:chunk.source);
+const bundlePath=join(temp,output.output.find(chunk=>chunk.type==='chunk'&&chunk.isEntry).fileName);const UI=await import(pathToFileURL(bundlePath));
 const render=(Component,props)=>renderToStaticMarkup(React.createElement(Component,props));
 const walk=(node,visit)=>{if(!node||typeof node!=='object')return;visit(node);React.Children.forEach(node.props?.children,c=>walk(c,visit));};
 // Parse the actual rendered markup, accounting for hidden/inert ancestors.
@@ -118,11 +120,11 @@ test('furniture movement controls expose all directions, rotation/reset and plan
 test('the home has one optional panel and three primary actions, with a focused furniture editor',()=>{
  const old=globalThis.localStorage;
  try{
-  for(const lang of ['he','en'])for(const panel of ['rooms','options','furniture']){
+  for(const lang of ['he','en'])for(const panel of ['rooms','options','furniture','yard']){
    globalThis.localStorage={getItem:()=>JSON.stringify(normalizeHomeSettings({lang}))};
    const html=render(UI.HomeApp,{initialRoom:'safe-room',initialMode:'walk',initialPanel:panel}),nodes=uiNodes(html),panels=nodes.filter(n=>hasClass(n,'hs-simple-panel')&&!n.hidden);
    assert.equal(panels.length,1);assert.equal(panels[0].attrs['data-active-panel'],panel);
-   for(const [name,visible] of [['hs-sidebar',panel==='rooms'],['hs-simple-options',panel==='options'],['hs-simple-editor',panel==='furniture']])assert.equal(!nodes.find(n=>hasClass(n,name)).hidden,visible,`${panel}: only the chosen panel content is visible`);
+   for(const [name,visible] of [['hs-sidebar',panel==='rooms'],['hs-simple-options',panel==='options'],['hs-simple-editor',panel==='furniture'],['hs-yard-editor',panel==='yard']])assert.equal(!nodes.find(n=>hasClass(n,name)).hidden,visible,`${panel}: only the chosen panel content is visible`);
    assert(!nodes.some(n=>hasClass(n,'hs-display-dock')||hasClass(n,'hs-space-title')),'no legacy overlapping title/dock');
    const walking=nodes.find(n=>hasClass(n,'hs-walk-controls'));if(walking)assert(walking.hidden,'walking pad yields to a panel');
    if(panel==='furniture'){
@@ -133,7 +135,7 @@ test('the home has one optional panel and three primary actions, with a focused 
     assert.equal(choices.length,3);assert.equal(choices.filter(n=>n.attrs['aria-pressed']==='true').length,1);
     assert(html.includes(lang==='he'?'10 ס״מ בכל לחיצה':'10 cm per press'));
     assert(!visibleUiControls(nodes).some(n=>n.attrs['aria-label']===(lang==='he'?'צעד הזזה':'Movement step')),'fixed arrow step needs no extra dropdown');
-    assert(!nodes.some(n=>n.attrs['data-electrical-id']&&!n.hidden));
+    const serviceIds=nodes.filter(n=>n.attrs['data-room-service']).map(n=>n.attrs['data-room-service']);assert.deepEqual(serviceIds,ELECTRICAL_LAYOUT.points.filter(p=>p.roomId==='safe-room').map(p=>p.id));assert(!html.includes('water-plan-markers'),'furniture editing shows electrical points without water clutter');
    }
   }
  }finally{globalThis.localStorage=old;}
@@ -169,12 +171,12 @@ test('actual home CSS reserves separate scene, toolbar and panel rows at phone, 
  };
  const old=globalThis.localStorage;
  try{
-  for(const panel of [null,'rooms','options','furniture'])for(const mode of ['overview','room','walk','plan'])for(const cleanView of [false,true]){
+  for(const panel of [null,'rooms','options','furniture','yard'])for(const mode of ['overview','room','walk','plan'])for(const cleanView of [false,true]){
    globalThis.localStorage={getItem:()=>JSON.stringify(normalizeHomeSettings({cleanView}))};
    const nodes=uiNodes(render(UI.HomeApp,{initialMode:mode,initialPanel:panel})),index=name=>nodes.findIndex(n=>hasClass(n,name));
    for(const [width,height] of [[320,640],[393,852],[768,1024],[932,430],[1280,800]]){
     assert.equal(value(nodes,index('hs-stage'),'display',width,height),'grid');
-    const scene=index(mode==='plan'||panel==='furniture'?'hs-plan-stage':'hs-model');
+    const scene=index(mode==='plan'||['furniture','yard'].includes(panel)?'hs-plan-stage':'hs-model');
     assert.equal(value(nodes,scene,'position',width,height),'relative');assert.equal(value(nodes,scene,'grid-row',width,height),cleanView?'1':'2');
     if(!cleanView){
      assert.equal(value(nodes,index('hs-simple-topbar'),'grid-row',width,height),'1');
@@ -187,6 +189,30 @@ test('actual home CSS reserves separate scene, toolbar and panel rows at phone, 
   }
  }finally{globalThis.localStorage=old;}
  assert.match(css.toString(),/\.hs-app \[hidden\],\.app \[hidden\]\{display:none!important\}/,'native hidden wins over mobile display rules');
+});
+
+test('furniture size form uses centimetres and guides show rotating fronts plus only the room’s source-backed electrical points',()=>{
+ const settings=normalizeHomeSettings({showElectrical:false}),item=getFurniture('safe-storage',settings),moves=[],formTree=UI.FurnitureSizeEditor({item,lang:'he',onMove:c=>moves.push(c)});let form;
+ walk(formTree,n=>{if(n.type==='form')form=n;});form.props.onSubmit({preventDefault(){},currentTarget:{elements:{namedItem:k=>({value:{w:'140',d:'55',h:'220'}[k]})}}});assert.deepEqual(moves,[{dimensions:{w:1.4,d:.55,h:2.2}}]);
+ const fronts=render(UI.FurnitureFrontMarkers,{settings,roomId:'safe-room',scale:30});assert(fronts.includes('data-furniture-front="safe-storage"'));assert(fronts.includes('rotate(-90)'));assert(fronts.includes('צד הרגליים'));
+ const selected=[],tree=UI.FurnitureRoomServices({settings,roomId:'safe-room',scale:30,onSelect:id=>selected.push(id)});walk(tree,n=>{if(n.type===UI.ElectricalFixtureGlyph)UI.ElectricalFixtureGlyph(n.props).props.onClick({stopPropagation(){}});});
+ assert.deepEqual(selected,ELECTRICAL_LAYOUT.points.filter(p=>p.roomId==='safe-room').map(p=>p.id));
+ const plan=render(UI.HomePlan,{settings,focusRoom:'safe-room',selectedRoom:'safe-room',onFurniture(){},onFurnitureMove(){},onInspect(){}});assert(plan.includes('hs-furniture-services'));assert(plan.includes('hs-furniture-fronts'));assert(plan.includes('fill="#d83f3f"'));assert(!/>S\d+<\/text>/.test(plan),'service IDs stay in accessible titles/details, not large plan labels');
+ const clean={...settings,cleanView:true};assert.equal(render(UI.FurnitureFrontMarkers,{settings:clean,roomId:'safe-room',scale:30}),'');assert.equal(render(UI.FurnitureRoomServices,{settings:clean,roomId:'safe-room',scale:30}),'');
+});
+
+test('yard editing stays in the one-panel workspace, exposes dimensions and dragging, and hide-all removes every editor control',()=>{
+ const old=globalThis.localStorage;
+ try{
+  for(const lang of ['he','en'])for(const cleanView of [false,true]){
+   globalThis.localStorage={getItem:()=>JSON.stringify(normalizeHomeSettings({lang,cleanView}))};
+   const html=render(UI.HomeApp,{initialPanel:'yard'}),nodes=uiNodes(html),plan=nodes.find(n=>hasClass(n,'hs-yard-plan'));if(cleanView)assert(!plan);else assert(plan&&!plan.hidden);assert(nodes.some(n=>hasClass(n,'hs-model')&&!n.hidden),'yard editing has a live 3D view');
+   assert.equal(nodes.filter(n=>hasClass(n,'hs-simple-panel')&&!n.hidden).length,cleanView?0:1);
+   if(cleanView){assert.equal(visibleUiControls(nodes).length,1);assert(!html.includes('hs-yard-reserves'));}
+   else{assert(html.includes('data-yard-id="shed"'));assert(html.includes('data-yard-id="pergola"'));assert(html.includes('hs-yard-reserves'));assert(html.includes(lang==='he'?'החלת שינויים':'Apply changes'));}
+  }
+  const changes=[],editor=UI.HomeYardEditor({settings:normalizeHomeSettings(),selectedId:'fence',onSelect(){},onChange:c=>changes.push(c)});let form;walk(editor,n=>{if(n.type==='form')form=n;});form.props.onSubmit({preventDefault(){},currentTarget:{elements:{namedItem:k=>({value:k==='color'?'#445544':'180'})}}});assert.deepEqual(changes,[{dimensions:{h:1.8},color:'#445544'}]);
+ }finally{globalThis.localStorage=old;}
 });
 
 test('actual kitchen CSS keeps toolbars in flow at phone, tablet and desktop widths despite the hide-all wrapper',async()=>{
@@ -442,4 +468,44 @@ test('actual app restoration corrects old floor choices and removes dry-room cla
   globalThis.localStorage={getItem:()=>JSON.stringify({modelRevision:7,settings:{...DEFAULTS,lang:'he',floor:'cool',finishScheduleVersion:FINISH_SCHEDULE_VERSION}})};
   assert(render(UI.KitchenApp,{}).includes('data-floor-finish="cool"'),'newly saved explicit trial finishes remain available');
  }finally{globalThis.localStorage=old;}
+});
+
+
+test('choosing a fence colour immediately changes the plan and real fence material without submitting or remounting the dimensions form',()=>{
+ let settings=normalizeHomeSettings();
+ const editor=()=>UI.HomeYardEditor({settings,selectedId:'fence',onSelect(){},onChange:command=>{const r=editHomeYard(settings,'fence',command);assert(!r.error);settings=r.settings;}});
+ const fields=tree=>{const found={};walk(tree,n=>{if(n.type==='form')found.form=n;if(n.type==='input'&&n.props.type==='color')found.colour=n;});return found;};
+ const original=yardForSettings(settings).garden.fence.color,initial=fields(editor()),key=initial.form.key;
+ for(const color of ['#eeeeee','#223344']){
+  const current=fields(editor());assert.equal(typeof current.colour.props.onChange,'function');
+  current.colour.props.onChange({currentTarget:{value:color}});
+  assert.equal(settings.yardDesign.fence.color,color,'no form submission is required');
+  const next=fields(editor());assert.equal(next.form.key,key,'colour changes must not recreate the native picker or discard draft dimensions');assert.equal(next.colour.props.value,color);
+  settings=normalizeHomeSettings(JSON.parse(JSON.stringify(settings)));assert.equal(yardForSettings(settings).garden.fence.color,color);
+  const plan=render(UI.YardPlan,{settings,selectedId:'fence',onSelect(){},onMove(){}});assert(plan.includes(`stroke="${color}"`));
+  const scene=createHomeScene(settings);try{let slats=0,posts=0;scene.group.traverse(mesh=>{if(['horizontal-fence-slat','fence-post'].includes(mesh.userData.part)){assert.equal('#'+mesh.material.color.getHexString(),color);mesh.userData.part==='fence-post'?posts++:slats++;}});assert(slats>0&&posts>0);}finally{scene.dispose();}
+ }
+ settings=editHomeYard(settings,'fence',{reset:true}).settings;assert.equal(fields(editor()).colour.props.value,original);
+});
+
+test('individual light controls edit only their own saved point and reveal a hidden light layer for manual preview',()=>{
+ const point={id:'lighting-K-L01',he:'תאורת מטבח',en:'Kitchen light'},other={enabled:false,brightness:15,kelvin:2700},settings={...DEFAULTS,lang:'he',showLighting:false,lightControls:{'lighting-S-L01':other}},changes=[];
+ const tree=UI.LightControls({point,settings,onChange:(k,v)=>changes.push([k,v])});let toggle,brightness,temperature;
+ walk(tree,n=>{if(n.type==='input'&&n.props.type==='checkbox')toggle=n;if(n.type==='input'&&n.props.type==='range')brightness=n;if(n.type==='select')temperature=n;});
+ assert(toggle&&brightness&&temperature);brightness.props.onChange({target:{value:'42'}});assert.equal(changes[0][0],'showLighting');assert.equal(changes[0][1],true);assert.equal(changes[1][0],'lightControls');assert.equal(changes[1][1][point.id].brightness,42);assert.deepEqual(changes[1][1]['lighting-S-L01'],other);
+ changes.length=0;temperature.props.onChange({target:{value:'4000'}});assert.equal(changes.at(-1)[1][point.id].kelvin,4000);
+ changes.length=0;toggle.props.onChange({target:{checked:false}});assert.equal(changes.length,1);assert.equal(changes[0][1][point.id].enabled,false);
+});
+
+test('planning actions stay inside the existing panel, expose offline alternatives/printing and hide with all controls',()=>{
+ const history={canUndo:true,canRedo:false,undo(){},redo(){}},pair={home:normalizeHomeSettings(),kitchen:DEFAULTS};
+ const html=render(UI.PlanningTools,{lang:'he',history,getPair:()=>pair,onLoad(){},onReport(){}});assert(html.includes('חלופות, ביטול ודף תכנון'));assert(html.includes('שמירת חלופה חדשה'));assert(html.includes('PDF'));assert(html.includes('ייצוא גיבוי חלופות'));assert(html.includes('ייבוא גיבוי חלופות'));assert(/maxlength="80"/i.test(html));assert(!html.includes('position:fixed'));
+ const calls=[],tree=UI.HistoryButtons({history:{...history,undo:()=>calls.push('undo'),redo:()=>calls.push('redo')},lang:'he'}),buttons=[];walk(tree,n=>{if(n.type==='button')buttons.push(n);});assert(!buttons[0].props.disabled);assert(buttons[1].props.disabled);buttons[0].props.onClick();assert.deepEqual(calls,['undo']);
+ const old=globalThis.localStorage;try{globalThis.localStorage={getItem:()=>JSON.stringify(normalizeHomeSettings({cleanView:true}))};const nodes=uiNodes(render(UI.HomeApp,{initialPanel:'options'}));assert.equal(visibleUiControls(nodes).length,1);}finally{globalThis.localStorage=old;}
+});
+
+test('furniture assistance reports clearances and its snap toggle without adding floating item labels',()=>{
+ const settings=normalizeHomeSettings(),changes=[],tree=UI.FurnitureAssistance({settings,id:'bed-a',onChange:(...c)=>changes.push(c)});let checkbox;walk(tree,n=>{if(n.type==='input')checkbox=n;});assert(checkbox.props.checked);checkbox.props.onChange({target:{checked:false}});assert.deepEqual(changes,[['furnitureSnap',false]]);
+ const html=render(UI.HomePlan,{settings,focusRoom:'bedroom-a',selectedFurnitureId:'bed-a'});assert(html.includes('furniture-clearance-guides'));assert(html.includes('hs-furniture-fronts'));assert(html.includes('data-room-service='));assert(!html.includes('object-label'));
+ const evidence=render(UI.DesignEvidence,{item:{lighting:true,positionInferred:true},settings,lang:'he'});assert(evidence.includes('נצפה בצילום'));assert(evidence.includes('הערכה במודל'));
 });

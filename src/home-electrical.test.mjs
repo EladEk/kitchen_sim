@@ -10,7 +10,7 @@ import {closeAllStudioOpenings} from './studio-state.mjs';
 const near=(a,b)=>assert(Math.abs(a-b)<1e-5,`${a} ≈ ${b}`);
 
 test('every electrical observation has stable identity, source evidence, and explicit estimate flags',()=>{
- assert.equal(E.points.length,48);assert.equal(new Set(E.points.map(p=>p.id)).size,E.points.length);
+ assert.equal(E.points.length,51);assert.equal(new Set(E.points.map(p=>p.id)).size,E.points.length);
  for(const p of E.points){
   assert(electricalPoint(p.id)===p);assert(ELECTRICAL_KINDS[p.kind]);assert(ROOMS.some(r=>r.id===p.roomId));assert(p.positionInferred);assert(p.dimensionsInferred);
   assert(p.evidence.length>0);for(const e of p.evidence){assert(ELECTRICAL_REFERENCES.some(s=>s.page===e.page));const [x,y,w,h]=e.rect;assert(x>=0&&y>=0&&w>0&&h>0&&x+w<=1&&y+h<=1,`${p.label} has a source-normalized rectangle`);}
@@ -59,7 +59,7 @@ test('actual 3D markers are independently inspectable, permanent with furniture 
 
 test('duplicate source views share one ID and source images, video times and provenance are portable',()=>{
  const file=p=>new URL(`../public${p}`,import.meta.url),record=JSON.parse(readFileSync(file('/house/electrical/provenance.json')));
- assert.equal(record.metricSurvey,false);assert.equal(record.items.filter(i=>i.second!=null).length,12);
+ assert.equal(record.metricSurvey,false);assert.equal(record.items.filter(i=>i.second!=null).length,14);
  for(const s of ELECTRICAL_REFERENCES){assert(existsSync(file(s.image)));if(s.second!=null){assert(s.second>=0&&s.second<32.332896);const bytes=readFileSync(file(s.image)),r=record.items.find(r=>r.second===s.second);assert.equal(createHash('sha256').update(bytes).digest('hex'),r.sha256);}}
  assert(E.points.find(p=>p.label==='K01').evidence.length===2);assert(E.points.filter(p=>p.label==='K01').length===1);
  assert(E.points.find(p=>p.label==='S03').evidence.some(e=>e.page===9));assert(E.points.find(p=>p.label==='S03').evidence.some(e=>e.page===13));
@@ -67,7 +67,7 @@ test('duplicate source views share one ID and source images, video times and pro
 
 test('the additional 277903 photo has five established IDs, retains original bytes and does not count hidden sockets or a reattached video twice',()=>{
  const source=ELECTRICAL_REFERENCES.find(r=>r.page===21),bytes=readFileSync(new URL(`../public${source.image}`,import.meta.url));assert.equal(createHash('sha256').update(bytes).digest('hex'),source.sha256);assert.equal(source.width,1536);assert.equal(source.height,1152);
- const ids=E.points.filter(p=>p.evidence.some(e=>e.page===21)).map(p=>p.label);assert.deepEqual(ids,['K06','K08','K09','K10','H02']);assert.equal(E.points.length,48);assert(!E.points.find(p=>p.label==='K07').evidence.some(e=>e.page===21));
+ const ids=E.points.filter(p=>p.evidence.some(e=>e.page===21)).map(p=>p.label);assert.deepEqual(ids,['K06','K08','K09','K10','H02']);assert.equal(E.points.length,51);assert(!E.points.find(p=>p.label==='K07').evidence.some(e=>e.page===21));
  const boxes=E.points.flatMap(p=>p.evidence.filter(e=>e.page===21).map(e=>({label:p.label,rect:e.rect})));for(const a of boxes)for(const b of boxes.filter(b=>b!==a)){const [x,y,w,h]=a.rect,[u,v,s,t]=b.rect;assert(Math.min(x+w,u+s)<=Math.max(x,u)||Math.min(y+h,v+t)<=Math.max(y,v));}
  const provenance=JSON.parse(readFileSync(new URL('../public/house/electrical/provenance.json',import.meta.url)));assert.equal(provenance.items.find(i=>i.file==='kitchen-hall-277903.jpg').sha256,source.sha256);const video=readFileSync(new URL('../public/house/photos/walkthrough.mp4',import.meta.url));assert.equal(createHash('sha256').update(video).digest('hex'),provenance.additionalReview.portableVideoSha256);
  for(const id of ['K06','K08','K09','K10'])assert(E.points.find(p=>p.label===id).evidence.some(e=>e.page===1),'earlier evidence remains accessible');
@@ -77,4 +77,24 @@ test('H02 is mounted on the living-facing wall across the hall entrance while K0
  const h=E.points.find(p=>p.label==='H02'),k=E.points.find(p=>p.label==='K09'),low=E.points.find(p=>p.label==='K10');assert.equal(h.roomId,'living');assert.equal(h.wallId,'bed-a-north');assert.equal(h.kind,'outlet');assert.deepEqual(h.normal,[0,-1]);assert(h.position[0]<k.observedPosition[0]-1);assert(h.position[2]<k.observedPosition[2]-.9);assert.equal(h.page,21);assert(h.positionInferred);assert.equal(h.height,2.2);assert(h.positionNoteHe.includes('משוערים'));
  assert.equal(k.kind,'preparation');assert.equal(k.height,1.65);assert.equal(k.observedHeight,1.15);assert.equal(k.relocation.accessPart,'oven:lift-up');near(k.observedPosition[0],low.position[0]);assert.equal(k.page,21);
  const scene=createHomeScene(normalizeHomeSettings({furniture:false}));try{scene.group.updateMatrixWorld(true);const node=scene.gardenGroups.get(h.id);assert.deepEqual(node.position.toArray(),h.position);assert(scene.picks.some(m=>m.userData.electricalId===h.id));assert(node.userData.inspectionView.from[2]<h.position[2]);}finally{scene.dispose();}
+});
+
+test('the repeated walkthrough adds the opposite office-wall pair and the separate hall entrance box, with exact source frames',()=>{
+ const by=id=>E.points.find(p=>p.label===id),record=JSON.parse(readFileSync(new URL('../public/house/electrical/provenance.json',import.meta.url)));
+ assert.deepEqual(record.repeatReview.newPoints,['O06','O07','H05']);assert.equal(record.repeatReview.displaySize[0],540);assert.equal(record.repeatReview.samplingSeconds,.5);
+ const video=readFileSync(new URL('../public/house/photos/walkthrough.mp4',import.meta.url));assert.equal(createHash('sha256').update(video).digest('hex'),record.repeatReview.sha256);
+ for(const id of ['O06','O07']){const p=by(id);assert.equal(p.roomId,'bedroom-c');assert(p.roomInferred);assert.equal(p.wallId,'bedroom-c-east');assert.deepEqual(p.normal,[-1,0]);assert.equal(p.evidence[0].page,28);assert.equal(p.height,.38);}
+ assert.equal(by('O06').kind,'outlet');assert.equal(by('O07').kind,'preparation');assert(by('O06').position[2]<by('O07').position[2]);
+ assert.equal(by('H05').wallId,'powder-east');assert.deepEqual(by('H05').normal,[1,0]);assert.equal(by('H05').kind,'preparation');assert.equal(by('H05').evidence[0].page,27);assert.notEqual(by('H05').wallId,by('H04').wallId);
+ assert.equal(ELECTRICAL_REFERENCES.find(r=>r.page===27).second,5.25);assert.equal(ELECTRICAL_REFERENCES.find(r=>r.page===28).second,30);
+ assert.equal(E.reviewedVideo.reviewRevision,39);assert(!by('K05'));assert.equal(by('K09').relocation.accessPart,'oven:lift-up');
+});
+
+test('the owner living-wall screenshot corrects existing L01–L03 to the hall-facing partition without duplicating them',()=>{
+ const items=E.points.filter(p=>['L01','L02','L03'].includes(p.label)),h=electricalPoint('electrical-H02');assert.equal(items.length,3);
+ for(const p of items){assert.equal(p.wallId,'bed-a-north');assert.deepEqual(p.normal,[0,-1]);near(p.position[2],h.position[2]);assert(p.evidence.some(e=>e.page===10));assert(p.evidence.some(e=>e.page===26));assert(p.position[0]<h.position[0]);}
+ assert(items[0].position[0]>items[1].position[0],'source image-left is east when facing the south partition');
+ const source=ELECTRICAL_REFERENCES.find(r=>r.page===26),record=JSON.parse(readFileSync(new URL('../public/house/electrical/provenance.json',import.meta.url))),original=readFileSync(new URL('../public'+source.image,import.meta.url));
+ assert.equal(createHash('sha256').update(original).digest('hex'),record.items.find(r=>r.file==='living-302046.jpg').sha256);assert.equal(E.points.filter(p=>p.evidence.some(e=>e.page===26)).length,3);
+ const scene=createHomeScene(normalizeHomeSettings({furniture:false}),{mode:'walk'});try{for(const p of items){const node=scene.gardenGroups.get(p.id);assert.deepEqual(node.position.toArray(),p.position);assert(node.userData.inspectionView.from[2]<p.position[2]);}}finally{scene.dispose();}
 });

@@ -1,3 +1,5 @@
+import {buildLightingPoints} from './home-lighting-scene.js';
+import {KITCHEN_LIGHTING_POINTS} from './kitchen-lighting.mjs';
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { ROOM,LONG,SHORT,UPPERS,ISLAND,ISLAND_UNITS,WINDOW,MATERIALS,STONES } from './model.mjs';
@@ -293,7 +295,8 @@ export function createKitchen(settings){
   for(const [id,p] of buildElectricalPoints({group,box:electricalBox,cylinder:electricalCylinder,mat,resources,settings:{...settings,electricalPresentation:'fixtures'},points:KITCHEN_ELECTRICAL_POINTS}))electricalGroups.set(id,p);
   for(const [id,p] of buildWaterPoints({group,box:electricalBox,cylinder:electricalCylinder,mat,resources,settings:{...settings,electricalPresentation:'fixtures'},points:KITCHEN_WATER_POINTS}))waterGroups.set(id,p);
  }
+ const lightingGroups=settings.inspection?new Map():buildLightingPoints({group,box:(x,y,z,w,h,d,m,parent)=>box(x/M,y/M,z/M,w/M,h/M,d/M,m,null,parent),cylinder:(x,y,z,r,h,m,parent)=>cylinder(x/M,y/M,z/M,r/M,h/M,m,parent),mat,resources,settings,points:KITCHEN_LIGHTING_POINTS,picks,interactive:false});
  const activePicks=picks.filter(objectVisible),electricalOccluders=[];
  group.traverse(mesh=>{if(mesh.isMesh&&objectVisible(mesh)&&!mesh.userData.electricalId&&opaqueMesh(mesh))electricalOccluders.push(mesh);});
- return {group,windowGroup,picks:activePicks,moduleGroups,openingObjects,electricalGroups,waterGroups,dimensionGroup,serviceGroups:new Map([...electricalGroups,...waterGroups]),furnishingRoots,roomStructure,electricalOccluders,dispose(){group.traverse(o=>{if(o.isLight&&o.shadow)o.shadow.dispose();});resources.forEach(r=>r.dispose?.());}};
+ return {group,lightingGroups,windowGroup,picks:activePicks,moduleGroups,openingObjects,electricalGroups,waterGroups,dimensionGroup,serviceGroups:new Map([...electricalGroups,...waterGroups]),furnishingRoots,roomStructure,electricalOccluders,dispose(){group.traverse(o=>{if(o.isLight&&o.shadow)o.shadow.dispose();});resources.forEach(r=>r.dispose?.());}};
 }

@@ -1,3 +1,6 @@
+import {normalizeLightControls} from './lighting-controls.mjs';
+import {createLightingLayout} from './home-lighting.mjs';
+import {normalizeYardDesign,resolveYardDesign,changeYardDesign,defaultYardItem} from './yard-design.mjs';
 import {OUTDOOR_KITCHEN} from './home-products.mjs';
 import {orderedFloor,orderedFloorForRoom} from './ordered-flooring.mjs';
 import {OPENING_SCHEDULE,DOOR_HANDINGS,SHUTTER_IDS} from './home-building-spec.mjs';
@@ -16,11 +19,11 @@ export const PLAN_ORIGIN=[606,45.7];
 export const point=(x,z)=>[(x-PLAN_ORIGIN[0])*PLAN_SCALE,(z-PLAN_ORIGIN[1])*PLAN_SCALE];
 const polygon=a=>a.map(p=>point(...p));
 const rect=(x0,z0,x1,z1)=>[[x0,z0],[x1,z0],[x1,z1],[x0,z1]];
-export const HOUSE={height:2.75,eyeHeight:1.62,playerRadius:.17,source:'/house/house-plan.pdf',image:'/house/house-plan.jpg',revision:34,scale:50};
+export const HOUSE={height:2.75,eyeHeight:1.62,playerRadius:.17,source:'/house/house-plan.pdf',image:'/house/house-plan.jpg',revision:39,scale:50};
 export const GARDEN_LAYOUT=createGardenLayout(point);
 export const EXTERIOR_LAYOUT=createExteriorLayout(point);
 export const SERVICE_YARD=createServiceYard(point);
-export const gardenElement=id=>[...GARDEN_LAYOUT.elements,...SERVICE_YARD.elements,...EXTERIOR_LAYOUT.elements].find(e=>e.id===id);
+export const gardenElement=(id,settings)=>{const {garden,service}=yardForSettings(settings);return [...garden.elements,...service.elements,...EXTERIOR_LAYOUT.elements].find(e=>e.id===id);};
 export const HOUSE_OUTLINE=polygon([[671.22,37.2],[1141.74,37.2],[1141.74,159.1],[1269.3,159.1],[1269.3,366.04],[1187.1,366.04],[1187.1,451.06],[1087.92,451.06],[1087.92,717.52],[1002.84,717.52],[1002.84,938.62],[589.02,938.62],[589.02,297.98],[671.22,297.98]]);
 export const PLOT=polygon(rect(273.84,42.28,1277.82,1032.94));
 export const PUBLIC_ENTRY=polygon(rect(1141.74,42.28,1277.82,159.1));
@@ -97,6 +100,8 @@ export const WINDOWS=[
  opening('utility-window','utility-east',400,431.2,['laundry'],'חלון השירות','window',1.2,.9)
 ];
 export const ELECTRICAL_LAYOUT=createElectricalLayout(point,WALLS,{kitchenAnchor:KITCHEN_ANCHOR});
+export const LIGHTING_LAYOUT=createLightingLayout(point,WALLS);
+export const lightingPoint=id=>LIGHTING_LAYOUT.points.find(p=>p.id===id);
 export const electricalPoint=id=>ELECTRICAL_LAYOUT.points.find(p=>p.id===id);
 export function openingPoint(o){const w=WALLS.find(w=>w.id===o.wallId);return o.vertical?[w.a[0],(o.start+o.end)/2]:[(o.start+o.end)/2,w.a[1]];}
 export const SHUTTERS=SHUTTER_IDS.map(id=>({id,opening:[...DOORS,...WINDOWS].find(o=>o.id===id)}));
@@ -134,6 +139,10 @@ export const FURNITURE=[
  const d=f.kind==='wall-toilet'?.52:f.id==='guest-basin'?.29:f.d,delta=(d-f.d)/2;
  return {...f,d,position:[f.position[0]+Math.sin(f.rotation)*delta,f.position[1]+Math.cos(f.rotation)*delta],...(f.kind==='wall-toilet'?{dimensionSources:{depth:'catalogue'},cataloguePage:26}:{}),...(f.id==='guest-basin'?{w:.33,dimensionSources:{width:'catalogue',depth:'catalogue'},cataloguePage:27}:{}),...(f.kind==='vanity'?{wallHung:true,bottom:.38,storage:f.id==='ensuite-vanity'?'drawers':'doors',cataloguePage:f.id==='ensuite-vanity'?32:31}:{})};
 });
+const yardContext=()=>({garden:GARDEN_LAYOUT,service:SERVICE_YARD,exterior:EXTERIOR_LAYOUT,plot:PLOT,house:HOUSE_OUTLINE,outdoorKitchen:furnitureBounds(FURNITURE.find(f=>f.id==='outdoor-kitchen'))});
+export const yardForSettings=settings=>resolveYardDesign(yardContext(),settings?.yardDesign);
+export const yardItem=(id,settings)=>{const p=yardForSettings(settings).design[id]||defaultYardItem(yardContext(),id);return {...p,id,position:id==='fence'?undefined:[p.x,p.z]};};
+export function editHomeYard(settings,id,command){const result=changeYardDesign(yardContext(),settings.yardDesign,id,command);return result.error?{settings,error:result.error}:{settings:{...settings,yardDesign:result.design}};}
 export const WATER_LAYOUT=createWaterLayout({point,walls:WALLS,furniture:FURNITURE,kitchenAnchor:KITCHEN_ANCHOR,openings:[...DOORS,...WINDOWS]});
 export const waterPoint=id=>WATER_LAYOUT.points.find(p=>p.id===id);
 // The plant at the northern/right end of the outdoor kitchen was removed in R08.
@@ -144,7 +153,11 @@ export const GARDEN_PLANTS=[
  {id:'south',position:[8.4,PLOT[2][1]-.65],size:1.3}
 ];
 export const editableFurniture=f=>!!f&&['bedroom-a','bedroom-b','bedroom-c','master','safe-room'].includes(f.roomId)&&['bed','desk','wardrobe','office-cabinet'].includes(f.kind);
-export const getFurniture=(id,settings)=>{const f=FURNITURE.find(f=>f.id===id),p=settings?.furnitureLayout?.[id];return f&&p&&editableFurniture(f)?{...f,position:[...p.position],rotation:p.rotation}:f;};
+export function furnitureSizeLimits(f){
+ return f?.kind==='bed'?{w:[.7,2.4],d:[1.5,2.4],h:[.25,.9]}:['wardrobe','office-cabinet'].includes(f?.kind)?{w:[.5,4],d:[.25,1],h:[.7,HOUSE.height-.1]}:{w:[.5,2.8],d:[.35,1.2],h:[.5,1.1]};
+}
+function validFurnitureSize(f,dimensions){return dimensions&&['w','d','h'].every(k=>Number.isFinite(dimensions[k])&&dimensions[k]>=furnitureSizeLimits(f)[k][0]&&dimensions[k]<=furnitureSizeLimits(f)[k][1]);}
+export const getFurniture=(id,settings)=>{const f=FURNITURE.find(f=>f.id===id),p=settings?.furnitureLayout?.[id];return f&&p&&editableFurniture(f)?{...f,userPlacement:p.position.some((v,i)=>Math.abs(v-f.position[i])>.001)||Math.abs(p.rotation-f.rotation)>.001,position:[...p.position],rotation:p.rotation,...(p.dimensions?{...p.dimensions,nightstands:f.nightstands??f.w>1.3,userDimensions:true,dimensionSources:{width:'user',depth:'user',height:'user'}}:{})}:f;};
 export const furnitureForSettings=settings=>FURNITURE.map(f=>getFurniture(f.id,settings));
 export function furnitureBounds(f){
  const extraW=f.kind==='bed'?(f.w>1.3&&f.nightstands!==false ? .77 : .08):0,extraD=f.kind==='bed'?.07:['wardrobe','office-cabinet'].includes(f.kind)?.08:0;
@@ -159,16 +172,18 @@ function furnitureFitsRoom(f){
 export function normalizeFurnitureLayout(value){
  const layout={};if(!value||typeof value!=='object'||Array.isArray(value))return layout;
  for(const f of FURNITURE.filter(editableFurniture)){
-  const p=value[f.id];if(!Array.isArray(p?.position)||p.position.length!==2||!p.position.every(Number.isFinite)||!Number.isFinite(p.rotation))continue;
-  const rotation=((Math.round(p.rotation/(Math.PI/2))%4)+4)%4*Math.PI/2,item={...f,position:p.position.map(n=>Math.round(n*1000)/1000),rotation};
-  if(furnitureFitsRoom(item))layout[f.id]={position:item.position,rotation};
+  const p=value[f.id];if(p?.dimensions&&!validFurnitureSize(f,p.dimensions))continue;if(!Array.isArray(p?.position)||p.position.length!==2||!p.position.every(Number.isFinite)||!Number.isFinite(p.rotation))continue;
+  const rotation=((Math.round(p.rotation/(Math.PI/2))%4)+4)%4*Math.PI/2,dimensions=p.dimensions?Object.fromEntries(['w','d','h'].map(k=>[k,Math.round(p.dimensions[k]*1000)/1000])):undefined,item={...f,...dimensions,nightstands:f.nightstands??f.w>1.3,position:p.position.map(n=>Math.round(n*1000)/1000),rotation};
+  if(furnitureFitsRoom(item))layout[f.id]={position:item.position,rotation,...(dimensions?{dimensions}:{})};
  }return layout;
 }
-export function moveHomeFurniture(settings,id,{dx=0,dz=0,rotate=false,reset=false}={}){
+export function moveHomeFurniture(settings,id,{dx=0,dz=0,rotate=false,reset=false,dimensions,resetDimensions=false}={}){
  const current=getFurniture(id,settings);if(!editableFurniture(current))return {settings,error:'unsupported'};
  const layout={...settings.furnitureLayout};if(reset){delete layout[id];return {settings:{...settings,furnitureLayout:layout}};}
  if(!Number.isFinite(dx)||!Number.isFinite(dz))return {settings,error:'outside'};
- const next={...current,position:[current.position[0]+dx,current.position[1]+dz],rotation:((Math.round((current.rotation+(rotate?Math.PI/2:0))/(Math.PI/2))%4)+4)%4*Math.PI/2},b=furnitureBounds(next),room=polygonBounds(getRoom(next.roomId).polygon);
+ if(dimensions&&!validFurnitureSize(current,dimensions))return {settings,error:'size'};
+ const size=resetDimensions?FURNITURE.find(f=>f.id===id):dimensions||current;
+ const next={...current,w:size.w,d:size.d,h:size.h,nightstands:current.nightstands??FURNITURE.find(f=>f.id===id).w>1.3,position:[current.position[0]+dx,current.position[1]+dz],rotation:((Math.round((current.rotation+(rotate?Math.PI/2:0))/(Math.PI/2))%4)+4)%4*Math.PI/2},b=furnitureBounds(next),room=polygonBounds(getRoom(next.roomId).polygon);
  // Keep a rotated item inside the room rather than rotating through the wall.
  const x=Math.max(room.minX-b.minX+.01,Math.min(0,room.maxX-b.maxX-.01)),z=Math.max(room.minZ-b.minZ+.01,Math.min(0,room.maxZ-b.maxZ-.01));
  next.position=[Math.round((next.position[0]+x)*1000)/1000,Math.round((next.position[1]+z)*1000)/1000];
@@ -176,7 +191,8 @@ export function moveHomeFurniture(settings,id,{dx=0,dz=0,rotate=false,reset=fals
  const bounds=furnitureBounds(next),intersects=o=>bounds.minX<o.maxX-.005&&bounds.maxX>o.minX+.005&&bounds.minZ<o.maxZ-.005&&bounds.maxZ>o.minZ+.005;
  if(furnitureForSettings(settings).some(f=>f.id!==id&&f.roomId===next.roomId&&intersects(furnitureBounds(f))))return {settings,error:'furniture'};
  for(const door of DOORS.filter(d=>d.rooms.includes(next.roomId))){const wall=WALLS.find(w=>w.id===door.wallId),axis=door.vertical?wall.a[0]:wall.a[1];if(intersects(door.vertical?{minX:axis-.45,maxX:axis+.45,minZ:door.start,maxZ:door.end}:{minX:door.start,maxX:door.end,minZ:axis-.45,maxZ:axis+.45}))return {settings,error:'door'};}
- layout[id]={position:next.position,rotation:next.rotation};return {settings:{...settings,furnitureLayout:layout}};
+ const stored=resetDimensions?null:dimensions||layout[id]?.dimensions;
+ layout[id]={position:next.position,rotation:next.rotation,...(stored?{dimensions:{w:next.w,d:next.d,h:next.h}}:{})};return {settings:{...settings,furnitureLayout:layout}};
 }
 export function furnitureParts(f){
  if(!f)return [];
@@ -194,7 +210,7 @@ export const FLOOR_FINISHES=[
  {id:'stone',he:'אבן בהירה',en:'Light stone',color:'#d9d3c5'},{id:'oak',he:'אלון',en:'Oak',color:'#b89a73'},{id:'warm',he:'אבן חמה',en:'Warm stone',color:'#c5b39a'}
 ];
 export const wallFinishesForRoom=id=>HOME_FINISHES.filter(f=>f.id!=='ordered-mona'||roomHasOrderedCladding(id));
-export const HOME_DEFAULTS={schema:2,finishScheduleVersion:FINISH_SCHEDULE_VERSION,lang:'he',light:'day',cutaway:true,labels:true,showRoomNames:false,furniture:true,furnitureLayout:{},pergolaRoof:true,shedRoof:true,openDoors:['patio'],openParts:[],closedShutters:[],rooms:{},showGarden:true,showElectrical:true,showWater:true,renderQuality:'realistic',cleanView:false,electricalInferred:true};
+export const HOME_DEFAULTS={schema:2,finishScheduleVersion:FINISH_SCHEDULE_VERSION,lang:'he',light:'day',cutaway:true,labels:true,showRoomNames:false,furniture:true,furnitureLayout:{},yardDesign:{},pergolaRoof:true,shedRoof:true,openDoors:['patio'],openParts:[],closedShutters:[],rooms:{},showGarden:true,showElectrical:true,showWater:true,showLighting:true,lightControls:{},furnitureSnap:true,renderQuality:'realistic',cleanView:false,electricalInferred:true};
 export function normalizeHomeSettings(value={}){
  if(!value||typeof value!=='object')value={};
  const validDoors=new Set(DOORS.map(d=>d.id)),validParts=new Set(ALL_HOME_PARTS.map(p=>p.id)),rooms={};
@@ -202,15 +218,15 @@ export function normalizeHomeSettings(value={}){
  const migratedParts=(Array.isArray(value.openParts)?value.openParts:[]).map(id=>({'ensuite-vanity:left':'ensuite-vanity:drawer-0','ensuite-vanity:right':'ensuite-vanity:drawer-1'})[id]||id);
  for(const r of ROOMS){const v=value.rooms?.[r.id]||{},wet=roomHasOrderedCladding(r.id),floorDefault=orderedFloorForRoom(r.id),validWall=wallFinishesForRoom(r.id).some(f=>f.id===v.wall);rooms[r.id]={wall:current&&validWall?v.wall:wet?'ordered-mona':validWall?v.wall:'ivory',floor:current&&FLOOR_FINISHES.some(f=>f.id===v.floor)?v.floor:floorDefault,wood:['oak','white','dark'].includes(v.wood)?v.wood:'oak'};}
 
- return {...HOME_DEFAULTS,furnitureLayout:normalizeFurnitureLayout(value.furnitureLayout),lang:value.lang==='en'?'en':'he',light:value.light==='evening'?'evening':'day',cutaway:typeof value.cutaway==='boolean'?value.cutaway:true,labels:value.labels!==false,showRoomNames:value.showRoomNames===true,furniture:value.furniture!==false,pergolaRoof:value.pergolaRoof!==false,shedRoof:value.shedRoof!==false,showElectrical:value.showElectrical!==false,showWater:value.showWater!==false,renderQuality:value.renderQuality==='light'?'light':'realistic',cleanView:value.cleanView===true,electricalInferred:value.electricalInferred!==false,openDoors:[...new Set((Array.isArray(value.openDoors)?value.openDoors:HOME_DEFAULTS.openDoors).filter(x=>validDoors.has(x)))],openParts:[...new Set(migratedParts.filter(x=>validParts.has(x)))],closedShutters:[...new Set((Array.isArray(value.closedShutters)?value.closedShutters:[]).filter(id=>SHUTTER_IDS.includes(id)))],rooms};
+ return {...HOME_DEFAULTS,furnitureLayout:normalizeFurnitureLayout(value.furnitureLayout),yardDesign:normalizeYardDesign(yardContext(),value.yardDesign),lang:value.lang==='en'?'en':'he',light:value.light==='evening'?'evening':'day',cutaway:typeof value.cutaway==='boolean'?value.cutaway:true,labels:value.labels!==false,showRoomNames:value.showRoomNames===true,furniture:value.furniture!==false,pergolaRoof:value.pergolaRoof!==false,shedRoof:value.shedRoof!==false,showElectrical:value.showElectrical!==false,showWater:value.showWater!==false,showLighting:value.showLighting!==false,lightControls:normalizeLightControls(value.lightControls),furnitureSnap:value.furnitureSnap!==false,renderQuality:value.renderQuality==='light'?'light':'realistic',cleanView:value.cleanView===true,electricalInferred:value.electricalInferred!==false,openDoors:[...new Set((Array.isArray(value.openDoors)?value.openDoors:HOME_DEFAULTS.openDoors).filter(x=>validDoors.has(x)))],openParts:[...new Set(migratedParts.filter(x=>validParts.has(x)))],closedShutters:[...new Set((Array.isArray(value.closedShutters)?value.closedShutters:[]).filter(id=>SHUTTER_IDS.includes(id)))],rooms};
 }
 export function insidePolygon(p,poly){let inside=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++){const [xi,zi]=poly[i],[xj,zj]=poly[j];if(((zi>p[1])!==(zj>p[1]))&&p[0]<(xj-xi)*(p[1]-zi)/(zj-zi)+xi)inside=!inside;}return inside;}
 export function polygonBounds(poly){return {minX:Math.min(...poly.map(p=>p[0])),maxX:Math.max(...poly.map(p=>p[0])),minZ:Math.min(...poly.map(p=>p[1])),maxZ:Math.max(...poly.map(p=>p[1]))};}
 export function roomAt(p){return ROOMS.filter(r=>!['garden','outdoor'].includes(r.kind)).find(r=>insidePolygon(p,r.polygon))?.id||(insidePolygon(p,GARDEN_LAYOUT.finished)?'terrace':insidePolygon(p,PLOT)&&!insidePolygon(p,HOUSE_OUTLINE)?'garden':'hall');}
 const boxForWall=(wall,a,b)=>{const v=Math.abs(wall.a[0]-wall.b[0])<.001;return v?{minX:wall.a[0]-wall.thickness/2,maxX:wall.a[0]+wall.thickness/2,minZ:a,maxZ:b}:{minX:a,maxX:b,minZ:wall.a[1]-wall.thickness/2,maxZ:wall.a[1]+wall.thickness/2};};
-export function collisionBoxes(openDoors=[],withFurniture=true,closedShutters=[],openParts=[],furnitureLayout={}){
- const opened=new Set(openDoors),result=[];
- for(const p of GARDEN_LAYOUT.posts)result.push({minX:p.x-p.size/2,maxX:p.x+p.size/2,minZ:p.z-p.size/2,maxZ:p.z+p.size/2,pergolaPostId:p.id});
+export function collisionBoxes(openDoors=[],withFurniture=true,closedShutters=[],openParts=[],furnitureLayout={},yardDesign={}){
+ const {garden,service}=yardForSettings({yardDesign}),opened=new Set(openDoors),result=[];
+ for(const p of garden.posts)result.push({minX:p.x-p.size/2,maxX:p.x+p.size/2,minZ:p.z-p.size/2,maxZ:p.z+p.size/2,pergolaPostId:p.id});
  for(const w of WALLS){const vertical=Math.abs(w.a[0]-w.b[0])<.001,low=vertical?w.a[1]:w.a[0],high=vertical?w.b[1]:w.b[0];let start=low;
   for(const d of DOORS.filter(d=>d.wallId===w.id&&!d.hostDoorId).sort((a,b)=>a.start-b.start)){
    if(d.start>start)result.push(boxForWall(w,start,d.start));
@@ -222,7 +238,7 @@ export function collisionBoxes(openDoors=[],withFurniture=true,closedShutters=[]
  }
  for(const shutter of SHUTTERS){const o=shutter.opening;if(o.type==='slider'&&closedShutters.includes(shutter.id)){const w=WALLS.find(w=>w.id===o.wallId);result.push({...boxForWall(w,o.start,o.end),shutterId:shutter.id});}}
  for(const a of EXTERIOR_LAYOUT.units)result.push({...a.body,acUnitId:a.id});
- const shed=SERVICE_YARD.shed,sd=shed.door,half=shed.wall/2;
+ const shed=service.shed,sd=shed.door,half=shed.wall/2;
  // A real doorway in the shed footprint; the flush chamber cover is walkable.
  for(const x of [shed.minX+half,shed.maxX-half])result.push({minX:x-half,maxX:x+half,minZ:shed.minZ,maxZ:shed.maxZ,shedWall:true});
  result.push({minX:shed.minX,maxX:shed.maxX,minZ:shed.maxZ-shed.wall,maxZ:shed.maxZ,shedWall:true});
@@ -255,8 +271,8 @@ export function movePlayer(position,delta,boxes){let p=[...position];const steps
 
 // Grid search uses actual wall and furniture obstacles. Closed doors on a found
 // route can then be opened individually; the fixed half of the patio stays solid.
-export function findWalkPath(from,to,withFurniture=true,openParts=[],furnitureLayout={}){
- const boxes=collisionBoxes(DOORS.map(d=>d.id),withFurniture,[],openParts,furnitureLayout),bounds=polygonBounds(PLOT),step=.16;
+export function findWalkPath(from,to,withFurniture=true,openParts=[],furnitureLayout={},yardDesign={}){
+ const boxes=collisionBoxes(DOORS.map(d=>d.id),withFurniture,[],openParts,furnitureLayout,yardDesign),bounds=polygonBounds(PLOT),step=.16;
  const cols=Math.ceil((bounds.maxX-bounds.minX)/step),rows=Math.ceil((bounds.maxZ-bounds.minZ)/step);
  const grid=p=>[Math.round((p[0]-bounds.minX)/step),Math.round((p[1]-bounds.minZ)/step)];
  const world=(x,z)=>[bounds.minX+x*step,bounds.minZ+z*step],key=(x,z)=>z*cols+x;

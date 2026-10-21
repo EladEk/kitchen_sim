@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {spawnSync} from 'node:child_process';
 import * as THREE from 'three';
-import {prepareFloorPhoto,PHOTO_LIGHTING_GAIN_LIMIT} from './floor-photo-preparation.mjs';
+import {prepareFloorPhoto,PHOTO_LIGHTING_GAIN_MIN,PHOTO_LIGHTING_GAIN_MAX} from './floor-photo-preparation.mjs';
 import {createSurfacePalette} from './surface-materials.mjs';
 import {ORDERED_FLOORS} from './ordered-flooring.mjs';
 import {configureSurfaceRenderer} from './scene-environment.js';
@@ -22,7 +22,7 @@ test('photo preparation reduces broad lighting falloff, preserves fine flecks an
  const before=rows(pixels),after=rows(result.color);assert(Math.abs(after.at(-1)-after[0])<Math.abs(before.at(-1)-before[0])*.15);
  let fineBefore=0,fineAfter=0,averageBefore=0,averageAfter=0;
  for(let i=0;i<pixels.length;i+=4){
-  for(let c=0;c<3;c++){const gain=decode(result.color[i+c])/decode(pixels[i+c]);assert(gain>=1-PHOTO_LIGHTING_GAIN_LIMIT-.015&&gain<=1+PHOTO_LIGHTING_GAIN_LIMIT+.015);}
+  for(let c=0;c<3;c++){const gain=decode(result.color[i+c])/decode(pixels[i+c]);assert(gain>=PHOTO_LIGHTING_GAIN_MIN-.015&&gain<=PHOTO_LIGHTING_GAIN_MAX+.015);}
   assert(Math.abs(decode(result.color[i])/decode(result.color[i+2])-decode(pixels[i])/decode(pixels[i+2]))<.03,'neutral illumination correction retains the photographed colour ratios');
   averageBefore+=pixels[i];averageAfter+=result.color[i];
   if((i/4)%size<size-1){fineBefore+=Math.abs(pixels[i]-pixels[i+4]);fineAfter+=Math.abs(result.color[i]-result.color[i+4]);}
@@ -65,4 +65,17 @@ test('the complete patched Three physical shaders compile/link on native GLES3 a
  if(result.error?.code==='ENOENT'){t.skip('Native shader check needs Python and EGL');return;}
  if(result.status===77){t.skip(result.stdout.trim());return;}
  assert.equal(result.status,0,result.stderr||result.stdout||String(result.error));const checked=JSON.parse(result.stdout);assert.equal(checked.linked,2);assert.deepEqual(checked.coverage,[255,128,0,26]);assert.equal(checked.rotations,true);
+});
+
+test('the real owner photo loses its centre hotspot and dark perimeter before it is repeated across tiles',t=>{
+ const result=spawnSync('python',['-c',`from PIL import Image
+import sys
+im=Image.open('public/materials/owner-products/MI402439-tile.jpg').convert('RGBA').crop((210,80,1090,960)).resize((256,256))
+sys.stdout.buffer.write(im.tobytes())`],{cwd:new URL('../',import.meta.url),maxBuffer:400000});
+ if(result.error?.code==='ENOENT'||result.status!==0){t.skip('Photo pixel validation needs Python/Pillow');return;}
+ const pixels=new Uint8Array(result.stdout),original=new Uint8Array(pixels),prepared=prepareFloorPhoto(pixels,256);assert.equal(prepared.lightingCorrection.method,'bounded-quadratic-and-low-frequency-light-field');
+ const cells=data=>{const means=[];for(let y=0;y<256;y+=32)for(let x=0;x<256;x+=32){let sum=0;for(let v=y;v<y+32;v++)for(let u=x;u<x+32;u++){const i=(v*256+u)*4;sum+=.2126*data[i]+.7152*data[i+1]+.0722*data[i+2];}means.push(sum/1024);}return means;};
+ const before=cells(pixels),after=cells(prepared.color),spread=v=>Math.max(...v)-Math.min(...v);assert(spread(before)>40,'test the actual uneven photo rather than a flat synthetic substitute');assert(spread(after)<10,'no broad dark perimeter should be baked into each repeated tile');assert(spread(after)<spread(before)*.15);
+ const edge=after.filter((_,i)=>i<8||i>=56||i%8===0||i%8===7),centre=[after[27],after[28],after[35],after[36]],average=v=>v.reduce((a,b)=>a+b,0)/v.length;assert(Math.abs(average(edge)-average(centre))<3);
+ assert.deepEqual(pixels,original);assert.equal(prepared.lightingCorrection.calibrated,false);
 });

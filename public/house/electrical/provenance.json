@@ -90,6 +90,27 @@
       "source": "277904.mp4",
       "sha256": "fa03067302b052eefaa32b5a1b36e64be77529e4d53b8015049acbc2c17de47e",
       "reviewRevision": 29
+    },
+    {
+      "file": "living-302046.jpg",
+      "original": "01-302046.jpg",
+      "source": "owner screenshot",
+      "sha256": "ee1089db0c2a41cadabff759bc5d58a0f2d2fd31e336a1e379b277997c856f42",
+      "reviewRevision": 39
+    },
+    {
+      "file": "frame-5.25.jpg",
+      "second": 5.25,
+      "source": "walkthrough.mp4",
+      "sha256": "f0cd9c943a170853f516b539ef15a58ce446757b55913171399ddb09a6e0e2f0",
+      "reviewRevision": 39
+    },
+    {
+      "file": "frame-30.jpg",
+      "second": 30,
+      "source": "walkthrough.mp4",
+      "sha256": "61addfc446c2728c49252162c4dca804549ca3ae99962bf5e604c253a15f7095",
+      "reviewRevision": 39
     }
   ],
   "metricSurvey": false,
@@ -113,6 +134,30 @@
       1920
     ],
     "reviewRevision": 29,
+    "metricSurvey": false
+  },
+  "repeatReview": {
+    "reviewRevision": 39,
+    "input": "walkthrough.mp4",
+    "sha256": "f7326c3dd4f89d954a961f9e2f537a91a6d84d9acf118144579437e5a79e74a3",
+    "displaySize": [
+      540,
+      960
+    ],
+    "samplingSeconds": 0.5,
+    "targetedSamplingSeconds": 0.25,
+    "durationSeconds": 32.333333,
+    "newPoints": [
+      "O06",
+      "O07",
+      "H05"
+    ],
+    "correctedHostPoints": [
+      "L01",
+      "L02",
+      "L03"
+    ],
+    "additionalScreenshot": "living-302046.jpg",
     "metricSurvey": false
   }
 }

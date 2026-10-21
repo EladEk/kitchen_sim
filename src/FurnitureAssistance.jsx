@@ -1,0 +1,10 @@
+import {furnitureClearances} from './furniture-assistance.mjs';
+export function FurnitureAssistance({settings,id,onChange}){
+ const he=settings.lang==='he',c=furnitureClearances(settings,id);if(!c)return null;
+ const rows=[...Object.entries(c.directions).filter(([,v])=>v).map(([k,v])=>({label:he?({left:'שמאלה',right:'ימינה',up:'למעלה בתוכנית',down:'למטה בתוכנית'}[k]):k,gap:v.gap})),...[['door','פתח הדלת','Door opening'],['window','פתח החלון','Window opening'],['nearestFurniture','הרהיט הקרוב','Nearest item']].filter(([k])=>c[k]).map(([k,iw,en])=>({label:he?iw:en,gap:c[k].gap}))];
+ return <details className="planning-details"><summary>{he?'הצמדה ומרווחים בס״מ':'Snap and clearances in cm'}</summary><label className="planning-check"><input type="checkbox" checked={settings.furnitureSnap!==false} onChange={e=>onChange('furnitureSnap',e.target.checked)}/>{he?'הצמדה חכמה בגרירה':'Smart snapping while dragging'}</label><dl className="clearance-values">{rows.map(r=><div key={r.label}><dt>{r.label}</dt><dd>≈{Math.round(r.gap*100)}</dd></div>)}</dl><p className="planning-note">{he?'מרווחים במבט על לפי מעטפת הרהיט במודל, כולל מסגרת מיטה ואביזרים. הפתחים נמדדים עד המעטפת; גובה חלון וציר פתיחת הדלת אינם כלולים.':'Plan-view distances use the model footprint including bed frames/accessories. Opening gaps are to the footprint; window height and door swing are not included.'}</p></details>;
+}
+export function FurnitureClearanceGuides({settings,id,scale=30}){
+ if(settings.cleanView)return null;const c=furnitureClearances(settings,id);if(!c)return null;
+ return <g className="furniture-clearance-guides" pointerEvents="none">{Object.entries(c.directions).filter(([,v])=>v&&v.gap>.12).map(([k,v])=><g key={k}><line x1={v.from[0]*scale} y1={v.from[1]*scale} x2={v.to[0]*scale} y2={v.to[1]*scale} stroke="#588778" strokeWidth=".6" strokeDasharray="2 1"/><text x={(v.from[0]+v.to[0])*scale/2} y={(v.from[1]+v.to[1])*scale/2-1.5} textAnchor="middle" fontSize="3.8" paintOrder="stroke" stroke="#fffdf5" strokeWidth="1.2" fill="#315e51">≈{Math.round(v.gap*100)}</text></g>)}</g>;
+}

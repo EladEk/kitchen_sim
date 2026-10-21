@@ -74,7 +74,7 @@ test('safe-room side groups, the main-bedroom rear wall and the hall fitting use
  assert(point('M04').position[0]<.5,'corner outlet stays beside the west window wall');assert(point('M03').position[0]>2.8,'three rear-wall preparations remain at the other end');
  assert.equal(point('M04').evidence[0].page,24);assert(point('M04').evidence.some(e=>e.page===6),'the original photograph is retained');
  assert.equal(point('H01').wallId,'bed-b-east');assert.deepEqual(point('H01').normal,[1,0]);
- assert.equal(E.points.length,48);assert(!point('K05'));assert.equal(point('K09').height,1.65);
+ assert.equal(E.points.length,51);assert(!point('K05'));assert.equal(point('K09').height,1.65);
 });
 
 test('the review covers every room, retains original-video provenance and links only indoor rooms to video intervals',()=>{

@@ -5,7 +5,7 @@ import {ElectricalCallouts} from './ElectricalCallouts.jsx';
 import {electricalPhotoCrop,electricalPhotoAnchors} from './electrical-ui.mjs';
 import './electrical.css';
 
-export function ElectricalPhoto({reference,entries,lang,selectedId,onSelect}){
+export function ElectricalPhoto({reference,entries,lang,selectedId,onSelect,kinds=ELECTRICAL_KINDS}){
  const he=lang==='he',frame=useRef(),markers=useRef(),[zoomed,setZoomed]=useState(false),[size,setSize]=useState([1536,1152]),[status,setStatus]=useState('loading');
  const selected=entries.find(e=>e.point.id===selectedId),crop=electricalPhotoCrop(selected?.rect,zoomed);
  useEffect(()=>{setStatus('loading');setZoomed(false);},[reference.image]);
@@ -15,7 +15,7 @@ export function ElectricalPhoto({reference,entries,lang,selectedId,onSelect}){
   <div className="electrical-photo-frame" ref={frame} style={{aspectRatio:`${size[0]} / ${size[1]}`}}>
    <div className="electrical-photo-scene" style={{width:`${100/crop.width}%`,left:`${-crop.x/crop.width*100}%`,top:`${-crop.y/crop.height*100}%`}}>
     <img key={reference.image} src={reference.image} alt={he?reference.he:reference.en} onLoad={e=>{setSize([e.currentTarget.naturalWidth,e.currentTarget.naturalHeight]);setStatus('ready');}} onError={()=>setStatus('error')}/>
-    {entries.map(({point:p,rect:[x,y,w,h]})=><div key={p.id} aria-hidden="true" className={`electrical-photo-outline ${p.id===selectedId?'is-selected':''} ${p.roomInferred?'is-inferred':''}`} style={{left:`${x*100}%`,top:`${y*100}%`,width:`${w*100}%`,height:`${h*100}%`,'--point-color':ELECTRICAL_KINDS[p.kind].color}}/>)}
+    {entries.map(({point:p,rect:[x,y,w,h]})=><div key={p.id} aria-hidden="true" className={`electrical-photo-outline ${p.id===selectedId?'is-selected':''} ${p.roomInferred?'is-inferred':''}`} style={{left:`${x*100}%`,top:`${y*100}%`,width:`${w*100}%`,height:`${h*100}%`,'--point-color':kinds[p.kind].color}}/>)}
    </div>
    {onSelect&&<ElectricalCallouts ref={markers} points={entries.map(e=>({...e.point,photoEvidence:true}))} selectedId={selectedId} lang={lang} onSelect={onSelect}/>}
   </div>

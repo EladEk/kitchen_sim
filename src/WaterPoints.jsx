@@ -1,3 +1,4 @@
+import {DesignEvidence} from './DesignEvidence.jsx';
 import {Droplets,Minimize2,Maximize2,X} from 'lucide-react';
 import {WATER_LAYOUT,getRoom} from './home-model.mjs';
 import {WATER_STYLE,waterVisible} from './home-water.mjs';
@@ -7,7 +8,7 @@ import {ElectricalPhoto} from './ElectricalPhoto.jsx';
 const files={harash:'/house/harash-products.pdf',hercules:'/house/hercules.pdf','apartment-spec':'/house/apartment-spec.pdf'};
 export function WaterPointDetails({point:p,lang}){
  const he=lang==='he',e=p.evidence[0],reference=e&&ELECTRICAL_REFERENCES.find(r=>r.page===e.page);
- return <div className="water-point-details"><p className="water-point-status">{p.status==='observed'?(he?'נראה בצילום · המיקום במודל משוער':'Photographed · model placement estimated'):(he?'חיבור משוער לפי מיקום הכלי בהדמיה':'Assumed connection at modeled fixture')}</p><p>{he?'חדר':'Room'}: {he?getRoom(p.roomId).he:getRoom(p.roomId).en}</p><p>{he?'גובה סימון משוער':'Assumed marker height'}: <bdi>≈ {Math.round(p.height*100)} cm</bdi></p><p>{he?'הכחול מסמן מים. הסימון אינו קובע מים חמים או קרים, תוואי צנרת או מיקום הכנה מדוד.':'Blue identifies water. It does not specify hot/cold supply, pipe routing or a measured rough-in.'}</p>
+ return <div className="water-point-details"><DesignEvidence item={p} lang={lang}/><p className="water-point-status">{p.status==='observed'?(he?'נראה בצילום · המיקום במודל משוער':'Photographed · model placement estimated'):(he?'חיבור משוער לפי מיקום הכלי בהדמיה':'Assumed connection at modeled fixture')}</p><p>{he?'חדר':'Room'}: {he?getRoom(p.roomId).he:getRoom(p.roomId).en}</p><p>{he?'גובה סימון משוער':'Assumed marker height'}: <bdi>≈ {Math.round(p.height*100)} cm</bdi></p><p>{he?'הכחול מסמן מים. הסימון אינו קובע מים חמים או קרים, תוואי צנרת או מיקום הכנה מדוד.':'Blue identifies water. It does not specify hot/cold supply, pipe routing or a measured rough-in.'}</p>
   {reference?<ElectricalPhoto reference={reference} entries={WATER_LAYOUT.points.flatMap(q=>q.evidence.filter(a=>a.page===e.page).map(a=>({point:q,rect:a.rect})))} lang={lang} selectedId={p.id}/>:<><p>{he?'הסימון נשען על פריסת הכלי בסימולטור ומפרט המוצרים. אין צילום שמאמת את ההכנה בקיר בנקודה הזאת.':'The marker follows the simulator fixture layout and product schedule. No photo verifies this wall rough-in location.'}</p><a className="hs-text-link" href={`${files[p.source]}#page=${p.page}`} target="_blank" rel="noreferrer">{he?'פתיחת מסמך המקור':'Open source document'}</a></>}
  </div>;
 }

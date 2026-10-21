@@ -26,7 +26,7 @@ test('the corrected photographed kitchen water cluster is inside the sink cabine
 test('all observed services remain on valid wall spans and inferred water connections register to the fixture back wall',()=>{
  for(const p of [...ELECTRICAL_LAYOUT.points,...WATER_LAYOUT.points])assert.deepEqual(servicePlacementIssues(p,WALLS,[...DOORS,...WINDOWS]),[],p.id);
  for(const p of WATER_LAYOUT.points.filter(p=>p.status==='layout')){assert.equal(p.evidence.length,0);assert(FURNITURE.some(f=>f.id===p.fixtureId));if(p.fixtureId==='outdoor-kitchen'){assert.equal(p.placementBasis,'fixture-back');continue;}assert.equal(p.placementBasis,'fixture-back-wall');const wall=WALLS.find(w=>w.id===p.wallId),vertical=Math.abs(wall.a[0]-wall.b[0])<1e-6;near(p.position[vertical?0:2],wall.a[vertical?0:1]+p.side*(wall.thickness/2+.018));}
- assert.equal(ELECTRICAL_LAYOUT.points.length,48);assert(!ELECTRICAL_LAYOUT.points.some(p=>p.label==='K05'));assert.equal(ELECTRICAL_LAYOUT.points.find(p=>p.label==='K09').height,1.65);
+ assert.equal(ELECTRICAL_LAYOUT.points.length,51);assert(!ELECTRICAL_LAYOUT.points.some(p=>p.label==='K05'));assert.equal(ELECTRICAL_LAYOUT.points.find(p=>p.label==='K09').height,1.65);
 });
 
 test('the new quality and clean-view preferences survive saved designs and Close all',()=>{

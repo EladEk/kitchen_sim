@@ -1,0 +1,44 @@
+.planning-tools,.planning-details{border:1px solid #d4ddcd;border-radius:7px;background:#fffef9;margin:8px 0;padding:0 9px;color:#3e5942;min-width:0}
+.planning-tools>summary,.planning-details>summary{cursor:pointer;min-height:44px;align-content:center;font:12px/1.5 Arial,sans-serif}
+.planning-tools[open],.planning-details[open]{padding-bottom:10px}
+.planning-tools button,.design-history button,.variant-actions button,.planning-report{display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;border:1px solid #c5d1bc;border-radius:6px;background:#fbfcf6;color:#36533d;font:12px/1.5 Arial,sans-serif;padding:7px 10px;cursor:pointer}
+.planning-tools input,.planning-tools select,.individual-light-controls select{min-height:44px;width:100%;min-width:0;border:1px solid #c5d1bc;border-radius:6px;background:#fff;padding:6px;font:13px Arial,sans-serif;color:#36533d}
+.planning-tools label{display:grid;gap:5px;font-size:12px;margin-top:8px;min-width:0}
+.planning-tools .planning-note,.planning-note{font:11px/1.6 Arial,sans-serif;color:#687963;margin:8px 0}
+.design-history{display:flex;gap:7px;padding:5px 0;flex-wrap:wrap}
+.design-history>button{flex:1;min-width:100px}
+.design-history button:disabled{opacity:.4;cursor:default}
+.planning-report{width:100%;margin:8px 0}
+.variant-save{display:grid;gap:7px;margin:8px 0}
+.variant-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.variant-actions>button{flex:1}
+.variant-compare-pickers,.variant-previews{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.variant-previews>figure{margin:10px 0;min-width:0;overflow:hidden}
+.variant-previews figcaption{font-size:12px;overflow-wrap:anywhere}
+.variant-previews .hs-plan-mini{width:100%;height:auto;min-height:110px;max-height:200px}
+.variant-comparison{width:100%;font-size:11px;border-collapse:collapse}
+.variant-comparison th,.variant-comparison td{border-bottom:1px solid #d5dece;text-align:start;padding:6px}
+.planning-check{display:flex!important;gap:8px;align-items:center;min-height:44px;font-size:12px}
+.planning-check input{width:18px!important;height:18px;min-height:18px!important;accent-color:#3e5942}
+.clearance-values,.design-evidence{display:grid;gap:3px;font-size:11px;margin:7px 0}
+.clearance-values>div,.design-evidence>div{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:4px 0}
+.clearance-values dd,.design-evidence dd{margin:0;text-align:end}
+.design-evidence dd{padding:3px 6px;border-radius:4px;background:#eaf0e5;color:#496342}
+.design-evidence [data-evidence=estimate]{background:#f6edd7;color:#81692d}
+.design-evidence [data-evidence=user]{background:#e5eff4;color:#3a697b}
+.individual-light-controls{display:flex;flex-direction:column;gap:6px;border:1px solid #d7dfce;border-radius:6px;margin:10px 0;padding:8px;min-width:0}
+.individual-light-controls legend{font-size:12px;padding:0 4px}
+.individual-light-controls>label{display:flex;flex-direction:column;gap:4px;font-size:11px;min-width:0}
+.individual-light-controls input[type=range]{width:100%;height:34px;accent-color:#af862d}
+.hs-app.hs-simple .hs-plan-stage:has(.yard-workspace){padding:0}
+.yard-workspace{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);height:100%;min-height:0;width:100%;overflow:hidden}
+.yard-workspace-tools{display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;padding:3px 8px;background:#f5f7ed;font-size:11px;grid-column:1 / -1}
+.yard-workspace-tools label{display:flex;align-items:center;gap:5px;min-height:36px}
+.yard-workspace-plan{min-height:0;overflow:hidden;padding:4px}
+.yard-workspace-plan svg{width:100%;height:100%}
+.yard-workspace-preview{position:relative;min-width:0;min-height:0;overflow:hidden;border-inline-start:1px solid #d7dfce}
+.yard-workspace-preview>.hs-model{position:absolute;inset:0;width:100%;height:100%}
+.yard-workspace.is-split{grid-template-columns:repeat(2,minmax(0,1fr))}
+.yard-workspace.is-clean{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr)}
+@media(max-width:650px){.yard-workspace.is-split{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) minmax(0,1fr)}.yard-workspace.is-clean{grid-template-rows:minmax(0,1fr)}.yard-workspace-preview{border-inline-start:0;border-top:1px solid #d7dfce}}
+@media(max-height:600px){.yard-workspace.is-split{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:auto minmax(0,1fr)}.yard-workspace.is-clean{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr)}}

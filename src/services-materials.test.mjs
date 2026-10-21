@@ -22,7 +22,7 @@ test('water points keep photographed evidence separate from assumed fixture conn
   if(p.status==='observed'){assert(p.evidence.length);for(const e of p.evidence){const ref=ELECTRICAL_REFERENCES.find(r=>r.page===e.page);assert(ref);assert(existsSync(new URL(`../public${ref.image}`,import.meta.url)));const [x,y,w,h]=e.rect;assert(x>=0&&y>=0&&x+w<=1&&y+h<=1);}}
   else {assert.equal(p.status,'layout');assert.equal(p.evidence.length,0);assert(p.fixtureId);assert(['harash','hercules','apartment-spec'].includes(p.source));}
  }
- assert(!WATER_LAYOUT.points.some(p=>p.label==='K05'));assert.equal(ELECTRICAL_LAYOUT.points.length,48);assert(WATER_LAYOUT.points.every(p=>!['living','bedroom-a','bedroom-b','bedroom-c','safe-room','master'].includes(p.roomId)));
+ assert(!WATER_LAYOUT.points.some(p=>p.label==='K05'));assert.equal(ELECTRICAL_LAYOUT.points.length,51);assert(WATER_LAYOUT.points.every(p=>!['living','bedroom-a','bedroom-b','bedroom-c','safe-room','master'].includes(p.roomId)));
  const p=KITCHEN_WATER_POINTS[0],home=waterPoint(p.id);assert.deepEqual(p.position,[KITCHEN_ANCHOR[0]-home.position[0],home.position[1],KITCHEN_ANCHOR[1]-home.position[2]]);
 });
 

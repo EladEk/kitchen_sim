@@ -1,8 +1,8 @@
 import * as THREE from 'three';
-import {SERVICE_YARD} from './home-model.mjs';
+import {yardForSettings} from './home-model.mjs';
 
 export function buildServiceYard({group,box,cylinder,floor,lines,mat,surface=(kind,color,options)=>mat(color,options),resources,motions,settings,mode}){
- const {manhole:m,shed:s}=SERVICE_YARD,groups=new Map(),full=mode==='walk'||!settings.cutaway,open=new Set(settings.openParts);
+ const service=yardForSettings(settings).service,{manhole:m,shed:s}=service,groups=new Map(),full=mode==='walk'||!settings.cutaway,open=new Set(settings.openParts);
  const node=id=>{const p=new THREE.Group();p.userData={buildingId:id,source:'service-yard',dimensionsInferred:true};group.add(p);groups.set(id,p);return p;};
  const chamber=node(m.id),tag={action:'building',buildingId:m.id},steel=mat('#77817c',{metalness:.5,roughness:.6}),cover=mat('#7c8581',{roughness:.8});
  const [mx,mz]=m.position;
@@ -12,8 +12,8 @@ export function buildServiceYard({group,box,cylinder,floor,lines,mat,surface=(ki
  for(const dx of [-.2,.2])box(mx+dx,.021,mz,.075,.008,.024,mat('#424c48'),chamber,tag);
  const access=floor(m.access,mat('#ca9d4c',{transparent:true,opacity:.12,depthWrite:false}),.001,chamber);access.userData.part='manhole-access-reserve';
  const edge=[];for(let j=0;j<4;j++){const a=m.access[j],b=m.access[(j+1)%4],length=Math.hypot(b[0]-a[0],b[1]-a[1]);for(let d=0;d<length;d+=.17){const end=Math.min(d+.09,length);edge.push([a[0]+(b[0]-a[0])*d/length,.025,a[1]+(b[1]-a[1])*d/length],[a[0]+(b[0]-a[0])*end/length,.025,a[1]+(b[1]-a[1])*end/length]);}}lines(edge,'#b18a42',.8,chamber);
- const windowReserve=node(SERVICE_YARD.safeWindow.id),wp=SERVICE_YARD.safeWindow.polygon;
- floor(wp,mat('#8eafb5',{transparent:true,opacity:.16,depthWrite:false}),.002,windowReserve,{action:'building',buildingId:SERVICE_YARD.safeWindow.id});
+ const windowReserve=node(service.safeWindow.id),wp=service.safeWindow.polygon;
+ floor(wp,mat('#8eafb5',{transparent:true,opacity:.16,depthWrite:false}),.002,windowReserve,{action:'building',buildingId:service.safeWindow.id});
  lines(wp.flatMap((a,i)=>{const b=wp[(i+1)%wp.length];return [[a[0],.018,a[1]],[b[0],.018,b[1]]];}),'#789da4',.6,windowReserve);
  const shed=node(s.id),shedTag={action:'building',buildingId:s.id},wall=surface('paint','#d9dcce'),trim=mat('#68776d',{metalness:.15}),inside=mat('#eceae0');
  const cx=(s.minX+s.maxX)/2,cz=(s.minZ+s.maxZ)/2,h=full?s.h-.06:.8;

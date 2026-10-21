@@ -5,7 +5,7 @@ const previousVisibility=new WeakMap();
 export function applySceneUiVisibility(model,settings){
  if(!model)return;
  model.group.traverse(o=>{
-  if(!['electrical-highlight','electrical-annotation-hit'].includes(o.userData.part))return;
+  if(!['electrical-highlight','electrical-annotation-hit','lighting-marker'].includes(o.userData.part))return;
   if(settings.cleanView){if(!previousVisibility.has(o))previousVisibility.set(o,o.visible);o.visible=false;}
   else if(previousVisibility.has(o)){o.visible=previousVisibility.get(o);previousVisibility.delete(o);}
  });

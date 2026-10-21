@@ -1,3 +1,4 @@
+import {DesignEvidence} from './DesignEvidence.jsx';
 import React,{useEffect,useState} from 'react';
 import {Eye,Info,Minimize2,Maximize2,X} from 'lucide-react';
 import {OpeningControls} from './OpeningControls.jsx';
@@ -13,7 +14,7 @@ export function CabinetPanel({selected,spec,openParts,activePart,inspecting,lang
    <small>{collapsed?t('CABINET CONTROLS · MINIMIZED','בקרת ארון · ממוזערת'):t('SELECTED CABINET','הארון הנבחר')}</small>
    <strong>{he?selected.he:selected.name}</strong>
    {collapsed?<span className="minimized-panel-hint">{t('Click parts in 3D · restore for controls','לחצו על החלק בתלת־ממד · הרחיבו לכפתורים')}</span>:<div id="cabinet-opening-panel" className="cabinet-panel-body">
-    <span className="cabinet-panel-dimensions" dir="ltr">{selected.w.toLocaleString()} × {selected.h.toLocaleString()} × {selected.d} mm <em>W × H × D</em></span>
+    <DesignEvidence item={selected} lang={lang}/><span className="cabinet-panel-dimensions" dir="ltr">{selected.w.toLocaleString()} × {selected.h.toLocaleString()} × {selected.d} mm <em>W × H × D</em></span>
     {selected.id==='sink'&&<span className="cabinet-sink-model">SCHOCK Vegas 70 · {t('Casablanca 98','קזבלנקה 98')} · <bdi>69 × 52 × 22 cm</bdi></span>}
     <OpeningControls cabinetId={selected.id} openParts={openParts} activePart={activePart} onToggle={onToggle} lang={lang}/>
     <div className="cabinet-open-actions">
