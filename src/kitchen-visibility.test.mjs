@@ -44,7 +44,7 @@ test('hidden mode removes every kitchen furnishing while preserving walls, windo
  const scene=createKitchen({...DEFAULTS,showElectrical:true,cabinetVisibility:'hidden'});
  try{
   scene.group.updateMatrixWorld(true);assert(scene.furnishingRoots.length>20);assert(scene.furnishingRoots.every(o=>!o.visible));assert(scene.roomStructure.has(scene.windowGroup));assert(scene.windowGroup.children.filter(o=>o.userData.part==='window-glass').length===4);
-  for(const root of scene.roomStructure){assert(objectVisible(root));root.traverse(o=>{if(o.isMesh){if(o.userData.part==='window-glass'){assert(o.material.transparent);assert.equal(o.material.opacity,.15);}else assert(o.material.opacity>=.98);}});}
+  for(const root of scene.roomStructure){assert(objectVisible(root));root.traverse(o=>{if(o.isMesh){if(o.userData.part==='window-glass'){assert(o.material.transparent);assert.equal(o.material.opacity,.15);}else assert(o.userData.part==='solar-ceiling-occluder'?o.material.colorWrite===false&&o.castShadow:o.material.opacity>=.98);}});}
   assert.equal(scene.electricalGroups.size,9);for(const p of P){const node=scene.electricalGroups.get(p.id);assert(objectVisible(node));assert.deepEqual(node.position.toArray(),p.position);}
   assert(scene.picks.length>0);assert(scene.picks.every(p=>!p.userData.kitchenFurnishing&&objectVisible(p)));assert(scene.electricalOccluders.every(p=>!p.userData.kitchenFurnishing));
  }finally{scene.dispose();}
@@ -54,7 +54,7 @@ test('translucent mode changes only furnishing materials; physical sockets/walls
  const scene=createKitchen({...DEFAULTS,showElectrical:true,cabinetVisibility:'translucent'}),materials=new Set();
  try{
   for(const root of scene.furnishingRoots){assert(root.visible);root.traverse(o=>{if(!o.isMesh)return;assert(o.material.transparent);assert(o.material.opacity<=.24);assert.equal(o.material.depthWrite,false);assert.equal(o.castShadow,false);materials.add(o.material);});}
-  for(const root of scene.roomStructure)root.traverse(o=>{if(o.isMesh){if(o.userData.part==='window-glass'){assert(o.material.transparent);assert.equal(o.material.opacity,.15);}else assert(o.material.opacity>=.98);assert(!materials.has(o.material),'shared stone or metal must be cloned before ghosting');}});
+  for(const root of scene.roomStructure)root.traverse(o=>{if(o.isMesh){if(o.userData.part==='window-glass'){assert(o.material.transparent);assert.equal(o.material.opacity,.15);}else assert(o.userData.part==='solar-ceiling-occluder'?o.material.colorWrite===false&&o.castShadow:o.material.opacity>=.98);assert(!materials.has(o.material),'shared stone or metal must be cloned before ghosting');}});
   for(const p of scene.electricalGroups.values()){const face=p.children.find(o=>o.userData.part==='electrical-faceplate');assert.equal(face.material.opacity,1);assert.equal(face.material.depthTest,true);}
   assert(scene.electricalOccluders.every(o=>!o.userData.kitchenFurnishing));
   let disposed=0;materials.forEach(m=>m.addEventListener('dispose',()=>disposed++));scene.dispose();assert.equal(disposed,materials.size,'all ghost materials are released');

@@ -1,4 +1,6 @@
 import {buildLightingPoints} from './home-lighting-scene.js';
+import {buildDaylight} from './daylight-scene.js';
+import {lightColour} from './lighting-controls.mjs';
 import {KITCHEN_LIGHTING_POINTS} from './kitchen-lighting.mjs';
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
@@ -40,6 +42,10 @@ export function createKitchen(settings){
  }
  floorMesh.userData.navigationSurface=true;
  const visualCeiling=HVAC_PROFILE.top/M;
+ // Keep the orbit view open while the assumed room ceiling blocks overhead
+ // sunlight. Transparent glass, rather than the open roof, admits daylight.
+ const ceilingMaterial=new THREE.MeshBasicMaterial({colorWrite:false,depthWrite:false,transparent:true,opacity:0});resources.push(ceilingMaterial);
+ const solarCeiling=box(ROOM.long/2,ROOM.height+15,ROOM.short/2,ROOM.long,30,ROOM.short,ceilingMaterial);solarCeiling.userData.part='solar-ceiling-occluder';
  box(-75,visualCeiling/2,1650,150,visualCeiling,3450,wall);
  const hole=WINDOW;
  box(hole.x/2,visualCeiling/2,-75,hole.x,visualCeiling,150,wall);
@@ -49,7 +55,7 @@ export function createKitchen(settings){
  // Two dark sliding sashes, recessed into the wall with a flush inner face.
  const windowGroup=new THREE.Group();windowGroup.userData.windowId='kitchen-window';group.add(windowGroup);
  const frame=mat('#343d3d',{metalness:.3,roughness:.45}),windowMat=mat('#b0c8be',{transparent:true,opacity:.15,roughness:.16,depthWrite:false});
- const windowBox=(x,y,z,w,h,d,material,part)=>{const mesh=box(x,y,z,w,h,d,material,null,windowGroup);mesh.userData={windowId:'kitchen-window',part};return mesh;};
+ const windowBox=(x,y,z,w,h,d,material,part)=>{const mesh=box(x,y,z,w,h,d,material,null,windowGroup);if(part==='window-glass')mesh.castShadow=false;mesh.userData={windowId:'kitchen-window',part};return mesh;};
  for(let i=0;i<2;i++){
   const x=hole.x+hole.width*(i+.5)/2,z=i?-38:-62,w=hole.width/2,y=hole.sill+hole.height/2;
   for(const zz of [-7,7])windowBox(x,y,z+zz,w-44,hole.height-44,4,windowMat,'window-glass').userData.glazing='double';
@@ -273,12 +279,10 @@ export function createKitchen(settings){
  cylinder(1120,942,260,95,60,mat('#c8c3ae'));for(let i=0;i<4;i++){const geo=new THREE.SphereGeometry(.035,12,8);resources.push(geo);const fruit=new THREE.Mesh(geo,mat(i%2?'#c4aa50':'#74815f'));fruit.position.set(1.08+i*.027,.99,.245+(i%2)*.03);group.add(fruit);}
  const furnishingRoots=group.children.filter(child=>!roomStructure.has(child));
  // Lighting changes are local to this scene group.
- const hemi=new THREE.HemisphereLight(settings.light==='day'?'#eaf2ff':'#e3e0ef','#b9aa94',settings.light==='day'?1.55:.75);group.add(hemi);
- const sun=new THREE.DirectionalLight(settings.light==='day'?'#fff5df':'#f3cf9d',settings.light==='day'?3.2:1.4);sun.position.set(3,6,5);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-5;sun.shadow.camera.right=5;sun.shadow.camera.top=5;sun.shadow.camera.bottom=-5;sun.shadow.normalBias=.015;sun.shadow.radius=3;sun.shadow.bias=-.0001;group.add(sun);
- const fill=new THREE.DirectionalLight('#e7edf1',settings.light==='day'?1:.45);fill.position.set(-3,3,1);group.add(fill);
- if(settings.led){
-  const ledmat=mat('#ffdda4',{emissive:'#ffcb77',emissiveIntensity:2});for(const [a,b] of [[1095,3470],[4370,4845]])furnishingRoots.push(box((a+b)/2,1494,300,b-a,4,12,ledmat));
-  for(const x of [1.65,2.65,3.65,4.55]){const l=new THREE.PointLight('#ffd9a1',settings.intensity/100*.7,2.5,2);l.position.set(x,1.42,.37);group.add(l);furnishingRoots.push(l);}
+ const updateDaylight=buildDaylight({group,settings,resources,kitchen:true,center:[2.725,0,1.65],radius:5});
+ if(settings.led&&settings.lampsOn!==false){
+  const ledmat=mat(lightColour(4000),{emissive:lightColour(4000),emissiveIntensity:2});for(const [a,b] of [[1095,3470],[4370,4845]])furnishingRoots.push(box((a+b)/2,1494,300,b-a,4,12,ledmat));
+  for(const x of [1.65,2.65,3.65,4.55]){const l=new THREE.PointLight(lightColour(4000),settings.intensity/100*2,2.5,2);l.userData.fixtureLight=true;l.position.set(x,1.42,.37);group.add(l);furnishingRoots.push(l);}
  }
  const dimensionGroup=new THREE.Group();group.add(dimensionGroup);dimensionGroup.visible=settings.dimensions;
  const dimmat=new THREE.LineBasicMaterial({color:'#526e60'});resources.push(dimmat);
@@ -298,5 +302,5 @@ export function createKitchen(settings){
  const lightingGroups=settings.inspection?new Map():buildLightingPoints({group,box:(x,y,z,w,h,d,m,parent)=>box(x/M,y/M,z/M,w/M,h/M,d/M,m,null,parent),cylinder:(x,y,z,r,h,m,parent)=>cylinder(x/M,y/M,z/M,r/M,h/M,m,parent),mat,resources,settings,points:KITCHEN_LIGHTING_POINTS,picks,interactive:false});
  const activePicks=picks.filter(objectVisible),electricalOccluders=[];
  group.traverse(mesh=>{if(mesh.isMesh&&objectVisible(mesh)&&!mesh.userData.electricalId&&opaqueMesh(mesh))electricalOccluders.push(mesh);});
- return {group,lightingGroups,windowGroup,picks:activePicks,moduleGroups,openingObjects,electricalGroups,waterGroups,dimensionGroup,serviceGroups:new Map([...electricalGroups,...waterGroups]),furnishingRoots,roomStructure,electricalOccluders,dispose(){group.traverse(o=>{if(o.isLight&&o.shadow)o.shadow.dispose();});resources.forEach(r=>r.dispose?.());}};
+ return {group,updateDaylight,lightingGroups,windowGroup,picks:activePicks,moduleGroups,openingObjects,electricalGroups,waterGroups,dimensionGroup,serviceGroups:new Map([...electricalGroups,...waterGroups]),furnishingRoots,roomStructure,electricalOccluders,dispose(){group.traverse(o=>{if(o.isLight&&o.shadow)o.shadow.dispose();});resources.forEach(r=>r.dispose?.());}};
 }

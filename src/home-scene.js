@@ -1,5 +1,6 @@
 import {buildEntranceServices} from './entrance-services-scene.js';
 import {buildLightingPoints} from './home-lighting-scene.js';
+import {buildDaylight} from './daylight-scene.js';
 import * as THREE from 'three';
 import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
 import {HOUSE,HOUSE_OUTLINE,PLOT,TERRACE,SERVICE_APRON,PUBLIC_ENTRY,ROOMS,WALLS,DOORS,WINDOWS,SHUTTERS,FURNITURE,furnitureForSettings,GARDEN_PLANTS,HOME_FINISHES,FLOOR_FINISHES,KITCHEN_ANCHOR,GARDEN_LAYOUT,WATER_LAYOUT,LIGHTING_LAYOUT,point,polygonBounds,insidePolygon,roomAt,openingPoint} from './home-model.mjs';
@@ -30,7 +31,7 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
  }
  function glazing(id,y,width,height,parent,data=null){
   const double=DOUBLE_GLAZED_IDS.includes(id),material=double?mat('#b0c8be',{transparent:true,opacity:.15,roughness:.16,depthWrite:false}):glass;
-  for(const z of double?[-.007,.007]:[0]){const pane=box(0,y,z,width,height,.004,material,parent,data);pane.userData.glazing=double?'double':'single';pane.userData.openingId=id;}
+  for(const z of double?[-.007,.007]:[0]){const pane=box(0,y,z,width,height,.004,material,parent,data);pane.castShadow=false;pane.userData.glazing=double?'double':'single';pane.userData.openingId=id;}
  }
  function cylinder(x,y,z,r,h,material,parent=group,data=null){const g=new THREE.CylinderGeometry(r,r,h,32);metricSurfaceUVs(g,[x,y,z]);resources.push(g);const m=new THREE.Mesh(g,material);m.position.set(x,y,z);m.castShadow=true;if(data)m.userData={...data};parent.add(m);if(data?.action)picks.push(m);return m;}
  function sphere(x,y,z,r,material,parent=group,scale=[1,1,1]){const g=new THREE.SphereGeometry(r,16,10);metricSurfaceUVs(g,[x,y,z]);resources.push(g);const m=new THREE.Mesh(g,material);m.position.set(x,y,z);m.scale.set(...scale);parent.add(m);m.castShadow=true;return m;}
@@ -39,7 +40,8 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
  function plant(x,z,size=1,parent=group){cylinder(x,.2*size,z,.2*size,.4*size,mat('#bcb6a1'),parent);cylinder(x,.48*size,z,.024*size,.75*size,oak,parent);for(let i=0;i<5;i++)sphere(x+Math.sin(i*1.8)*.13*size,(.75+i*.09)*size,z+Math.cos(i*1.8)*.13*size,.25*size,mat(i%2?'#7f9470':'#637d59'),parent,[1,.65,1]);}
  function roomMaterial(id){const value=settings.rooms[id]||settings.rooms.living;return value?.wall==='ordered-mona'?'#e9e5db':HOME_FINISHES.find(f=>f.id===value?.wall)?.color||'#e9e5db';}
  const green=surface('grass','#90a17b');floor(PLOT,green,-.035);floor(PUBLIC_ENTRY,surface('cement','#b9b9af'),-.01);floor(HOUSE_OUTLINE,mat('#d8d3c5'),0);
- if(mode==='walk'){const ceiling=floor(HOUSE_OUTLINE,offwhite,HOUSE.height);ceiling.userData.part='illustrative-ceiling';}
+ if(mode==='walk'){const ceiling=floor(HOUSE_OUTLINE,offwhite,HOUSE.height);ceiling.castShadow=true;ceiling.userData.part='illustrative-ceiling';}
+ else if(!settings.cutaway){const m=new THREE.MeshBasicMaterial({colorWrite:false,depthWrite:false,transparent:true,opacity:0});resources.push(m);const ceiling=floor(HOUSE_OUTLINE,m,HOUSE.height);ceiling.castShadow=true;ceiling.userData.part='solar-ceiling-occluder';}
 
  function roomFloor(room,poly,parent,data){
   const f=FLOOR_FINISHES.find(f=>f.id===settings.rooms[room.id]?.floor)||FLOOR_FINISHES[0],kind=f.id==='oak'?'wood':f.id==='ordered-wet'?'cement':f.id==='ordered-terrace'?'terrace':'porcelain',m=floor(poly,surface(kind,f.color,{productId:f.productId}),.008,parent,data);m.userData.navigationSurface=true;m.userData.floorFinish=f.id;m.userData.tile=f.tile||null;m.userData.productId=f.productId;
@@ -244,8 +246,7 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
  for(let i=0;i<4;i++){const x=(ISLAND.x+340+i*585)/1000,z=(ISLAND.z+1160)/1000;cylinder(x,.65,z,.17,.05,oak,kg);cylinder(x,.32,z,.025,.62,ink,kg);cylinder(x,.025,z,.17,.04,ink,kg);}
  for(const [id,p] of buildElectricalPoints({group,box,cylinder,mat,resources,settings}))gardenGroups.set(id,p);
  for(const [id,p] of buildWaterPoints({group,box,cylinder,mat,resources,settings,points:WATER_LAYOUT.points}))gardenGroups.set(id,p);
- const hemi=new THREE.HemisphereLight('#e9f1ff','#b8ab95',settings.light==='evening'?.55:1.35);group.add(hemi);
- const sun=new THREE.DirectionalLight(settings.light==='evening'?'#e8bf86':'#fff1d7',settings.light==='evening'?1.1:3);sun.position.set(-8,20,-5);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-15;sun.shadow.camera.right=15;sun.shadow.camera.top=16;sun.shadow.camera.bottom=-16;sun.shadow.camera.far=65;sun.shadow.normalBias=.018;sun.shadow.radius=3;sun.shadow.bias=-.0002;group.add(sun);
- for(const [id,p] of buildLightingPoints({group,box,cylinder,mat,resources,settings,points:LIGHTING_LAYOUT.points,picks}))gardenGroups.set(id,p);
- return {group,picks,motions,roomGroups,furnitureGroups,doorGroups,shutterGroups,buildingGroups,gardenGroups,wallHeight,dispose(){group.traverse(o=>{if(o.isLight&&o.shadow)o.shadow.dispose();});resources.forEach(r=>r.dispose?.());}};
+ const updateDaylight=buildDaylight({group,settings,resources});
+ for(const [id,p] of buildLightingPoints({group,box,cylinder,mat,resources,settings,points:LIGHTING_LAYOUT.points,picks,selectedRoom}))gardenGroups.set(id,p);
+ return {group,picks,motions,roomGroups,furnitureGroups,doorGroups,shutterGroups,buildingGroups,gardenGroups,wallHeight,updateDaylight,dispose(){group.traverse(o=>{if(o.isLight&&o.shadow)o.shadow.dispose();});resources.forEach(r=>r.dispose?.());}};
 }

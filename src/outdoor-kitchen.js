@@ -1,10 +1,11 @@
+import {lightColour} from './lighting-controls.mjs';
 import * as THREE from 'three';
 import {OUTDOOR_KITCHEN} from './home-products.mjs';
 
 // Metric Hercules assembly from the supplied product sheet: 80 + 150 + 80 cm,
 // about 70 cm deep. Cabinet height and internal hardware are illustrative.
 export function buildOutdoorKitchen({f,parent,box,cylinder,mat,resources,motions,picks,settings}){
- const metal=mat('#232724',{metalness:.5,roughness:.48}),stone=mat('#363a35',{roughness:.85}),steel=mat('#aeb7b3',{metalness:.8,roughness:.28}),black=mat('#121a16'),inside=mat('#61685e'),glass=mat('#72929c',{transparent:true,opacity:.3,metalness:.12,roughness:.1,depthWrite:false}),led=mat('#b3d1ed',{emissive:'#6d99cc',emissiveIntensity:settings.light==='evening'?1.4:.45});
+ const metal=mat('#232724',{metalness:.5,roughness:.48}),stone=mat('#363a35',{roughness:.85}),steel=mat('#aeb7b3',{metalness:.8,roughness:.28}),black=mat('#121a16'),inside=mat('#61685e'),glass=mat('#72929c',{transparent:true,opacity:.3,metalness:.12,roughness:.1,depthWrite:false}),led=mat(lightColour(4000),{emissive:lightColour(4000),emissiveIntensity:settings.lampsOn===false?0:.45});
  const opened=new Set(settings.openParts),data={action:'furniture',furnitureId:f.id},part=key=>({action:'part',furnitureId:f.id,partId:`${f.id}:${key}`});
  const bodyTop=.86,base=.10,depth=OUTDOOR_KITCHEN.depth;
  parent.userData.productId='hercules';
@@ -33,7 +34,7 @@ export function buildOutdoorKitchen({f,parent,box,cylinder,mat,resources,motions
  const hoodGeo=new THREE.CylinderGeometry(.29,.29,1.05,32,1,true,0,Math.PI);hoodGeo.rotateZ(Math.PI/2);hoodGeo.translate(0,0,.29);resources.push(hoodGeo);const hood=new THREE.Mesh(hoodGeo,metal);hood.userData=part('grill-lid');hood.material.side=THREE.DoubleSide;hood.castShadow=true;lid.add(hood);picks.push(hood);
  for(const x of [-.525,.525]){const geo=new THREE.CircleGeometry(.29,32,0,Math.PI);geo.rotateY(Math.PI/2);geo.translate(x,0,.29);resources.push(geo);const end=new THREE.Mesh(geo,metal);end.userData=part('grill-lid');lid.add(end);picks.push(end);}
  box(0,.07,.603,.86,.027,.027,steel,lid,part('grill-lid'));for(const x of [-.40,.40])box(x,.07,.58,.025,.025,.06,steel,lid,part('grill-lid'));
- const warm=mat('#f1d7a4',{emissive:'#ffcc77',emissiveIntensity:opened.has(`${f.id}:grill-lid`)?1:.1});for(const x of [-.43,.43])box(x,.025,.30,.025,.012,.06,warm,lid);
+ const warm=mat(lightColour(4000),{emissive:lightColour(4000),emissiveIntensity:settings.lampsOn===false?0:opened.has(`${f.id}:grill-lid`)?1:.1});for(const x of [-.43,.43])box(x,.025,.30,.025,.012,.06,warm,lid);
  // Glass-door refrigerator and adjacent storage within the 80 cm unit.
  for(const x of [1.045,1.535])box(x,.48,0,.02,.73,.63,black,parent,data);box(1.29,.48,-.305,.5,.73,.02,black,parent,data);for(const y of [.12,.84])box(1.29,y,0,.5,.025,.63,black,parent,data);for(const y of [.20,.40,.60])box(1.29,y,.03,.45,.012,.52,steel,parent,data);box(1.29,.80,-.26,.43,.015,.02,led,parent,data);
  for(const x of [1.16,1.29,1.42]){cylinder(x,.28,.1,.035,.14,mat('#6b7757'),parent);cylinder(x,.38,.1,.013,.08,black,parent);}

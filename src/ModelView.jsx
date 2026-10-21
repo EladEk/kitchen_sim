@@ -2,6 +2,7 @@ import {useEffect,useRef,useState,forwardRef,useImperativeHandle} from 'react';
 import * as THREE from 'three';
 import {createScenePresentation} from './scene-presentation.js';
 import {installSceneEnvironment,configureSurfaceRenderer} from './scene-environment.js';
+import {applyDaylightPresentation} from './daylight-scene.js';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {createKitchen} from './scene.js';
 import {applySceneUiVisibility} from './scene-interface.mjs';
@@ -54,8 +55,9 @@ export const ModelView=forwardRef(function ModelView({settings,onSelect,onPartCl
   const onLost=e=>{e.preventDefault();renderer.setAnimationLoop(null);r.vr.dispose();vrCallbacks.current.onVRState?.({status:'unsupported',reason:'webgl'});setFailed(true);};renderer.domElement.addEventListener('webglcontextlost',onLost);
   return()=>{renderer.setAnimationLoop(null);r.vr.dispose();observer.disconnect();controls.dispose();renderer.domElement.removeEventListener('pointerdown',start);renderer.domElement.removeEventListener('pointerup',end);renderer.domElement.removeEventListener('pointermove',hover);renderer.domElement.removeEventListener('pointercancel',cancel);renderer.domElement.removeEventListener('webglcontextlost',onLost);if(model.current){scene.remove(model.current.group);model.current.dispose();model.current=null;}presentation.dispose();disposeEnvironment();renderer.dispose();renderer.domElement.remove();runtime.current=null;};
  },[]);
- const visualKey=JSON.stringify([settings.base,settings.upper,settings.stone,settings.hardware,settings.floor,settings.light,settings.intensity,settings.led,settings.openParts,settings.activePart,settings.inspection,settings.selected,settings.dimensions,settings.showElectrical,settings.showWater,settings.showLighting,settings.lightControls,settings.cabinetVisibility,selectedElectricalId,vrActive]);
- useEffect(()=>{const r=runtime.current;if(!r)return;if(model.current){r.scene.remove(model.current.group);model.current.dispose();}model.current=createKitchen({...settings,inspection:vrActive?false:settings.inspection,selectedElectricalId});r.scene.add(model.current.group);r.navigation=createKitchenVrNavigation(model.current);r.scene.background.set(settings.light==='day'?'#eeeae2':'#bcb8b0');},[visualKey]);
+ const visualKey=JSON.stringify([settings.base,settings.upper,settings.stone,settings.hardware,settings.floor,settings.lampsOn,settings.light,settings.intensity,settings.led,settings.openParts,settings.activePart,settings.inspection,settings.selected,settings.dimensions,settings.showElectrical,settings.showWater,settings.showLighting,settings.lightControls,settings.cabinetVisibility,selectedElectricalId,vrActive]);
+ useEffect(()=>{const r=runtime.current;if(!r)return;if(model.current){r.scene.remove(model.current.group);model.current.dispose();}model.current=createKitchen({...settings,inspection:vrActive?false:settings.inspection,selectedElectricalId});r.scene.add(model.current.group);r.navigation=createKitchenVrNavigation(model.current);applyDaylightPresentation(r.scene,settings);},[visualKey]);
+ useEffect(()=>{const r=runtime.current;if(!r)return;model.current?.updateDaylight(settings);applyDaylightPresentation(r.scene,settings);},[settings.solar,settings.light,visualKey]);
  useEffect(()=>{
   const r=runtime.current;if(!r||r.renderer.xr.isPresenting)return;
   if(settings.inspection&&settings.selected){

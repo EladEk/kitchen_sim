@@ -6,3 +6,5 @@
 .hs-lighting-inspector .hs-inspector-header>div{min-width:0}
 .hs-lighting-inspector .hs-icon-button{width:44px;min-width:44px;height:44px}
 .hs-lighting-inspector .electrical-photo-tools{flex-wrap:wrap}
+
+.lighting-simulation-note{padding:12px;border:1px dashed #8a65ac;background:#f5effa;border-radius:8px;color:#63477e;font-size:13px;line-height:1.65}

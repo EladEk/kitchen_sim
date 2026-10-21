@@ -1,0 +1,24 @@
+{
+  "source": "house-plan.pdf",
+  "sourceSha256": "c170670c7e5c4ba376b9102e3ee3cc3ac7db0029aee979e7bf6238814e0d8782",
+  "page": 1,
+  "northCropPdfPoints": [
+    26,
+    115,
+    77,
+    158
+  ],
+  "northDirectionInPlan": "down-left",
+  "planTopBearingDegrees": 135,
+  "bearingPrecision": "read from diagonal plan symbol, not surveyed bearing",
+  "location": {
+    "city": "Ofakim",
+    "plot": "1410",
+    "building": "4102",
+    "apartment": "4"
+  },
+  "latitude": 31.31,
+  "longitude": 34.62,
+  "coordinateBasis": "regional Ofakim reference; no GPS coordinates printed on the apartment plan",
+  "solarFormula": "https://gml.noaa.gov/grad/solcalc/solareqns.PDF"
+}

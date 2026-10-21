@@ -1,3 +1,4 @@
+import {lightColour} from './lighting-controls.mjs';
 import * as THREE from 'three';
 import {HOOD} from './appliances.mjs';
 const M=.001;
@@ -63,7 +64,7 @@ export function createBoxinHood({box,cylinder,part,mat,resources,settings,steel,
   add(cx,.6,latchZ+5,31,1.2,3,steel,latch);
  }
  // Round recessed LEDs with metal bezels, placed in the front 77.6 mm strip.
- const light=mat(settings.led?'#fff2d8':'#d7d9d3',{emissive:'#ffe6c0',emissiveIntensity:settings.led?settings.intensity/100*2.1:0,roughness:.35});
+ const enabled=settings.led&&settings.lampsOn!==false,light=mat(enabled?lightColour(4000):'#d7d9d3',{emissive:lightColour(4000),emissiveIntensity:enabled?settings.intensity/100*2.1:0,roughness:.35});
  for(const x of [-w*.3,w*.3]){
   const bezel=new THREE.Group();part(bezel,'hood-led-bezel');root.add(bezel);
   const rimGeo=new THREE.RingGeometry(.0205,.025,48);rimGeo.rotateX(Math.PI/2);resources.push(rimGeo);const rim=new THREE.Mesh(rimGeo,steel);rim.position.set(x*M,0,lampZ*M);bezel.add(rim);

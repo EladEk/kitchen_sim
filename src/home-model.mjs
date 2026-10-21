@@ -1,5 +1,6 @@
 import {createEntranceServices,entranceCollisionBoxes} from './entrance-services.mjs';
 import {normalizeLightControls} from './lighting-controls.mjs';
+import {normalizeSolar,solarDefaults} from './solar-lighting.mjs';
 import {createLightingLayout} from './home-lighting.mjs';
 import {normalizeYardDesign,resolveYardDesign,changeYardDesign,defaultYardItem} from './yard-design.mjs';
 import {OUTDOOR_KITCHEN} from './home-products.mjs';
@@ -20,7 +21,7 @@ export const PLAN_ORIGIN=[606,45.7];
 export const point=(x,z)=>[(x-PLAN_ORIGIN[0])*PLAN_SCALE,(z-PLAN_ORIGIN[1])*PLAN_SCALE];
 const polygon=a=>a.map(p=>point(...p));
 const rect=(x0,z0,x1,z1)=>[[x0,z0],[x1,z0],[x1,z1],[x0,z1]];
-export const HOUSE={height:2.75,eyeHeight:1.62,playerRadius:.17,source:'/house/house-plan.pdf',image:'/house/house-plan.jpg',revision:42,scale:50};
+export const HOUSE={height:2.75,eyeHeight:1.62,playerRadius:.17,source:'/house/house-plan.pdf',image:'/house/house-plan.jpg',revision:43,scale:50};
 export const GARDEN_LAYOUT=createGardenLayout(point);
 export const EXTERIOR_LAYOUT=createExteriorLayout(point);
 export const SERVICE_YARD=createServiceYard(point);
@@ -213,7 +214,7 @@ export const FLOOR_FINISHES=[
  {id:'stone',he:'אבן בהירה',en:'Light stone',color:'#d9d3c5'},{id:'oak',he:'אלון',en:'Oak',color:'#b89a73'},{id:'warm',he:'אבן חמה',en:'Warm stone',color:'#c5b39a'}
 ];
 export const wallFinishesForRoom=id=>HOME_FINISHES.filter(f=>f.id!=='ordered-mona'||roomHasOrderedCladding(id));
-export const HOME_DEFAULTS={schema:2,finishScheduleVersion:FINISH_SCHEDULE_VERSION,lang:'he',light:'day',cutaway:true,labels:true,showRoomNames:false,furniture:true,furnitureLayout:{},yardDesign:{},pergolaRoof:true,shedRoof:true,openDoors:['patio'],openParts:[],closedShutters:[],rooms:{},showGarden:true,showElectrical:true,showWater:true,showLighting:true,lightControls:{},furnitureSnap:true,renderQuality:'realistic',cleanView:false,electricalInferred:true};
+export const HOME_DEFAULTS={schema:2,finishScheduleVersion:FINISH_SCHEDULE_VERSION,lang:'he',light:'day',solar:solarDefaults(),lampsOn:true,cutaway:true,labels:true,showRoomNames:false,furniture:true,furnitureLayout:{},yardDesign:{},pergolaRoof:true,shedRoof:true,openDoors:['patio'],openParts:[],closedShutters:[],rooms:{},showGarden:true,showElectrical:true,showWater:true,showLighting:true,lightControls:{},furnitureSnap:true,renderQuality:'realistic',cleanView:false,electricalInferred:true};
 export function normalizeHomeSettings(value={}){
  if(!value||typeof value!=='object')value={};
  const validDoors=new Set(DOORS.map(d=>d.id)),validParts=new Set(ALL_HOME_PARTS.map(p=>p.id)),rooms={};
@@ -221,7 +222,7 @@ export function normalizeHomeSettings(value={}){
  const migratedParts=(Array.isArray(value.openParts)?value.openParts:[]).map(id=>({'ensuite-vanity:left':'ensuite-vanity:drawer-0','ensuite-vanity:right':'ensuite-vanity:drawer-1'})[id]||id);
  for(const r of ROOMS){const v=value.rooms?.[r.id]||{},wet=roomHasOrderedCladding(r.id),floorDefault=orderedFloorForRoom(r.id),validWall=wallFinishesForRoom(r.id).some(f=>f.id===v.wall);rooms[r.id]={wall:current&&validWall?v.wall:wet?'ordered-mona':validWall?v.wall:'ivory',floor:current&&FLOOR_FINISHES.some(f=>f.id===v.floor)?v.floor:floorDefault,wood:['oak','white','dark'].includes(v.wood)?v.wood:'oak'};}
 
- return {...HOME_DEFAULTS,furnitureLayout:normalizeFurnitureLayout(value.furnitureLayout),yardDesign:normalizeYardDesign(yardContext(),value.yardDesign),lang:value.lang==='en'?'en':'he',light:value.light==='evening'?'evening':'day',cutaway:typeof value.cutaway==='boolean'?value.cutaway:true,labels:value.labels!==false,showRoomNames:value.showRoomNames===true,furniture:value.furniture!==false,pergolaRoof:value.pergolaRoof!==false,shedRoof:value.shedRoof!==false,showElectrical:value.showElectrical!==false,showWater:value.showWater!==false,showLighting:value.showLighting!==false,lightControls:normalizeLightControls(value.lightControls),furnitureSnap:value.furnitureSnap!==false,renderQuality:value.renderQuality==='light'?'light':'realistic',cleanView:value.cleanView===true,electricalInferred:value.electricalInferred!==false,openDoors:[...new Set((Array.isArray(value.openDoors)?value.openDoors:HOME_DEFAULTS.openDoors).filter(x=>validDoors.has(x)))],openParts:[...new Set(migratedParts.filter(x=>validParts.has(x)))],closedShutters:[...new Set((Array.isArray(value.closedShutters)?value.closedShutters:[]).filter(id=>SHUTTER_IDS.includes(id)))],rooms};
+ return {...HOME_DEFAULTS,furnitureLayout:normalizeFurnitureLayout(value.furnitureLayout),yardDesign:normalizeYardDesign(yardContext(),value.yardDesign),lang:value.lang==='en'?'en':'he',light:['evening','night'].includes(value.light)?value.light:'day',solar:normalizeSolar(value.solar),lampsOn:value.lampsOn!==false,cutaway:typeof value.cutaway==='boolean'?value.cutaway:true,labels:value.labels!==false,showRoomNames:value.showRoomNames===true,furniture:value.furniture!==false,pergolaRoof:value.pergolaRoof!==false,shedRoof:value.shedRoof!==false,showElectrical:value.showElectrical!==false,showWater:value.showWater!==false,showLighting:value.showLighting!==false,lightControls:normalizeLightControls(value.lightControls),furnitureSnap:value.furnitureSnap!==false,renderQuality:value.renderQuality==='light'?'light':'realistic',cleanView:value.cleanView===true,electricalInferred:value.electricalInferred!==false,openDoors:[...new Set((Array.isArray(value.openDoors)?value.openDoors:HOME_DEFAULTS.openDoors).filter(x=>validDoors.has(x)))],openParts:[...new Set(migratedParts.filter(x=>validParts.has(x)))],closedShutters:[...new Set((Array.isArray(value.closedShutters)?value.closedShutters:[]).filter(id=>SHUTTER_IDS.includes(id)))],rooms};
 }
 export function insidePolygon(p,poly){let inside=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++){const [xi,zi]=poly[i],[xj,zj]=poly[j];if(((zi>p[1])!==(zj>p[1]))&&p[0]<(xj-xi)*(p[1]-zi)/(zj-zi)+xi)inside=!inside;}return inside;}
 export function polygonBounds(poly){return {minX:Math.min(...poly.map(p=>p[0])),maxX:Math.max(...poly.map(p=>p[0])),minZ:Math.min(...poly.map(p=>p[1])),maxZ:Math.max(...poly.map(p=>p[1]))};}
