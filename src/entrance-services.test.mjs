@@ -9,11 +9,14 @@ import {createHomeScene} from './home-scene.js';
 import {closeAllStudioOpenings} from './studio-state.mjs';
 import {designEvidence} from './design-evidence.mjs';
 
-test('the entry remains common-area context with photographed contents and explicitly unknown unopened equipment',()=>{
+test('the entry remains common-area context with only photographed contents and the new last-cabinet assignment',()=>{
  assert.equal(E.cabinets.length,3);assert.equal(E.parts.length,6);assert.equal(new Set(E.parts.map(p=>p.id)).size,6);
  for(const c of E.cabinets){assert.strictEqual(entryElement(c.id),c);assert(c.positionInferred&&c.dimensionsInferred);assert.equal(c.source,'entry-services');assert.deepEqual(designEvidence(c),{basis:'photo',position:'estimate',dimensions:'estimate'});assert(c.z>openingPoint(DOORS.find(d=>d.id==='entry'))[1]);assert(c.x>E.context.minX);assert(c.x+c.w/2<E.context.maxX);assert(c.parts.every(p=>ALL_HOME_PARTS.some(q=>q.id===p.id)));}
- assert.deepEqual(E.cabinets.map(c=>c.contents.length),[3,3,0]);assert(E.cabinets[1].contents[0].he.includes('לא קריאים'));assert(E.cabinets[2].he.includes('התכולה לא צולמה'));
- const all=JSON.stringify(E.cabinets.flatMap(c=>c.contents));assert(!/filter|non-return|meter/.test(all),'no invented concealed meter, filter or non-return assembly');
+ assert.deepEqual(E.cabinets.map(c=>c.contents.length),[3,3,5]);assert(E.cabinets[1].contents[0].he.includes('לא קריאים'));assert(E.cabinets[2].he.includes('מונים 4 ו־3'));
+ const all=JSON.stringify(E.cabinets.flatMap(c=>c.contents));assert(!/filter|non-return/.test(all),'no invented concealed filter or non-return assembly');
+ assert.deepEqual(E.cabinets.slice(0,2).map(c=>c.meters),[undefined,undefined]);
+ assert.deepEqual(E.cabinets[2].meters.map(m=>[m.apartment,m.capOpen]),[[4,false],[3,true]]);assert(E.cabinets[2].meters[0].y>E.cabinets[2].meters[1].y);
+ assert.equal(E.cabinets[2].page,4);assert.equal(ENTRY_SOURCE.references.find(r=>r.page===4).file,'298252.jpg');
 });
 
 test('all six cabinet doors retain independent saved state and global close-all closes them',()=>{
@@ -30,13 +33,35 @@ test('actual 3D doors open outward separately, equipment remains pickable, and o
    const collected=[];for(const c of E.cabinets)scene.buildingGroups.get(c.id).traverse(o=>{if(o.userData.part?.startsWith('observed-'))collected.push(o);});
    for(const part of ['observed-blue-riser','observed-grey-riser','observed-inspection-cap','observed-hot-water-tank','observed-black-insulated-pipe','observed-lower-metal-connection'])assert(collected.some(o=>o.userData.part===part));
    assert(collected.every(o=>o.userData.action==='building'&&o.userData.observed),'equipment clicks inspect; they do not operate real valves');
-   const unseen=scene.buildingGroups.get('entry-unseen');assert(!unseen.children.some(o=>o.userData.observed));
+   const last=[];scene.buildingGroups.get('entry-unseen').traverse(o=>last.push(o));
+   assert.deepEqual(last.filter(o=>o.userData.part==='observed-water-meter').map(o=>[o.userData.apartment,o.userData.capOpen]),[[4,false],[3,true]]);
+   assert.equal(last.filter(o=>o.userData.part==='observed-meter-valve-handle').length,4);
+   assert.equal(last.filter(o=>o.userData.part==='observed-meter-floor-drain').length,1);
+   for(const part of ['observed-meter-open-cover','observed-meter-closed-cover','observed-meter-apartment-tag'])assert(last.some(o=>o.userData.part===part));
   }finally{scene.dispose();}
  }
  const closed=createHomeScene(normalizeHomeSettings({openParts:[]}),{mode:'walk'});
  try{
   closed.group.updateMatrixWorld(true);for(const c of E.cabinets){const ray=new THREE.Raycaster(new THREE.Vector3(c.x-.16,1.3,c.z-1),new THREE.Vector3(0,0,1)),hits=ray.intersectObjects(closed.picks);assert.equal(hits[0].object.userData.action,'part');assert(hits[0].object.userData.partId.startsWith(c.id+':'));}
  }finally{closed.dispose();}
+});
+
+test('the final cabinet contains the photographed meter arrangement with accessible 3D picking and no fabricated reading',()=>{
+ const c=E.cabinets[2],scene=createHomeScene(normalizeHomeSettings({openParts:c.parts.map(p=>p.id),furniture:false}),{mode:'walk'});
+ try{
+  scene.group.updateMatrixWorld(true);const g=scene.buildingGroups.get(c.id),items=[];g.traverse(o=>items.push(o));
+  const meters=items.filter(o=>o.userData.part==='observed-water-meter');assert.equal(meters.length,2);
+  const top=meters.find(o=>o.userData.apartment===4),bottom=meters.find(o=>o.userData.apartment===3);
+  assert(new THREE.Box3().setFromObject(top).getCenter(new THREE.Vector3()).y>new THREE.Box3().setFromObject(bottom).getCenter(new THREE.Vector3()).y);
+  assert(!top.children.some(o=>o.userData.part==='observed-meter-dial'),'closed upper lid hides the dial');assert(bottom.children.some(o=>o.userData.part==='observed-meter-dial'));
+  assert(items.filter(o=>o.userData.part==='meter-dial-detail-illustration').every(o=>o.userData.illustrative&&!o.userData.observed));assert(!items.some(o=>'reading' in o.userData));
+  for(const mesh of items.filter(o=>o.isMesh&&o.userData.observed)){
+   const b=new THREE.Box3().setFromObject(mesh);assert(b.min.x>=c.x-c.w/2-.001&&b.max.x<=c.x+c.w/2+.001,`${mesh.userData.part} fits cabinet width`);assert(b.min.z>=c.z-.001&&b.max.z<=c.z+c.d+.001,`${mesh.userData.part} fits cabinet depth`);assert(b.min.y>=c.bottom-.001&&b.max.y<=c.bottom+c.h+.001,`${mesh.userData.part} fits cabinet height`);
+  }
+  const ray=new THREE.Raycaster(new THREE.Vector3(c.x+.02,.93,c.z-1),new THREE.Vector3(0,0,1)),hits=ray.intersectObjects(scene.picks);
+  assert(hits.length);assert.equal(hits[0].object.userData.buildingId,c.id);assert.equal(hits[0].object.userData.action,'building');assert.equal(hits[0].object.userData.apartment,4,'open doors expose the upper meter for inspection');
+  assert(g.userData.inspectionView.target[1]<1,'focus looks down at the meters and drain');
+ }finally{scene.dispose();}
 });
 
 test('walking can cross only the open existing apartment entrance and cannot cross cabinets or opened service leaves',()=>{
@@ -71,5 +96,6 @@ test('the neighbour wall and coping stop before the common entrance in every vie
 test('entrance references keep the original photos and video with exact hashes, independent of the old house walkthrough',()=>{
  const record=JSON.parse(readFileSync(new URL('../public/house/entry-services/provenance.json',import.meta.url)));assert.equal(record.metricSurvey,false);assert.equal(record.videoInteriorObserved,false);
  for(const r of record.items){const file=new URL('../public/house/entry-services/'+r.file,import.meta.url);assert(existsSync(file));assert.equal(createHash('sha256').update(readFileSync(file)).digest('hex'),r.sha256);}
- assert.equal(ENTRY_SOURCE.videoPage,10);assert(ENTRY_SOURCE.video.endsWith('298240.mp4'));assert(ENTRY_SOURCE.videoNoteEn.includes('closed'));assert.deepEqual(ENTRY_SOURCE.pages,[1,2,3,10]);
+ assert.equal(ENTRY_SOURCE.videoPage,10);assert(ENTRY_SOURCE.video.endsWith('298240.mp4'));assert(ENTRY_SOURCE.videoNoteEn.includes('closed'));assert.deepEqual(ENTRY_SOURCE.pages,[1,2,3,4,10]);
+ assert(record.items.some(r=>r.file==='298252.jpg'));assert(record.lastCabinetAssignment.includes('Upper meter tag 4'));
 });

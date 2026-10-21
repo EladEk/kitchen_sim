@@ -35,7 +35,7 @@ export function EntranceServicesPlan({layout,settings,scale,mini,onSelect}){
   {layout.cabinets.map(c=><g key={c.id} data-entry-cabinet={c.id} role={mini?'img':'button'} tabIndex={mini?-1:0} aria-label={he?c.he:c.en} onClick={e=>activate(e,c.id)} onKeyDown={e=>activate(e,c.id)}>
    <title>{he?c.he:c.en}</title><rect x={(c.x-c.w/2)*scale} y={c.z*scale} width={c.w*scale} height={c.d*scale} fill="#e9e8df" stroke="#727c70" strokeWidth="1"/>
    {c.parts.map((p,i)=>{const x=c.x+(i?1:-1)*c.w/2,w=c.w/2;return <line key={p.id} data-entry-part={p.id} x1={x*scale} y1={c.z*scale} x2={(opened.has(p.id)?x:c.x)*scale} y2={(c.z-(opened.has(p.id)?w:0))*scale} stroke={opened.has(p.id)?'#4c7759':'#aaa08a'} strokeWidth="1.5"/>;})}
-   {!mini&&!settings.cleanView&&<text x={c.x*scale} y={(c.z+.35)*scale} textAnchor="middle" fontSize="4.5" fill="#465346" pointerEvents="none">{c.id==='entry-pipes'?(he?'צנרת':'Pipes'):c.id==='entry-hot-water'?(he?'מיכל 4':'Tank 4'):(he?'לא צולם':'Unseen')}</text>}
+   {!mini&&!settings.cleanView&&<text x={c.x*scale} y={(c.z+.35)*scale} textAnchor="middle" fontSize="4.5" fill="#465346" pointerEvents="none">{c.id==='entry-pipes'?(he?'צנרת':'Pipes'):c.id==='entry-hot-water'?(he?'מיכל 4':'Tank 4'):(he?'מונים 4 / 3':'Meters 4 / 3')}</text>}
   </g>)}
   {!mini&&!settings.cleanView&&<text x={(layout.context.minX+.8)*scale} y={(layout.frontZ-.7)*scale} fontSize="6" fill="#677565" pointerEvents="none">{he?'מבואת כניסה משותפת ≈':'Common entrance ≈'}</text>}
  </g>;

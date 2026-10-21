@@ -1,5 +1,5 @@
 {
-  "reviewRevision": 40,
+  "reviewRevision": 42,
   "metricSurvey": false,
   "videoDurationSeconds": 5.644729,
   "videoInteriorObserved": false,
@@ -37,14 +37,25 @@
       "file": "298240.mp4",
       "originalUpload": "298240.mp4",
       "sha256": "f333a1c3905df4dc6d659b77b6996b096639178c75ddfd59bddd17c39044c94b"
+    },
+    {
+      "file": "298252.jpg",
+      "originalUpload": "01-298252.jpg",
+      "sha256": "126dd575c053bc6720de12a0d16f52203663cb70b1bcd2f6d3208f9276a8cddf",
+      "displaySize": [
+        1152,
+        1536
+      ]
     }
   ],
   "notVerified": [
-    "cabinet dimensions",
+    "cabinet and equipment dimensions",
     "tank model/capacity",
-    "unopened bay contents",
+    "meter readings/models",
+    "pipe diameters",
     "hidden routing",
-    "meter/filter/non-return valve presence"
+    "filter/non-return valve presence"
   ],
-  "placementBasis": "common-side kitchen return, beside existing apartment 4 entrance; approximate offset and cabinet dimensions"
+  "placementBasis": "common-side kitchen return, beside existing apartment 4 entrance; approximate offset and cabinet dimensions",
+  "lastCabinetAssignment": "Owner identifies photo 298252.jpg as the last cabinet. Upper meter tag 4, blue cover closed; lower meter tag 3, blue cover open; visible valve handles, pipework and floor drain."
 }

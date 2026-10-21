@@ -2,7 +2,7 @@
 
 React + Vite + Three.js whole-house and detailed kitchen simulator. The house follows the attached RG1 floor plan. Kitchen geometry retains the Anise order 167968 drawings and subsequent technical/appliance sheets.
 
-Current revision **41**: the garden neighbour wall stops at the kitchen return and no longer intersects the common entrance or its service cabinets. Retains the revision-40 photographed entrance equipment, flooring corrections, electrical observations, yard planning, furniture editing, history, lighting, mobile/VR navigation and access rules.
+Current revision **42**: the last entrance water cabinet now contains the photographed meters marked 4 and 3, their visible covers, valves, pipework and floor drain. The corrected garden wall endpoint, existing entrance equipment, flooring, electrical observations, yard planning, furniture editing, history, lighting, mobile/VR navigation and access rules are retained.
 
 ## Run
 
@@ -553,3 +553,11 @@ Validation: all 208 automated checks passed with two test workers. New checks co
 The east neighbour wall previously followed the entire rectangular plot bound, including the public entrance notch. Its north endpoint now stops at RG1 coordinate (1277.82, 159.1), aligned with the kitchen return. Both the rendered wall and its stone coping, and the inspector's run length, use that corrected shared layout. The original plot, apartment walls, entrance and estimated service cabinet positions remain fixed; saved fence colour/height choices retain this corrected endpoint.
 
 Validation: 19 targeted entrance, garden, yard-editing and home-model checks pass. The new spatial regression checks actual Three mesh bounds against both the original entry notch and complete cabinet alcove in overview, room and walking scenes, with cutaway on/off, closed/open cabinet leaves and a saved fence design. It also checks the walkable route in front of open cabinet doors across the former wall line. Production build/package uses the Sites helper. Browser visual QA remains unavailable because the managed preview supervisor is missing.
+
+## Revision 42 — last water cabinet photo
+
+The owner's new 298252.jpg identifies the last cabinet's interior: an upper water meter with tag 4 and closed blue cover, a lower meter with tag 3 and open blue cover, two visible valve handles per meter, left vertical pipework, exposed connecting pipes and a round floor drain. The original photo is preserved byte-for-byte with SHA-256 provenance and a new page 4 in the entrance gallery. The cabinet inspector compares directly to this photo, replaces the previous unknown-contents message and focuses the camera on the lower equipment. Both language variants and the plan identify the meters. The original cabinet ID `entry-unseen` and its two leaf IDs remain stable so existing saved opening states continue to work.
+
+The equipment is rendered as inspectable Three geometry inside the existing cabinet envelope, including hanging numbered tags, differing cover states, pipe joints and drain grille. Positions/dimensions remain illustrative; unreadable meter readings, brands, diameters, hidden routing, filters and non-return valves are not invented. Dial ticks are marked illustrative and contain no reading. Clicking equipment inspects the cabinet; it does not operate plumbing. The other two cabinet interiors, entrance/garden coordinates, shared wall fix and access rules are unchanged.
+
+Validation: 18 targeted checks passed across entrance geometry/evidence, garden and home-model navigation, plus the real React inspector/plan/gallery handlers. These cover cabinet-fit bounds, actual upper-meter picking behind the opened doors, correct meter order/cover states, four handles, drain, source image hash, saved leaf IDs and source comparison in Hebrew/English. The production build/package uses the Sites helper. Browser visual QA remains unavailable because the managed preview supervisor is missing.
