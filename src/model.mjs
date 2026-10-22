@@ -40,7 +40,7 @@ export const STONES = [
  {id:'calacatta',name:'Calacatta',he:'קלקטה',color:'#edebe4'},
  {id:'basalt',name:'Basalt',he:'בזלת',color:'#535653'}
 ];
-export const DEFAULTS={finishScheduleVersion:FINISH_SCHEDULE_VERSION,base:'chalk',upper:'chalk',stone:'taj',hardware:'black',floor:'harash',light:'day',solar:solarDefaults(),lampsOn:true,intensity:70,led:true,dimensions:false,labels:false,openParts:[],selected:null,showElectrical:false,showWater:true,showLighting:true,lightControls:{},renderQuality:'realistic',cleanView:false,showElectricalLabels:false,cabinetVisibility:'solid',view:'perspective',lang:'en'};
+export const DEFAULTS={finishScheduleVersion:FINISH_SCHEDULE_VERSION,base:'chalk',upper:'chalk',stone:'taj',hardware:'black',floor:'harash',light:'day',solar:solarDefaults(),lampsOn:true,buildingShadows:true,intensity:70,led:true,dimensions:false,labels:false,openParts:[],selected:null,showElectrical:false,showWater:true,showLighting:true,lightControls:{},renderQuality:'realistic',cleanView:false,showElectricalLabels:false,cabinetVisibility:'solid',view:'perspective',lang:'en'};
 export const PRESETS={original:{base:'chalk',upper:'chalk',stone:'calacatta',hardware:'black'},oak:{base:'oak',upper:'chalk',stone:'taj',hardware:'brass'},warm:{base:'linen',upper:'chalk',stone:'taj',hardware:'brass'}};
 export function getModule(id){ return [...LONG,...SHORT,...UPPERS,...ISLAND_UNITS].find(m=>m.id===id); }
 export function clearance(island=ISLAND){return {workAisle:island.z-ROOM.counterDepth,returnAisle:island.x-ROOM.counterDepth};}

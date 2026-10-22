@@ -1,0 +1,10 @@
+.hs-walk-joystick{display:none;position:relative;width:124px;height:124px;border-radius:50%;touch-action:none;user-select:none;-webkit-user-select:none;pointer-events:auto;background:#f9fbf2c9;border:1px solid #b6c4ac;box-shadow:0 3px 15px #24382218;outline:none;direction:ltr;cursor:grab}
+.hs-walk-joystick:active{cursor:grabbing}
+.hs-walk-joystick:focus-visible{outline:3px solid #789a70;outline-offset:3px}
+.hs-joystick-axis{position:absolute;display:block;pointer-events:none;background:#77946a30}
+.hs-joystick-horizontal{left:18px;right:18px;top:61px;height:1px}
+.hs-joystick-vertical{top:18px;bottom:18px;left:61px;width:1px}
+.hs-joystick-knob{position:absolute;left:39px;top:39px;width:44px;height:44px;border-radius:50%;background:#3f5c45;border:2px solid #f9fbf2;box-shadow:0 2px 7px #20342840;pointer-events:none;will-change:transform}
+.hs-joystick-label{position:absolute;bottom:7px;left:0;right:0;text-align:center;font:9px/1 Arial,sans-serif;letter-spacing:.05em;color:#5c7454;pointer-events:none}
+@media(max-width:900px),(any-pointer:coarse){.hs-walk-joystick{display:block}.hs-app.hs-simple .hs-walk-pad,.hs-walk-controls .hs-walk-pad{display:none}}
+@media(max-height:500px){.hs-walk-joystick{transform:scale(.87);transform-origin:bottom right}}

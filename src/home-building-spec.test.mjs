@@ -38,7 +38,7 @@ test('bathroom tile surfaces stop at door-frame height, guest WC surfaces at 120
 });
 
 test('new source previews use actual PDF page numbers and retain original PDF bytes',()=>{
- for(const [id,digest,pages] of [['apartment-spec','5c7d7ec1e85d73ee89d3d8df171c087d1bb1d4c00b418fd8eb6a290204df6b2f',[11,12,16,17,26,30,31,32,33,34]],['building-plan','17b91da71d113f1ef3f8bbb2fd9a472354c357c59ff0046422451a3857022f73',[2,3]]]){
+ for(const [id,digest,pages] of [['apartment-spec','5c7d7ec1e85d73ee89d3d8df171c087d1bb1d4c00b418fd8eb6a290204df6b2f',[11,12,16,17,26,30,31,32,33,34]],['building-plan','17b91da71d113f1ef3f8bbb2fd9a472354c357c59ff0046422451a3857022f73',[2,3,4,5,6,7,8,9,10,11]]]){
   const source=HOUSE_SOURCES.find(s=>s.id===id);assert.deepEqual(source.pages,pages);
   assert.equal(createHash('sha256').update(readFileSync(new URL(`../public${source.pdf}`,import.meta.url))).digest('hex'),digest);
   for(const page of pages)assert(existsSync(new URL(`../public${source.imagePrefix}${page}.jpg`,import.meta.url)));

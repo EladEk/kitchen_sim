@@ -14,7 +14,7 @@ export function vrSurfaceHit(root,raycaster){
  return raycaster.intersectObject(root,true).find(h=>h.object.isMesh&&objectVisible(h.object)&&!['electrical-annotation-hit','electrical-highlight'].includes(h.object.userData.part)&&(Array.isArray(h.object.material)?h.object.material:[h.object.material]).some(m=>m?.visible!==false&&m?.opacity>=.2))||null;
 }
 
-export function createVrRuntime({renderer,scene,camera,controls,getStart,move,canTeleport,onSelect,onState=()=>{},getModel=()=>null,environment=globalThis}){
+export function createVrRuntime({renderer,scene,camera,controls,getStart,move,canTeleport,onSelect,onState=()=>{},getModel=()=>null,getFloorHeight=null,environment=globalThis}){
  const xr=renderer.xr,system=environment.navigator?.xr,rig=new THREE.Group(),ray=new THREE.Raycaster(),resources=[],controllers=[],bindings=[];
  let state={status:'checking'},session=null,pending=null,disposed=false,saved=null,calibrate=true,startPose=null,lastTime=null,lastRayTime=-Infinity,turnHeld=false,exitHeld=false,floor=true;
  const headLocal=new THREE.Vector3(),headOrientation=new THREE.Quaternion(),headWorld=new THREE.Vector3(),forward=new THREE.Vector3(),right=new THREE.Vector3();
@@ -67,7 +67,7 @@ export function createVrRuntime({renderer,scene,camera,controls,getStart,move,ca
     try{space=await session.requestReferenceSpace('local-floor');floor=true;}catch{space=await session.requestReferenceSpace('local');floor=false;}
     if(disposed||session!==created){await created.end();return null;}
     startPose=getStart();saved={parent:camera.parent,position:camera.position.clone(),quaternion:camera.quaternion.clone(),scale:camera.scale.clone(),order:camera.rotation.order,target:controls.target.clone(),enabled:controls.enabled,shadows:renderer.shadowMap?.enabled,projection:Object.fromEntries(['fov','aspect','near','far','zoom','focus','filmGauge','filmOffset'].map(k=>[k,camera[k]]))};
-    controls.enabled=false;if(renderer.shadowMap)renderer.shadowMap.enabled=false;rig.position.set(startPose.position[0],floor?0:1.62,startPose.position[2]);rig.rotation.set(0,startPose.yaw||0,0);camera.position.set(0,0,0);camera.quaternion.identity();camera.scale.set(1,1,1);rig.add(camera);scene.add(rig);calibrate=true;lastTime=null;
+    controls.enabled=false;if(renderer.shadowMap)renderer.shadowMap.enabled=false;rig.position.set(startPose.position[0],(startPose.position[1]||0)+(floor?0:1.62),startPose.position[2]);rig.rotation.set(0,startPose.yaw||0,0);camera.position.set(0,0,0);camera.quaternion.identity();camera.scale.set(1,1,1);rig.add(camera);scene.add(rig);calibrate=true;lastTime=null;
     xr.setReferenceSpaceType(floor?'local-floor':'local');await xr.setSession(created);if(disposed||session!==created){await created.end();return null;}xr.setReferenceSpace(space);emit('presenting');return created;
    }catch(e){if(created){try{await created.end();}catch{}}restore();if(!disposed)emit('error',e.name==='NotAllowedError'||e.name==='SecurityError'?'permission':'runtime');return null;}
    finally{pending=null;}
@@ -85,7 +85,7 @@ export function createVrRuntime({renderer,scene,camera,controls,getStart,move,ca
   if(Math.abs(input.turn)>.65&&!turnHeld){turnHeld=true;const old=headWorld.clone();rig.rotation.y-=Math.sign(input.turn)*Math.PI/6;rig.updateMatrixWorld(true);headWorld.copy(headLocal).applyMatrix4(rig.matrixWorld);rig.position.x+=old.x-headWorld.x;rig.position.z+=old.z-headWorld.z;headWorld.copy(old);}
   forward.set(0,0,-1).applyQuaternion(headOrientation).applyAxisAngle(new THREE.Vector3(0,1,0),rig.rotation.y);forward.y=0;if(forward.lengthSq()<.001)forward.set(0,0,-1).applyAxisAngle(new THREE.Vector3(0,1,0),rig.rotation.y);forward.normalize();right.set(-forward.z,0,forward.x);
   const delta=[(forward.x*input.forward+right.x*input.side)*dt*1.25,(forward.z*input.forward+right.z*input.side)*dt*1.25],next=move?.([headWorld.x,headWorld.z],delta)||[headWorld.x+delta[0],headWorld.z+delta[1]];
-  rig.position.x+=next[0]-headWorld.x;rig.position.z+=next[1]-headWorld.z;rig.updateMatrixWorld(true);headWorld.copy(headLocal).applyMatrix4(rig.matrixWorld);
+  rig.position.x+=next[0]-headWorld.x;rig.position.z+=next[1]-headWorld.z;if(getFloorHeight)rig.position.y=getFloorHeight()+(floor?0:1.62);rig.updateMatrixWorld(true);headWorld.copy(headLocal).applyMatrix4(rig.matrixWorld);
   // Pointer feedback is sampled at 10 Hz; trigger selection always raycasts
   // immediately. Head tracking and movement remain at the headset frame rate.
   if(time-lastRayTime>100){lastRayTime=time;getModel()?.group.updateWorldMatrix(true,true);

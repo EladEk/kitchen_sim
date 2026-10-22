@@ -1,6 +1,8 @@
 import {buildEntranceServices} from './entrance-services-scene.js';
 import {buildLightingPoints} from './home-lighting-scene.js';
 import {buildDaylight} from './daylight-scene.js';
+import {buildBuildingContext} from './building-scene.js';
+import {BUILDING_CENTER,BUILDING_BOUNDS} from './building-layout.mjs';
 import * as THREE from 'three';
 import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
 import {HOUSE,HOUSE_OUTLINE,PLOT,TERRACE,SERVICE_APRON,PUBLIC_ENTRY,ROOMS,WALLS,DOORS,WINDOWS,SHUTTERS,FURNITURE,furnitureForSettings,GARDEN_PLANTS,HOME_FINISHES,FLOOR_FINISHES,KITCHEN_ANCHOR,GARDEN_LAYOUT,WATER_LAYOUT,LIGHTING_LAYOUT,point,polygonBounds,insidePolygon,roomAt,openingPoint} from './home-model.mjs';
@@ -21,11 +23,12 @@ import {buildElectricalPoints,buildWaterPoints} from './home-electrical-scene.js
 import {LONG,SHORT,UPPERS,ISLAND,ISLAND_UNITS,MATERIALS,STONES,DEFAULTS} from './model.mjs';
 
 export function createHomeScene(settings,{mode='overview',selectedRoom='living',kitchenSettings=DEFAULTS}={}){
+ if(mode==='building')settings={...settings,cutaway:settings.buildingLevel===0};
  const group=new THREE.Group(),picks=[],resources=[],motions=[],roomGroups=new Map(),furnitureGroups=new Map(),doorGroups=new Map(),shutterGroups=new Map();
  const mat=(color,opts={})=>{const m=new THREE.MeshStandardMaterial({color,roughness:.78,...opts});resources.push(m);return m;};
  const surface=createSurfacePalette(resources);
  const offwhite=surface('paint','#efebe2'),oak=surface('wood','#ae8b61'),ink=mat('#35463d'),windowInk=mat('#343d3d',{metalness:.3,roughness:.5}),steel=mat('#a7b1ac',{metalness:.55,roughness:.35}),white=mat('#f0f0e8'),dark=mat('#29352f'),glass=mat('#b0c8be',{transparent:true,opacity:.28,roughness:.16,depthWrite:false}),linen=surface('fabric','#c5c5af'),clay=mat('#b58e75'),cap=mat('#c7c9bc');
- const wallHeight=mode==='walk'||!settings.cutaway?HOUSE.height:.86;
+ const wallHeight=mode==='building'?(settings.buildingLevel===0?.86:HOUSE.height):mode==='walk'||!settings.cutaway?HOUSE.height:.86;
  function box(x,y,z,w,h,d,material,parent=group,data=null,round=0){
   const g=round?new RoundedBoxGeometry(w,h,d,material.userData?.surfaceKind==='fabric'?5:2,Math.min(round,w/5,h/5,d/5)):new THREE.BoxGeometry(w,h,d);metricSurfaceUVs(g,[x,y,z]);resources.push(g);const m=new THREE.Mesh(g,material);m.position.set(x,y,z);m.castShadow=m.receiveShadow=true;if(data)m.userData={...data};parent.add(m);if(data?.action||data?.blockPick)picks.push(m);return m;
  }
@@ -67,7 +70,8 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
   const vertexCuts=ROOMS.filter(r=>!['garden','outdoor'].includes(r.kind)).flatMap(r=>r.polygon).filter(p=>Math.abs(p[vertical?0:1]-w.a[vertical?0:1])<.45).map(p=>p[vertical?1:0]);
   const segment=(a,b,bottom,height)=>{if(b-a<.002||height<.002)return;const cuts=[...new Set([a,b,...vertexCuts.filter(n=>n>a+.002&&n<b-.002)])].sort((a,b)=>a-b);
    for(let i=0;i<cuts.length-1;i++){const aa=cuts[i],bb=cuts[i+1],mid=vertical?[w.a[0],(aa+bb)/2]:[(aa+bb)/2,w.a[1]],regions=[roomAt([mid[0]+(vertical?.21:0),mid[1]+(vertical?0:.21)]),roomAt([mid[0]-(vertical?.21:0),mid[1]-(vertical?0:.21)])],m1=surface('paint',roomMaterial(regions[0]),{roughness:.9,bumpScale:.00012}),m2=surface('paint',roomMaterial(regions[1]),{roughness:.9,bumpScale:.00012}),mats=[m1,m2,cap,cap,m1,m2];
-    const mesh=vertical?box(w.a[0],bottom+height/2,(aa+bb)/2,w.thickness,height,bb-aa,mats,group,{blockPick:true,wallId:w.id}):box((aa+bb)/2,bottom+height/2,w.a[1],bb-aa,height,w.thickness,mats,group,{blockPick:true,wallId:w.id});mesh.userData.part='architectural-wall';
+    const facade=mode==='building'&&w.external?surface('limestone','#d9d2c5'):null;
+    const mesh=vertical?box(w.a[0],bottom+height/2,(aa+bb)/2,w.thickness,height,bb-aa,facade||mats,group,{blockPick:true,wallId:w.id}):box((aa+bb)/2,bottom+height/2,w.a[1],bb-aa,height,w.thickness,facade||mats,group,{blockPick:true,wallId:w.id});mesh.userData.part='architectural-wall';
     for(let side=0;side<2;side++){const sign=side?-1:1,rr=settings.rooms[regions[side]],normal=w.a[vertical?0:1]+sign*(w.thickness/2+.004);
      if(rr?.wall==='ordered-mona'&&roomHasOrderedCladding(regions[side])){
       const top=Math.min(bottom+height,claddingHeight(regions[side]));
@@ -246,7 +250,12 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
  for(let i=0;i<4;i++){const x=(ISLAND.x+340+i*585)/1000,z=(ISLAND.z+1160)/1000;cylinder(x,.65,z,.17,.05,oak,kg);cylinder(x,.32,z,.025,.62,ink,kg);cylinder(x,.025,z,.17,.04,ink,kg);}
  for(const [id,p] of buildElectricalPoints({group,box,cylinder,mat,resources,settings}))gardenGroups.set(id,p);
  for(const [id,p] of buildWaterPoints({group,box,cylinder,mat,resources,settings,points:WATER_LAYOUT.points}))gardenGroups.set(id,p);
- const updateDaylight=buildDaylight({group,settings,resources});
+ if(mode==='building'&&settings.buildingLevel>0)for(const w of WALLS.filter(w=>w.external)){
+  const v=Math.abs(w.a[0]-w.b[0])<.001,h=3.1-HOUSE.height;
+  box((w.a[0]+w.b[0])/2,HOUSE.height+h/2,(w.a[1]+w.b[1])/2,v?w.thickness:Math.abs(w.b[0]-w.a[0]),h,v?Math.abs(w.b[1]-w.a[1]):w.thickness,surface('limestone','#d9d2c5'),group,{part:'building-apartment-top-band'});
+ }
+ const buildingContext=buildBuildingContext({group,resources,settings,mode,picks,apartmentOutline:HOUSE_OUTLINE});
+ const updateDaylight=buildDaylight({group,settings,resources,center:BUILDING_CENTER,radius:Math.max(BUILDING_BOUNDS.maxX-BUILDING_BOUNDS.minX,BUILDING_BOUNDS.maxZ-BUILDING_BOUNDS.minZ)*.8,distance:100});
  for(const [id,p] of buildLightingPoints({group,box,cylinder,mat,resources,settings,points:LIGHTING_LAYOUT.points,picks,selectedRoom}))gardenGroups.set(id,p);
- return {group,picks,motions,roomGroups,furnitureGroups,doorGroups,shutterGroups,buildingGroups,gardenGroups,wallHeight,updateDaylight,dispose(){group.traverse(o=>{if(o.isLight&&o.shadow)o.shadow.dispose();});resources.forEach(r=>r.dispose?.());}};
+ return {group,picks,motions,roomGroups,furnitureGroups,doorGroups,shutterGroups,buildingGroups,gardenGroups,buildingContext,wallHeight,updateDaylight,dispose(){group.traverse(o=>{if(o.isLight&&o.shadow)o.shadow.dispose();});resources.forEach(r=>r.dispose?.());}};
 }

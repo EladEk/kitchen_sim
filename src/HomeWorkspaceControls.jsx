@@ -1,3 +1,5 @@
+import {BUILDING_FLOORS} from './building-layout.mjs';
+import {BuildingDestinationOptions} from './BuildingTour.jsx';
 import {FurnitureAssistance} from './FurnitureAssistance.jsx';
 import {Layers,Move,SlidersHorizontal,Check,X} from 'lucide-react';
 import {ROOMS,FURNITURE,ELECTRICAL_LAYOUT,getFurniture,editableFurniture} from './home-model.mjs';
@@ -10,13 +12,14 @@ export function furnitureEditorSelection(roomId,itemId){
  const requested=getFurniture(itemId),first=editableFurniture(requested)?requested:FURNITURE.find(f=>f.roomId===roomId&&editableFurniture(f))||FURNITURE.find(editableFurniture);
  return {roomId:first.roomId,itemId:first.id};
 }
-export function HomeViewChooser({mode,roomId,lang,editing,onMode,onRoom}){
+export function HomeViewChooser({mode,roomId,lang,editing,onMode,onRoom,buildingLevel=9,onBuildingLevel,tourDestination='unit:4:0',onDestination}){
  const he=lang==='he',rooms=editing?ROOMS.filter(r=>FURNITURE.some(f=>f.roomId===r.id&&editableFurniture(f))):ROOMS;
- return <div className="hs-simple-topbar"><select aria-label={he?'בחירת חדר':'Choose room'} value={roomId} onChange={e=>onRoom(e.target.value)}>{rooms.map(r=><option key={r.id} value={r.id}>{he?r.he:r.en}</option>)}</select>{editing?<span>{he?'מבט על · גרירת ריהוט':'Floor plan · drag furniture'}</span>:<select aria-label={he?'בחירת תצוגה':'Choose view'} value={mode} onChange={e=>onMode(e.target.value)}>{[['overview','כל הבית','Whole home'],['room','מבט חדר','Room view'],['walk','סיור רגלי','Walk through'],['plan','תוכנית','Floor plan']].map(([id,iw,en])=><option key={id} value={id}>{he?iw:en}</option>)}</select>}</div>;
+ const destination=mode==='building'&&buildingLevel===9?'building':['building','unit','walk'].includes(mode)?tourDestination:`room:${roomId}`;
+ return <div className="hs-simple-topbar">{editing?<select aria-label={he?'בחירת חדר':'Choose room'} value={roomId} onChange={e=>onRoom(e.target.value)}>{rooms.map(r=><option key={r.id} value={r.id}>{he?r.he:r.en}</option>)}</select>:<select aria-label={he?'בחירת דירה, קומה או חדר':'Choose apartment, floor or room'} value={destination} onChange={e=>e.target.value.startsWith('room:')?onRoom(e.target.value.slice(5)):onDestination?.(e.target.value)}><BuildingDestinationOptions lang={lang}/><optgroup label={he?'החדרים בדירה שלי · 4':'My apartment 4 · rooms'}>{rooms.map(r=><option key={r.id} value={`room:${r.id}`}>{he?r.he:r.en}</option>)}</optgroup></select>}{editing?<span>{he?'מבט על · גרירת ריהוט':'Floor plan · drag furniture'}</span>:<select aria-label={he?'בחירת תצוגה':'Choose view'} value={mode} onChange={e=>onMode(e.target.value)}>{[...(mode==='unit'?[['unit','מבט הדירה שנבחרה','Selected apartment']]:[]),['building','כל הבניין','Whole building'],['overview','הדירה שלי','My apartment'],['room','מבט חדר','Room view'],['walk','סיור רגלי','Walk through'],['plan','תוכנית הדירה שלי','My floor plan']].map(([id,iw,en])=><option key={id} value={id}>{he?iw:en}</option>)}</select>}</div>;
 }
-export function HomePrimaryActions({panel,lang,onRooms,onEdit,onOptions,onDone,yardContext=false}){
+export function HomePrimaryActions({panel,lang,onRooms,onEdit,onOptions,onDone,yardContext=false,editLabel}){
  const he=lang==='he';
- return <nav className="hs-simple-actions" aria-label={he?'פעולות ראשיות':'Main actions'}>{['furniture','yard'].includes(panel)?<><span>{he?'השינויים נשמרים אוטומטית':'Changes save automatically'}</span><button className="hs-simple-done" onClick={onDone}><Check size={19}/>{he?'סיום עריכה':'Done editing'}</button></>:<>{[[Layers,he?'חדרים':'Rooms',onRooms,panel==='rooms'],[Move,he?(yardContext?'תכנון חצר':'ריהוט ומידות'):(yardContext?'Plan yard':'Furniture & sizes'),onEdit,false],[SlidersHorizontal,he?'אפשרויות':'Options',onOptions,panel==='options']].map(([Icon,label,action,active])=><button key={label} aria-expanded={active} onClick={action}><Icon size={18}/><span>{label}</span></button>)}</>}</nav>;
+ return <nav className="hs-simple-actions" aria-label={he?'פעולות ראשיות':'Main actions'}>{['furniture','yard'].includes(panel)?<><span>{he?'השינויים נשמרים אוטומטית':'Changes save automatically'}</span><button className="hs-simple-done" onClick={onDone}><Check size={19}/>{he?'סיום עריכה':'Done editing'}</button></>:<>{[[Layers,he?'דירות וחדרים':'Apartments & rooms',onRooms,panel==='rooms'],[Move,editLabel||(he?(yardContext?'תכנון חצר':'ריהוט ומידות'):(yardContext?'Plan yard':'Furniture & sizes')),onEdit,false],[SlidersHorizontal,he?'אפשרויות':'Options',onOptions,panel==='options']].map(([Icon,label,action,active])=><button key={label} aria-expanded={active} onClick={action}><Icon size={18}/><span>{label}</span></button>)}</>}</nav>;
 }
 export function HomePanelHeading({title,onClose,lang}){
  return <div className="hs-simple-panel-heading"><strong>{title}</strong><button aria-label={lang==='he'?'סגירת הלוח':'Close panel'} onClick={onClose}><X size={19}/></button></div>;

@@ -13,7 +13,7 @@ export const HOUSE_SOURCES=[
  {id:'harash',he:'פירוט המוצרים — חרש',en:'Harash product schedule',pdf:'/house/harash-products.pdf',image:'/house/harash-products-1.jpg',pages:[1,2,3,4,5],imagePrefix:'/house/harash-products-'},
  {id:'hercules',he:'מטבח חוץ הרקולס',en:'Hercules outdoor kitchen',pdf:'/house/hercules.pdf',image:'/house/hercules.jpg'},
  {id:'apartment-spec',he:'מפרט הדירה — RG/RG1',en:'Apartment specification — RG/RG1',pdf:'/house/apartment-spec.pdf',image:'/house/apartment-spec-16.jpg',pages:[11,12,16,17,26,30,31,32,33,34],imagePrefix:'/house/apartment-spec-'},
- {id:'building-plan',he:'תוכנית הבניין — קומת גן',en:'Building plan — ground floor',pdf:'/house/building-plan.pdf',image:'/house/building-plan-3.jpg',pages:[2,3],imagePrefix:'/house/building-plan-'},
+ {id:'building-plan',he:'תוכניות הבניין — כל הקומות',en:'Building plans — all floors',pdf:'/house/building-plan.pdf',image:'/house/building-plan-3.jpg',pages:[2,3,4,5,6,7,8,9,10,11],imagePrefix:'/house/building-plan-'},
  ENTRY_SOURCE,HARASH_CATALOG_SOURCE,PHOTO_SOURCE,GARDEN_SOURCE,SERVICE_SOURCE,EXTERIOR_SOURCE,ELECTRICAL_SOURCE,OWNER_PRODUCTS_SOURCE
 ];
 export const OUTDOOR_KITCHEN={width:3.1,depth:.7,sinkWidth:.8,grillWidth:1.5,fridgeWidth:.8,height:.9,heightInferred:true,source:'hercules',page:1};

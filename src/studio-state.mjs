@@ -5,7 +5,7 @@ export function readStudioSave(storage,key){try{return record(JSON.parse(storage
 // Active state is supplied by its React app; the unmounted simulator is read
 // from storage. Neither view resets finishes, camera settings or source metadata.
 export function closeAllStudioOpenings(storage,{home,kitchen}={}){
- const nextHome={...record(home??readStudioSave(storage,HOME_STORAGE)),openDoors:[],openParts:[],closedShutters:[...SHUTTER_IDS]};
+ const nextHome={...record(home??readStudioSave(storage,HOME_STORAGE)),openDoors:[],openParts:[],closedBuildingDoors:BUILDING_INTERIORS.floors.flatMap(f=>f.doors.map(d=>d.id)),closedShutters:[...SHUTTER_IDS]};
  const savedKitchen=record(kitchen??readStudioSave(storage,KITCHEN_STORAGE));
  const nextKitchen={...savedKitchen,settings:{...record(savedKitchen.settings),openParts:[]}};
  let persisted=true;
@@ -13,3 +13,5 @@ export function closeAllStudioOpenings(storage,{home,kitchen}={}){
  return {home:nextHome,kitchen:nextKitchen,persisted};
 }
 import {SHUTTER_IDS} from './home-building-spec.mjs';
+
+import {BUILDING_INTERIORS} from './building-interiors.mjs';

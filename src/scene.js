@@ -1,5 +1,7 @@
 import {buildLightingPoints} from './home-lighting-scene.js';
 import {buildDaylight} from './daylight-scene.js';
+import {buildBuildingContext} from './building-scene.js';
+import {KITCHEN_ANCHOR} from './home-model.mjs';
 import {lightColour} from './lighting-controls.mjs';
 import {KITCHEN_LIGHTING_POINTS} from './kitchen-lighting.mjs';
 import * as THREE from 'three';
@@ -279,7 +281,8 @@ export function createKitchen(settings){
  cylinder(1120,942,260,95,60,mat('#c8c3ae'));for(let i=0;i<4;i++){const geo=new THREE.SphereGeometry(.035,12,8);resources.push(geo);const fruit=new THREE.Mesh(geo,mat(i%2?'#c4aa50':'#74815f'));fruit.position.set(1.08+i*.027,.99,.245+(i%2)*.03);group.add(fruit);}
  const furnishingRoots=group.children.filter(child=>!roomStructure.has(child));
  // Lighting changes are local to this scene group.
- const updateDaylight=buildDaylight({group,settings,resources,kitchen:true,center:[2.725,0,1.65],radius:5});
+ if(!settings.inspection)buildBuildingContext({group,resources,settings,mode:'kitchen',kitchenAnchor:KITCHEN_ANCHOR});
+ const updateDaylight=buildDaylight({group,settings,resources,kitchen:true,center:[2.725,0,1.65],radius:45,distance:100});
  if(settings.led&&settings.lampsOn!==false){
   const ledmat=mat(lightColour(4000),{emissive:lightColour(4000),emissiveIntensity:2});for(const [a,b] of [[1095,3470],[4370,4845]])furnishingRoots.push(box((a+b)/2,1494,300,b-a,4,12,ledmat));
   for(const x of [1.65,2.65,3.65,4.55]){const l=new THREE.PointLight(lightColour(4000),settings.intensity/100*2,2.5,2);l.userData.fixtureLight=true;l.position.set(x,1.42,.37);group.add(l);furnishingRoots.push(l);}

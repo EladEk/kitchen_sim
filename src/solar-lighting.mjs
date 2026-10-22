@@ -36,4 +36,4 @@ export function daylightState(settings){
  const sun=solarPosition(settings.solar),amount=lampsOnly(settings)?0:clamp(Math.sin(sun.elevation*rad),0,1);
  return {sun,amount,intensity:amount>0?3*Math.sqrt(amount):0,sky:amount*.65,environment:amount*.22,background:lampsOnly(settings)||sun.elevation<-6?'#030508':sun.elevation<=0?'#343a48':'#e3e9e9'};
 }
-export const SHARED_LIGHT_SETTINGS=['solar','light','lampsOn','lightControls'];
+export const SHARED_LIGHT_SETTINGS=['solar','light','lampsOn','lightControls','buildingShadows'];
