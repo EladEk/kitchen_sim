@@ -1,4 +1,5 @@
 import {normalizeBuildingLevel,normalizeTourDestination} from './building-layout.mjs';
+import {connectedWallRuns} from './building-geometry.mjs';
 import {createEntranceServices,entranceCollisionBoxes} from './entrance-services.mjs';
 import {normalizeLightControls} from './lighting-controls.mjs';
 import {normalizeSolar,solarDefaults} from './solar-lighting.mjs';
@@ -22,7 +23,7 @@ export const PLAN_ORIGIN=[606,45.7];
 export const point=(x,z)=>[(x-PLAN_ORIGIN[0])*PLAN_SCALE,(z-PLAN_ORIGIN[1])*PLAN_SCALE];
 const polygon=a=>a.map(p=>point(...p));
 const rect=(x0,z0,x1,z1)=>[[x0,z0],[x1,z0],[x1,z1],[x0,z1]];
-export const HOUSE={height:2.75,eyeHeight:1.62,playerRadius:.17,source:'/house/house-plan.pdf',image:'/house/house-plan.jpg',revision:49,scale:50};
+export const HOUSE={height:2.75,eyeHeight:1.62,playerRadius:.17,source:'/house/house-plan.pdf',image:'/house/house-plan.jpg',revision:50,scale:50};
 export const GARDEN_LAYOUT=createGardenLayout(point);
 export const EXTERIOR_LAYOUT=createExteriorLayout(point);
 export const SERVICE_YARD=createServiceYard(point);
@@ -104,6 +105,10 @@ export const WINDOWS=[
  opening('kitchen-window','kitchen-south',1204.14,1255.14,['kitchen'],'חלון המטבח','window',1.1,1),
  opening('utility-window','utility-east',400,431.2,['laundry'],'חלון השירות','window',1.2,.9)
 ];
+// Keep documented axes and all opening coordinates immutable. Construction
+// caps continue through the adjoining wall's thickness at solid corners.
+const profileOpening=o=>{const w=WALLS.find(w=>w.id===o.wallId);return {...o,hinge:o.vertical?[w.a[0],o.start]:[o.start,w.a[1]],closed:o.vertical?[w.a[0],o.end]:[o.end,w.a[1]]};};
+export const CONSTRUCTION_WALLS=connectedWallRuns({walls:WALLS.map(w=>({...w,width:w.thickness})),doors:DOORS.filter(d=>!d.hostDoorId).map(profileOpening),entries:[],lifts:[]},{envelope:[{openings:WINDOWS.map(o=>{const p=profileOpening(o);return {a:p.hinge,b:p.closed,kind:'window'};})}]}).map(w=>({...w,thickness:w.width}));
 export const ELECTRICAL_LAYOUT=createElectricalLayout(point,WALLS,{kitchenAnchor:KITCHEN_ANCHOR});
 export const LIGHTING_LAYOUT=createLightingLayout(point,WALLS);
 export const lightingPoint=id=>LIGHTING_LAYOUT.points.find(p=>p.id===id);
@@ -232,7 +237,7 @@ const boxForWall=(wall,a,b)=>{const v=Math.abs(wall.a[0]-wall.b[0])<.001;return 
 export function collisionBoxes(openDoors=[],withFurniture=true,closedShutters=[],openParts=[],furnitureLayout={},yardDesign={}){
  const {garden,service}=yardForSettings({yardDesign}),opened=new Set(openDoors),result=entranceCollisionBoxes(ENTRANCE_SERVICES,openParts);
  for(const p of garden.posts)result.push({minX:p.x-p.size/2,maxX:p.x+p.size/2,minZ:p.z-p.size/2,maxZ:p.z+p.size/2,pergolaPostId:p.id});
- for(const w of WALLS){const vertical=Math.abs(w.a[0]-w.b[0])<.001,low=vertical?w.a[1]:w.a[0],high=vertical?w.b[1]:w.b[0];let start=low;
+ for(const w of CONSTRUCTION_WALLS){const vertical=Math.abs(w.a[0]-w.b[0])<.001,low=vertical?w.a[1]:w.a[0],high=vertical?w.b[1]:w.b[0];let start=low;
   for(const d of DOORS.filter(d=>d.wallId===w.id&&!d.hostDoorId).sort((a,b)=>a.start-b.start)){
    if(d.start>start)result.push(boxForWall(w,start,d.start));
    const blocked=DOORS.filter(leaf=>leaf.id===d.id||leaf.hostDoorId===d.id).filter(leaf=>!opened.has(leaf.id));

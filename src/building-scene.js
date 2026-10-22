@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import {BUILDING,BUILDING_FLOORS,BUILDING_ROOF,BUILDING_SITE,BUILDING_CENTER,normalizeBuildingLevel} from './building-layout.mjs';
 import {BUILDING_INTERIORS} from './building-interiors.mjs';
 import {onDetailedGround,segmentDistance,parseDestination,isDoorOpening,gardenFenceEdge} from './building-navigation.mjs';
-import {connectedWallRuns,exposedBalconySegments,commonStairRails,duplexFlightRails,duplexLandingGuards} from './building-geometry.mjs';
+import {connectedWallRuns,doorWallOpening,exposedBalconySegments,commonStairRails,duplexFlightRails,duplexLandingGuards} from './building-geometry.mjs';
 import {COMMON_ENTRY_DOORS} from './building-site.mjs';
 import {balconyFrameStacks} from './building-appearance.mjs';
 import {buildElevators} from './building-elevators.js';
@@ -63,6 +63,7 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
   if(poly.length<3)return;const s=new THREE.Shape();poly.forEach(([x,z],i)=>i?s.lineTo(x,z):s.moveTo(x,z));s.closePath();for(const poly of holes){const hole=new THREE.Path();poly.forEach(([x,z],i)=>i?hole.lineTo(x,z):hole.moveTo(x,z));hole.closePath();s.holes.push(hole);}const geo=new THREE.ExtrudeGeometry(s,{depth:thickness,bevelEnabled:false});geo.rotateX(Math.PI/2);resources.push(geo);const mesh=new THREE.Mesh(geo,mat);mesh.position.y=y;mesh.castShadow=mesh.receiveShadow=true;mesh.userData={part,buildingFloor:level,source:'building-plan'};parent.add(mesh);return mesh;
  }
  function segment(a,b,y,h,thickness,into){const dx=b[0]-a[0],dz=b[1]-a[1],length=Math.hypot(dx,dz);if(length<.008||h<.008)return;into.push([(a[0]+b[0])/2,y+h/2,(a[1]+b[1])/2,length,h,thickness,-Math.atan2(dz,dx)]);}
+ function closedWallLoop(poly,y,h,thickness,into){for(let i=0;i<poly.length;i++){const a=poly[i],b=poly[(i+1)%poly.length],len=Math.hypot(b[0]-a[0],b[1]-a[1]),u=b.map((n,k)=>(n-a[k])/len),overlap=thickness/2+.002;segment(a.map((n,k)=>n-u[k]*overlap),b.map((n,k)=>n+u[k]*overlap),y,h,thickness,into);}}
  function stairHandrails(paths,base,parent,level,part){
   const g=new THREE.CylinderGeometry(.018,.018,1,10),items=[];resources.push(g);
   for(const path of paths){const a=new THREE.Vector3(path.a[0],base+path.a[1]+.98,path.a[2]),b=new THREE.Vector3(path.b[0],base+path.b[1]+.98,path.b[2]);items.push([a,b]);const length=a.distanceTo(b),count=Math.max(1,Math.ceil(length/.65));for(let i=0;i<=count;i++){const top=a.clone().lerp(b,i/count);items.push([new THREE.Vector3(top.x,top.y-.98,top.z),top]);}items.push([a.clone().add(new THREE.Vector3(0,-.48,0)),b.clone().add(new THREE.Vector3(0,-.48,0))]);}
@@ -95,7 +96,7 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
    });
   }
   for(const w of connectedWallRuns(source,def,def.level===0?COMMON_ENTRY_DOORS:[])){
-   const mid=w.a.map((n,i)=>(n+w.b[i])/2);if(def.level===0&&(onDetailedGround(mid)||shown&&onGroundReplica(mid)))continue;
+   const ownership=w.sourceWallIndex==null?w:source.walls[w.sourceWallIndex],mid=ownership.a.map((n,i)=>(n+ownership.b[i])/2);if(def.level===0&&(onDetailedGround(mid)||shown&&onGroundReplica(mid)))continue;
    const exterior=def.envelope.some(path=>path.polygon.some((a,i)=>segmentDistance(mid,a,path.polygon[(i+1)%path.polygon.length])<.25));
    segment(w.a,w.b,base,h,w.width,exterior?walls:interiorWalls);
    if(shown&&!exterior){const dx=w.b[0]-w.a[0],dz=w.b[1]-w.a[1],len=Math.hypot(dx,dz),nx=-dz/len,nz=dx/len;for(const sign of [-1,1])segment([w.a[0]+nx*sign*(w.width/2+.007),w.a[1]+nz*sign*(w.width/2+.007)],[w.b[0]+nx*sign*(w.width/2+.007),w.b[1]+nz*sign*(w.width/2+.007)],base+.01,.075,.014,trims);}
@@ -105,11 +106,11 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
    for(const unit of def.units){if(def.level===0)continue;slab(unit.polygon,base+.005,.025,interiorFloor,node,'building-unit-finish',def.level,holes.filter(h=>pointInPolygon(h[0],unit.polygon)));}
    for(const door of source.doors){
     if(def.level===0&&onDetailedGround(door.hinge))continue;
-    const open=!settings.closedBuildingDoors?.includes(door.id),end=open?door.opened:door.closed,items=[],dh=cut?.82:2.18;
+    const open=!settings.closedBuildingDoors?.includes(door.id),end=open?door.opened:door.closed,items=[],dh=cut?.82:2.18,construction=doorWallOpening(source,door);
     segment(door.hinge,end,base,dh,.045,items);
     const dx=door.closed[0]-door.hinge[0],dz=door.closed[1]-door.hinge[1],width=Math.hypot(dx,dz),angle=-Math.atan2(dz,dx);for(const at of [door.hinge,door.closed])trims.push([at[0],base+dh/2,at[1],.052,dh,.14,angle]);if(!cut){segment(door.hinge,door.closed,base+2.18,.055,.14,trims);const lx=end[0]-door.hinge[0],lz=end[1]-door.hinge[1],ll=Math.hypot(lx,lz),normal=[-lz/ll,lx/ll],handle=door.hinge.map((n,i)=>n+(end[i]-n)*Math.max(.1,(ll-.12)/ll));for(const sign of [-1,1]){handles.push([handle[0]+normal[0]*sign*.034,base+1.02,handle[1]+normal[1]*sign*.034,.035,.085,.018,-Math.atan2(lz,lx)]);segment([handle[0]+normal[0]*sign*.055,handle[1]+normal[1]*sign*.055],[handle[0]-lx/ll*.10+normal[0]*sign*.055,handle[1]-lz/ll*.10+normal[1]*sign*.055],base+1.03,.018,.019,handles);}}
     const mesh=batch(node,doorMat,items,'building-apartment-door',null);mesh.userData={part:'building-apartment-door',source:'building-plan',action:'building-door',doorId:door.id,unit:door.unit,buildingFloor:def.level};picks.push(mesh);
-    if(h>2.2&&!(def.level===0&&onGroundReplica(door.hinge)))segment(door.hinge,door.closed,base+2.2,h-2.2,.13,interiorWalls);
+    if(h>2.2&&!(def.level===0&&onGroundReplica(door.hinge)))segment(construction.a,construction.b,base+2.18,h-2.18,construction.width,interiorWalls);
    }
   }
   // The low rail courses in the photographs have glass infill, dark top rails
@@ -168,8 +169,8 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
   const node=new THREE.Group();node.name='building-roof';node.userData={part:'building-roof',level:9,page:11};root.add(node);floors.set(9,node);
   slab(BUILDING_ROOF.polygon,BUILDING_ROOF.elevation-.015,BUILDING.slab,roofMat,node,'building-main-roof',9);
   const parapets=[],heads=[];
-  BUILDING_ROOF.polygon.forEach((a,i)=>segment(a,BUILDING_ROOF.polygon[(i+1)%BUILDING_ROOF.polygon.length],BUILDING_ROOF.elevation,.38,.16,parapets));
-  for(const poly of BUILDING_ROOF.heads){poly.forEach((a,i)=>segment(a,poly[(i+1)%poly.length],BUILDING_ROOF.elevation,BUILDING.roofHead,.2,heads));slab(poly,BUILDING_ROOF.elevation+BUILDING.roofHead,.18,roofMat,node,'building-roof-head-cap',9);}
+  closedWallLoop(BUILDING_ROOF.polygon,BUILDING_ROOF.elevation,.38,.16,parapets);
+  for(const poly of BUILDING_ROOF.heads){closedWallLoop(poly,BUILDING_ROOF.elevation,BUILDING.roofHead,.2,heads);slab(poly,BUILDING_ROOF.elevation+BUILDING.roofHead,.18,roofMat,node,'building-roof-head-cap',9);}
   batch(node,limestone,parapets,'building-roof-parapet',9);batch(node,limestone,heads,'building-lift-stair-head',9);
  }
  // The dark continuous balcony surround is visible in the developer's

@@ -29,8 +29,43 @@ def distance(p,a,b):
     return math.hypot(p[0]-a[0]-dx*t,p[1]-a[1]-dz*t)
 def contained(p,polys,tolerance=.24):
     return any(inside(p,poly) or min(distance(p,a,poly[(i+1)%len(poly)]) for i,a in enumerate(poly))<tolerance for poly in polys)
+def annotation_frames(page):
+    """Ignore outlined callout digits, which use the same pen as wall faces.
+
+    Closed triangle/hexagon frames have oblique sides; architectural wall
+    rectangles and free-standing structural columns are deliberately retained.
+    """
+    result=[]
+    for d in DOC[page-1].get_drawings():
+        items=d['items'];polygons=[]
+        if len(items) in (3,6) and all(i[0]=='l' for i in items):
+            edges=[(world(page,i[1]),world(page,i[2])) for i in items]
+            if all(math.dist(edges[i][1],edges[(i+1)%len(edges)][0])<.005 for i in range(len(edges))):polygons.append([a for a,b in edges])
+        for item in items:
+            if item[0]=='qu':
+                q=item[1];poly=[]
+                for p in [q.ul,q.ur,q.lr,q.ll]:
+                    p=world(page,p)
+                    if not any(math.dist(p,a)<.005 for a in poly):poly.append(p)
+                polygons.append(poly)
+        for poly in polygons:
+            # PyMuPDF sometimes represents a triangle as a quad with one
+            # additional point on its straight base.
+            changed=True
+            while changed and len(poly)>3:
+                changed=False
+                for i,p in enumerate(poly):
+                    a,b=poly[i-1],poly[(i+1)%len(poly)]
+                    if distance(p,a,b)<.005:
+                        poly.pop(i);changed=True;break
+            if len(poly) not in (3,6):continue
+            xs=[p[0] for p in poly];zs=[p[1] for p in poly];edges=list(zip(poly,poly[1:]+poly[:1]))
+            if not (.3<max(xs)-min(xs)<1.6 and .3<max(zs)-min(zs)<1.6):continue
+            if sum(abs(a[0]-b[0])>.02 and abs(a[1]-b[1])>.02 for a,b in edges)<2:continue
+            result.append(poly)
+    return result
 def walls(page,polys):
-    lines={}
+    lines={};annotations=annotation_frames(page)
     for d in DOC[page-1].get_drawings():
         if d.get('color')!=(0.,0.,0.) or abs((d.get('width') or 0)-1.26)>.02:continue
         edges=[]
@@ -41,6 +76,8 @@ def walls(page,polys):
                 edges.extend(zip(vertices,vertices[1:]+vertices[:1]))
         for aa,bb in edges:
             a,b=world(page,aa),world(page,bb)
+            midpoint=[(x+y)/2 for x,y in zip(a,b)]
+            if any(inside(midpoint,p) or min(distance(midpoint,c,p[(i+1)%len(p)]) for i,c in enumerate(p))<.008 for p in annotations):continue
             vertical=abs(a[0]-b[0])<.012;horizontal=abs(a[1]-b[1])<.012
             if not vertical and not horizontal:continue
             v=0 if vertical else 1;c=(a[v]+b[v])/2;lo,hi=sorted([a[1-v],b[1-v]])
@@ -79,7 +116,7 @@ def walls(page,polys):
             if b-a<.06:continue
             aa=[c,a] if v==0 else [a,c];bb=[c,b] if v==0 else [b,c]
             result.append({'a':aa,'b':bb,'width':w,'basis':'paired-pdf-wall-faces'})
-    return sorted(result,key=lambda q:(q['a'],q['b']))
+    return sorted(result,key=lambda q:(q['a'],q['b'])),[[v,round(c,5),round(a,5),round(b,5)] for v,c,a,b in lines],annotations
 
 controls=json.loads((ROOT/'scripts/building-source-controls.json').read_text())
 source_doors=json.loads((ROOT/'scripts/building-source-doors.json').read_text())
@@ -88,7 +125,7 @@ def rounded(p):return [round(v,5) for v in p]
 floors=[]
 for f in trace['floors']:
     polys=[p['polygon'] for p in f['envelope']]
-    ws=walls(f['page'],polys)
+    ws,faces,annotations=walls(f['page'],polys)
     page=f['page'];level=f['level'];doors=[];seen=set()
     for door in source_doors[str(page)]['doors']:
         leaf=door.get('leaf')
@@ -123,7 +160,7 @@ for f in trace['floors']:
     stairs={'rect':stairrect,'westSouth':True,'turnLanding':'south','source':'pdf-stair-enclosure-and-direction-arrows'}
     duplex=next((d for d in controls.get('duplex32InternalStair',{}).get('levelsData',[]) if d['level']==level),None)
     duplexWorld={k:[rounded(px_world(page,p)) for p in duplex[k+'Px']] for k in ['longFlightRect','shortFlightRect','cornerLandingRect']} if duplex else None
-    floors.append({'level':level,'page':page,'walls':ws,'doors':doors,'entries':entries,'lifts':lifts,'stairs':stairs,'duplexStair':duplexWorld})
+    floors.append({'level':level,'page':page,'walls':ws,'wallFaces':faces,'annotationFrames':annotations,'doors':doors,'entries':entries,'lifts':lifts,'stairs':stairs,'duplexStair':duplexWorld})
 result={'sourceSha256':REG['buildingPdfSha256'],'floors':floors}
 (ROOT/'src/building-interiors.mjs').write_text('// Generated from black architectural faces in building-plan.pdf.\nexport const BUILDING_INTERIORS='+json.dumps(result,separators=(',',':'))+';\n')
 print(json.dumps({'wallsPerFloor':[len(f['walls']) for f in floors]}))
