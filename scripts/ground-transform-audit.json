@@ -1,0 +1,141 @@
+{
+  "source": "unit4 ground centreline footprint to each independently traced building-plan.pdf page3 footprint; native house wall centres align to unit4 without offset; do not fit HOUSE_OUTLINE because it mixes outer wall faces",
+  "transforms": [
+    {
+      "unit": 1,
+      "matrix": [
+        [
+          0,
+          -1
+        ],
+        [
+          1,
+          0
+        ]
+      ],
+      "translationMetres": [
+        11.5499714,
+        -23.4532286
+      ],
+      "determinant": 1,
+      "rmsCornerResidualMetres": 0.00915,
+      "maxCornerResidualMetres": 0.02238,
+      "bestPureRotationRmsMetres": 0.00915,
+      "nativeDefinition": "native=[(housePdfX-606)*0.0176388888889,(housePdfY-45.7)*0.0176388888889]; target=M*native+t",
+      "housePdfToTargetWorld": [
+        [
+          0.0,
+          -0.017638888888888888,
+          12.356068650793649
+        ],
+        [
+          0.017638888888888888,
+          0.0,
+          -34.14239523809524
+        ]
+      ]
+    },
+    {
+      "unit": 2,
+      "matrix": [
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          0
+        ]
+      ],
+      "translationMetres": [
+        11.8487857,
+        -23.4538286
+      ],
+      "determinant": -1,
+      "rmsCornerResidualMetres": 0.00892,
+      "maxCornerResidualMetres": 0.0218,
+      "bestPureRotationRmsMetres": 3.13699,
+      "nativeDefinition": "native=[(housePdfX-606)*0.0176388888889,(housePdfY-45.7)*0.0176388888889]; target=M*native+t",
+      "housePdfToTargetWorld": [
+        [
+          0.0,
+          0.017638888888888888,
+          11.042688492063492
+        ],
+        [
+          0.017638888888888888,
+          0.0,
+          -34.14299523809524
+        ]
+      ]
+    },
+    {
+      "unit": 3,
+      "matrix": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "translationMetres": [
+        23.4000286,
+        -0.0003714
+      ],
+      "determinant": -1,
+      "rmsCornerResidualMetres": 0.00041,
+      "maxCornerResidualMetres": 0.00053,
+      "bestPureRotationRmsMetres": 3.14088,
+      "nativeDefinition": "native=[(housePdfX-606)*0.0176388888889,(housePdfY-45.7)*0.0176388888889]; target=M*native+t",
+      "housePdfToTargetWorld": [
+        [
+          -0.017638888888888888,
+          0.0,
+          34.08919523809524
+        ],
+        [
+          0.0,
+          0.017638888888888888,
+          -0.8064686507936508
+        ]
+      ]
+    },
+    {
+      "unit": 4,
+      "matrix": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "translationMetres": [
+        0.0,
+        0.0
+      ],
+      "determinant": 1,
+      "rmsCornerResidualMetres": 0.0,
+      "maxCornerResidualMetres": 0.0,
+      "bestPureRotationRmsMetres": 0.0,
+      "nativeDefinition": "native=[(housePdfX-606)*0.0176388888889,(housePdfY-45.7)*0.0176388888889]; target=M*native+t",
+      "housePdfToTargetWorld": [
+        [
+          0.017638888888888888,
+          0.0,
+          -10.689166666666667
+        ],
+        [
+          0.0,
+          0.017638888888888888,
+          -0.8060972222222222
+        ]
+      ]
+    }
+  ]
+}

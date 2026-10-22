@@ -2,14 +2,16 @@ import {BUILDING,BUILDING_FLOORS,BUILDING_SITE} from './building-layout.mjs';
 import {BUILDING_INTERIORS} from './building-interiors.mjs';
 import {HOUSE,HOUSE_OUTLINE,PLOT,ENTRANCE_SERVICES,ROOMS,collisionBoxes,roomAt} from './home-model.mjs';
 import {liftIsOpen,carContains} from './elevator-model.mjs';
+import {groundFurnitureBoxes} from './ground-apartments.mjs';
+import {sitePolygons,siteCollisionBoxes,COMMON_ENTRY_DOORS} from './building-site.mjs';
 
 export const interiorsForFloor=level=>BUILDING_INTERIORS.floors[Math.max(0,Math.min(8,Math.round(level)))];
 export function inPolygon([x,z],poly){let yes=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++){const a=poly[i],b=poly[j];if((a[1]>z)!=(b[1]>z)&&x<(b[0]-a[0])*(z-a[1])/(b[1]-a[1])+a[0])yes=!yes;}return yes;}
 export function segmentDistance(p,a,b){const dx=b[0]-a[0],dz=b[1]-a[1],l=dx*dx+dz*dz,t=l?Math.max(0,Math.min(1,((p[0]-a[0])*dx+(p[1]-a[1])*dz)/l)):0;return Math.hypot(p[0]-a[0]-dx*t,p[1]-a[1]-dz*t);}
 export function onDetailedGround(p){const e=ENTRANCE_SERVICES.context;return inPolygon(p,HOUSE_OUTLINE)||HOUSE_OUTLINE.some((a,i)=>segmentDistance(p,a,HOUSE_OUTLINE[(i+1)%HOUSE_OUTLINE.length])<.23)||p[0]>e.minX-.05&&p[0]<e.maxX+.05&&p[1]>e.minZ-.05&&p[1]<e.maxZ+.05;}
 export function segmentBox(a,b,width=.12,extra={}){return {minX:Math.min(a[0],b[0])-width/2,maxX:Math.max(a[0],b[0])+width/2,minZ:Math.min(a[1],b[1])-width/2,maxZ:Math.max(a[1],b[1])+width/2,...extra};}
-export const buildingDoor=id=>BUILDING_INTERIORS.floors.flatMap(f=>f.doors).find(d=>d.id===id);
-export function isDoorOpening(a,b,source){const mid=a.map((n,i)=>(n+b[i])/2);return source.doors.some(d=>segmentDistance(mid,d.hinge,d.closed)<.43);}
+export const buildingDoor=id=>[...BUILDING_INTERIORS.floors.flatMap(f=>f.doors),...COMMON_ENTRY_DOORS].find(d=>d.id===id);
+export function isDoorOpening(a,b,source){const mid=a.map((n,i)=>(n+b[i])/2);return [...source.doors,...(source===interiorsForFloor(0)?COMMON_ENTRY_DOORS:[])].some(d=>segmentDistance(mid,d.hinge,d.closed)<.43);}
 export function gardenFenceEdge(a,b,f=BUILDING_FLOORS[0]){const mid=a.map((n,i)=>(n+b[i])/2);return ![...f.units.map(u=>u.polygon),f.core].some(poly=>poly.some((c,j)=>segmentDistance(mid,c,poly[(j+1)%poly.length])<.34));}
 export function buildingBoxes(level,settings,cars=[]){
  const f=BUILDING_FLOORS[level],source=interiorsForFloor(level),boxes=[];
@@ -23,11 +25,14 @@ export function buildingBoxes(level,settings,cars=[]){
  boxes.push({minX:mx-.12,maxX:mx+.12,minZ:a[1]+1.48,maxZ:b[1]-1.05,stairRail:true});
  if(level===0)for(const garden of f.gardens||[]){if(garden.unit===4)continue;garden.plot.forEach((a,i)=>{const b=garden.plot[(i+1)%garden.plot.length];if(!gardenFenceEdge(a,b,f))return;boxes.push(segmentBox(a,b,.05,{gardenFence:true}));});}
  if(level===0)boxes.push(...collisionBoxes(settings.openDoors,settings.furniture,settings.closedShutters,settings.openParts,settings.furnitureLayout,settings.yardDesign));
+ if(level===0&&settings.furniture!==false)for(const unit of [1,2,3])boxes.push(...groundFurnitureBoxes(unit));
+ if(level===0)boxes.push(...siteCollisionBoxes());
+ if(level===0)for(const d of COMMON_ENTRY_DOORS)if(settings.closedBuildingDoors?.includes(d.id))boxes.push(segmentBox(d.hinge,d.closed,.06,{buildingDoorId:d.id}));
  return boxes;
 }
 export function buildingCanStand(p,level,boxes,cars=[],radius=HOUSE.playerRadius){
  const f=BUILDING_FLOORS[level];if(!f||!p.every(Number.isFinite))return false;
- const domains=level===0?[BUILDING_SITE,PLOT,...(f.gardens||[]).map(g=>g.plot)]:[...f.envelope.map(p=>p.polygon),...f.balconies];
+ const domains=level===0?[BUILDING_SITE,PLOT,...(f.gardens||[]).map(g=>g.plot),...sitePolygons()]:[...f.envelope.map(p=>p.polygon),...f.balconies];
  if(!domains.some(poly=>inPolygon(p,poly)||poly.some((a,i)=>segmentDistance(p,a,poly[(i+1)%poly.length])<.18)))return false;
  for(const lift of interiorsForFloor(level).lifts){if(carContains(lift,p,-.02)&&!liftIsOpen(cars[lift.id],level))return false;}
  for(const b of boxes){const dx=p[0]-Math.max(b.minX,Math.min(b.maxX,p[0])),dz=p[1]-Math.max(b.minZ,Math.min(b.maxZ,p[1]));if(dx*dx+dz*dz<radius*radius)return false;}

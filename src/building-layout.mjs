@@ -1,4 +1,5 @@
 import {BUILDING_TRACE as T} from './building-trace.mjs';
+import {SITE_TRACE} from './building-site-trace.mjs';
 
 // Horizontal traces follow the original floor sheets. No elevation/section is
 // present: 3.10m storeys, slab thicknesses, sills and roof heads are estimates.
@@ -22,7 +23,7 @@ export function normalizeTourDestination(value){
 }
 export function buildingLevel(value){const level=normalizeBuildingLevel(value);return level===9?BUILDING_ROOF:BUILDING_FLOORS[level];}
 export function buildingCamera(aspect=1,level=9){
- const b=BUILDING_BOUNDS,top=level===9?b.maxY:(level+1)*BUILDING.storey,height=top+.2,c=[BUILDING_CENTER[0],height*.42,BUILDING_CENTER[2]],width=b.maxX-b.minX,depth=b.maxZ-b.minZ;
+ const context=[...SITE_TRACE.walkable,...SITE_TRACE.parking,...SITE_TRACE.roads,...SITE_TRACE.features].flatMap(p=>p.polygon||[]),b={...BUILDING_BOUNDS,minX:Math.min(BUILDING_BOUNDS.minX,...context.map(p=>p[0])),maxX:Math.max(BUILDING_BOUNDS.maxX,...context.map(p=>p[0])),minZ:Math.min(BUILDING_BOUNDS.minZ,...context.map(p=>p[1])),maxZ:Math.max(BUILDING_BOUNDS.maxZ,...context.map(p=>p[1]))},top=level===9?b.maxY:(level+1)*BUILDING.storey,height=top+.2,c=[(b.minX+b.maxX)/2,height*.42,(b.minZ+b.maxZ)/2],width=b.maxX-b.minX,depth=b.maxZ-b.minZ;
  const radius=Math.hypot(width,depth,height)/2,fov=(aspect<1?52:44)*Math.PI/180,half=Math.atan(Math.tan(fov/2)*Math.min(1,Math.max(.3,aspect))),distance=radius/Math.sin(half)*1.1;
  const direction=[-.62,.46,.64],n=Math.hypot(...direction);
  return {target:c,position:c.map((x,i)=>x+direction[i]/n*distance),distance};
@@ -30,6 +31,6 @@ export function buildingCamera(aspect=1,level=9){
 export const BUILDING_ACCURACY={
  planHe:'מתארי הקומות, הנסיגות ותחומי המרפסות נעקבו מתוכניות קומת הקרקע, 1, 2, 3–4, 5, 6, 7, 8 והגג. פתחי החזית זוהו מהפסקות בקווי הקיר ב־PDF. המודל הוא שחזור להמחשה ולא מדידת ביצוע.',
  planEn:'Storey outlines, setbacks and balcony extents are traced from ground, 1, 2, 3–4, 5, 6, 7, 8 and roof plans. Facade opening spans come from wall-line gaps in the PDF. This is an illustrative reconstruction, not an as-built survey.',
- estimateHe:'קירות הפנים ופתחי הדלתות בדירות האחרות נלקחו מקווי ה־PDF. הגימורים בהן ניטרליים להמחשה, ללא שיוך המוצרים של דירה 4. אין חתך גבהים בקובץ: מרווח הקומות 3.10 מ׳, גובהי פתחים ואדנים, פרטי חיפוי ומעקות, פנים תאי המעליות וגובה מבני הגג משוערים. הצילומים מתעדים חלק מהחזיתות בלבד.',
- estimateEn:'Neighbouring interior walls and door openings follow PDF vectors. Their neutral finishes are illustrative, without apartment 4’s product assignments. No height section is supplied: 3.10 m storey rise, opening/sill heights, facade/rail details, elevator cabin finishes and roof-head heights are estimates. Photos cover part of the facades.'
+ estimateHe:'דירות הגן 1–3 מקבלות את הבנוי של דירת הבסיס בסיבוב/שיקוף לפי התוכנית, עם המטבח בצורת ר׳ והכלים הסניטריים המקוריים. השינויים האישיים, הריהוט, האי והגינות של דירה 4 אינם מועתקים. גימורי השכנים ניטרליים; נקודות חשמל, מים, מיזוג ותאורה שמקורן בדירה 4 מסומנות כנגזרות עד לקבלת תיעוד לכל דירה. המדרכות, החניות ומרכזי השוחות נעקבו בנפרד מהתוכניות. אין חתך גבהים בקובץ: מרווח הקומות 3.10 מ׳, גובהי פתחים ואדנים, פרטי חיפוי ומעקות, פנים תאי המעליות וגובה מבני הגג משוערים.',
+ estimateEn:'Garden units 1–3 use the rotated/reflected base built interior, source L-kitchen and original sanitary footprints. Apartment 4’s personal furniture, island, alterations and gardens are excluded. Neighbour finishes are neutral; services copied from apartment 4 remain derived until unit-specific documentation is available. Sidewalks, parking bays and chamber centres are independently traced. No height section is supplied: storey rise, opening/sill heights, facade/rail details, elevator interiors and roof-head heights are illustrative.'
 };

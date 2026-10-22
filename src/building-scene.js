@@ -4,6 +4,8 @@ import {BUILDING_INTERIORS} from './building-interiors.mjs';
 import {onDetailedGround,segmentDistance,parseDestination,isDoorOpening,gardenFenceEdge} from './building-navigation.mjs';
 import {buildElevators} from './building-elevators.js';
 import {buildingNumberPlate} from './building-signage.js';
+import {buildGroundApartments} from './ground-apartments-scene.js';
+import {buildSiteContext} from './building-site-scene.js';
 
 // Shared instanced cubes keep nine storeys affordable on phones. Physical
 // shadow geometry remains present while the apartment is viewed as a cutaway;
@@ -44,16 +46,17 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
  }
  function segment(a,b,y,h,thickness,into){const dx=b[0]-a[0],dz=b[1]-a[1],length=Math.hypot(dx,dz);if(length<.008||h<.008)return;into.push([(a[0]+b[0])/2,y+h/2,(a[1]+b[1])/2,length,h,thickness,-Math.atan2(dz,dx)]);}
  const nearApartment=(a,b)=>{const p=[(a[0]+b[0])/2,(a[1]+b[1])/2];return p[0]<11.98&&p[0]>-.7&&p[1]>-.35&&p[1]<16.05;};
+ const onGroundReplica=p=>BUILDING_FLOORS[0].units.some(u=>u.number!==4&&(pointInPolygon(p,u.polygon)||u.polygon.some((a,i)=>segmentDistance(p,a,u.polygon[(i+1)%u.polygon.length])<.24)));
  for(const def of BUILDING_FLOORS){
   if(def.level>limit)continue;
   const node=new THREE.Group();node.name=def.id;node.userData={part:'building-storey',level:def.level,page:def.page,source:'building-plan'};root.add(node);floors.set(def.level,node);
-  const cut=shown&&!walking&&limit<9&&def.level===limit,base=def.elevation,h=cut?.85:BUILDING.storey,walls=[],frames=[],panes=[],dark=[],rails=[],decks=[],interiorWalls=[],source=BUILDING_INTERIORS.floors[def.level];
+  const cut=settings.cutaway===true&&shown&&!walking&&limit<9&&def.level===limit,base=def.elevation,h=cut?.85:BUILDING.storey,walls=[],frames=[],panes=[],dark=[],rails=[],decks=[],interiorWalls=[],source=BUILDING_INTERIORS.floors[def.level];
   const [sa,sb]=source.stairs.rect,rect=(a,b)=>[[a[0],a[1]],[b[0],a[1]],[b[0],b[1]],[a[0],b[1]]],holes=[rect(sa,sb),...source.lifts.map(l=>rect([l.minX-.12,l.minZ-.05],[l.doorCenter[0]-.04,l.maxZ+.05]))];
   if(source.duplexStair){const d=source.duplexStair,[a,b]=d.longFlightRect,[c,e]=d.shortFlightRect;holes.push([[c[0],c[1]],[b[0],c[1]],[b[0],b[1]],[a[0],b[1]],[a[0],e[1]],[c[0],e[1]]]);}
   for(const path of def.envelope){
    slab(path.polygon,base-.015,BUILDING.slab,concrete,node,'building-floor-slab',def.level,holes.filter(h=>pointInPolygon(h[0],path.polygon)));
    path.polygon.forEach((a,i)=>{
-    const b=path.polygon[(i+1)%path.polygon.length];if(def.level===0&&nearApartment(a,b))return; // detailed apartment 4 owns these walls and openings
+    const b=path.polygon[(i+1)%path.polygon.length];if(def.level===0&&(nearApartment(a,b)||shown&&onGroundReplica(a.map((n,k)=>(n+b[k])/2))))return; // detailed ground profiles own their openings
     const length=Math.hypot(b[0]-a[0],b[1]-a[1]),u=[(b[0]-a[0])/length,(b[1]-a[1])/length],at=t=>[a[0]+u[0]*t,a[1]+u[1]*t],span=o=>[o.a,o.b].map(p=>(p[0]-a[0])*u[0]+(p[1]-a[1])*u[1]).sort((a,b)=>a-b);
     const holes=path.openings.filter(o=>o.edge===i&&!isDoorOpening(o.a,o.b,source)).map(o=>({...o,span:span(o)})).sort((a,b)=>a.span[0]-b.span[0]);let cursor=0;
     for(const o of holes){const [l,r]=o.span,sill=o.kind==='slider'?0:1,oh=o.kind==='slider'?2.3:1.25;segment(at(l),at(r),base,Math.min(h,sill),.3,walls);if(h>sill+oh)segment(at(l),at(r),base+sill+oh,h-sill-oh,.3,walls);
@@ -69,19 +72,19 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
    });
   }
   for(const w of source.walls){
-   const mid=w.a.map((n,i)=>(n+w.b[i])/2);if(def.level===0&&onDetailedGround(mid))continue;
+   const mid=w.a.map((n,i)=>(n+w.b[i])/2);if(def.level===0&&(onDetailedGround(mid)||shown&&onGroundReplica(mid)))continue;
    const exterior=def.envelope.some(path=>path.polygon.some((a,i)=>segmentDistance(mid,a,path.polygon[(i+1)%path.polygon.length])<.25));
    segment(w.a,w.b,base,h,w.width,exterior?walls:interiorWalls);
   }
   if(shown){
    for(const entry of source.entries){const door=source.doors.find(d=>d.id===entry.doorId),plate=buildingNumberPlate(entry.unit,resources);if(!plate||!door)continue;const length=Math.hypot(door.opened[0]-door.hinge[0],door.opened[1]-door.hinge[1]),normal=door.opened.map((n,i)=>(door.hinge[i]-n)/length),middle=door.hinge.map((n,i)=>(n+door.closed[i])/2);plate.position.set(middle[0]+normal[0]*.11,base+1.68,middle[1]+normal[1]*.11);plate.rotation.y=Math.atan2(normal[0],normal[1]);plate.userData={part:'building-unit-label',action:def.level===0&&entry.unit===4?'door':'building-door',doorId:def.level===0&&entry.unit===4?'entry':door.id,unit:entry.unit,buildingFloor:def.level};node.add(plate);picks.push(plate);}
-   for(const unit of def.units){if(def.level===0&&unit.number===4)continue;slab(unit.polygon,base+.005,.025,interiorFloor,node,'building-unit-finish',def.level,holes.filter(h=>pointInPolygon(h[0],unit.polygon)));}
+   for(const unit of def.units){if(def.level===0)continue;slab(unit.polygon,base+.005,.025,interiorFloor,node,'building-unit-finish',def.level,holes.filter(h=>pointInPolygon(h[0],unit.polygon)));}
    for(const door of source.doors){
     if(def.level===0&&onDetailedGround(door.hinge))continue;
     const open=!settings.closedBuildingDoors?.includes(door.id),end=open?door.opened:door.closed,items=[],dh=cut?.82:2.18;
     segment(door.hinge,end,base,dh,.045,items);
     const mesh=batch(node,doorMat,items,'building-apartment-door',null);mesh.userData={part:'building-apartment-door',source:'building-plan',action:'building-door',doorId:door.id,unit:door.unit,buildingFloor:def.level};picks.push(mesh);
-    if(h>2.2)segment(door.hinge,door.closed,base+2.2,h-2.2,.13,interiorWalls);
+    if(h>2.2&&!(def.level===0&&onGroundReplica(door.hinge)))segment(door.hinge,door.closed,base+2.2,h-2.2,.13,interiorWalls);
    }
   }
   // The low rail courses in the photographs have glass infill, dark top rails
@@ -124,6 +127,7 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
    }
   }
   batch(node,limestone,walls,'building-facade-wall',def.level);batch(node,insideWall,interiorWalls,'building-interior-wall',def.level);batch(node,metal,frames,'building-window-frame',def.level);batch(node,glass,panes,'building-glazing',def.level,false);batch(node,voidMat,dark,'building-fascia-and-service-screen',def.level);batch(node,metal,rails,'building-rail-and-louvres',def.level);batch(node,limestone,decks,'building-stone-sill',def.level);
+  if(def.level===0&&shown)buildGroundApartments({root:node,resources,picks,settings,cut,mode});
   if(shown&&def.level>0&&!cut){
    // Closed floor tops prevent seeing through the entire shell through a pane.
    // These are slabs, not fictitious interior apartment details.
@@ -151,6 +155,7 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
    batch(root,fence,bars,'building-garden-fence',0);
   }
   slab(BUILDING_SITE,-.09,.14,material('#b5baa1'),root,'building-site-base',null);
+  buildSiteContext({root,resources,picks,settings,cut:settings.cutaway===true&&!walking&&limit===0});
   // Highlight the original apartment footprint with an unobtrusive outline.
   // No large room labels cover the facade or its controls.
   const poly=apartmentOutline||BUILDING_FLOORS[0].units.find(u=>u.number===4).polygon,geo=new THREE.BufferGeometry().setFromPoints([...poly,poly[0]].map(([x,z])=>new THREE.Vector3(x,.08,z))),m=new THREE.LineBasicMaterial({color:'#e5a64b',transparent:true,opacity:.9});resources.push(geo,m);const line=new THREE.Line(geo,m);line.name='apartment-4-outline';line.userData.part='building-apartment-highlight';root.add(line);

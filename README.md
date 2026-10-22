@@ -2,7 +2,7 @@
 
 React + Vite + Three.js whole-house and detailed kitchen simulator. The house follows the attached RG1 floor plan. Kitchen geometry retains the Anise order 167968 drawings and subsequent technical/appliance sheets.
 
-Current revision **45**: four independently retraced garden apartments, source-derived interior partitions and 43 apartment entrances, apartment/floor destinations, continuous whole-building walking, two animated elevators serving ground–8, source-positioned common/duplex stairs, and an analog mobile joystick. Apartment 4 and the detailed kitchen retain their existing edits, real material sources, service points, 4000K lighting and access rules.
+Current revision **47**: garden units 1–3 now share the original built RG1 interior with audited rotations/reflections, source L-kitchen and eight sanitary footprints. The owner's island, office conversion, ordered products, moved furniture and custom garden are excluded. Copied photo-based services remain explicitly derived. Gardens retain their separate traces, with six independent private chamber centres and five common chambers. Page-2 development geometry adds 45 numbered parking bays plus N1, tandem topology, drive aisles, surrounding sidewalks/curbs and both building entrances. The previously misclassified main entrance now opens for walking. The documented site main-meter cabinet is separate from the photographed apartment4/3 meter cabinet and from reservoir/pump rooms. No undocumented meter room or pipe network is invented. Existing wall-cut preferences, apartment4 edits, private access, lifts, joystick and source material evidence are retained.
 
 ## Run
 
@@ -607,3 +607,8 @@ Two independent cars close their doors, travel at a simulated speed, and open at
 Mobile/coarse-pointer walking replaces the arrow pad with a captured analog joystick: radial dead zone, variable speed, diagonal clamp, release/cancel/capture-loss/blur reset. Drag the scene independently to look. The desktop pad/WASD remain available. Hide all controls retains movement and the restore button; contextual elevator controls occupy their own layout row.
 
 Verification covers every unit destination, all 43 entry crossings, both elevators at all 18 landings, blocked shafts, door-before-motion/arrival transitions, independent cars, source registration, stair landings, analog movement and actual moving Three.js cabin/door meshes. Existing home/kitchen/lighting tests and production compilation are retained. Browser/device visual QA remains unverified: the managed preview supervisor mailbox was unavailable; no alternate preview server was started.
+
+
+## R47 source audit
+
+`ground-base-source-audit.json`, `ground-transform-audit.json`, and `building-site-source-audit.json` under `scripts/` retain source coordinates, drawing indices, SHA256 and registration controls. Runtime geometry uses `ground-base-source.mjs` and `building-site-trace.mjs`. Two garden units require reflection, not rotation alone; maximum footprint control residual is 22.4mm. No loose furniture is specified on the baseline plan. The original kitchen supplier is responsible for its detailed modules; generic source-positioned appliances/counter heights remain illustrative. Chamber glyph diameters are not installed lid measurements. Parking outline dimensions do not establish ownership. Site heights, paving profile, cabinet height and unphotographed neighbour service placements remain inferred.

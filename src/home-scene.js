@@ -3,6 +3,7 @@ import {buildLightingPoints} from './home-lighting-scene.js';
 import {buildDaylight} from './daylight-scene.js';
 import {buildBuildingContext} from './building-scene.js';
 import {BUILDING_CENTER,BUILDING_BOUNDS} from './building-layout.mjs';
+import {parseDestination} from './building-navigation.mjs';
 import * as THREE from 'three';
 import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
 import {HOUSE,HOUSE_OUTLINE,PLOT,TERRACE,SERVICE_APRON,PUBLIC_ENTRY,ROOMS,WALLS,DOORS,WINDOWS,SHUTTERS,FURNITURE,furnitureForSettings,GARDEN_PLANTS,HOME_FINISHES,FLOOR_FINISHES,KITCHEN_ANCHOR,GARDEN_LAYOUT,WATER_LAYOUT,LIGHTING_LAYOUT,point,polygonBounds,insidePolygon,roomAt,openingPoint} from './home-model.mjs';
@@ -23,12 +24,13 @@ import {buildElectricalPoints,buildWaterPoints} from './home-electrical-scene.js
 import {LONG,SHORT,UPPERS,ISLAND,ISLAND_UNITS,MATERIALS,STONES,DEFAULTS} from './model.mjs';
 
 export function createHomeScene(settings,{mode='overview',selectedRoom='living',kitchenSettings=DEFAULTS}={}){
- if(mode==='building')settings={...settings,cutaway:settings.buildingLevel===0};
  const group=new THREE.Group(),picks=[],resources=[],motions=[],roomGroups=new Map(),furnitureGroups=new Map(),doorGroups=new Map(),shutterGroups=new Map();
  const mat=(color,opts={})=>{const m=new THREE.MeshStandardMaterial({color,roughness:.78,...opts});resources.push(m);return m;};
  const surface=createSurfacePalette(resources);
  const offwhite=surface('paint','#efebe2'),oak=surface('wood','#ae8b61'),ink=mat('#35463d'),windowInk=mat('#343d3d',{metalness:.3,roughness:.5}),steel=mat('#a7b1ac',{metalness:.55,roughness:.35}),white=mat('#f0f0e8'),dark=mat('#29352f'),glass=mat('#b0c8be',{transparent:true,opacity:.28,roughness:.16,depthWrite:false}),linen=surface('fabric','#c5c5af'),clay=mat('#b58e75'),cap=mat('#c7c9bc');
- const wallHeight=mode==='building'?(settings.buildingLevel===0?.86:HOUSE.height):mode==='walk'||!settings.cutaway?HOUSE.height:.86;
+ // Selecting a destination removes upper floors, but must not enable wall cuts.
+ const wallCutaway=settings.cutaway===true&&mode!=='walk'&&(mode==='building'?settings.buildingLevel===0:mode==='unit'?parseDestination(settings.tourDestination).floor===0:true);
+ const wallHeight=wallCutaway?.86:HOUSE.height;
  function box(x,y,z,w,h,d,material,parent=group,data=null,round=0){
   const g=round?new RoundedBoxGeometry(w,h,d,material.userData?.surfaceKind==='fabric'?5:2,Math.min(round,w/5,h/5,d/5)):new THREE.BoxGeometry(w,h,d);metricSurfaceUVs(g,[x,y,z]);resources.push(g);const m=new THREE.Mesh(g,material);m.position.set(x,y,z);m.castShadow=m.receiveShadow=true;if(data)m.userData={...data};parent.add(m);if(data?.action||data?.blockPick)picks.push(m);return m;
  }

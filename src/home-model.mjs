@@ -22,7 +22,7 @@ export const PLAN_ORIGIN=[606,45.7];
 export const point=(x,z)=>[(x-PLAN_ORIGIN[0])*PLAN_SCALE,(z-PLAN_ORIGIN[1])*PLAN_SCALE];
 const polygon=a=>a.map(p=>point(...p));
 const rect=(x0,z0,x1,z1)=>[[x0,z0],[x1,z0],[x1,z1],[x0,z1]];
-export const HOUSE={height:2.75,eyeHeight:1.62,playerRadius:.17,source:'/house/house-plan.pdf',image:'/house/house-plan.jpg',revision:45,scale:50};
+export const HOUSE={height:2.75,eyeHeight:1.62,playerRadius:.17,source:'/house/house-plan.pdf',image:'/house/house-plan.jpg',revision:47,scale:50};
 export const GARDEN_LAYOUT=createGardenLayout(point);
 export const EXTERIOR_LAYOUT=createExteriorLayout(point);
 export const SERVICE_YARD=createServiceYard(point);
