@@ -7,7 +7,7 @@ export const OWNER_PRODUCT_REFERENCES={
 export const FLOOR_PHOTO={
  ...OWNER_PRODUCT_REFERENCES.floorTile,
  // Label-free square on the actual showroom tile; no invented vein/grain.
- sample:[210,80,880,880],size:1024,previewRgb:[163,155,147],
+ sample:[210,80,880,880],runtimeImage:'/materials/runtime/MI402439-sample.png',runtimeSample:[0,0,880,880],size:1024,previewRgb:[163,155,147],
  textureBasis:'owner-product-photo',photoScaleInferred:true
 };
 export const OWNER_PRODUCTS_SOURCE={id:'ordered-product-photos',kind:'gallery',he:'הריצוף והכיור שבחרת — צילומי מקור',en:'Your selected floor & sink — original photos',pages:[1,2,3],references:[

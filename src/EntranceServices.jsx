@@ -1,3 +1,4 @@
+import {ProtectedImage} from './DocumentAccess.jsx';
 import {Camera,DoorOpen,ArrowUpRight,X,Maximize2,Minimize2} from 'lucide-react';
 import {ENTRANCE_SERVICES,entryElement} from './home-model.mjs';
 import {ENTRY_SOURCE} from './entrance-services.mjs';
@@ -22,7 +23,7 @@ export function EntryServiceInspector({element,settings,lang,minimized,onMinimiz
    <button className="hs-text-link" onClick={()=>onFocus(c.id,true)}><Maximize2 size={14}/>{he?'מיקוד המצלמה בארון':'Focus camera on cabinet'}</button>
    <h4>{he?'מה נראה בתוך הארון':'Visible cabinet contents'}</h4>
    {c.contents.length?<ul>{c.contents.map(item=><li key={item.id}>{he?item.he:item.en}</li>)}</ul>:<p className="hs-small-note">{he?'התא לא צולם פתוח. התכולה לא ידועה; החלל הריק בתלת־ממד אינו אישור שהתא ריק במציאות.':'This bay was not photographed open. Contents are unknown; an empty model does not mean the actual bay is empty.'}</p>}
-   <details className="entry-source-compare"><summary><Camera size={15}/>{he?'השוואה לצילום האמיתי':'Compare with the real photo'}</summary><a href={photo.image} target="_blank" rel="noreferrer"><img src={photo.image} alt={he?photo.he:photo.en}/></a><p>{he?photo.noteHe:photo.noteEn}</p><button className="hs-text-link" onClick={()=>onSource(ENTRY_SOURCE.id,c.page)}>{he?'פתיחת המקור המלא':'Open full source'}<ArrowUpRight size={13}/></button></details>
+   <details className="entry-source-compare"><summary><Camera size={15}/>{he?'השוואה לצילום האמיתי':'Compare with the real photo'}</summary><a href={photo.image} target="_blank" rel="noreferrer"><ProtectedImage src={photo.image} alt={he?photo.he:photo.en}/></a><p>{he?photo.noteHe:photo.noteEn}</p><button className="hs-text-link" onClick={()=>onSource(ENTRY_SOURCE.id,c.page)}>{he?'פתיחת המקור המלא':'Open full source'}<ArrowUpRight size={13}/></button></details>
    <p className="hs-small-note">{he?c.noteHe:c.noteEn}</p>
    <p className="hs-small-note">{he?'מידות מעטפת משוערות — רוחב × עומק × גובה:':'Estimated envelope — width × depth × height:'} <bdi>≈ {c.dimensions.map(v=>Math.round(v*100)).join(' × ')} cm</bdi></p>
   </div>}

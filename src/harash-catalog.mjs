@@ -28,6 +28,6 @@ export const HARASH_MATCHES={
 export const catalogueMatch=id=>HARASH_MATCHES[id]||null;
 export const cataloguePhoto=id=>{
  const match=catalogueMatch(id),r=match?.refs?.[0];if(!r||!['wet-floor','shower-floor','terrace-floor','wet-wall'].includes(id))return null;
- return {...r,sample:[0,0,r.width,r.height],size:512,rotate:id==='terrace-floor'?90:0,textureBasis:'catalog-product-image',photoScaleInferred:false};
+ return {...r,runtimeImage:'/materials/runtime/'+r.image.split('/').pop().replace(/\.[^.]+$/,'')+'-sample.png',runtimeSample:[0,0,r.width,r.height],sample:[0,0,r.width,r.height],size:512,rotate:id==='terrace-floor'?90:0,textureBasis:'catalog-product-image',photoScaleInferred:false};
 };
 export const catalogueSource=(id,index=0)=>{const r=catalogueMatch(id)?.refs?.[index];return r?{source:'harash-catalog',page:r.page,catalogueProductId:id,catalogueReference:index}:null;};

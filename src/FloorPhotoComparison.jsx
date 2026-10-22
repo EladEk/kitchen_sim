@@ -1,8 +1,9 @@
+import {DocumentGate} from './DocumentAccess.jsx';
 import {useEffect,useRef,useState} from 'react';
 import {FLOOR_PHOTO} from './owner-product-references.mjs';
 import {orderedFloorPhotoData} from './ordered-floor-photo.mjs';
 
-export function FloorPhotoComparison({lang}){
+function FloorPhotoComparisonContent({lang}){
  const he=lang==='he',canvas=useRef(),[open,setOpen]=useState(false),[status,setStatus]=useState('loading');
  useEffect(()=>{
   if(!open)return;
@@ -26,3 +27,5 @@ export function FloorPhotoComparison({lang}){
   <p>{he?'אותה דוגמה מהצילום, לאחר הסרת התאורה הבהירה במרכז וההכהיה בקצוות. אין מסגרת כהה באריח. גודל האריח 100×100 ס״מ. רוחב הפוגה והחזר האור משוערים; הגוון תלוי גם בתאורה ובמסך.':'The same photographed pattern after removing the bright centre and dark perimeter lighting. The tile has no dark border. Tile size: 100×100 cm. Joint width and reflectance are estimates; light and screen affect shade.'}</p>
  </details>;
 }
+
+export function FloorPhotoComparison(props){return <DocumentGate lang={props.lang||props.settings?.lang}><FloorPhotoComparisonContent {...props}/></DocumentGate>;}

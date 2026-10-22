@@ -10,7 +10,7 @@ export function orderedFloorPhotoData(productId){
   image.onerror=()=>{tasks.delete(key);reject(Error('The source product image could not load: '+productId));};
   image.onload=()=>{
    try{
-    const {size,sample}=photo,canvas=document.createElement('canvas');canvas.width=canvas.height=size;
+    const {size}=photo,sample=photo.runtimeSample||photo.sample,canvas=document.createElement('canvas');canvas.width=canvas.height=size;
     const context=canvas.getContext('2d',{willReadFrequently:true});if(!context)throw Error('Texture canvas unavailable');
     // The plank's native long axis is horizontal; floor UV v follows its 60 cm
     // length. Rotate the source sampling, never the physical tile grid.
@@ -23,7 +23,7 @@ export function orderedFloorPhotoData(productId){
     resolve({size,...prepared,height,roughness,textureBasis:photo.textureBasis});
    }catch(error){tasks.delete(key);reject(error);}
   };
-  image.src=photo.image;
+  image.src=photo.runtimeImage||photo.image;
  }));
  return tasks.get(key);
 }

@@ -1,0 +1,32 @@
+{
+  "framework": "vite",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist/client",
+  "functions": {
+    "api/documents.js": {
+      "includeFiles": "dist/**"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/documents/:action",
+      "destination": "/api/documents?action=:action"
+    },
+    {
+      "source": "/house/:path*",
+      "destination": "/api/documents?resource=house/:path*"
+    },
+    {
+      "source": "/plans/:path*",
+      "destination": "/api/documents?resource=plans/:path*"
+    },
+    {
+      "source": "/materials/owner-products/:path*",
+      "destination": "/api/documents?resource=materials/owner-products/:path*"
+    },
+    {
+      "source": "/materials/harash/:path*",
+      "destination": "/api/documents?resource=materials/harash/:path*"
+    }
+  ]
+}

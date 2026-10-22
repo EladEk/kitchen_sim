@@ -1,3 +1,4 @@
+import {DocumentGate} from './DocumentAccess.jsx';
 import {useEffect,useRef,useState} from 'react';
 import {ZoomIn,Scan,ArrowUpRight} from 'lucide-react';
 import {ELECTRICAL_KINDS} from './home-electrical.mjs';
@@ -5,7 +6,7 @@ import {ElectricalCallouts} from './ElectricalCallouts.jsx';
 import {electricalPhotoCrop,electricalPhotoAnchors} from './electrical-ui.mjs';
 import './electrical.css';
 
-export function ElectricalPhoto({reference,entries,lang,selectedId,onSelect,kinds=ELECTRICAL_KINDS}){
+function ElectricalPhotoContent({reference,entries,lang,selectedId,onSelect,kinds=ELECTRICAL_KINDS}){
  const he=lang==='he',frame=useRef(),markers=useRef(),[zoomed,setZoomed]=useState(false),[size,setSize]=useState([1536,1152]),[status,setStatus]=useState('loading');
  const selected=entries.find(e=>e.point.id===selectedId),crop=electricalPhotoCrop(selected?.rect,zoomed);
  useEffect(()=>{setStatus('loading');setZoomed(false);},[reference.image]);
@@ -24,3 +25,5 @@ export function ElectricalPhoto({reference,entries,lang,selectedId,onSelect,kind
   {selected&&<p className="electrical-photo-caption" aria-live="polite"><bdi>{selected.point.label}</bdi> · {he?selected.point.he:selected.point.en}</p>}
  </div>;
 }
+
+export function ElectricalPhoto(props){return <DocumentGate lang={props.lang||props.settings?.lang}><ElectricalPhotoContent {...props}/></DocumentGate>;}

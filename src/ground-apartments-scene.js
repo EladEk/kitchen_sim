@@ -4,13 +4,14 @@ import {point} from './home-model.mjs';
 import {createSurfacePalette,metricSurfaceUVs} from './surface-materials.mjs';
 import {buildObservedArchitecture} from './home-observed-scene.js';
 import {buildElectricalPoints,buildWaterPoints} from './home-electrical-scene.js';
+import {createCeramicBowl} from './sanitary-fixtures.js';
 import {lightOutput} from './lighting-controls.mjs';
 
 // One shared base geometry, three rigid placements. Gardens, ordered products,
 // movable owner furniture and the owner's kitchen never enter this builder.
-export function buildGroundApartments({root,resources,picks,settings,cut=false,mode='building'}){
+export function buildGroundApartments({root,resources,picks,settings,cut=false,mode='building',floorMaterial=null}){
  const profile=groundBaseProfile(),template=new THREE.Group(),h=cut?.85:profile.height,mat=(color,extra={})=>{const m=new THREE.MeshStandardMaterial({color,roughness:.72,...extra});resources.push(m);return m;},surface=createSurfacePalette(resources);
- const paint=surface('paint','#eeece5'),stone=surface('limestone','#d9d2c5'),neutralFloor=surface('porcelain','#d0cdc5'),wetFloor=surface('cement','#c4c3bd'),white=mat('#f0f0e9'),metal=mat('#343e3d',{metalness:.35,roughness:.4}),glass=mat('#acc2ca',{transparent:true,opacity:.28,depthWrite:false,roughness:.18}),wood=surface('paint','#dedbd1');
+ const paint=surface('paint','#eeece5'),stone=surface('limestone','#d9d2c5'),neutralFloor=floorMaterial||surface('porcelain','#d0cdc5'),wetFloor=surface('cement','#c4c3bd'),white=mat('#f0f0e9'),metal=mat('#343e3d',{metalness:.35,roughness:.4}),glass=mat('#acc2ca',{transparent:true,opacity:.28,depthWrite:false,roughness:.18}),wood=surface('paint','#dedbd1');
  const cube=new THREE.BoxGeometry(1,1,1);resources.push(cube);let interactive=false;
  const box=(x,y,z,w,hh,d,m,parent=template,data=null)=>{const mesh=new THREE.Mesh(cube,m);mesh.position.set(x,y,z);mesh.scale.set(w,hh,d);mesh.castShadow=mesh.receiveShadow=true;mesh.userData={...(data||{}),baseline:true};parent.add(mesh);if(interactive&&data?.action)picks.push(mesh);return mesh;};
  const cylinder=(x,y,z,r,hh,m,parent=template,data=null)=>{const g=new THREE.CylinderGeometry(r,r,hh,20);resources.push(g);const mesh=new THREE.Mesh(g,m);mesh.position.set(x,y,z);mesh.userData={...(data||{}),baseline:true};mesh.castShadow=true;parent.add(mesh);if(interactive&&data?.action)picks.push(mesh);return mesh;};
@@ -36,7 +37,12 @@ export function buildGroundApartments({root,resources,picks,settings,cut=false,m
  if(settings.furniture!==false)for(const f of profile.furniture){
   const p=new THREE.Group();p.position.set(f.position[0],0,f.position[1]);p.rotation.y=f.rotation;p.userData={part:'ground-base-fixture',baseFixtureId:f.id,baseline:true};template.add(p);
   if(f.kind==='wc'){box(0,.37,0,f.w,.16,f.d,white,p);box(0,.2,-.1,.24,.3,.28,white,p);box(0,.46,-.02,f.w-.025,.025,f.d-.06,wood,p);}
-  else if(f.kind==='tub'||f.kind==='basin'){box(0,f.h/2,0,f.w,f.h,f.d,white,p);box(0,f.h+.004,0,f.w-.12,.009,f.d-.11,wetFloor,p);cylinder(f.w*.3,f.h+.015,0,.025,.012,metal,p);if(f.kind==='basin')box(0,f.h+.11,-f.d/2+.04,.025,.22,.025,metal,p);}
+  else if(f.kind==='tub'||f.kind==='basin'){
+   const tub=f.kind==='tub',bowl=createCeramicBowl(resources,{productId:null,w:f.w,d:f.d,top:f.h,depth:tub?.37:.14,innerW:Math.max(.15,f.w-(tub?.15:.10)),innerD:Math.max(.13,f.d-(tub?.16:.11)),innerZ:0,radius:tub?.035:.06,innerRadius:tub?.06:.045,drainZ:tub?-f.d*.30:0});
+   bowl.traverse(o=>{o.userData={...o.userData,productId:null,shapeBasis:'source-plan-footprint',baseline:true,detailsInferred:true};});p.add(bowl);
+   if(tub){box(0,(f.h-.06)/2,f.d/2-.025,f.w,f.h-.06,.05,white,p);for(const x of [-f.w/2+.025,f.w/2-.025])box(x,(f.h-.06)/2,0,.05,f.h-.06,f.d,white,p);}
+   else{box(0,f.h+.11,-f.d/2+.04,.025,.22,.025,metal,p);box(0,f.h+.21,-f.d/2+.095,.025,.025,.13,metal,p);}
+  }
   else if(f.kind==='shower'){box(0,.025,0,f.w,.045,f.d,wetFloor,p);if(!cut)box(f.w/2-.02,1,0,.012,2,f.d,glass,p);}
   else if(f.kind==='washer'){box(0,f.h/2,0,f.w,f.h,f.d,white,p);const door=cylinder(0,.4,f.d/2+.012,.19,.018,metal,p);door.rotation.x=Math.PI/2;}
  }

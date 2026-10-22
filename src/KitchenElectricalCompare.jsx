@@ -1,3 +1,4 @@
+import {DocumentGate} from './DocumentAccess.jsx';
 import {ArrowLeft,ArrowRight,Focus} from 'lucide-react';
 import {Elevation} from './PlanViews.jsx';
 import {KitchenElectricalViewControls} from './KitchenElectrical.jsx';
@@ -5,7 +6,7 @@ import {ElectricalPhoto} from './ElectricalPhoto.jsx';
 import {KITCHEN_SERVICE_POINTS,KITCHEN_ELECTRICAL_PHOTOS,kitchenElectricalSelection} from './kitchen-electrical.mjs';
 import {ELECTRICAL_KINDS} from './home-electrical.mjs';
 
-export function KitchenElectricalCompare({settings,selectedId,page,onSelect,onPage,onFocus,onViewChange}){
+function KitchenElectricalCompareContent({settings,selectedId,page,onSelect,onPage,onFocus,onViewChange}){
  const he=settings.lang==='he',t=(a,b)=>he?a:b,{point,source,wall}=kitchenElectricalSelection(selectedId,page),kind=ELECTRICAL_KINDS[point.kind],index=KITCHEN_SERVICE_POINTS.indexOf(point);
  const entries=KITCHEN_SERVICE_POINTS.flatMap(p=>p.evidence.filter(e=>e.page===source.page).map(e=>({point:p,rect:e.rect})));
  const next=step=>onSelect(KITCHEN_SERVICE_POINTS[(index+step+KITCHEN_SERVICE_POINTS.length)%KITCHEN_SERVICE_POINTS.length].id);
@@ -30,3 +31,5 @@ export function KitchenElectricalCompare({settings,selectedId,page,onSelect,onPa
   <p className="electrical-comparison-note">{t('בחירה במספר מעדכנת את שני הצדדים. המיקום והגובה בהדמיה הם אומדן מהצילום; הם אינם מדידה בשטח.','Selecting an ID updates both sides. Model positions and heights are photo estimates, not site measurements.')}</p>
  </div>;
 }
+
+export function KitchenElectricalCompare(props){return <DocumentGate lang={props.lang||props.settings?.lang}><KitchenElectricalCompareContent {...props}/></DocumentGate>;}

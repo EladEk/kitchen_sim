@@ -30,7 +30,7 @@ test('ordered floors load the actual owner tile RGB rather than the generic atla
    for(const map of [material.map,material.bumpMap,material.roughnessMap]){assert.equal(map.repeat.x,1/order.dimensions[0]);assert.equal(map.repeat.y,1/order.dimensions[1]);}
   }
   const data=await orderedFloorPhotoData('dry-floor');await Promise.resolve();
-  const expectedImages=[...new Set(Object.values(ORDERED_FLOORS).map(p=>p.photo.image))];assert.deepEqual(images,expectedImages);assert.deepEqual(rects[0],[...FLOOR_PHOTO.sample,0,0,FLOOR_PHOTO.size,FLOOR_PHOTO.size]);assert.deepEqual(data.color,new Uint8Array(pixels),'actual coloured pixels must not be converted to generic grey/white');
+  const expectedImages=[...new Set(Object.values(ORDERED_FLOORS).map(p=>p.photo.runtimeImage||p.photo.image))];assert.deepEqual(images,expectedImages);assert.deepEqual(rects[0],[...FLOOR_PHOTO.runtimeSample,0,0,FLOOR_PHOTO.size,FLOOR_PHOTO.size]);assert.deepEqual(data.color,new Uint8Array(pixels),'actual coloured pixels must not be converted to generic grey/white');
   const floor=surface('porcelain','#ff0000',{productId:'dry-floor'});assert.strictEqual(floor.map.image.data,data.color);assert.equal(floor.map.image.width,1024);assert.equal(floor.map.repeat.x,1);assert.equal(floor.map.repeat.y,1);assert.equal(floor.bumpScale,0);assert.equal(floor.map.colorSpace,THREE.SRGBColorSpace);
   const wet=surface('cement','#a4a6a3',{productId:'wet-floor'}),shower=surface('cement','#a4a6a3',{productId:'shower-floor'});assert.notStrictEqual(wet.map,shower.map);assert(shower.roughness>wet.roughness);
  }finally{resources.forEach(r=>r.dispose());globalThis.Image=previousImage;globalThis.document=previousDocument;}

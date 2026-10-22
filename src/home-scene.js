@@ -252,7 +252,7 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
  for(let i=0;i<4;i++){const x=(ISLAND.x+340+i*585)/1000,z=(ISLAND.z+1160)/1000;cylinder(x,.65,z,.17,.05,oak,kg);cylinder(x,.32,z,.025,.62,ink,kg);cylinder(x,.025,z,.17,.04,ink,kg);}
  for(const [id,p] of buildElectricalPoints({group,box,cylinder,mat,resources,settings}))gardenGroups.set(id,p);
  for(const [id,p] of buildWaterPoints({group,box,cylinder,mat,resources,settings,points:WATER_LAYOUT.points}))gardenGroups.set(id,p);
- if(mode==='building'&&settings.buildingLevel>0)for(const w of WALLS.filter(w=>w.external)){
+ if(['building','unit','walk'].includes(mode)&&!wallCutaway)for(const w of WALLS.filter(w=>w.external)){
   const v=Math.abs(w.a[0]-w.b[0])<.001,h=3.1-HOUSE.height;
   box((w.a[0]+w.b[0])/2,HOUSE.height+h/2,(w.a[1]+w.b[1])/2,v?w.thickness:Math.abs(w.b[0]-w.a[0]),h,v?Math.abs(w.b[1]-w.a[1]):w.thickness,surface('limestone','#d9d2c5'),group,{part:'building-apartment-top-band'});
  }

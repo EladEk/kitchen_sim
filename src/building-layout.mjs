@@ -8,6 +8,8 @@ export const BUILDING_FLOORS=T.floors.map(f=>({...f,elevation:f.level*BUILDING.s
 export const BUILDING_ROOF={...T.roof,elevation:BUILDING.levels*BUILDING.storey,id:'building-roof',image:'/house/building-plan-11.jpg'};
 export const BUILDING_SITE=T.site[0];
 export const BUILDING_PHOTOS=[
+ {image:'/house/efi-reference/site.png',he:'מתחם 5 — איתור בניין 4102',en:'Complex 5 — building 4102',source:'efi-project',page:1},
+ {image:'/house/efi-reference/002.jpg',he:'הדמיית החזית הרשמית של אפי קפיטל',en:'Official Efi Capital facade render',source:'efi-project',page:2},
  {image:'/house/exterior/reference-3.jpg',he:'מסתורי השירות והנסיגות בחזית',en:'Service screens and facade setbacks',source:'exterior-details',page:3},
  {image:'/house/garden/reference-2.jpg',he:'מרפסת קומה ראשונה וחיפוי האבן',en:'First-floor balcony and limestone',source:'garden-design',page:2},
  {image:'/house/garden/reference-3.jpg',he:'מעקות זכוכית, מסגרות ופינות הבניין',en:'Glass rails, frames and building corners',source:'garden-design',page:3}

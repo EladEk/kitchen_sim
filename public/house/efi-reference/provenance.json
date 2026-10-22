@@ -1,0 +1,164 @@
+{
+  "project": "Efi in Afikei Nahal Ofakim stage A, complex5",
+  "building": 4102,
+  "plot": 1410,
+  "checked": "2026-10-22",
+  "galleryPage": "https://efficapital.co.il/Effi-Afikim/",
+  "projectPage": "https://www.efficapital.co.il/פרויקטים/אפי-באפיקי-נחל-אופקים-שלב-א/",
+  "references": [
+    {
+      "file": "001.jpg",
+      "url": "https://efficapital.co.il/Effi-Afikim/wp-content/uploads/2024/05/2228_fn_001-scaled.jpg",
+      "sha256": "026cf236644d19d66192c9e95488e11420f5186fabe03d6d282f02bac8f94cc2",
+      "type": "official-marketing-render",
+      "basis": "official stage-A gallery; generic project block, not surveyed building elevation"
+    },
+    {
+      "file": "002.jpg",
+      "url": "https://efficapital.co.il/Effi-Afikim/wp-content/uploads/2024/05/2228_fn_002-scaled.jpg",
+      "sha256": "6ea1eb4f4b4ecbcaa76066795629239adaecc0ed5450f7bb7222d389a9e03439",
+      "type": "official-marketing-render",
+      "basis": "official stage-A gallery; generic project block, not surveyed building elevation"
+    },
+    {
+      "file": "003.jpg",
+      "url": "https://efficapital.co.il/Effi-Afikim/wp-content/uploads/2024/05/2228_fn_003-scaled.jpg",
+      "sha256": "7ebb7fa86f81bdc73fd7571f9b4bdcd049d6703fca81a2f2eafab1e1579645d6",
+      "type": "official-marketing-render",
+      "basis": "official stage-A gallery; generic project block, not surveyed building elevation"
+    },
+    {
+      "file": "004.jpg",
+      "url": "https://efficapital.co.il/Effi-Afikim/wp-content/uploads/2024/05/2228_fn_004-scaled.jpg",
+      "sha256": "e4afd2a9300dbf65a8b775d15035d49b6bb24df045b5d117deabc9140a6dca1d",
+      "type": "official-marketing-render",
+      "basis": "official stage-A gallery; generic project block, not surveyed building elevation"
+    },
+    {
+      "file": "005.jpg",
+      "url": "https://efficapital.co.il/Effi-Afikim/wp-content/uploads/2024/05/2228_fn_005-scaled.jpg",
+      "sha256": "372ae725a4278c8e4e6ded293d39dc048180a163918fe32017b7d25804056e56",
+      "type": "official-marketing-render",
+      "basis": "official stage-A gallery; generic project block, not surveyed building elevation"
+    },
+    {
+      "file": "006t.jpg",
+      "url": "https://efficapital.co.il/Effi-Afikim/wp-content/uploads/2024/05/2228_fn_006t-scaled.jpg",
+      "sha256": "85d62f5900ee1c0e5032ddc859e41377c962808a03598cd0c9184d9308517ffd",
+      "type": "official-marketing-render",
+      "basis": "official stage-A gallery; generic project block, not surveyed building elevation"
+    },
+    {
+      "file": "site.pdf",
+      "url": "https://efficapital.co.il/Effi-Afikim/wp-content/uploads/2024/06/104187-5_effi_hadmaya_c-1-1.pdf",
+      "sha256": "5f9e8ce25d3b92a74eb7115c4553dcb07d526b5686b8446b4186cb031efcdb3e",
+      "type": "official-labelled-marketing-aerial",
+      "basis": "Explicit building 4102 label, complex5"
+    },
+    {
+      "file": "interior-01.webp",
+      "url": "https://www.efficapital.co.il/wp-content/uploads/2024/06/Efi-in-Nahal-Ofakim_INT_View_01.webp",
+      "sha256": "13add805857dda78e7ebe335fa964b4d0fc8009e3ec68ed09df4208559e5e98a",
+      "type": "official-interior-marketing-render",
+      "basis": "Use lighting/material realism reference only; does not verify owner choices, common lobby or precise apartment"
+    },
+    {
+      "file": "interior-02.webp",
+      "url": "https://www.efficapital.co.il/wp-content/uploads/2024/06/Efi-in-Nahal-Ofakim_INT_View_02.webp",
+      "sha256": "22821c145f95705876ae909620862a5fdfeaa66d7177b8884a7b1a6e5f9225e1",
+      "type": "official-interior-marketing-render",
+      "basis": "Use lighting/material realism reference only; does not verify owner choices, common lobby or precise apartment"
+    },
+    {
+      "file": "interior-03.webp",
+      "url": "https://www.efficapital.co.il/wp-content/uploads/2024/06/Efi-in-Nahal-Ofakim_INT_View_03.webp",
+      "sha256": "5e530e43e846f54af064bac13590de1296c0f20ca46c631f884b546c175aa292",
+      "type": "official-interior-marketing-render",
+      "basis": "Use lighting/material realism reference only; does not verify owner choices, common lobby or precise apartment"
+    },
+    {
+      "file": "interior-04.webp",
+      "url": "https://www.efficapital.co.il/wp-content/uploads/2024/06/Efi-in-Nahal-Ofakim_INT_View_04.webp",
+      "sha256": "691683e72073a64ffcde3f99e48578b0a937b06c434ac16d2936248221c91bfc",
+      "type": "official-interior-marketing-render",
+      "basis": "Use lighting/material realism reference only; does not verify owner choices, common lobby or precise apartment"
+    },
+    {
+      "file": "interior-05.webp",
+      "url": "https://www.efficapital.co.il/wp-content/uploads/2024/06/Efi-in-Nahal-Ofakim_INT_View_05.webp",
+      "sha256": "a5c1d49c398791dbe570153cfad4baefea4510ac6bdde4faa5b90c22b557e84a",
+      "type": "official-interior-marketing-render",
+      "basis": "Use lighting/material realism reference only; does not verify owner choices, common lobby or precise apartment"
+    },
+    {
+      "file": "interior-06.webp",
+      "url": "https://www.efficapital.co.il/wp-content/uploads/2024/06/Efi-in-Nahal-Ofakim_INT_View_06.webp",
+      "sha256": "66661d9d2529f805494b3e20d06f7de18499f183d24002b0fc5cb91e743d8b2d",
+      "type": "official-interior-marketing-render",
+      "basis": "Use lighting/material realism reference only; does not verify owner choices, common lobby or precise apartment"
+    },
+    {
+      "file": "interior-07.webp",
+      "url": "https://www.efficapital.co.il/wp-content/uploads/2024/06/Efi-in-Nahal-Ofakim_INT_View_07.webp",
+      "sha256": "8628557af82244b550d31a6dbdff8194de7724cb6bdc1168166704ad622eece0",
+      "type": "official-interior-marketing-render",
+      "basis": "Use lighting/material realism reference only; does not verify owner choices, common lobby or precise apartment"
+    },
+    {
+      "file": "interior-08.webp",
+      "url": "https://www.efficapital.co.il/wp-content/uploads/2024/06/Efi-in-Nahal-Ofakim_INT_View_08.webp",
+      "sha256": "2b47e1eedb58a2a519d878ba70ea2b3698c35610535342d04ab296532f5b4eb9",
+      "type": "official-interior-marketing-render",
+      "basis": "Use lighting/material realism reference only; does not verify owner choices, common lobby or precise apartment"
+    },
+    {
+      "file": "interior-09.webp",
+      "url": "https://www.efficapital.co.il/wp-content/uploads/2024/06/Efi-in-Nahal-Ofakim_INT_View_09.webp",
+      "sha256": "a4f8da77696f61aa4e830fd473cfb8e6abfd6b51d6d39ec3529c85c53c0c6368",
+      "type": "official-interior-marketing-render",
+      "basis": "Use lighting/material realism reference only; does not verify owner choices, common lobby or precise apartment"
+    },
+    {
+      "file": "interior-10.webp",
+      "url": "https://www.efficapital.co.il/wp-content/uploads/2024/06/Efi-in-Nahal-Ofakim_INT_View_10.webp",
+      "sha256": "a0bb3b45b961c06d1901af798a87b862e452c451a5ae45ad296d1be42184ef47",
+      "type": "official-interior-marketing-render",
+      "basis": "Use lighting/material realism reference only; does not verify owner choices, common lobby or precise apartment"
+    },
+    {
+      "file": "interior-11.webp",
+      "url": "https://www.efficapital.co.il/wp-content/uploads/2024/06/Efi-in-Nahal-Ofakim_INT_View_11.webp",
+      "sha256": "58d58e2456a4c939ceb26e6a269eed3c792458cf41a95ba6a8569502e6d6f37c",
+      "type": "official-interior-marketing-render",
+      "basis": "Use lighting/material realism reference only; does not verify owner choices, common lobby or precise apartment"
+    },
+    {
+      "file": "interior-12.webp",
+      "url": "https://www.efficapital.co.il/wp-content/uploads/2024/06/Efi-in-Nahal-Ofakim_INT_View_12.webp",
+      "sha256": "d6ca050c18ebc43d2c38e33964108f3a0d0afd186f17276b14ff24443cd006dd",
+      "type": "official-interior-marketing-render",
+      "basis": "Use lighting/material realism reference only; does not verify owner choices, common lobby or precise apartment"
+    },
+    {
+      "file": "interior-13.webp",
+      "url": "https://www.efficapital.co.il/wp-content/uploads/2024/06/Efi-in-Nahal-Ofakim_INT_View_13.webp",
+      "sha256": "b29f7281cfc08f7095559952c8cfce1f308ac0ee204275221cb832d7341bb0e5",
+      "type": "official-interior-marketing-render",
+      "basis": "Use lighting/material realism reference only; does not verify owner choices, common lobby or precise apartment"
+    },
+    {
+      "file": "interior-14.webp",
+      "url": "https://www.efficapital.co.il/wp-content/uploads/2024/06/Efi-in-Nahal-Ofakim_INT_View_14.webp",
+      "sha256": "30b3a8041ee1026875b64253ab0baf78e5f7817dd215dea5fc2eb1c7249dd0d3",
+      "type": "official-interior-marketing-render",
+      "basis": "Use lighting/material realism reference only; does not verify owner choices, common lobby or precise apartment"
+    },
+    {
+      "file": "interior-15.webp",
+      "url": "https://www.efficapital.co.il/wp-content/uploads/2024/06/Efi-in-Nahal-Ofakim_INT_View_15.webp",
+      "sha256": "f57970facf823ce59fcb5e7fd98fc7b11f62f2ec1eb5367cc32ce075c9ad2ed5",
+      "type": "official-interior-marketing-render",
+      "basis": "Use lighting/material realism reference only; does not verify owner choices, common lobby or precise apartment"
+    }
+  ]
+}
