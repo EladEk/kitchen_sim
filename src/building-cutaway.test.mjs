@@ -13,18 +13,21 @@ function wallTop(node,part){
 }
 const near=(actual,expected,label)=>assert(Math.abs(actual-expected)<.002,`${label}: ${actual} ≈ ${expected}`);
 
-test('uncut floor and apartment views close at the full wall top instead of leaving raised room-wall stubs above the ceiling',()=>{
+test('selected-floor and apartment overviews expose the requested rooms while leaving unchecked walls full height',()=>{
  for(const floor of BUILDING_FLOORS)for(const mode of ['building','unit']){
   const root=new THREE.Group(),resources=[],settings=normalizeHomeSettings({cutaway:false,buildingLevel:floor.level,tourDestination:`unit:${floor.units[0].number}:${floor.level}`}),model=buildBuildingContext({group:root,resources,settings,mode});
-  try{const node=model.floors.get(floor.level),ceilings=node.children.filter(o=>o.userData.part==='building-storey-ceiling');assert(ceilings.length,`${mode} ${floor.level}: closed top is present, including ground floor`);root.updateMatrixWorld(true);
-   for(const ceiling of ceilings){const bounds=new THREE.Box3().setFromObject(ceiling);near(bounds.max.y,floor.elevation+BUILDING.storey,'ceiling meets the full wall top');near(bounds.min.y,floor.elevation+BUILDING.storey-BUILDING.slab,'structural closing slab stays above the room');}
-   for(const part of ['building-interior-wall','building-facade-wall'])assert(wallTop(node,part)<=floor.elevation+BUILDING.storey+.002,'no wall rises above the closing ceiling');
-   // Native rays from above reproduce the user's floor-4 / apartment-8 views.
-   // Interior rooms must encounter an opaque closing ceiling at full height.
-   const unit=floor.units[0],xs=unit.polygon.map(p=>p[0]),zs=unit.polygon.map(p=>p[1]),ray=new THREE.Raycaster(new THREE.Vector3((Math.min(...xs)+Math.max(...xs))/2,floor.elevation+BUILDING.storey+1,(Math.min(...zs)+Math.max(...zs))/2),new THREE.Vector3(0,-1,0));
-   const hits=ray.intersectObjects(ceilings);assert(hits.length,`${mode} ${floor.level}: top-down room ray hits closing slab`);near(hits[0].point.y,floor.elevation+BUILDING.storey,'opaque top surface');
+  try{const top=model.floors.get(floor.level);assert.equal(top.children.filter(o=>o.userData.part==='building-storey-ceiling').length,0,`${mode} ${floor.level}: the selected floor must not be hidden by its own ceiling`);
+   for(const [level,node] of model.floors){for(const part of ['building-interior-wall','building-facade-wall'])near(wallTop(node,part),level*BUILDING.storey+BUILDING.storey,'unchecked full wall height');if(level<floor.level){const ceilings=node.children.filter(o=>o.userData.part==='building-storey-ceiling');assert(ceilings.length);for(const ceiling of ceilings){const bounds=new THREE.Box3().setFromObject(ceiling);near(bounds.max.y,level*BUILDING.storey+BUILDING.storey,'lower-floor closing slab');}}}
+   // The old R48 roof was the very first hit from an overhead room probe.
+   // This ray must now reach a mesh inside the requested storey.
+   root.updateMatrixWorld(true);const finishes=[];top.traverse(o=>{if(['building-unit-finish','ground-base-room'].includes(o.userData.part))finishes.push(o);});assert(finishes.length);let roomVisible=false;
+   for(const mesh of finishes){const positions=mesh.geometry.attributes.position,index=mesh.geometry.index;for(let triangle=0;triangle<Math.min(30,(index?.count||positions.count)/3)&&!roomVisible;triangle++){const center=new THREE.Vector3();for(let j=0;j<3;j++){const i=index?index.getX(triangle*3+j):triangle*3+j;center.add(new THREE.Vector3().fromBufferAttribute(positions,i));}center.multiplyScalar(1/3).applyMatrix4(mesh.matrixWorld);const ray=new THREE.Raycaster(new THREE.Vector3(center.x,floor.elevation+BUILDING.storey+.2,center.z),new THREE.Vector3(0,-1,0));if(ray.intersectObjects([mesh]).length)roomVisible=true;}if(roomVisible)break;}assert(roomVisible,`requested room floors remain available to the overhead view on ${floor.level}`);
   }finally{resources.forEach(r=>r.dispose?.());}
  }
+});
+
+test('complete-building roofs and walking ceilings stay solid independently of the overview cutaway preference',()=>{
+ for(const mode of ['building','walk'])for(const cutaway of [false,true]){const root=new THREE.Group(),resources=[],model=buildBuildingContext({group:root,resources,settings:normalizeHomeSettings({buildingLevel:9,cutaway}),mode});try{assert(root.getObjectByName('building-roof'));for(const f of BUILDING_FLOORS){const ceilings=model.floors.get(f.level).children.filter(o=>o.userData.part==='building-storey-ceiling');assert(ceilings.length,`${mode} ${f.level}: ceiling retained`);}}finally{resources.forEach(r=>r.dispose?.());}}
 });
 
 test('the saved wall-cutaway switch controls actual facade and interior heights in every floor and apartment view',()=>{

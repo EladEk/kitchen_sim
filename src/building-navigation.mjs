@@ -1,3 +1,4 @@
+import {connectedWallRuns,exposedBalconySegments,wallFootprint,duplexFlightRails,duplexLandingGuards} from './building-geometry.mjs';
 import {BUILDING,BUILDING_FLOORS,BUILDING_SITE} from './building-layout.mjs';
 import {BUILDING_INTERIORS} from './building-interiors.mjs';
 import {HOUSE,HOUSE_OUTLINE,PLOT,ENTRANCE_SERVICES,ROOMS,collisionBoxes,roomAt} from './home-model.mjs';
@@ -15,14 +16,16 @@ export function isDoorOpening(a,b,source){const mid=a.map((n,i)=>(n+b[i])/2);ret
 export function gardenFenceEdge(a,b,f=BUILDING_FLOORS[0]){const mid=a.map((n,i)=>(n+b[i])/2);return ![...f.units.map(u=>u.polygon),f.core].some(poly=>poly.some((c,j)=>segmentDistance(mid,c,poly[(j+1)%poly.length])<.34));}
 export function buildingBoxes(level,settings,cars=[]){
  const f=BUILDING_FLOORS[level],source=interiorsForFloor(level),boxes=[];
- for(const w of source.walls){const mid=w.a.map((n,i)=>(n+w.b[i])/2);if(level===0&&onDetailedGround(mid))continue;boxes.push(segmentBox(w.a,w.b,w.width,{sourceWall:true}));}
+ for(const w of connectedWallRuns(source,f,level===0?COMMON_ENTRY_DOORS:[])){const mid=w.a.map((n,i)=>(n+w.b[i])/2);if(level===0&&onDetailedGround(mid))continue;boxes.push({...wallFootprint(w),sourceWall:true});}
  for(const path of f.envelope)for(const o of path.openings){const mid=o.a.map((n,i)=>(n+o.b[i])/2);if(level===0&&onDetailedGround(mid)||isDoorOpening(o.a,o.b,source))continue;const edge=path.polygon[o.edge],next=path.polygon[(o.edge+1)%path.polygon.length],projection=p=>(p[0]-edge[0])*(next[0]-edge[0])+(p[1]-edge[1])*(next[1]-edge[1]),start=projection(o.a)<projection(o.b)?o.a:o.b;boxes.push(segmentBox(o.kind==='slider'?start:o.a,o.kind==='slider'?mid:o.b,.09,{window:true}));}
  for(const door of source.doors){if(level===0&&onDetailedGround(door.hinge))continue;if(settings.closedBuildingDoors?.includes(door.id))boxes.push(segmentBox(door.hinge,door.closed,.06,{buildingDoorId:door.id}));}
  // Guard every exposed balcony edge; walking must not step off an upper slab.
- for(const poly of f.balconies)poly.forEach((a,i)=>{const b=poly[(i+1)%poly.length],mid=a.map((n,k)=>(n+b[k])/2),dx=b[0]-a[0],dz=b[1]-a[1],len=Math.hypot(dx,dz)||1;if(f.envelope.some(path=>inPolygon([mid[0]+dz/len*.18,mid[1]-dx/len*.18],path.polygon)||inPolygon([mid[0]-dz/len*.18,mid[1]+dx/len*.18],path.polygon)))return;boxes.push(segmentBox(a,b,.06,{guardrail:true}));});
+ for(const {a,b} of exposedBalconySegments(f))boxes.push(segmentBox(a,b,.06,{guardrail:true}));
  for(const lift of source.lifts){if(!liftIsOpen(cars[lift.id],level)){const [x,z]=lift.doorCenter;boxes.push(segmentBox([x+.01,z-.68],[x+.01,z+.68],.08,{liftDoor:true}));}}
  const stair=source.stairs.rect,[a,b]=stair,mx=(a[0]+b[0])/2;
  boxes.push({minX:mx-.12,maxX:mx+.12,minZ:a[1]+1.48,maxZ:b[1]-1.05,stairRail:true});
+ if(level===5&&source.duplexStair)for(const r of duplexFlightRails(source.duplexStair,BUILDING.storey))boxes.push(segmentBox([r.a[0],r.a[2]],[r.b[0],r.b[2]],.04,{duplexGuard:true}));
+ if(level===6&&source.duplexStair)for(const r of duplexLandingGuards(source.duplexStair))boxes.push(segmentBox(r.a,r.b,.04,{duplexGuard:true}));
  if(level===0)for(const garden of f.gardens||[]){if(garden.unit===4)continue;garden.plot.forEach((a,i)=>{const b=garden.plot[(i+1)%garden.plot.length];if(!gardenFenceEdge(a,b,f))return;boxes.push(segmentBox(a,b,.05,{gardenFence:true}));});}
  if(level===0)boxes.push(...collisionBoxes(settings.openDoors,settings.furniture,settings.closedShutters,settings.openParts,settings.furnitureLayout,settings.yardDesign));
  if(level===0&&settings.furniture!==false)for(const unit of [1,2,3])boxes.push(...groundFurnitureBoxes(unit));

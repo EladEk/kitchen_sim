@@ -1,3 +1,4 @@
+import {parkingCarPlacements} from './site-appearance.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
@@ -43,4 +44,13 @@ test('walking reaches the actual main entrance from the sidewalk and a closed en
 });
 test('the native scene has exactly three base interiors, ten additional chamber covers, 46 bays and operable common entry leaves',()=>{
  const root=new THREE.Group(),resources=[],picks=[],settings=normalizeHomeSettings({buildingLevel:0,cutaway:false}),model=buildBuildingContext({group:root,resources,picks,settings,mode:'building'}),nodes=[];root.traverse(o=>nodes.push(o));try{assert.equal(nodes.filter(o=>o.userData.part==='ground-base-apartment').length,3);assert.equal(nodes.filter(o=>o.userData.part==='ground-base-kitchen').length,3);assert.equal(nodes.filter(o=>o.userData.part==='site-inspection-cover').length,10);assert.equal(nodes.filter(o=>o.userData.part==='site-parking-bay').length,46);assert(picks.some(o=>o.userData.doorId==='bd-0-1000'));assert.equal(model.floors.size,1);}finally{resources.forEach(r=>r.dispose?.());}
+});
+
+
+test('parking paving faces the overhead camera, curbs have height and the reference props preserve all 46 source bays',()=>{
+ const root=new THREE.Group(),resources=[],model=buildBuildingContext({group:root,resources,picks:[],settings:normalizeHomeSettings({buildingLevel:0}),mode:'building'}),nodes=[];root.traverse(o=>nodes.push(o));root.updateMatrixWorld(true);
+ try{const bays=nodes.filter(o=>o.userData.part==='site-parking-bay');assert.equal(bays.length,46);for(const bay of bays){const source=SITE_TRACE.parking.find(b=>b.id===bay.userData.buildingId),center=source.polygon.reduce((sum,p)=>sum.map((n,i)=>n+p[i]/source.polygon.length),[0,0]),ray=new THREE.Raycaster(new THREE.Vector3(center[0],.3,center[1]),new THREE.Vector3(0,-1,0));assert(ray.intersectObject(bay).length,'pavement must be visible from above');assert.equal(bay.material.side,THREE.DoubleSide);}
+ const curbs=nodes.filter(o=>o.userData.part==='site-raised-curb');assert(curbs.length);for(const c of curbs){const b=new THREE.Box3().setFromObject(c);near(b.max.y-b.min.y,.12,.001);assert(c.userData.heightInferred);}
+ assert(nodes.some(o=>o.userData.part==='site-illustrative-cars'&&o.isInstancedMesh));for(const car of parkingCarPlacements()){const bay=SITE_TRACE.parking.find(b=>b.id===car.bayId),xs=bay.polygon.map(p=>p[0]),zs=bay.polygon.map(p=>p[1]);for(const x of [-car.width/2,car.width/2])for(const z of [-car.length/2,car.length/2]){const xx=car.position[0]+x*Math.cos(car.angle)+z*Math.sin(car.angle),zz=car.position[1]-x*Math.sin(car.angle)+z*Math.cos(car.angle);assert(xx>=Math.min(...xs)&&xx<=Math.max(...xs)&&zz>=Math.min(...zs)&&zz<=Math.max(...zs));}}
+ }finally{resources.forEach(r=>r.dispose?.());}
 });

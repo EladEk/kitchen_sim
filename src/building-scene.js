@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import {BUILDING,BUILDING_FLOORS,BUILDING_ROOF,BUILDING_SITE,BUILDING_CENTER,normalizeBuildingLevel} from './building-layout.mjs';
 import {BUILDING_INTERIORS} from './building-interiors.mjs';
 import {onDetailedGround,segmentDistance,parseDestination,isDoorOpening,gardenFenceEdge} from './building-navigation.mjs';
+import {connectedWallRuns,exposedBalconySegments,commonStairRails,duplexFlightRails,duplexLandingGuards} from './building-geometry.mjs';
+import {COMMON_ENTRY_DOORS} from './building-site.mjs';
 import {balconyFrameStacks} from './building-appearance.mjs';
 import {buildElevators} from './building-elevators.js';
 import {buildingNumberPlate} from './building-signage.js';
@@ -61,6 +63,11 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
   if(poly.length<3)return;const s=new THREE.Shape();poly.forEach(([x,z],i)=>i?s.lineTo(x,z):s.moveTo(x,z));s.closePath();for(const poly of holes){const hole=new THREE.Path();poly.forEach(([x,z],i)=>i?hole.lineTo(x,z):hole.moveTo(x,z));hole.closePath();s.holes.push(hole);}const geo=new THREE.ExtrudeGeometry(s,{depth:thickness,bevelEnabled:false});geo.rotateX(Math.PI/2);resources.push(geo);const mesh=new THREE.Mesh(geo,mat);mesh.position.y=y;mesh.castShadow=mesh.receiveShadow=true;mesh.userData={part,buildingFloor:level,source:'building-plan'};parent.add(mesh);return mesh;
  }
  function segment(a,b,y,h,thickness,into){const dx=b[0]-a[0],dz=b[1]-a[1],length=Math.hypot(dx,dz);if(length<.008||h<.008)return;into.push([(a[0]+b[0])/2,y+h/2,(a[1]+b[1])/2,length,h,thickness,-Math.atan2(dz,dx)]);}
+ function stairHandrails(paths,base,parent,level,part){
+  const g=new THREE.CylinderGeometry(.018,.018,1,10),items=[];resources.push(g);
+  for(const path of paths){const a=new THREE.Vector3(path.a[0],base+path.a[1]+.98,path.a[2]),b=new THREE.Vector3(path.b[0],base+path.b[1]+.98,path.b[2]);items.push([a,b]);const length=a.distanceTo(b),count=Math.max(1,Math.ceil(length/.65));for(let i=0;i<=count;i++){const top=a.clone().lerp(b,i/count);items.push([new THREE.Vector3(top.x,top.y-.98,top.z),top]);}items.push([a.clone().add(new THREE.Vector3(0,-.48,0)),b.clone().add(new THREE.Vector3(0,-.48,0))]);}
+  const mesh=new THREE.InstancedMesh(g,metal,items.length),q=new THREE.Quaternion(),m=new THREE.Matrix4();items.forEach(([a,b],i)=>{const delta=b.clone().sub(a);q.setFromUnitVectors(THREE.Object3D.DEFAULT_UP,delta.clone().normalize());m.compose(a.clone().add(b).multiplyScalar(.5),q,new THREE.Vector3(1,delta.length(),1));mesh.setMatrixAt(i,m);});mesh.castShadow=mesh.receiveShadow=true;mesh.userData={part,buildingFloor:level,dimensionsInferred:true,source:'building-plan'};mesh.computeBoundingSphere();resources.push(mesh);parent.add(mesh);
+ }
  const nearApartment=(a,b)=>{const p=[(a[0]+b[0])/2,(a[1]+b[1])/2];return p[0]<11.98&&p[0]>-.7&&p[1]>-.35&&p[1]<16.05;};
  const onGroundReplica=p=>BUILDING_FLOORS[0].units.some(u=>u.number!==4&&(pointInPolygon(p,u.polygon)||u.polygon.some((a,i)=>segmentDistance(p,a,u.polygon[(i+1)%u.polygon.length])<.24)));
  for(const def of BUILDING_FLOORS){
@@ -87,7 +94,7 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
     }
    });
   }
-  for(const w of source.walls){
+  for(const w of connectedWallRuns(source,def,def.level===0?COMMON_ENTRY_DOORS:[])){
    const mid=w.a.map((n,i)=>(n+w.b[i])/2);if(def.level===0&&(onDetailedGround(mid)||shown&&onGroundReplica(mid)))continue;
    const exterior=def.envelope.some(path=>path.polygon.some((a,i)=>segmentDistance(mid,a,path.polygon[(i+1)%path.polygon.length])<.25));
    segment(w.a,w.b,base,h,w.width,exterior?walls:interiorWalls);
@@ -110,14 +117,11 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
   for(const poly of def.balconies){
    slab(poly,base-.012,BUILDING.slab,deck,node,'building-balcony-slab',def.level);
    if(shown)slab(poly,base-.016-BUILDING.slab,.012,soffit,node,'building-balcony-soffit',def.level);
-   poly.forEach((a,i)=>{const b=poly[(i+1)%poly.length],mid=[(a[0]+b[0])/2,(a[1]+b[1])/2];
-    // Only exposed edges get guardrails; balcony-to-building joints stay open.
-    const dx=b[0]-a[0],dz=b[1]-a[1],len=Math.hypot(dx,dz),eps=.13;
-    const inEnclosure=p=>def.envelope.some(path=>pointInPolygon(p,path.polygon));
-    if(inEnclosure([mid[0]+dz/len*eps,mid[1]-dx/len*eps])||inEnclosure([mid[0]-dz/len*eps,mid[1]+dx/len*eps]))return;
-    segment(a,b,base-BUILDING.slab,.24,.20,fascias);segment(a,b,base+1.08,.045,.05,rails);
-    if(!cut){segment(a,b,base+.05,1.02,.015,panes);for(let j=0,n=Math.max(1,Math.ceil(len/1.25));j<=n;j++){const t=j/n;rails.push([a[0]+dx*t,base+.55,a[1]+dz*t,.035,1.1,.035]);}}
-   });
+
+  }
+  for(const {a,b} of exposedBalconySegments(def)){
+   const dx=b[0]-a[0],dz=b[1]-a[1],len=Math.hypot(dx,dz);segment(a,b,base-BUILDING.slab,.24,.20,fascias);segment(a,b,base+1.08,.045,.05,rails);
+   if(!cut){segment(a,b,base+.05,1.02,.015,panes);for(let j=0,n=Math.max(1,Math.ceil(len/1.25));j<=n;j++){const t=j/n;rails.push([a[0]+dx*t,base+.55,a[1]+dz*t,.035,1.1,.035]);}}
   }
   // Actual PDF flight footprints and directions; vertical rise is estimated.
   if(shown){
@@ -130,6 +134,10 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
    }
    if(def.level<8&&!cut)steps.push([mx,base+BUILDING.storey/2-.07,(s+b[1])/2,b[0]-a[0],.14,b[1]-s]);
    batch(node,concrete,steps,'building-common-stair',def.level);
+   if(!cut&&def.level<8)stairHandrails(commonStairRails(source,BUILDING.storey),base,node,def.level,'building-stair-guard');
+   if(!cut&&def.level===5&&source.duplexStair)stairHandrails(duplexFlightRails(source.duplexStair,BUILDING.storey),base,node,def.level,'building-duplex-guard');
+   if(!cut&&def.level===6&&source.duplexStair)stairHandrails(duplexLandingGuards(source.duplexStair).map(s=>({a:[s.a[0],0,s.a[1]],b:[s.b[0],0,s.b[1]]})),base,node,def.level,'building-duplex-landing-guard');
+
    if(def.level===5&&source.duplexStair){const d=source.duplexStair,[a,b]=d.longFlightRect,[c,e]=d.shortFlightRect,[la,lb]=d.cornerLandingRect,stairs=[];
     for(let j=0;j<12;j++){const rise=(j+1)/16*BUILDING.storey;if(!cut||rise<=h)stairs.push([(a[0]+b[0])/2,base+rise/2,b[1]-(j+.5)*(b[1]-a[1])/12,b[0]-a[0],rise,(b[1]-a[1])/12]);}
     if(!cut)stairs.push([(la[0]+lb[0])/2,base+BUILDING.storey*.75-.07,(la[1]+lb[1])/2,lb[0]-la[0],.14,lb[1]-la[1]]);
@@ -148,7 +156,7 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
   batch(node,trimMat,trims,'building-interior-trim',def.level);batch(node,handleMat,handles,'building-door-hardware',def.level);batch(node,fascia,fascias,'building-balcony-fascia',def.level);
   batch(node,limestone,walls,'building-facade-wall',def.level);batch(node,insideWall,interiorWalls,'building-interior-wall',def.level);batch(node,metal,frames,'building-window-frame',def.level);batch(node,glass,panes,'building-glazing',def.level,false);batch(node,voidMat,dark,'building-fascia-and-service-screen',def.level);batch(node,metal,rails,'building-rail-and-louvres',def.level);batch(node,limestone,decks,'building-stone-sill',def.level);
   if(def.level===0&&shown)buildGroundApartments({root:node,resources,picks,settings,cut,mode,floorMaterial:interiorFloor});
-  if(shown&&!cut){
+  if(shown&&!cut&&(walking||def.level<limit||limit===9)){
    // A visible closing slab must meet the full storey-height walls. Placing
    // its upper face at the interior clear height hid the rooms while leaving
    // 35cm of every partition above it, making unchecked views look sliced.
