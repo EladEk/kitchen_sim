@@ -1,3 +1,4 @@
+import {RESIDENTS_CLUB,clubWindowProfile,isClubDestination,inResidentsClub} from './residents-club.mjs';
 import {connectedWallRuns,exposedBalconySegments,wallFootprint,duplexFlightRails,duplexLandingGuards} from './building-geometry.mjs';
 import {BUILDING,BUILDING_FLOORS,BUILDING_SITE} from './building-layout.mjs';
 import {BUILDING_INTERIORS} from './building-interiors.mjs';
@@ -17,7 +18,7 @@ export function gardenFenceEdge(a,b,f=BUILDING_FLOORS[0]){const mid=a.map((n,i)=
 export function buildingBoxes(level,settings,cars=[]){
  const f=BUILDING_FLOORS[level],source=interiorsForFloor(level),boxes=[];
  for(const w of connectedWallRuns(source,f,level===0?COMMON_ENTRY_DOORS:[])){const ownership=w.sourceWallIndex==null?w:source.walls[w.sourceWallIndex],mid=ownership.a.map((n,i)=>(n+ownership.b[i])/2);if(level===0&&onDetailedGround(mid))continue;boxes.push({...wallFootprint(w),sourceWall:true});}
- for(const path of f.envelope)for(const o of path.openings){const mid=o.a.map((n,i)=>(n+o.b[i])/2);if(level===0&&onDetailedGround(mid)||isDoorOpening(o.a,o.b,source))continue;const edge=path.polygon[o.edge],next=path.polygon[(o.edge+1)%path.polygon.length],projection=p=>(p[0]-edge[0])*(next[0]-edge[0])+(p[1]-edge[1])*(next[1]-edge[1]),start=projection(o.a)<projection(o.b)?o.a:o.b;boxes.push(segmentBox(o.kind==='slider'?start:o.a,o.kind==='slider'?mid:o.b,.09,{window:true}));}
+ for(const path of f.envelope)for(const o of path.openings){const mid=o.a.map((n,i)=>(n+o.b[i])/2);if(level===0&&onDetailedGround(mid)||isDoorOpening(o.a,o.b,source))continue;const edge=path.polygon[o.edge],next=path.polygon[(o.edge+1)%path.polygon.length],projection=p=>(p[0]-edge[0])*(next[0]-edge[0])+(p[1]-edge[1])*(next[1]-edge[1]),start=projection(o.a)<projection(o.b)?o.a:o.b;boxes.push(segmentBox(!clubWindowProfile(level,o)&&o.kind==='slider'?start:o.a,!clubWindowProfile(level,o)&&o.kind==='slider'?mid:o.b,.09,{window:true}));}
  for(const door of source.doors){if(level===0&&onDetailedGround(door.hinge))continue;if(settings.closedBuildingDoors?.includes(door.id))boxes.push(segmentBox(door.hinge,door.closed,.06,{buildingDoorId:door.id}));}
  // Guard every exposed balcony edge; walking must not step off an upper slab.
  for(const {a,b} of exposedBalconySegments(f))boxes.push(segmentBox(a,b,.06,{guardrail:true}));
@@ -29,7 +30,7 @@ export function buildingBoxes(level,settings,cars=[]){
  if(level===0)for(const garden of f.gardens||[]){if(garden.unit===4)continue;garden.plot.forEach((a,i)=>{const b=garden.plot[(i+1)%garden.plot.length];if(!gardenFenceEdge(a,b,f))return;boxes.push(segmentBox(a,b,.05,{gardenFence:true}));});}
  if(level===0)boxes.push(...collisionBoxes(settings.openDoors,settings.furniture,settings.closedShutters,settings.openParts,settings.furnitureLayout,settings.yardDesign));
  if(level===0&&settings.furniture!==false)for(const unit of [1,2,3])boxes.push(...groundFurnitureBoxes(unit));
- if(level===0)boxes.push(...siteCollisionBoxes());
+ if(level===0)boxes.push({...RESIDENTS_CLUB.cabinet,clubCabinet:true},...siteCollisionBoxes());
  if(level===0)for(const d of COMMON_ENTRY_DOORS)if(settings.closedBuildingDoors?.includes(d.id))boxes.push(segmentBox(d.hinge,d.closed,.06,{buildingDoorId:d.id}));
  return boxes;
 }
@@ -52,12 +53,14 @@ export function clearBuildingPosition(at,level,boxes,cars){
  return null;
 }
 export function parseDestination(value='unit:4:0'){
+ if(isClubDestination(value))return {floor:0,unit:null,common:'club'};
  const parts=String(value).split(':'),floor=Number(parts[parts[0]==='floor'?1:2]);
  if(Number.isInteger(floor)&&floor>=0&&floor<=8){if(parts[0]==='floor')return {floor,unit:null};const unit=Number(parts[1]);if(BUILDING_FLOORS[floor].units.some(u=>u.number===unit))return {floor,unit};}
  return {floor:0,unit:4};
 }
 export function destinationStart(destination,settings,cars){
  const {floor,unit}=parseDestination(destination),source=interiorsForFloor(floor),boxes=buildingBoxes(floor,settings,cars);
+ if(isClubDestination(destination))return {position:clearBuildingPosition(RESIDENTS_CLUB.walk,0,boxes,cars)||RESIDENTS_CLUB.walk,floor:0,yaw:RESIDENTS_CLUB.yaw};
  if(unit===4&&floor===0){const p=clearBuildingPosition(ROOMS[0].walk,floor,boxes,cars);return {position:p||ROOMS[0].walk,floor,yaw:Math.PI};}
  const entry=source.entries.find(e=>e.unit===unit),door=source.doors.find(d=>d.id===entry?.doorId);
  let at,yaw;
@@ -68,7 +71,7 @@ export function destinationStart(destination,settings,cars){
 }
 export function buildingLocation(p,floor){
  const f=BUILDING_FLOORS[floor],unit=f.units.find(u=>inPolygon(p,u.polygon))?.number||null;
- return {floor,unit,roomId:floor===0&&(unit===4||inPolygon(p,PLOT))?roomAt(p):null};
+ return {floor,unit,common:floor===0&&inResidentsClub(p)?'club':null,roomId:floor===0&&(unit===4||inPolygon(p,PLOT))?roomAt(p):null};
 }
 export function nearbyLift(p,floor,cars){
  const source=interiorsForFloor(floor);

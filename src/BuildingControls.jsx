@@ -1,3 +1,4 @@
+import {RESIDENTS_CLUB} from './residents-club.mjs';
 import {ProtectedImage} from './DocumentAccess.jsx';
 import {Building2,House,FileText,Camera} from 'lucide-react';
 import {BUILDING,BUILDING_FLOORS,BUILDING_PHOTOS,BUILDING_ACCURACY,buildingLevel} from './building-layout.mjs';
@@ -15,6 +16,7 @@ export function BuildingControls({settings,mode,onMode,onChange,onSource,onInspe
   <button className="building-source-button" onClick={()=>onSource('building-plan',selected.page)}><FileText size={17}/>{he?'השוואה לתוכנית הקומה המקורית':'Compare original floor plan'} · {selected.page}</button>
   <label className="building-shadow-choice"><input type="checkbox" checked={settings.buildingShadows!==false} onChange={e=>onChange('buildingShadows',e.target.checked)}/>{he?'צל הבניין גם כשמתמקדים בדירה':'Building shadows when focusing the apartment'}</label>
   <small>{he?'במבט הדירה מעטפת הבניין מוסתרת מהעין ושומרת על ההצללה. כיבוי האפשרות מאפשר להשוות לדירה מבודדת. בחירת קומה מסתירה את הקומות שמעליה ואת התקרה מעל הקומה הנבחרת; קיצור הקירות נקבע בנפרד ב״חתך קירות״.':'In apartment view the building is visually hidden while its shadows remain. Turn this off to compare with an isolated apartment. Selecting a floor hides the floors above it and opens its ceiling for an interior overview. Shortening the walls is controlled separately by Cutaway.'}</small>
+  <details className="building-evidence"><summary>{he?'מועדון דיירים — תיעוד ודיוק':'Residents’ club — evidence and accuracy'}</summary><p>{he?RESIDENTS_CLUB.noteHe:RESIDENTS_CLUB.noteEn}</p><button className="building-source-button" onClick={()=>onSource('residents-club-video',4)}><Camera size={17}/>{he?'צפייה בסרטון המקורי':'Watch original video'}</button></details>
   <BuildingSiteFacts lang={settings.lang} onSource={onSource} onInspect={onInspect}/>
   <details className="building-evidence"><summary>{he?'מקורות ודיוק השחזור':'Sources and reconstruction accuracy'}</summary><p>{he?BUILDING_ACCURACY.planHe:BUILDING_ACCURACY.planEn}</p><p>{he?BUILDING_ACCURACY.estimateHe:BUILDING_ACCURACY.estimateEn}</p><p>{he?'מרווח קומה משוער':'Assumed storey spacing'}: {BUILDING.storey.toFixed(2)} {he?'מ׳':'m'}.</p><div className="building-photo-grid">{BUILDING_PHOTOS.map(p=><button key={p.image} onClick={()=>onSource(p.source,p.page)}><ProtectedImage src={p.image} loading="lazy" alt={he?p.he:p.en}/><span><Camera size={14}/>{he?p.he:p.en}</span></button>)}</div><a href={BUILDING.source} target="_blank" rel="noreferrer">{he?'פתיחת PDF הבניין המקורי':'Open the original building PDF'}</a></details>
  </section>;

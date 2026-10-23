@@ -1,3 +1,5 @@
+import {clubWindowProfile} from './residents-club.mjs';
+import {buildResidentsClub} from './residents-club-scene.js';
 import * as THREE from 'three';
 import {BUILDING,BUILDING_FLOORS,BUILDING_ROOF,BUILDING_SITE,BUILDING_CENTER,normalizeBuildingLevel} from './building-layout.mjs';
 import {BUILDING_INTERIORS} from './building-interiors.mjs';
@@ -83,14 +85,14 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
     const b=path.polygon[(i+1)%path.polygon.length];if(def.level===0&&(nearApartment(a,b)||shown&&onGroundReplica(a.map((n,k)=>(n+b[k])/2))))return; // detailed ground profiles own their openings
     const length=Math.hypot(b[0]-a[0],b[1]-a[1]),u=[(b[0]-a[0])/length,(b[1]-a[1])/length],at=t=>[a[0]+u[0]*t,a[1]+u[1]*t],span=o=>[o.a,o.b].map(p=>(p[0]-a[0])*u[0]+(p[1]-a[1])*u[1]).sort((a,b)=>a-b);
     const holes=path.openings.filter(o=>o.edge===i&&!isDoorOpening(o.a,o.b,source)).map(o=>({...o,span:span(o)})).sort((a,b)=>a.span[0]-b.span[0]);let cursor=0;
-    for(const o of holes){const [l,r]=o.span,sill=o.kind==='slider'?0:1,oh=o.kind==='slider'?2.3:1.25;segment(at(l),at(r),base,Math.min(h,sill),.3,walls);if(h>sill+oh)segment(at(l),at(r),base+sill+oh,h-sill-oh,.3,walls);
+    for(const o of holes){const [l,r]=o.span,profile=clubWindowProfile(def.level,o),kind=profile?.kind||o.kind,sill=profile?.sill??(kind==='slider'?0:1),oh=profile?.height??(kind==='slider'?2.3:1.25);segment(at(l),at(r),base,Math.min(h,sill),.3,walls);if(h>sill+oh)segment(at(l),at(r),base+sill+oh,h-sill-oh,.3,walls);
      if(!cut){
       const angle=-Math.atan2(u[1],u[0]),mid=at((l+r)/2),width=r-l;
-      const paneCenter=o.kind==='slider'?at(l+width/4):mid;
-      panes.push([paneCenter[0],base+sill+oh/2,paneCenter[1],(o.kind==='slider'?width/2:width)-.05,oh-.05,.018,angle]);
+      const paneCenter=kind==='slider'?at(l+width/4):mid;
+      panes.push([paneCenter[0],base+sill+oh/2,paneCenter[1],(kind==='slider'?width/2:width)-.05,oh-.05,.018,angle]);
       for(const q of [l+.018,r-.018,(l+r)/2])frames.push([at(q)[0],base+sill+oh/2,at(q)[1],.035,oh,.085,angle]);
       for(const yy of [sill,sill+oh])frames.push([mid[0],base+yy,mid[1],width,.04,.085,angle]);
-      if(o.kind==='window'){segment(at(l-.04),at(r+.04),base+sill-.045,.06,.42,decks);dark.push([mid[0],base+sill+oh+.11,mid[1],width+.12,.17,.17,angle]);}
+      if(kind==='window'){segment(at(l-.04),at(r+.04),base+sill-.045,.06,.42,decks);dark.push([mid[0],base+sill+oh+.11,mid[1],width+.12,.17,.17,angle]);}
      }cursor=r;
     }
    });
@@ -156,6 +158,7 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
   }
   batch(node,trimMat,trims,'building-interior-trim',def.level);batch(node,handleMat,handles,'building-door-hardware',def.level);batch(node,fascia,fascias,'building-balcony-fascia',def.level);
   batch(node,limestone,walls,'building-facade-wall',def.level);batch(node,insideWall,interiorWalls,'building-interior-wall',def.level);batch(node,metal,frames,'building-window-frame',def.level);batch(node,glass,panes,'building-glazing',def.level,false);batch(node,voidMat,dark,'building-fascia-and-service-screen',def.level);batch(node,metal,rails,'building-rail-and-louvres',def.level);batch(node,limestone,decks,'building-stone-sill',def.level);
+  if(def.level===0&&shown)buildResidentsClub({parent:node,resources,settings,cut,ceilingVisible:walking||limit>0});
   if(def.level===0&&shown)buildGroundApartments({root:node,resources,picks,settings,cut,mode,floorMaterial:interiorFloor});
   if(shown&&!cut&&(walking||def.level<limit||limit===9)){
    // A visible closing slab must meet the full storey-height walls. Placing

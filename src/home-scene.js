@@ -1,3 +1,4 @@
+import {RESIDENTS_CLUB} from './residents-club.mjs';
 import {buildEntranceServices} from './entrance-services-scene.js';
 import {buildLightingPoints} from './home-lighting-scene.js';
 import {buildDaylight} from './daylight-scene.js';
@@ -259,5 +260,11 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
  const buildingContext=buildBuildingContext({group,resources,settings,mode,picks,apartmentOutline:HOUSE_OUTLINE});
  const updateDaylight=buildDaylight({group,settings,resources,center:BUILDING_CENTER,radius:Math.max(BUILDING_BOUNDS.maxX-BUILDING_BOUNDS.minX,BUILDING_BOUNDS.maxZ-BUILDING_BOUNDS.minZ)*.8,distance:100});
  for(const [id,p] of buildLightingPoints({group,box,cylinder,mat,resources,settings,points:LIGHTING_LAYOUT.points,picks,selectedRoom}))gardenGroups.set(id,p);
+ // One shadow budget for the apartment and common rooms together on mobile.
+ group.updateMatrixWorld(true);
+ const focusXZ=settings.tourDestination===RESIDENTS_CLUB.destination?RESIDENTS_CLUB.walk:(ROOMS.find(r=>r.id===selectedRoom)?.walk||[3,8]),shadowCandidates=[];
+ group.traverse(o=>{if(o.isLight&&o.userData.fixtureLight&&o.castShadow)shadowCandidates.push(o);});
+ shadowCandidates.sort((a,b)=>{const pa=a.getWorldPosition(new THREE.Vector3()),pb=b.getWorldPosition(new THREE.Vector3());return Math.hypot(pa.x-focusXZ[0],pa.z-focusXZ[1])-Math.hypot(pb.x-focusXZ[0],pb.z-focusXZ[1]);});
+ shadowCandidates.slice(6).forEach(light=>{light.castShadow=false;});
  return {group,picks,motions,roomGroups,furnitureGroups,doorGroups,shutterGroups,buildingGroups,gardenGroups,buildingContext,wallHeight,updateDaylight,dispose(){group.traverse(o=>{if(o.isLight&&o.shadow)o.shadow.dispose();});resources.forEach(r=>r.dispose?.());}};
 }

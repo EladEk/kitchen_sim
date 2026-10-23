@@ -557,7 +557,7 @@ test('the whole-building view has only a floor/view chooser, an in-flow apartmen
    else{assert(html.includes('בחירת דירה, קומה או חדר'));assert(html.includes('כניסה לסיור'));assert(html.includes('unit:43:8'));assert(!html.includes('hs-projection-labels'));}
   }
   const changes=[],modes=[],sources=[],chooser=UI.HomeViewChooser({mode:'building',roomId:'living',lang:'he',buildingLevel:9,onDestination:v=>changes.push(v),onBuildingLevel:v=>changes.push(v),onMode:v=>modes.push(v)});let first;walk(chooser,n=>{if(n.type==='select'&&n.props['aria-label']==='בחירת דירה, קומה או חדר')first=n;});first.props.onChange({target:{value:'floor:6'}});assert.deepEqual(changes,['floor:6']);
-  const controls=UI.BuildingControls({settings:normalizeHomeSettings({buildingLevel:6}),mode:'building',onChange:(...v)=>changes.push(v),onMode:v=>modes.push(v),onSource:(...v)=>sources.push(v)});walk(controls,n=>{if(n.props?.className==='building-source-button')n.props.onClick();});assert.deepEqual(sources,[['building-plan',8]]);
+  const controls=UI.BuildingControls({settings:normalizeHomeSettings({buildingLevel:6}),mode:'building',onChange:(...v)=>changes.push(v),onMode:v=>modes.push(v),onSource:(...v)=>sources.push(v)});walk(controls,n=>{if(n.props?.className==='building-source-button')n.props.onClick();});assert.deepEqual(sources,[['building-plan',8],['residents-club-video',4]]);
   const evidence=render(UI.BuildingControls,{settings:normalizeHomeSettings(),mode:'building',onChange(){},onMode(){},onSource(){}});assert(evidence.includes('אין חתך גבהים'));assert(evidence.includes('/house/exterior/reference-3.jpg'));assert(evidence.includes('/house/garden/reference-2.jpg'));
  }finally{globalThis.localStorage=old;}
 });
