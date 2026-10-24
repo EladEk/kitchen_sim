@@ -1,3 +1,7 @@
+# R57 — Mirror wall, walking speed and service access
+
+Moved the lobby mirror to the perpendicular west lobby wall, facing the entrance. Walking speed now has Normal, ×2 and ×3 choices in the building/3D toolbar; joystick, keyboard and guided walking share the selected multiplier and existing movement collision substeps. Removed the two ground-plane service door leaves/lintels at the pump/meter stair access and their closed-door collision; these access passages remain open. Added plan-inferred northern service screen mouths to the existing south/east/west screens. Unphotographed screen registration and mirror placement remain estimates requiring visual review. This revision does not reconstruct unmeasured service-stair elevations.
+
 # R56 — Lobby, entrance lights and service screens
 
 Rechecked both Oct 24 lobby videos and new photographs. Added a low-resolution real reflecting lobby mirror with thin warm frame, changed the bench to cantilevered supports, and replaced remaining lobby square fixture bodies with recessed round downlights. Entry details now include two round porch lights, wall sconces, intercom and mail bank. 4000 K remains the lighting target, not a measured colour-temperature claim.

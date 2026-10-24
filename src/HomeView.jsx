@@ -93,8 +93,8 @@ export const HomeView=forwardRef(function HomeView({settings,mode,selectedRoom,c
    if(renderer.xr.isPresenting){r.vr.update(now,frame);if(c.mode==='walk'&&now-r.lastPosition>160){const p=r.vr.pose();if(p){r.lastPosition=now;r.publish(p);}}}
    else if(c.mode==='walk'){
     let dx=0,dz=0;const mobile=c.navigationLocked?{}:c.mobileMove||{};const input=walkingInput(c.navigationLocked?new Set():r.keys,mobile);if(input.moving&&r.route)stopTour();
-    if(r.route){const {path,index}=r.route,target=path[index];if(target){const vx=target[0]-camera.position.x,vz=target[1]-camera.position.z,dist=Math.hypot(vx,vz);if(dist<.055)r.route.index++;else{const step=Math.min(dist,1.65*dt);dx=vx/dist*step;dz=vz/dist*step;const desired=Math.atan2(-vx,-vz),delta=Math.atan2(Math.sin(desired-r.yaw),Math.cos(desired-r.yaw));r.yaw+=delta*Math.min(1,dt*6);}}else{r.route=null;c.onTourState?.(null);}}
-    else{const {forward,side,turn}=input;r.yaw+=turn*dt*1.5;dx=(-Math.sin(r.yaw)*forward+Math.cos(r.yaw)*side)*dt*1.85;dz=(-Math.cos(r.yaw)*forward-Math.sin(r.yaw)*side)*dt*1.85;}
+    if(r.route){const {path,index}=r.route,target=path[index];if(target){const vx=target[0]-camera.position.x,vz=target[1]-camera.position.z,dist=Math.hypot(vx,vz);if(dist<.055)r.route.index++;else{const step=Math.min(dist,1.65*(c.settings.walkSpeed||1)*dt);dx=vx/dist*step;dz=vz/dist*step;const desired=Math.atan2(-vx,-vz),delta=Math.atan2(Math.sin(desired-r.yaw),Math.cos(desired-r.yaw));r.yaw+=delta*Math.min(1,dt*6);}}else{r.route=null;c.onTourState?.(null);}}
+    else{const {forward,side,turn}=input;r.yaw+=turn*dt*1.5;dx=(-Math.sin(r.yaw)*forward+Math.cos(r.yaw)*side)*dt*1.85*(c.settings.walkSpeed||1);dz=(-Math.cos(r.yaw)*forward-Math.sin(r.yaw)*side)*dt*1.85*(c.settings.walkSpeed||1);}
     const p=r.moveWalk([camera.position.x,camera.position.z],[dx,dz]);camera.position.set(p[0],r.baseY+HOUSE.eyeHeight,p[1]);camera.rotation.set(r.pitch,r.yaw,0,'YXZ');
     if(now-r.lastPosition>160){r.lastPosition=now;r.publish();}
    }else controls.update();

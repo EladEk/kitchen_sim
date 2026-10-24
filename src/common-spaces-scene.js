@@ -48,9 +48,9 @@ export function buildCommonSpaces({parent,resources,settings,cut=false}){
  }
  if(!cut){
   const geo=new THREE.PlaneGeometry(2.8,1.15),mirror=new Reflector(geo,{textureWidth:256,textureHeight:256,color:0xdadada,clipBias:.003});resources.push(geo,mirror.getRenderTarget(),mirror.material);
-  mirror.position.set(15.65,1.45,-.325);mirror.rotation.y=Math.PI;mirror.name='lobby-wall-mirror';mirror.userData={source:'307558.jpg',dimensionsInferred:true};root.add(mirror);
-  const frame=mat('#9b7554');for(const x of [14.235,17.065])box('lobby-mirror-frame',x,1.45,-.32,.025,1.20,.028,frame);
-  for(const y of [.863,2.037])box('lobby-mirror-frame',15.65,y,-.32,2.85,.025,.028,frame);
+  mirror.position.set(12.38,1.45,-2.05);mirror.rotation.y=Math.PI/2;mirror.name='lobby-wall-mirror';mirror.userData={source:'307558.jpg',dimensionsInferred:true};root.add(mirror);
+  const frame=mat('#9b7554');for(const z of [-3.465,-.635])box('lobby-mirror-frame',12.38,1.45,z,.028,1.20,.025,frame);
+  for(const y of [.863,2.037])box('lobby-mirror-frame',12.38,y,-2.05,.028,.025,2.85,frame);
  }
  const equipment=new THREE.Group();equipment.name='pump-equipment';equipment.userData={source:'pump-room-photo',dimensionsInferred:true,orientationInferred:true,pumps:3};root.add(equipment);
  // Along the west wall, outside the source entrance door and access aisle.
