@@ -65,9 +65,24 @@ def annotation_frames(page):
             result.append(poly)
     return result
 def walls(page,polys):
-    lines={};annotations=annotation_frames(page)
+    lines={};annotations=annotation_frames(page);opening_edges=[]
+    # Window jamb caps are also black architectural faces. Pairing opposite
+    # caps across a 50cm window produced a false solid block through its glass.
+    # Independently drawn OPENING members spanning that void disprove the pair.
+    for index,d in enumerate(DOC[page-1].get_drawings()):
+        if not (d.get('layer') or '').upper().endswith('|OPENING'):continue
+        for item in d['items']:
+            pairs=[item[1:]] if item[0]=='l' else list(zip([item[1].ul,item[1].ur,item[1].lr,item[1].ll],[item[1].ur,item[1].lr,item[1].ll,item[1].ul])) if item[0]=='qu' else []
+            for a,b in pairs:
+                a,b=world(page,a),world(page,b)
+                if min(abs(a[i]-b[i]) for i in range(2))>.012:continue
+                v=0 if abs(a[0]-b[0])<.012 else 1
+                opening_edges.append((v,(a[v]+b[v])/2,*sorted([a[1-v],b[1-v]]),index))
     for d in DOC[page-1].get_drawings():
         if d.get('color')!=(0.,0.,0.) or abs((d.get('width') or 0)-1.26)>.02:continue
+        # CAD apartment-number glyphs can share the 1.26pt architectural pen.
+        # They are annotations even when their outlines are rectangular.
+        if any(token in (d.get('layer') or '').upper() for token in ['FLAT-NUM','SALETXT','NOTIS','FRMTEXT']):continue
         edges=[]
         for item in d['items']:
             if item[0]=='l':edges.append((item[1],item[2]))
@@ -86,11 +101,12 @@ def walls(page,polys):
     lines=list(lines.values());pairs=[]
     for i,(v,c,lo,hi) in enumerate(lines):
         # Pair each face with its nearest overlapping opposite face. The width
-        # range covers the actual 10/12/20/25/30/35cm partitions and safe rooms.
+        # range also includes the 45/50cm concrete safe-room face pairs. The
+        # former 42.5cm limit silently omitted those thick facade sections.
         candidates=[]
         for j,(vv,cc,ll,hh) in enumerate(lines):
             separation=abs(c-cc);a,b=max(lo,ll),min(hi,hh)
-            if i==j or vv!=v or separation<.072 or separation>.425 or b-a<.065:continue
+            if i==j or vv!=v or separation<.072 or separation>.50 or b-a<.065:continue
             candidates.append((separation,j,a,b))
         if not candidates:continue
         # Split at overlaps so a long outside face can match several jambs.
@@ -115,18 +131,25 @@ def walls(page,polys):
         for a,b in merged:
             if b-a<.06:continue
             aa=[c,a] if v==0 else [a,c];bb=[c,b] if v==0 else [b,c]
+            matches=[e for e in opening_edges if e[0]==1-v and a-.008<=e[1]<=b+.008
+                     and min(e[3],c+w/2)-max(e[2],c-w/2)>w*.8]
+            if w>=.45 and len({e[4] for e in matches})>=2 and max(e[1] for e in matches)-min(e[1] for e in matches)>(b-a)*.6:
+                rejected_window_caps.append({'page':page,'a':aa,'b':bb,'width':w,'sourceOpeningPaths':sorted({e[4] for e in matches})})
+                continue
             result.append({'a':aa,'b':bb,'width':w,'basis':'paired-pdf-wall-faces'})
     return sorted(result,key=lambda q:(q['a'],q['b'])),[[v,round(c,5),round(a,5),round(b,5)] for v,c,a,b in lines],annotations
 
 controls=json.loads((ROOT/'scripts/building-source-controls.json').read_text())
 source_doors=json.loads((ROOT/'scripts/building-source-doors.json').read_text())
+door_ids_path=ROOT/'scripts/building-door-ids.json'
+door_ids=json.loads(door_ids_path.read_text()) if door_ids_path.exists() else {}
 def px_world(page,p):return world(page,[v*DOC[page-1].rect.width/1250 for v in p])
 def rounded(p):return [round(v,5) for v in p]
-floors=[]
+floors=[];rejected_window_caps=[]
 for f in trace['floors']:
     polys=[p['polygon'] for p in f['envelope']]
     ws,faces,annotations=walls(f['page'],polys)
-    page=f['page'];level=f['level'];doors=[];seen=set()
+    page=f['page'];level=f['level'];doors=[];seen=set();stable_ids=door_ids.setdefault(str(level),{})
     for door in source_doors[str(page)]['doors']:
         leaf=door.get('leaf')
         if not leaf or not .43<leaf['widthMetres']<1.8:continue
@@ -137,7 +160,15 @@ for f in trace['floors']:
         if key in seen:continue
         seen.add(key)
         entry=next((e for e in controls['entries'] if e['level']==level and math.dist(e['hingePx'],leaf['hinge'])<.3),None)
-        doors.append({'id':f'bd-{level}-{len(doors)}','hinge':hinge,'closed':closed,'opened':opened,'unit':entry['unit'] if entry else None,'sourcePath':door['id'],'basis':'pdf-door-leaf-and-jamb'})
+        key=str(door['id'])
+        if key not in stable_ids:stable_ids[key]=f'bd-{level}-{max([int(v.rsplit("-",1)[1]) for v in stable_ids.values()],default=-1)+1}'
+        balcony_ids=[]
+        for index,poly in enumerate(f['balconies']):
+            for i,a in enumerate(poly):
+                b=poly[(i+1)%len(poly)];dx,dz=b[0]-a[0],b[1]-a[1]
+                if abs((closed[0]-hinge[0])*dz-(closed[1]-hinge[1])*dx)>.05*math.dist(a,b):continue
+                if max(distance(p,a,b) for p in [hinge,closed])<.35:balcony_ids.append(index);break
+        doors.append({'id':stable_ids[key],'hinge':hinge,'closed':closed,'opened':opened,'unit':entry['unit'] if entry else None,'sourcePath':door['id'],'basis':'pdf-door-leaf-and-jamb',**({'balconyDoor':True,'balconies':balcony_ids} if balcony_ids else {})})
     entries=[]
     for e in controls['entries']:
         if e['level']!=level:continue
@@ -162,5 +193,7 @@ for f in trace['floors']:
     duplexWorld={k:[rounded(px_world(page,p)) for p in duplex[k+'Px']] for k in ['longFlightRect','shortFlightRect','cornerLandingRect']} if duplex else None
     floors.append({'level':level,'page':page,'walls':ws,'wallFaces':faces,'annotationFrames':annotations,'doors':doors,'entries':entries,'lifts':lifts,'stairs':stairs,'duplexStair':duplexWorld})
 result={'sourceSha256':REG['buildingPdfSha256'],'floors':floors}
+(ROOT/'qa/window-cap-rejections-r61.json').write_text(json.dumps({'sourceSha256':REG['buildingPdfSha256'],'rejected':rejected_window_caps},indent=2)+'\n')
 (ROOT/'src/building-interiors.mjs').write_text('// Generated from black architectural faces in building-plan.pdf.\nexport const BUILDING_INTERIORS='+json.dumps(result,separators=(',',':'))+';\n')
+door_ids_path.write_text(json.dumps(door_ids,indent=2)+'\n')
 print(json.dumps({'wallsPerFloor':[len(f['walls']) for f in floors]}))

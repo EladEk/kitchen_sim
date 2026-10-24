@@ -1,0 +1,66 @@
+[
+  {
+    "floor": 7,
+    "unit": 40,
+    "sharedWallZ": -3.655,
+    "basis": "paired-pdf-common-wall",
+    "sourceWalls": [
+      {
+        "a": [
+          6.198,
+          -3.655
+        ],
+        "b": [
+          7.747,
+          -3.655
+        ],
+        "width": 0.301,
+        "basis": "paired-pdf-wall-faces"
+      },
+      {
+        "a": [
+          7.849,
+          -3.655
+        ],
+        "b": [
+          9.398,
+          -3.655
+        ],
+        "width": 0.301,
+        "basis": "paired-pdf-wall-faces"
+      }
+    ]
+  },
+  {
+    "floor": 8,
+    "unit": 42,
+    "sharedWallZ": -3.678,
+    "basis": "paired-pdf-common-wall",
+    "sourceWalls": [
+      {
+        "a": [
+          6.2,
+          -3.678
+        ],
+        "b": [
+          7.749,
+          -3.678
+        ],
+        "width": 0.25,
+        "basis": "paired-pdf-wall-faces"
+      },
+      {
+        "a": [
+          7.849,
+          -3.678
+        ],
+        "b": [
+          9.398,
+          -3.678
+        ],
+        "width": 0.25,
+        "basis": "paired-pdf-wall-faces"
+      }
+    ]
+  }
+]

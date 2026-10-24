@@ -691,3 +691,76 @@ Visual references are recorded in `public/house/efi-reference/provenance.json` a
 - Flat garden-neighbour and site surfaces use both visible face directions so an overhead camera can see the actual paving instead of the green base behind it.
 
 Validation includes all source/navigation tests, overhead surface rays, actual instanced corner/rail coverage, portal protection, immutable traces, shared guards/collision, parked-car containment, native GLES material shader linking, lifecycle visibility/context/BFCache event simulation, camera/lift-state retention, retry/dismiss handlers and the compiled protected-document Worker/Vercel checks. The managed preview supervisor is unavailable in this workspace, so mobile-browser GPU restoration and visual screenshot QA are unverified; no unsupported preview workaround was used.
+
+## R58 — full wall audit, apartment furniture and open service descent
+
+Re-read the complete 32.059-second original `307562.mp4`. The entry service cabinet bank is split by an open descending stair portal. Move its flush panels east of the complete stair mouth, retain the long wood-panel wall, reconstruct seven descending steps and a bottom landing, lower the pump/meter floors and pump equipment together, and remove the overlapping floor/site surfaces above the descent. Walking height follows the service floor. Both original service door portals remain open and reachable from the lobby. The source plan fixes horizontal extents; the 1.05 m descent, step profile and finish dimensions are illustrative estimates from the video, not a surveyed section. Upper slabs and the existing duplex stair aperture remain intact.
+
+The repeatable CAD wall extractor now excludes FLAT-NUM, SALETXT, NOTIS and FRMTEXT annotation layers. This removes 32 short number/annotation fragments that had become false column-like walls. All genuine architectural runs remain: 3,271 source wall runs over nine floors, plus 128 runs in the four detailed ground profiles. The full rendered-mesh audit includes 82,914 wall samples, 2,920 source corner samples, 1,834 door samples, 3,042 lintel samples and 96 roof corner samples, with zero failures. Original removals and the audit are in `qa/annotation-wall-removals-r58.json` and `qa/building-wall-audit-r58.json`.
+
+Add 39 proposed kitchens, one for every independent upper apartment, and 138 beds in the upper-floor bedrooms/safe rooms registered on the original PDF. The duplex has one kitchen on its entry floor. Native PDF room seeds, a repeatable wall/door-aware placement generator and its zero-failure report are included. Kitchens back onto real wall runs and include cabinets, worktop, sink and hob. Fifteen proposed beds furnish the five sleeping rooms of each of the other three garden apartments; their existing source-positioned kitchens remain. Apartment 4 retains its detailed editable kitchen, bedroom furniture and office. These generic layouts are proposals, not documented installed furniture. Add the two previously omitted penthouse safe-room footprint portions without moving their source walls. Furniture rendering and walking collision use the same placements; the existing furniture visibility control applies to all new items.
+
+Validation: all automated tests, including room/door/wall clearance, all service-route waypoints, actual mesh cabinet bounds, downward stair rays and ceiling/aperture rays. The managed preview now loads and its controls were checked, but its cloud browser reports WebGL disabled and cannot create a Three.js context; in-browser 3D appearance and device performance remain unverified. No successful 3D browser render is claimed. Production compilation and encrypted-source checks use the existing Sites workflow.
+
+## R59 — classify and repair the marked facade voids
+
+The owner's marked simulator captures `309108.jpg` and `309105.jpg` are retained byte-for-byte under protected `public/house/facade-review-r59`, with SHA-256 provenance. They identify model defects, not real-site geometry. Original CAD floor sheets and real exterior photos remain the geometric/appearance evidence.
+
+Three separate omissions caused the visible slots. The wall extractor's former 42.5 cm limit excluded actual 45/50 cm safe-room concrete face pairs. The two corrected upper safe-room unit polygons had not propagated into the building envelope, slab or wall-extraction mask. Some genuine near-corner windows were absent from the opening list. The extractor now retains the thick walls; penthouse envelopes are rebuilt from the corrected units/core; page 10's western utility/balcony boundary follows its concrete face pair; ten missed windows are restored only where actual OPENING-layer CAD strokes cover an architectural wall gap. Real windows retain glazing, sill/head walls and clear apertures.
+
+All six laundry-screen stacks now have per-floor CAD registration. The two north stacks turn onto their actual side-facing mouths. The east and west stacks gain their documented L-shaped side returns. The two south shafts retain their photographed outer return plane at z=11.64 m, rather than moving back to the recessed AC platforms. The resulting 48 screen/return panels cover floors 1–6; upper terraces and real balconies remain open. Individual slats have physical ventilation gaps, without opaque backing plates, and share screen footprints with walking collision. Slat pitch, member dimensions and vertical rise remain illustrative. Existing door IDs stay mapped to their source paths, and proposed furniture is refitted against the corrected walls.
+
+Reproduce the registered repairs in order:
+
+```sh
+python scripts/repair-facade-trace.py
+python scripts/trace-building-interiors.py
+python scripts/extract-facade-edges.py
+node scripts/repair-facade-openings.mjs
+node scripts/place-laundry-screens.mjs
+node scripts/place-apartment-furniture.mjs
+```
+
+The independent rendered-wall audit now covers 3,522 source runs plus 128 ground-profile runs, with 89,313 wall samples and 3,228 corner samples; all source doors, lintels and roof corners remain checked. `qa/building-wall-audit-r59.json` retains the full result. New spatial regressions check the actual screen meshes and open gaps, both upper safe-room slabs/envelopes, thick facade sections, and glass/sill/head coverage at all ten restored windows.
+
+Four depth-buffer geometry views were rendered from the actual transformed Three.js scene through native GLES3 and inspected; `qa/facade-geometry-review-r59.jpg` contains the views. Reproduce them with `node qa/export-building-review.mjs /absolute/output/prefix` followed by `python qa/render-building-review.py /absolute/output/prefix` (NumPy/Pillow and native EGL/GLES3 required). These use simple lighting and flat material colours to inspect geometry; they are not browser screenshots or a validation of the final material/reflection effects. Browser WebGL/device performance remains unverified. Production build, protected originals, compiled Worker and portable adapter use the established checks.
+
+## R60 — real balcony exits and attached laundry screens
+
+The five marked simulator screenshots 309163, 309161, 309159, 309157 and 309165 are retained unchanged under protected `public/house/balcony-review-r60`, with SHA-256 provenance. All marked terraces are present as balconies on the original floor sheets; they are retained rather than removed as inaccessible roofs.
+
+The earlier source-door extraction accepted closed quad leaves and missed three-line U-shaped exterior leaves. Recover these only with their actual CAD swing arcs, two parallel leaf faces and a threshold aligned to a source balcony. Thirteen source records yield twelve additional unique runtime doors, preserving existing stable IDs. The exterior leaves render with dark frames, glazing, handles and separate open/closed picking; their source positions, widths and swing directions are retained. Door height and glazed-leaf styling are illustrative because elevations and installed door schedules have not been supplied. Thirteen former window records are classified as balcony doors, including previously known exits. Their lower sill barriers are removed and the existing door controls/collision apply. Exterior heads receive facade stone instead of an unrelated white patch.
+
+Floor 2's two side balconies now reach the actual living-room wall/slider. Floor 6's north corner terraces are excluded from the enclosed apartment/envelope mask, restoring their exterior guards. The source southern AC-platform side walls continue to z≈9.096 m; their former extraction mask stopped at z=7.317 m and omitted four actual wall runs. Extending the registered platform mask retains those walls.
+
+R59's photo-inferred southern screen plane at z=11.64 m was beyond the actual PORCH mouth and left the inner posts detached. Both frames now use their exact per-floor CAD endpoints at z≈9.045 m. Every southern post meets a genuine wall within 1 cm in the model. The original side returns and physical slat gaps remain. This corrects the earlier inferred placement rather than adding invented opaque walls, deep ledges or platforms.
+
+`qa/audit-balcony-access.mjs` checks actual walking collision, rendered wall clearance at foot/body/head heights, sliding and hinged exits, and clear links between contiguous terrace pieces. All 58 upper-floor balcony surfaces are reachable through 61 tested portal crossings; `qa/balcony-access-r60.json` retains the zero-failure result. Eleven targeted regressions passed, including closing/reopening a real glazed exit, all southern post attachments, the corrected terrace guards, and the full nine-floor source-wall audit (3,526 source runs). Proposed furniture refits with 138 upper beds and 39 kitchens without wall/door conflicts.
+
+The repair sequence after the existing trace is:
+
+```sh
+python scripts/repair-facade-trace.py
+python scripts/repair-balcony-trace.py
+python scripts/recover-balcony-doors.py
+python scripts/trace-building-interiors.py
+python scripts/extract-facade-edges.py
+node scripts/repair-facade-openings.mjs
+node scripts/classify-balcony-openings.mjs
+node scripts/place-laundry-screens.mjs
+node scripts/place-apartment-furniture.mjs
+```
+
+Native geometry review supports `--balcony-closeups` on the export command to add five targeted views. The managed preview loaded, but its cloud browser again reported WebGL disabled. At the owner's request further browser checking was skipped; final browser rendering and device performance are unverified. The production build remains required for publication.
+
+## R61 — the marked west terrace and the apparent door above it
+
+Screenshot 309179 is retained unchanged with its SHA-256 under protected `public/house/balcony-review-r61`. It identifies a model defect; it is not elevation or construction evidence. The original floor-7 and floor-8 sheets establish the geometry.
+
+The western en suites of apartments 40 and 42 had been omitted from their enclosing polygons. The bedroom's recessed bathroom doorway was mistaken for the outside boundary. This left an internal door and window exposed in an artificial vertical slot. Restore each room through its actual paired common wall against the next apartment's safe room, at z=-3.655 m and -3.678 m. The unit finish, structural floor, ceiling, exterior return, extraction mask and walking domain now include the entire bathroom. Its existing real internal door, ID and swing are preserved.
+
+The west bedroom sliders were also split into window records by the facade extraction. Restore each full 1.90 m gap from the two independently located CAD glazing tracks, including their separate sliding-panel strokes. The floor-7 terrace now has a full-height bedroom exit. Both actual narrow bathroom windows retain glazing, sill and head. Reject 27 false wall blocks formed by pairing opposite window-jamb caps across their 50 cm gaps; actual OPENING-layer members must independently span the disputed void before such a pair is excluded. Source wall faces remain unchanged for provenance and corner/lintel construction. `qa/window-cap-rejections-r61.json` retains the rejected pairs and exact source path IDs; `qa/facade-restored-openings.json` describes the current recovered glazing. The historical R59 report is retained.
+
+Run `python scripts/repair-upper-ensuite-trace.py` after the existing facade/balcony trace repairs and before `trace-building-interiors.py`; then run the existing facade-edge/opening, door-classification, screen and furniture generation commands. The base trace definitions also include the missing bathroom depth; the repair aligns their final common boundary to the paired original source wall. `qa/upper-ensuite-trace-r61.json` records that evidence.
+
+The source-to-mesh wall audit covers all nine floors, 3,501 source runs, the four detailed garden profiles and roof corners, with 88,827 wall samples and zero failures. The balcony audit reaches all 58 balcony surfaces through 62 tested crossings. All 293 tests pass, and the production build protects 178 original source files. New regressions verify the internal bathroom door's open/closed walking behavior, real room floor and ceiling support, the exterior enclosure, the full-height terrace exits and the narrow window apertures. The actual scene geometry was reviewed from two matching west-side closeups with `--upper-ensuite-closeups`; these native flat-colour views do not validate browser materials. Browser checking remains skipped at the owner's request. Storey rise, vertical opening sizes and finishes retain the existing illustrative assumptions.

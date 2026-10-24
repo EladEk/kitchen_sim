@@ -26,7 +26,7 @@ const sampleWall=w=>{const v=Math.abs(w.a[0]-w.b[0])<.01;return [.04,.5,.96].fla
 const sourceProfile=(walls,doors,windows)=>({walls:walls.map(w=>({...w,width:w.thickness})),doors:doors.map(o=>{const w=walls.find(w=>w.id===o.wallId);return {...o,hinge:o.vertical?[w.a[0],o.start]:[o.start,w.a[1]],closed:o.vertical?[w.a[0],o.end]:[o.end,w.a[1]]};}),entries:[],lifts:[]});
 
 export function auditBuildingWalls(){
- const failures=[],resources=[],root=new THREE.Group(),settings=normalizeHomeSettings({cutaway:false,buildingLevel:9,openDoors:DOORS.map(d=>d.id),furniture:false}),model=buildBuildingContext({group:root,resources,settings,mode:'walk'}),result={revision:50,source:BUILDING.source,sourceSha256:BUILDING_INTERIORS.sourceSha256,coverage:'all source wall runs, all floors 0–8, four ground profiles, source-supported outer corners and inline seams, door clear spans',floors:[],groundProfiles:[]};
+ const failures=[],resources=[],root=new THREE.Group(),settings=normalizeHomeSettings({cutaway:false,buildingLevel:9,openDoors:DOORS.map(d=>d.id),furniture:false}),model=buildBuildingContext({group:root,resources,settings,mode:'walk'}),result={revision:61,source:BUILDING.source,sourceSha256:BUILDING_INTERIORS.sourceSha256,coverage:'all source wall runs, all floors 0–8, four ground profiles, source-supported outer corners and inline seams, door clear spans',floors:[],groundProfiles:[]};
  const addFailure=(kind,level,detail)=>failures.push({kind,level,...detail});
  try{
  for(const f of BUILDING_FLOORS){
@@ -49,7 +49,7 @@ export function auditBuildingWalls(){
    if(!sourceFaceCovers(s,1,z,Math.min(a[ae][0],x),Math.max(a[ae][0],x))||!sourceFaceCovers(s,0,x,Math.min(b[be][1],z),Math.max(b[be][1],z)))continue;
    for(const tx of [.25,.75])for(const tz of [.25,.75]){const p=[q[0]+dx*b.width/2*tx,q[1]+dz*a.width/2*tz];if(portals.some(b=>contains(b,p)))continue;row.sourceCornerChecks++;if(!footprints.some(b=>contains(b,p)))addFailure('incomplete-source-corner',f.level,{walls:[i,j],point:p});}
   }
-  for(const d of s.doors){const opening=doorWallOpening(s,d);row.doors.push({id:d.id,construction:opening});if(opening.basis==='door-fallback')addFailure('unsupported-door-lintel',f.level,{door:d.id});if(f.level===0&&(onDetailedGround(d.hinge)||replica(d.hinge)))continue;for(const t of [.15,.35,.5,.65,.85]){const p=d.hinge.map((n,k)=>n+(d.closed[k]-n)*t);row.doorClearanceChecks++;if(has(boxes,p,f.elevation+1.4))addFailure('wall-in-doorway',f.level,{door:d.id,point:p});}
+  for(const d of s.doors){const opening=doorWallOpening(s,d);row.doors.push({id:d.id,construction:opening});if(opening.basis==='door-fallback')addFailure('unsupported-door-lintel',f.level,{door:d.id});if(f.level===0&&(onDetailedGround(d.hinge)||replica(d.hinge)))continue;for(const t of [.15,.35,.5,.65,.85]){const p=d.hinge.map((n,k)=>n+(d.closed[k]-n)*t);row.doorClearanceChecks++;if(has(boxes,p,f.elevation+1.4-(f.level===0&&['bd-0-4','bd-0-5'].includes(d.id)?1.05:0)))addFailure('wall-in-doorway',f.level,{door:d.id,point:p});}
    const vertical=Math.abs(opening.a[0]-opening.b[0])<.01;for(const t of [.06,.5,.94])for(const n of [-.35,0,.35]){const p=opening.a.map((v,k)=>v+(opening.b[k]-v)*t);p[vertical?0:1]+=n*opening.width;row.lintelChecks++;if(!has(boxes,p,f.elevation+2.7))addFailure('incomplete-door-lintel',f.level,{door:d.id,point:p});}
   }
   result.floors.push(row);

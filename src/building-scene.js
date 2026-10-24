@@ -1,5 +1,6 @@
-import {LAUNDRY_SCREENS} from './laundry-screens.mjs';
-import {LAUNDRY_SCREEN_Z} from './site-photo-layout.mjs';
+import {serviceSlabHoles} from './service-access.mjs';
+import {buildApartmentFurniture} from './apartment-furniture-scene.js';
+import {laundryScreens} from './laundry-screens.mjs';
 import {buildCommonSpaces} from './common-spaces-scene.js';
 import {clubWindowProfile} from './residents-club.mjs';
 import {buildResidentsClub} from './residents-club-scene.js';
@@ -88,6 +89,7 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
   const cut=settings.cutaway===true&&shown&&!walking&&limit<9&&def.level===limit,base=def.elevation,h=cut?.85:BUILDING.storey,walls=[],frames=[],panes=[],dark=[],rails=[],decks=[],interiorWalls=[],trims=[],handles=[],fascias=[],source=BUILDING_INTERIORS.floors[def.level];
   const [sa,sb]=source.stairs.rect,rect=(a,b)=>[[a[0],a[1]],[b[0],a[1]],[b[0],b[1]],[a[0],b[1]]],holes=[rect(sa,sb),...source.lifts.map(l=>rect([l.minX-.12,l.minZ-.05],[l.doorCenter[0]-.04,l.maxZ+.05]))];
   if(source.duplexStair){const d=source.duplexStair,[a,b]=d.longFlightRect,[c,e]=d.shortFlightRect;holes.push([[c[0],c[1]],[b[0],c[1]],[b[0],b[1]],[a[0],b[1]],[a[0],e[1]],[c[0],e[1]]]);}
+  const ceilingHoles=[...holes];if(def.level===0)holes.push(...serviceSlabHoles());
   for(const path of def.envelope){
    slab(path.polygon,base-.015,BUILDING.slab,concrete,node,'building-floor-slab',def.level,holes.filter(h=>pointInPolygon(h[0],path.polygon)));
    path.polygon.forEach((a,i)=>{
@@ -116,13 +118,19 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
    for(const entry of source.entries){const door=source.doors.find(d=>d.id===entry.doorId),plate=buildingNumberPlate(entry.unit,resources);if(!plate||!door)continue;const length=Math.hypot(door.opened[0]-door.hinge[0],door.opened[1]-door.hinge[1]),normal=door.opened.map((n,i)=>(door.hinge[i]-n)/length),middle=door.hinge.map((n,i)=>(n+door.closed[i])/2);plate.position.set(middle[0]+normal[0]*.11,base+1.68,middle[1]+normal[1]*.11);plate.rotation.y=Math.atan2(normal[0],normal[1]);plate.userData={part:'building-unit-label',action:def.level===0&&entry.unit===4?'door':'building-door',doorId:def.level===0&&entry.unit===4?'entry':door.id,unit:entry.unit,buildingFloor:def.level};node.add(plate);picks.push(plate);}
    for(const unit of def.units){if(def.level===0)continue;slab(unit.polygon,base+.005,.025,interiorFloor,node,'building-unit-finish',def.level,holes.filter(h=>pointInPolygon(h[0],unit.polygon)));}
    for(const door of source.doors){
-    if(def.level===0&&['bd-0-4','bd-0-5'].includes(door.id))continue;
+    if(def.level===0&&['bd-0-4','bd-0-5'].includes(door.id)){const opening=doorWallOpening(source,door);if(h>1.15)segment(opening.a,opening.b,base+1.15,h-1.15,opening.width,interiorWalls);continue;}
     if(def.level===0&&onDetailedGround(door.hinge))continue;
     const open=!settings.closedBuildingDoors?.includes(door.id),end=open?door.opened:door.closed,items=[],dh=cut?.82:2.18,construction=doorWallOpening(source,door);
-    segment(door.hinge,end,base,dh,.045,items);
+    if(door.balconyDoor){
+     const length=Math.hypot(end[0]-door.hinge[0],end[1]-door.hinge[1]),u=end.map((v,i)=>(v-door.hinge[i])/length),angle=-Math.atan2(u[1],u[0]);
+     for(const t of [.025,length-.025])items.push([door.hinge[0]+u[0]*t,base+dh/2,door.hinge[1]+u[1]*t,.045,dh,.075,angle]);
+     segment(door.hinge,end,base,.045,.075,items);segment(door.hinge,end,base+dh-.045,.045,.075,items);
+     const panes=[];segment(door.hinge.map((v,i)=>v+u[i]*.05),end.map((v,i)=>v-u[i]*.05),base+.055,dh-.11,.016,panes);
+     const glassLeaf=batch(node,glass,panes,'building-balcony-door-glazing',def.level,false);if(glassLeaf){glassLeaf.userData={part:'building-balcony-door-glazing',source:'building-plan',action:'building-door',doorId:door.id,balconyDoor:true,buildingFloor:def.level};picks.push(glassLeaf);}
+    }else segment(door.hinge,end,base,dh,.045,items);
     const dx=door.closed[0]-door.hinge[0],dz=door.closed[1]-door.hinge[1],width=Math.hypot(dx,dz),angle=-Math.atan2(dz,dx);for(const at of [door.hinge,door.closed])trims.push([at[0],base+dh/2,at[1],.052,dh,.14,angle]);if(!cut){segment(door.hinge,door.closed,base+2.18,.055,.14,trims);const lx=end[0]-door.hinge[0],lz=end[1]-door.hinge[1],ll=Math.hypot(lx,lz),normal=[-lz/ll,lx/ll],handle=door.hinge.map((n,i)=>n+(end[i]-n)*Math.max(.1,(ll-.12)/ll));for(const sign of [-1,1]){handles.push([handle[0]+normal[0]*sign*.034,base+1.02,handle[1]+normal[1]*sign*.034,.035,.085,.018,-Math.atan2(lz,lx)]);segment([handle[0]+normal[0]*sign*.055,handle[1]+normal[1]*sign*.055],[handle[0]-lx/ll*.10+normal[0]*sign*.055,handle[1]-lz/ll*.10+normal[1]*sign*.055],base+1.03,.018,.019,handles);}}
-    const mesh=batch(node,doorMat,items,'building-apartment-door',null);mesh.userData={part:'building-apartment-door',source:'building-plan',action:'building-door',doorId:door.id,unit:door.unit,buildingFloor:def.level};picks.push(mesh);
-    if(h>2.2&&!(def.level===0&&onGroundReplica(door.hinge)))segment(construction.a,construction.b,base+2.18,h-2.18,construction.width,interiorWalls);
+    const mesh=batch(node,door.balconyDoor?metal:doorMat,items,'building-apartment-door',null);mesh.userData={part:'building-apartment-door',source:'building-plan',action:'building-door',doorId:door.id,unit:door.unit,balconyDoor:!!door.balconyDoor,buildingFloor:def.level};picks.push(mesh);
+    if(h>2.2&&!(def.level===0&&onGroundReplica(door.hinge)))segment(construction.a,construction.b,base+2.18,h-2.18,construction.width,door.balconyDoor?walls:interiorWalls);
    }
   }
   // The low rail courses in the photographs have glass infill, dark top rails
@@ -160,17 +168,20 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
   }
   // Owner photos 307552/307556: continuous dark louvers over the service
   // recess, from the first-floor soffit to the last repeated storey.
+  const louvres=[];
   if(def.level>0&&def.level<=6&&!cut){
-   for(const screen of LAUNDRY_SCREENS){
+   for(const screen of laundryScreens(def.level)){
     const {a,b}=screen,dx=b[0]-a[0],dz=b[1]-a[1],width=Math.hypot(dx,dz),angle=-Math.atan2(dz,dx),x=(a[0]+b[0])/2,z=(a[1]+b[1])/2,height=BUILDING.storey;
     // Actual slat gaps remain open: no opaque backing plate across the recess.
-    for(const q of [a,b])rails.push([q[0],base+height/2,q[1],.045,height,.08,angle]);
-    for(let y=.04;y<height;y+=.08)rails.push([x,base+y,z,width,.045,.105,angle]);
+    for(const q of [a,b])louvres.push([q[0],base+height/2,q[1],.045,height,.08,angle]);
+    for(let y=.04;y<height;y+=.08)louvres.push([x,base+y,z,width,.045,.105,angle]);
     fascias.push([x,base-.06,z,width,.12,.13,angle]);
    }
   }
+  const screenMesh=batch(node,metal,louvres,'building-laundry-screen',def.level);if(screenMesh)screenMesh.userData.screens=laundryScreens(def.level);
   batch(node,trimMat,trims,'building-interior-trim',def.level);batch(node,handleMat,handles,'building-door-hardware',def.level);batch(node,fascia,fascias,'building-balcony-fascia',def.level);
   batch(node,limestone,walls,'building-facade-wall',def.level);batch(node,insideWall,interiorWalls,'building-interior-wall',def.level);batch(node,metal,frames,'building-window-frame',def.level);batch(node,glass,panes,'building-glazing',def.level,false);batch(node,voidMat,dark,'building-fascia-and-service-screen',def.level);batch(node,metal,rails,'building-rail-and-louvres',def.level);batch(node,limestone,decks,'building-stone-sill',def.level);
+  if(shown)buildApartmentFurniture({parent:node,resources,level:def.level,base,settings});
   if(def.level===0&&shown)buildCommonSpaces({parent:node,resources,settings,cut});
   if(def.level===0&&shown)buildResidentsClub({parent:node,resources,settings,cut,ceilingVisible:walking||limit>0});
   if(def.level===0&&shown)buildGroundApartments({root:node,resources,picks,settings,cut,mode,floorMaterial:interiorFloor});
@@ -179,7 +190,7 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
    // its upper face at the interior clear height hid the rooms while leaving
    // 35cm of every partition above it, making unchecked views look sliced.
    // The source slab helper extrudes downward from its supplied top level.
-   for(const path of def.envelope)slab(path.polygon,base+BUILDING.storey,BUILDING.slab,soffit,node,'building-storey-ceiling',def.level,holes.filter(h=>pointInPolygon(h[0],path.polygon)));
+   for(const path of def.envelope)slab(path.polygon,base+BUILDING.storey,BUILDING.slab,soffit,node,'building-storey-ceiling',def.level,ceilingHoles.filter(h=>pointInPolygon(h[0],path.polygon)));
   }
  }
  if(limit===9){
@@ -202,7 +213,7 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
    garden.plot.forEach((a,i)=>{const b=garden.plot[(i+1)%garden.plot.length];if(!gardenFenceEdge(a,b))return;const length=Math.hypot(b[0]-a[0],b[1]-a[1]);segment(a,b,.09,.045,.055,bars);segment(a,b,1.05,.045,.055,bars);for(let j=0,n=Math.ceil(length/.13);j<=n;j++)bars.push([a[0]+(b[0]-a[0])*j/n,.56,a[1]+(b[1]-a[1])*j/n,.025,1.05,.025]);});
    batch(root,fence,bars,'building-garden-fence',0);
   }
-  slab(BUILDING_SITE,-.09,.14,material('#b5baa1'),root,'building-site-base',null);
+  slab(BUILDING_SITE,-.09,.14,material('#b5baa1'),root,'building-site-base',null,serviceSlabHoles());
   buildSiteContext({root,resources,picks,settings,ceilingVisible:walking||limit>0,cut:settings.cutaway===true&&!walking&&limit===0});
   // Highlight the original apartment footprint with an unobtrusive outline.
   // No large room labels cover the facade or its controls.

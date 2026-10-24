@@ -1,0 +1,52 @@
+[
+  {
+    "file": "309163.jpg",
+    "sha256": "003a6c9e33c3af1c98a1856f1a1323a87a385a438576a29576549a2a1668a847",
+    "size": [
+      709,
+      1536
+    ],
+    "kind": "owner-marked-simulator-screenshot",
+    "note": "Simulator issue report, not a real-site elevation."
+  },
+  {
+    "file": "309161.jpg",
+    "sha256": "8a517302aa8c3d1bad4f3d4689fb1924d15aca5bd7582480147e8b76bb76210b",
+    "size": [
+      709,
+      1536
+    ],
+    "kind": "owner-marked-simulator-screenshot",
+    "note": "Simulator issue report, not a real-site elevation."
+  },
+  {
+    "file": "309159.jpg",
+    "sha256": "a036565f90d5fff332e7a20fddc46101eba1abb3b5ddb734b269860b81118c6e",
+    "size": [
+      709,
+      1536
+    ],
+    "kind": "owner-marked-simulator-screenshot",
+    "note": "Simulator issue report, not a real-site elevation."
+  },
+  {
+    "file": "309157.jpg",
+    "sha256": "ac66d4bbd80bdb4ed0afcf5f87df83c4cf2cb7f47011e07a0b9c39df88d9408f",
+    "size": [
+      709,
+      1536
+    ],
+    "kind": "owner-marked-simulator-screenshot",
+    "note": "Simulator issue report, not a real-site elevation."
+  },
+  {
+    "file": "309165.jpg",
+    "sha256": "22831893d4a6e6a9592aa6d8263c140f969e33c76de34257262c217d6f29dd48",
+    "size": [
+      709,
+      1536
+    ],
+    "kind": "owner-marked-simulator-screenshot",
+    "note": "Simulator issue report, not a real-site elevation."
+  }
+]

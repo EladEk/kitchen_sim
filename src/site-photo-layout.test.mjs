@@ -19,7 +19,7 @@ test('both entrances retain a clear approach between planted courtyard borders',
  const boxes=buildingBoxes(0,normalizeHomeSettings({}),createElevators());for(const p of [[24,-4.32],[29,-4.32],[4,-1.17]])assert(buildingCanStand(p,0,boxes,createElevators()));
 });
 test('screen plane follows the outer wall return and manhole coordinates agree between views',()=>{
- assert(LAUNDRY_SCREEN_Z>11.60&&LAUNDRY_SCREEN_Z<11.70);
+ assert(LAUNDRY_SCREEN_Z>9.0&&LAUNDRY_SCREEN_Z<9.1);
  assert.deepEqual(SITE_CHAMBERS.find(c=>c.unit===4).position,SERVICE_YARD.manhole.position);
  assert(SERVICE_YARD.manhole.position[1]>16.5);assert(Math.abs(SERVICE_YARD.shed.maxZ-15.86)<.001,'shed ends before the chamber access reserve');
  assert.match(SITE_TRACE.features.find(f=>f.id==='site-electrical-room').he,/חדר מונים/);

@@ -1,3 +1,5 @@
+import {apartmentFurnitureBoxes} from './apartment-furniture-scene.js';
+import {laundryScreens} from './laundry-screens.mjs';
 import {LOBBY_BENCHES} from './lobby-reference.mjs';
 import {COMMON_SPACES,commonSpace,PUMP_OBSTACLES} from './common-spaces.mjs';
 import {RESIDENTS_CLUB,clubWindowProfile,isClubDestination,inResidentsClub} from './residents-club.mjs';
@@ -19,6 +21,8 @@ export function isDoorOpening(a,b,source){const mid=a.map((n,i)=>(n+b[i])/2);ret
 export function gardenFenceEdge(a,b,f=BUILDING_FLOORS[0]){const mid=a.map((n,i)=>(n+b[i])/2);return ![...f.units.map(u=>u.polygon),f.core].some(poly=>poly.some((c,j)=>segmentDistance(mid,c,poly[(j+1)%poly.length])<.34));}
 export function buildingBoxes(level,settings,cars=[]){
  const f=BUILDING_FLOORS[level],source=interiorsForFloor(level),boxes=[];
+ for(const s of laundryScreens(level))boxes.push(segmentBox(s.a,s.b,.105,{laundryScreen:s.id}));
+ if(settings.furniture!==false)boxes.push(...apartmentFurnitureBoxes(level));
  for(const w of connectedWallRuns(source,f,level===0?COMMON_ENTRY_DOORS:[])){const ownership=w.sourceWallIndex==null?w:source.walls[w.sourceWallIndex],mid=ownership.a.map((n,i)=>(n+ownership.b[i])/2);if(level===0&&onDetailedGround(mid))continue;boxes.push({...wallFootprint(w),sourceWall:true});}
  for(const path of f.envelope)for(const o of path.openings){const mid=o.a.map((n,i)=>(n+o.b[i])/2);if(level===0&&onDetailedGround(mid)||isDoorOpening(o.a,o.b,source))continue;const edge=path.polygon[o.edge],next=path.polygon[(o.edge+1)%path.polygon.length],projection=p=>(p[0]-edge[0])*(next[0]-edge[0])+(p[1]-edge[1])*(next[1]-edge[1]),start=projection(o.a)<projection(o.b)?o.a:o.b;boxes.push(segmentBox(!clubWindowProfile(level,o)&&o.kind==='slider'?start:o.a,!clubWindowProfile(level,o)&&o.kind==='slider'?mid:o.b,.09,{window:true}));}
  for(const door of source.doors){if(level===0&&['bd-0-4','bd-0-5'].includes(door.id))continue;if(level===0&&onDetailedGround(door.hinge))continue;if(settings.closedBuildingDoors?.includes(door.id))boxes.push(segmentBox(door.hinge,door.closed,.06,{buildingDoorId:door.id}));}

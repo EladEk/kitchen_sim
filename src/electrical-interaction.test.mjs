@@ -67,7 +67,7 @@ test('hide-all keeps walking arrows and restore available while hiding other con
     const nodes=uiNodes(render(UI.HomeApp,{initialMode:mode})),controls=visibleUiControls(nodes),scene=nodes.find(n=>hasClass(n,mode==='plan'?'hs-plan-stage':'hs-model'));
     assert(scene&&!scene.hidden,`${mode}: the house remains mounted and visible`);
     if(cleanView){assert.equal(controls.length,mode==='walk'?5:1,`${mode}: only restore and walking arrows remain`);assert.equal(controls.filter(n=>'data-scene-ui-restore' in n.attrs).length,1);}
-    else{assert.equal(controls.length,mode==='walk'?11:7,'two selectors and three primary actions, plus header and optional walking arrows');assert(!controls.some(n=>'data-scene-ui-restore' in n.attrs));}
+    else{assert.equal(controls.length,mode==='walk'?12:7,'two selectors and three primary actions, plus header, walking arrows and walking-speed selector');assert(!controls.some(n=>'data-scene-ui-restore' in n.attrs));}
     for(const c of ['hs-header','hs-footer','hs-simple-topbar','hs-simple-actions'])assert.equal(nodes.find(n=>hasClass(n,c)).hidden,cleanView,`${mode}: ${c}`);
     for(const c of ['hs-sidebar','hs-simple-panel'])assert(nodes.find(n=>hasClass(n,c)).hidden,`${c} stays closed until requested`);
     if(mode==='walk'){

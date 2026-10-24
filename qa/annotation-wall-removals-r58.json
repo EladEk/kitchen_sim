@@ -1,0 +1,437 @@
+[
+  {
+    "level": 0,
+    "removedAnnotationWalls": [],
+    "addedWalls": []
+  },
+  {
+    "level": 1,
+    "removedAnnotationWalls": [],
+    "addedWalls": []
+  },
+  {
+    "level": 2,
+    "removedAnnotationWalls": [
+      {
+        "a": [
+          8.222,
+          2.213
+        ],
+        "b": [
+          8.222,
+          2.297
+        ],
+        "width": 0.159,
+        "basis": "paired-pdf-wall-faces"
+      },
+      {
+        "a": [
+          8.228,
+          2.213
+        ],
+        "b": [
+          8.228,
+          2.297
+        ],
+        "width": 0.148,
+        "basis": "paired-pdf-wall-faces"
+      },
+      {
+        "a": [
+          8.233,
+          2.213
+        ],
+        "b": [
+          8.233,
+          2.297
+        ],
+        "width": 0.138,
+        "basis": "paired-pdf-wall-faces"
+      },
+      {
+        "a": [
+          8.239,
+          2.213
+        ],
+        "b": [
+          8.239,
+          2.297
+        ],
+        "width": 0.15,
+        "basis": "paired-pdf-wall-faces"
+      },
+      {
+        "a": [
+          8.245,
+          2.198
+        ],
+        "b": [
+          8.245,
+          2.297
+        ],
+        "width": 0.161,
+        "basis": "paired-pdf-wall-faces"
+      },
+      {
+        "a": [
+          10.073,
+          -15.993
+        ],
+        "b": [
+          10.073,
+          -15.737
+        ],
+        "width": 0.229,
+        "basis": "paired-pdf-wall-faces"
+      },
+      {
+        "a": [
+          10.079,
+          -15.993
+        ],
+        "b": [
+          10.079,
+          -15.737
+        ],
+        "width": 0.218,
+        "basis": "paired-pdf-wall-faces"
+      },
+      {
+        "a": [
+          10.084,
+          -15.993
+        ],
+        "b": [
+          10.084,
+          -15.737
+        ],
+        "width": 0.207,
+        "basis": "paired-pdf-wall-faces"
+      },
+      {
+        "a": [
+          10.089,
+          -15.993
+        ],
+        "b": [
+          10.089,
+          -15.737
+        ],
+        "width": 0.218,
+        "basis": "paired-pdf-wall-faces"
+      },
+      {
+        "a": [
+          10.095,
+          -16.022
+        ],
+        "b": [
+          10.095,
+          -15.737
+        ],
+        "width": 0.229,
+        "basis": "paired-pdf-wall-faces"
+      }
+    ],
+    "addedWalls": []
+  },
+  {
+    "level": 3,
+    "removedAnnotationWalls": [
+      {
+        "a": [
+          9.268,
+          -16.031
+        ],
+        "b": [
+          9.268,
+          -15.946
+        ],
+        "width": 0.138,
+        "basis": "paired-pdf-wall-faces"
+      },
+      {
+        "a": [
+          13.72,
+          -15.775
+        ],
+        "b": [
+          13.811,
+          -15.775
+        ],
+        "width": 0.085,
+        "basis": "paired-pdf-wall-faces"
+      }
+    ],
+    "addedWalls": []
+  },
+  {
+    "level": 4,
+    "removedAnnotationWalls": [
+      {
+        "a": [
+          9.268,
+          -16.031
+        ],
+        "b": [
+          9.268,
+          -15.946
+        ],
+        "width": 0.138,
+        "basis": "paired-pdf-wall-faces"
+      },
+      {
+        "a": [
+          13.72,
+          -15.775
+        ],
+        "b": [
+          13.811,
+          -15.775
+        ],
+        "width": 0.085,
+        "basis": "paired-pdf-wall-faces"
+      }
+    ],
+    "addedWalls": []
+  },
+  {
+    "level": 5,
+    "removedAnnotationWalls": [
+      {
+        "a": [
+          8.34,
+          1.709
+        ],
+        "b": [
+          8.431,
+          1.709
+        ],
+        "width": 0.085,
+        "basis": "paired-pdf-wall-faces"
+      },
+      {
+        "a": [
+          11.38,
+          -15.944
+        ],
+        "b": [
+          11.38,
+          -15.845
+        ],
+        "width": 0.337,
+        "basis": "paired-pdf-wall-faces"
+      },
+      {
+        "a": [
+          11.387,
+          -15.944
+        ],
+        "b": [
+          11.387,
+          -15.859
+        ],
+        "width": 0.324,
+        "basis": "paired-pdf-wall-faces"
+      },
+      {
+        "a": [
+          11.392,
+          -15.944
+        ],
+        "b": [
+          11.392,
+          -15.859
+        ],
+        "width": 0.313,
+        "basis": "paired-pdf-wall-faces"
+      },
+      {
+        "a": [
+          14.59,
+          -15.917
+        ],
+        "b": [
+          14.59,
+          -15.845
+        ],
+        "width": 0.127,
+        "basis": "paired-pdf-wall-faces"
+      },
+      {
+        "a": [
+          14.597,
+          -15.917
+        ],
+        "b": [
+          14.597,
+          -15.845
+        ],
+        "width": 0.114,
+        "basis": "paired-pdf-wall-faces"
+      },
+      {
+        "a": [
+          14.602,
+          -15.917
+        ],
+        "b": [
+          14.602,
+          -15.845
+        ],
+        "width": 0.125,
+        "basis": "paired-pdf-wall-faces"
+      }
+    ],
+    "addedWalls": []
+  },
+  {
+    "level": 6,
+    "removedAnnotationWalls": [
+      {
+        "a": [
+          8.103,
+          1.804
+        ],
+        "b": [
+          8.103,
+          1.904
+        ],
+        "width": 0.195,
+        "basis": "paired-pdf-wall-faces"
+      },
+      {
+        "a": [
+          8.108,
+          1.804
+        ],
+        "b": [
+          8.108,
+          1.889
+        ],
+        "width": 0.184,
+        "basis": "paired-pdf-wall-faces"
+      },
+      {
+        "a": [
+          8.113,
+          1.804
+        ],
+        "b": [
+          8.113,
+          1.889
+        ],
+        "width": 0.174,
+        "basis": "paired-pdf-wall-faces"
+      },
+      {
+        "a": [
+          10.791,
+          -16.843
+        ],
+        "b": [
+          10.905,
+          -16.843
+        ],
+        "width": 0.188,
+        "basis": "paired-pdf-wall-faces"
+      },
+      {
+        "a": [
+          10.791,
+          -16.836
+        ],
+        "b": [
+          10.882,
+          -16.836
+        ],
+        "width": 0.201,
+        "basis": "paired-pdf-wall-faces"
+      },
+      {
+        "a": [
+          12.763,
+          -16.621
+        ],
+        "b": [
+          12.763,
+          -16.535
+        ],
+        "width": 0.404,
+        "basis": "paired-pdf-wall-faces"
+      },
+      {
+        "a": [
+          13.133,
+          -16.621
+        ],
+        "b": [
+          13.133,
+          -16.535
+        ],
+        "width": 0.337,
+        "basis": "paired-pdf-wall-faces"
+      },
+      {
+        "a": [
+          13.138,
+          -16.621
+        ],
+        "b": [
+          13.138,
+          -16.535
+        ],
+        "width": 0.326,
+        "basis": "paired-pdf-wall-faces"
+      },
+      {
+        "a": [
+          13.144,
+          -16.634
+        ],
+        "b": [
+          13.144,
+          -16.535
+        ],
+        "width": 0.315,
+        "basis": "paired-pdf-wall-faces"
+      }
+    ],
+    "addedWalls": []
+  },
+  {
+    "level": 7,
+    "removedAnnotationWalls": [],
+    "addedWalls": []
+  },
+  {
+    "level": 8,
+    "removedAnnotationWalls": [
+      {
+        "a": [
+          10.698,
+          3.078
+        ],
+        "b": [
+          10.791,
+          3.078
+        ],
+        "width": 0.085,
+        "basis": "paired-pdf-wall-faces"
+      },
+      {
+        "a": [
+          12.349,
+          -15.32
+        ],
+        "b": [
+          12.44,
+          -15.32
+        ],
+        "width": 0.085,
+        "basis": "paired-pdf-wall-faces"
+      }
+    ],
+    "addedWalls": []
+  }
+]

@@ -57,7 +57,7 @@ export function buildSiteContext({root,resources,picks,settings,cut=false,ceilin
  // actual locations. No unrecorded meter-room equipment is invented.
  for(const f of SITE_TRACE.features.filter(f=>f.id!=='site-main-water-meter')){
   if(f.id.includes('entrance')){const [x,z]=f.position;box(x,2.38,z,.024,.08,1.2,cover,{action:'building',buildingId:f.id,part:'site-entry-header'});}
-  else slab(f.polygon,.023,surface('cement',f.id==='site-water-reservoir'?'#a9bdc0':'#b5b6aa'),{action:'building',buildingId:f.id,part:'site-common-room-floor'});
+  else if(f.id!=='site-pump-room'&&f.id!=='site-electrical-room')slab(f.polygon,.023,surface('cement',f.id==='site-water-reservoir'?'#a9bdc0':'#b5b6aa'),{action:'building',buildingId:f.id,part:'site-common-room-floor'});
  }
  buildPhotoSite({group,resources,picks,cut,ceilingVisible,settings});
  group.traverse(o=>{o.userData.buildingFloor=0;});return group;

@@ -20,5 +20,5 @@ test('callout digits in every source sheet stay annotations and stepped doorway 
  const source=BUILDING_INTERIORS.floors[5],door=source.doors.find(d=>d.id==='bd-5-2'),opening=doorWallOpening(source,door);assert.equal(opening.basis,'pdf-jamb-caps');assert(Math.abs(opening.width-.09948)<.0001);assert(opening.a[0]<door.hinge[0]-.04,'the hinge lies on the face, not the wall centre');
 });
 test('every wall on all nine floors, all four ground profiles, every opening and all roof corners pass the source-to-mesh audit',()=>{
- const r=auditBuildingWalls();assert.equal(r.summary.floors,9);assert.equal(r.summary.sourceWalls,3303);assert.equal(r.summary.groundProfileWalls,128);assert(r.summary.wallSamples>80000);assert(r.summary.sourceCornerSamples>2900);assert(r.summary.doorSamples>1800);assert(r.summary.lintelSamples>3000);assert.equal(r.summary.roofCornerSamples,96);assert.deepEqual(r.failures,[]);
+ const r=auditBuildingWalls();assert.equal(r.summary.floors,9);assert.equal(r.summary.sourceWalls,3501);assert.equal(r.summary.groundProfileWalls,128);assert(r.summary.wallSamples>88000);assert(r.summary.sourceCornerSamples>3200);assert(r.summary.doorSamples>1800);assert(r.summary.lintelSamples>3000);assert.equal(r.summary.roofCornerSamples,96);assert.deepEqual(r.failures,[]);
 });

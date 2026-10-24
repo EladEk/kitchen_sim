@@ -1,0 +1,22 @@
+[
+  {
+    "file": "309108.jpg",
+    "sha256": "03adee9619c6604a27f2603fe1084ca47bec60d72959055c171e30b6778deffe",
+    "size": [
+      709,
+      1536
+    ],
+    "kind": "owner-marked-simulator-screenshot",
+    "note": "Issue marks supplied by the owner; not a photograph of the real building."
+  },
+  {
+    "file": "309105.jpg",
+    "sha256": "b5b2199c91a2bfaddb201ef5543ebc9ba31afc2487f357d1ece084f9ca14ae72",
+    "size": [
+      709,
+      1536
+    ],
+    "kind": "owner-marked-simulator-screenshot",
+    "note": "Issue marks supplied by the owner; not a photograph of the real building."
+  }
+]

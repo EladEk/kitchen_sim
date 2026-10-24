@@ -1,3 +1,4 @@
+import {SERVICE_ACCESS,SERVICE_ROOM_POLYGONS} from './service-access.mjs';
 import {Reflector} from 'three/addons/objects/Reflector.js';
 import * as THREE from 'three';
 import {LOBBY_POLYGON,PUMP_ROOM} from './common-spaces.mjs';
@@ -14,8 +15,8 @@ export function buildCommonSpaces({parent,resources,settings,cut=false}){
  function item(geo,m,p,s,q=null,name='common-detail'){const key=geo.uuid+m.uuid+name;let b=batches.get(key);if(!b)batches.set(key,b={geo,m,name,matrices:[]});dummy.position.set(...p);dummy.scale.set(...s);dummy.quaternion.copy(q||new THREE.Quaternion());dummy.updateMatrix();b.matrices.push(dummy.matrix.clone());}
  const box=(name,x,y,z,w,h,d,m)=>item(cube,m,[x,y,z],[w,h,d],null,name);
  function pipe(name,a,b,r,m){const va=new THREE.Vector3(...a),vb=new THREE.Vector3(...b),dir=vb.clone().sub(va),q=new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,1,0),dir.clone().normalize());item(cylinder,m,va.add(vb).multiplyScalar(.5).toArray(),[r,dir.length(),r],q,name);}
- function floor(poly,m,name){const shape=new THREE.Shape();poly.forEach(([x,z],i)=>i?shape.lineTo(x,z):shape.moveTo(x,z));shape.closePath();const g=new THREE.ShapeGeometry(shape);g.rotateX(Math.PI/2);resources.push(g);m.side=THREE.DoubleSide;const mesh=new THREE.Mesh(g,m);mesh.position.y=.025;mesh.name=name;mesh.receiveShadow=true;root.add(mesh);}
- floor(LOBBY_POLYGON,stone,'lobby-floor-finish');floor(PUMP_ROOM.polygon,concrete,'pump-floor-finish');
+ function floor(poly,m,name,y=.025){const shape=new THREE.Shape();poly.forEach(([x,z],i)=>i?shape.lineTo(x,z):shape.moveTo(x,z));shape.closePath();const g=new THREE.ShapeGeometry(shape);g.rotateX(Math.PI/2);resources.push(g);m.side=THREE.DoubleSide;const mesh=new THREE.Mesh(g,m);mesh.position.y=y;mesh.name=name;mesh.receiveShadow=true;root.add(mesh);}
+ floor(LOBBY_POLYGON,stone,'lobby-floor-finish');floor(PUMP_ROOM.polygon,concrete,'pump-floor-finish',-SERVICE_ACCESS.depth+.025);floor(SERVICE_ROOM_POLYGONS.meters,stone,'meter-room-floor-finish',-SERVICE_ACCESS.depth+.025);
  // Narrow seams cut to the actual lobby polygon, never long lines through walls.
  function inside([x,z],poly){let v=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++){let a=poly[i],b=poly[j];if((a[1]>z)!=(b[1]>z)&&x<(b[0]-a[0])*(z-a[1])/(b[1]-a[1])+a[0])v=!v;}return v;}
  for(let x=12;x<22;x+=.8)for(let z=-7.7;z<-.4;z+=.05)if(inside([x,z],LOBBY_POLYGON)&&inside([x,z+.05],LOBBY_POLYGON))box('lobby-tile-joints',x,.027,z+.025,.002,.001,.05,grout);
@@ -33,7 +34,7 @@ export function buildCommonSpaces({parent,resources,settings,cut=false}){
  // South face of the pump-room wall and entry-side service bank.
  box('lobby-oak-panelling',16.13,panelHeight/2,-5.165,4.20,panelHeight,.028,oak);
  for(let x=14.05;x<18.24;x+=.60)box('lobby-panel-reveal',x,panelHeight/2,-5.145,.008,panelHeight,.006,shadow);
- for(let x=18.73;x<21.6;x+=.56){
+ for(let x=20.12;x<21.6;x+=.56){
   box('lobby-flush-service-panel',x,panelHeight/2,-5.59,.548,panelHeight,.028,panel);
   if(!cut)box('lobby-service-handle',x+.21,1.05,-5.565,.018,.13,.022,black);
  }
@@ -52,7 +53,21 @@ export function buildCommonSpaces({parent,resources,settings,cut=false}){
   const frame=mat('#9b7554');for(const z of [-3.465,-.635])box('lobby-mirror-frame',12.38,1.45,z,.028,1.20,.025,frame);
   for(const y of [.863,2.037])box('lobby-mirror-frame',12.38,y,-2.05,.028,.025,2.85,frame);
  }
- const equipment=new THREE.Group();equipment.name='pump-equipment';equipment.userData={source:'pump-room-photo',dimensionsInferred:true,orientationInferred:true,pumps:3};root.add(equipment);
+ // Open portal between the two cabinet banks; no cabinet crosses the stair mouth.
+ const access=SERVICE_ACCESS,pitch=(access.topZ-access.bottomZ)/access.steps;
+ for(let i=0;i<access.steps;i++){const top=-(i+1)*access.depth/access.steps,bot=-access.depth-.12;
+  box('service-descending-step',(access.minX+access.maxX)/2,(top+bot)/2,access.topZ-(i+.5)*pitch,access.maxX-access.minX,top-bot,pitch+.002,stone);
+  box('service-step-nosing',(access.minX+access.maxX)/2,top+.004,access.topZ-i*pitch-.015,access.maxX-access.minX,.012,.035,grout);
+ }
+ for(const x of [18.40,19.75])box('service-stair-retaining-wall',x,-access.depth/2,-6.76,.09,access.depth,2.2,white);
+ box('service-bottom-landing',19.05,-access.depth-.06,-8.45,1.40,.12,1,stone);
+ for(const poly of Object.values(SERVICE_ROOM_POLYGONS))for(let i=0;i<poly.length;i++){
+  const a=poly[i],b=poly[(i+1)%poly.length],dx=b[0]-a[0],dz=b[1]-a[1];
+  // Preserve both source door portals at the bottom landing.
+  if((Math.abs(a[0]-18.249)<.02&&Math.abs(b[0]-18.249)<.02)||(Math.abs(a[0]-19.85)<.02&&Math.abs(b[0]-19.85)<.02))continue;
+  const length=Math.hypot(dx,dz),q=new THREE.Quaternion().setFromAxisAngle(THREE.Object3D.DEFAULT_UP,-Math.atan2(dz,dx));item(cube,white,[(a[0]+b[0])/2,-access.depth/2,(a[1]+b[1])/2],[length,access.depth,.08],q,'service-lower-wall');
+ }
+ const equipment=new THREE.Group();equipment.name='pump-equipment';equipment.position.y=-SERVICE_ACCESS.depth;equipment.userData={source:'pump-room-photo',dimensionsInferred:true,orientationInferred:true,pumps:3};root.add(equipment);
  // Along the west wall, outside the source entrance door and access aisle.
  box('pump-plinth',14.67,.10,-6.72,1.02,.20,2.15,concrete);
  box('pump-steel-frame',14.67,.27,-6.72,.82,.13,1.84,steel);

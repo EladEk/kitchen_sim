@@ -1,6 +1,6 @@
 // R54: horizontal context is registered to the ground/development plans.
 // Furniture heights, planting and bin dimensions are photo-based estimates.
-export const LAUNDRY_SCREEN_Z=11.64; // outer edge of the recess, not its back at 7.15
+export const LAUNDRY_SCREEN_Z=9.04526; // actual southern PORCH mouth; registered per storey
 export const ENTRY_GARDENS=[
  {id:'secondary-entry-garden',polygon:[[-5.90,-10.90],[-4.85,-10.90],[-4.85,-.65],[-5.90,-.65]]},
  {id:'secondary-entry-border',polygon:[[-.10,-2.58],[5.48,-2.58],[5.48,-2.04],[-.10,-2.04]]},

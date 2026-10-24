@@ -1,0 +1,237 @@
+{
+  "sourceSha256": "17b91da71d113f1ef3f8bbb2fd9a472354c357c59ff0046422451a3857022f73",
+  "added": [
+    {
+      "level": 1,
+      "path": 1,
+      "edge": 7,
+      "a": [
+        -0.094,
+        -16.355
+      ],
+      "b": [
+        -0.094,
+        -15.356
+      ],
+      "kind": "window",
+      "basis": "pdf-wall-gap",
+      "sourceOpeningPaths": [
+        8182,
+        8185,
+        8186,
+        8187,
+        8188
+      ],
+      "restored": true
+    },
+    {
+      "level": 1,
+      "path": 1,
+      "edge": 23,
+      "a": [
+        17.4238,
+        -11.503
+      ],
+      "b": [
+        17.4238,
+        -10.504
+      ],
+      "kind": "window",
+      "basis": "pdf-wall-gap",
+      "sourceOpeningPaths": [
+        4526,
+        4527,
+        4528,
+        4735,
+        4736,
+        4744
+      ],
+      "restored": true
+    },
+    {
+      "level": 2,
+      "path": 0,
+      "edge": 40,
+      "a": [
+        5.9598,
+        -1.403
+      ],
+      "b": [
+        5.9598,
+        -0.404
+      ],
+      "kind": "window",
+      "basis": "pdf-wall-gap",
+      "sourceOpeningPaths": [
+        14948,
+        14949,
+        14950,
+        15157,
+        15158,
+        15166
+      ],
+      "restored": true
+    },
+    {
+      "level": 3,
+      "path": 0,
+      "edge": 16,
+      "a": [
+        5.9604,
+        -1.405
+      ],
+      "b": [
+        5.9604,
+        -0.406
+      ],
+      "kind": "window",
+      "basis": "pdf-wall-gap",
+      "sourceOpeningPaths": [
+        22114,
+        22115,
+        22116,
+        22323,
+        22324,
+        22332
+      ],
+      "restored": true
+    },
+    {
+      "level": 4,
+      "path": 0,
+      "edge": 16,
+      "a": [
+        5.9604,
+        -1.405
+      ],
+      "b": [
+        5.9604,
+        -0.406
+      ],
+      "kind": "window",
+      "basis": "pdf-wall-gap",
+      "sourceOpeningPaths": [
+        22114,
+        22115,
+        22116,
+        22323,
+        22324,
+        22332
+      ],
+      "restored": true
+    },
+    {
+      "level": 5,
+      "path": 0,
+      "edge": 22,
+      "a": [
+        5.9598,
+        -1.403
+      ],
+      "b": [
+        5.9598,
+        -0.404
+      ],
+      "kind": "window",
+      "basis": "pdf-wall-gap",
+      "sourceOpeningPaths": [
+        24958,
+        24966
+      ],
+      "restored": true
+    },
+    {
+      "level": 6,
+      "path": 1,
+      "edge": 33,
+      "a": [
+        5.961,
+        -1.428
+      ],
+      "b": [
+        5.961,
+        -0.404
+      ],
+      "kind": "window",
+      "basis": "pdf-wall-gap",
+      "sourceOpeningPaths": [
+        1325,
+        1328,
+        1329,
+        1330,
+        1331
+      ],
+      "restored": true
+    },
+    {
+      "level": 7,
+      "path": 0,
+      "edge": 7,
+      "a": [
+        5.9009,
+        -8.2035
+      ],
+      "b": [
+        5.9009,
+        -7.304
+      ],
+      "kind": "window",
+      "basis": "pdf-wall-gap",
+      "sourceOpeningPaths": [
+        8132,
+        8235,
+        8236,
+        8237,
+        8238,
+        8239
+      ],
+      "restored": true
+    },
+    {
+      "level": 7,
+      "path": 0,
+      "edge": 13,
+      "a": [
+        17.2912,
+        -11.526499999999999
+      ],
+      "b": [
+        17.2912,
+        -10.479
+      ],
+      "kind": "window",
+      "basis": "pdf-wall-gap",
+      "sourceOpeningPaths": [
+        7967,
+        7968,
+        7969,
+        8559,
+        8560,
+        8570
+      ],
+      "restored": true
+    },
+    {
+      "level": 8,
+      "path": 0,
+      "edge": 19,
+      "a": [
+        17.4729,
+        -11.378
+      ],
+      "b": [
+        17.4729,
+        -10.354
+      ],
+      "kind": "window",
+      "basis": "pdf-wall-gap",
+      "sourceOpeningPaths": [
+        6184,
+        6187,
+        6188,
+        6189
+      ],
+      "restored": true
+    }
+  ]
+}
