@@ -1,3 +1,27 @@
+# R55 — Shed 3.5 m wide × 3 m deep
+
+The default shed is enlarged to 350 cm across the yard and 300 cm along the neighbour wall, and moved rearward to end 10 cm before the chamber access reserve. Approximate clear passage beside the house is 125 cm; the neighbour-wall gap stays 10 cm, and the estimated lid-rim gap is 40 cm. The door faces the service exit and opens inward. Dimensions, roof, appliance placeholders, shelving, collision and inspector metrics share the updated footprint. Clearances depend on the photo-estimated chamber position and need field measurement. Existing individually saved yard designs remain editable.
+
+# R54 — Waste bins, outer laundry screens and entrance courtyard
+
+Two photographed underground-bin intake towers and flush plates are placed on the development-plan waste island. Their steel bodies, sloped tops and intake flaps are illustrative; below-ground mechanisms are not invented. Walking collision matches the towers.
+
+Laundry/service screens move from the back of the recess (z≈7.15 m) to its exterior return (z≈11.64 m). The owner’s chamber is repositioned to [11.05,16.76] from the visible lid in 307548/307549, close to the front railing and neighbour wall. Photo registration and lid diameter remain estimates. Original plan coordinates are retained as provenance; the shed stays in its previous position and the access reserve is clipped at the property boundary. Apartment and site views share the corrected centre.
+
+Main and secondary entrance courtyards gain planted borders and stone curbs while preserving both approach routes. The water reservoir now has a solid enclosing shell, base and pump-facing service hatch; cutaway opens its cap, and walking cannot enter the tank. Heights and hatch profile remain estimates. The plan label beside it is corrected to “Meter room · raised floor”, retaining the existing footprint. Unmeasured internal meter equipment and floor levels are not invented.
+
+Reference photographs are included in the protected viewer. Validation covers source/scene consistency, both entrance approaches, reservoir/bin collision, chamber access and preserved shed position. Browser/mobile visual verification remains unavailable in this environment.
+
+# R53 — Lobby video and actual facade corrections
+
+The new lobby video and five facade photographs are available in the protected source viewer. The entrance glazing now has a complete head/lintel up to the storey above, rather than an open gap. The lobby has video-based wood-effect panels, flush service cabinet fronts, a stone bench at the window return, and ceiling details. Finish sizes and their registration remain estimates, not survey measurements. Bench geometry is shared with walking collision.
+
+The south service recess has continuous, full-storey dark horizontal louver screens at its plan-defined returns. Artificial continuous dark balcony-frame columns inferred from marketing imagery are removed; real PDF wall piers remain. Floor 7 terrace tessellation seams no longer generate internal glass railings or collision barriers; exterior guards and separate lower-floor balcony boundaries remain.
+
+Unresolved: the earlier screenshots identifying specific interior columns and the circled lobby hole are not attached to this session. Small isolated wall pieces sampled against the PDF proved to be real jambs/piers and were retained. The entrance-head correction addresses a confirmed gap, but cannot certify that it is the exact circled defect. Upper-apartment furnishing is not part of this revision.
+
+Validation: scene geometry, navigation and existing automated tests. Browser/mobile visual verification unavailable because the managed preview daemon mailbox is missing.
+
 # R51 — Residents’ club
 
 Select **מועדון דיירים · קומת קרקע / Residents’ club · ground floor** in the destination list, then start walking. The room is reachable through its actual lobby door (`bd-0-9`). Its wide opening is now a window with a sill, not a floor-height slider, both in rendering and walking collision. Both existing window widths and structural returns remain traced from page 3. Interior plaster, neutral matte flooring, dark frames, the partly raised wide-window shutter, a split AC, a service recess with riser and four round ceiling fixtures follow the owner’s 4.24-second video. The video and three frames are accessible through the protected source viewer. Round-light layout, fixture sizes, mounting heights, AC placement and the flooring product are estimates; the video is not a measured survey. 4000 K lights follow the global lamp switch. No furniture or construction debris is added. The separate pump room is outside this club-only revision.

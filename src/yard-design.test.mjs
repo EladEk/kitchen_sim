@@ -20,10 +20,10 @@ test('yard choices save, import and close independently while source boundaries,
 });
 
 test('shed edits reject chamber, window and condenser reserves; pergola stays in its strip and invalid imports are discarded',()=>{
- const s=normalizeHomeSettings(),cases=[['shed',{position:SERVICE_YARD.manhole.position},'chamber'],['shed',{position:[8.1,12.8]},'window'],['shed',{position:[10.5,10.8]},'ac'],['shed',{position:[20,20]},'outside'],['shed',{dimensions:{w:1,d:2.5,h:2.2}},'size'],['pergola',{position:[5,5]},'paving'],['fence',{dimensions:{h:8}},'size']];
+ const s=normalizeHomeSettings(),cases=[['shed',{position:[9.95,14.5]},'chamber'],['shed',{position:[9.7,12.8]},'window'],['shed',{position:[9.95,10.8]},'ac'],['shed',{position:[20,20]},'outside'],['shed',{dimensions:{w:1,d:2.5,h:2.2}},'size'],['pergola',{position:[5,5]},'paving'],['fence',{dimensions:{h:8}},'size']];
  for(const [id,command,error] of cases){const r=editHomeYard(s,id,command);assert.equal(r.error,error);assert.equal(r.settings,s,'failed edit preserves last valid state');}
  const bad=normalizeHomeSettings({yardDesign:{shed:{x:Infinity},pergola:{w:NaN},fence:{h:9,color:'url(x)'}}});assert.deepEqual(bad.yardDesign,{});
- const moved=edit(s,'shed',{dx:-.2}),back=yardForSettings(moved).service;assert(back.shed.passage<SERVICE_YARD.shed.passage);
+ const moved=edit(s,'shed',{dx:-.05}),back=yardForSettings(moved).service;assert(back.shed.passage<SERVICE_YARD.shed.passage);
  const route=findWalkPath(getRoom('laundry').walk,SERVICE_YARD.manhole.position,true,[],{},moved.yardDesign);assert(route?.length,'updated obstacles still allow a route to the chamber');
 });
 

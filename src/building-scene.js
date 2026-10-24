@@ -1,3 +1,5 @@
+import {LAUNDRY_SCREEN_Z} from './site-photo-layout.mjs';
+import {buildCommonSpaces} from './common-spaces-scene.js';
 import {clubWindowProfile} from './residents-club.mjs';
 import {buildResidentsClub} from './residents-club-scene.js';
 import * as THREE from 'three';
@@ -6,7 +8,6 @@ import {BUILDING_INTERIORS} from './building-interiors.mjs';
 import {onDetailedGround,segmentDistance,parseDestination,isDoorOpening,gardenFenceEdge} from './building-navigation.mjs';
 import {connectedWallRuns,doorWallOpening,exposedBalconySegments,commonStairRails,duplexFlightRails,duplexLandingGuards} from './building-geometry.mjs';
 import {COMMON_ENTRY_DOORS} from './building-site.mjs';
-import {balconyFrameStacks} from './building-appearance.mjs';
 import {buildElevators} from './building-elevators.js';
 import {buildingNumberPlate} from './building-signage.js';
 import {buildGroundApartments} from './ground-apartments-scene.js';
@@ -24,6 +25,13 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
  function material(color,extra={}){const m=shown?new THREE.MeshStandardMaterial({color,roughness:.8,...extra}):new THREE.MeshBasicMaterial({colorWrite:false,depthWrite:false,transparent:true,opacity:0});resources.push(m);return m;}
  const limestone=material('#e2ddd3',{roughness:.83}),concrete=material('#d5d2ca'),deck=material('#d8d2c5'),metal=material('#303b3e',{roughness:.42,metalness:.45}),glass=material('#bdcdd1',{roughness:.09,metalness:.18,transparent:true,opacity:.28,depthWrite:false}),voidMat=material('#485052',{roughness:.4}),roofMat=material('#ddd9cc'),insideWall=material('#f1efe9',{roughness:.9}),doorMat=material('#e5e1d7',{roughness:.55}),interiorFloor=material('#dcd7ce',{roughness:.48}),soffit=material('#f4f2eb',{roughness:.91}),fascia=material('#606665',{roughness:.72}),trimMat=material('#eeece5',{roughness:.62}),handleMat=material('#a9afad',{metalness:.8,roughness:.27});
  if(shown){
+  // Subtle mineral micro-relief, independent of tile borders. A material study,
+  // not a product scan; the documented facade colour and courses remain intact.
+  const size=64,data=new Uint8Array(size*size*4);let seed=4102;
+  for(let i=0;i<size*size;i++){seed=(Math.imul(seed,1664525)+1013904223)>>>0;const v=118+(seed%20);data.set([v,v,v,255],i*4);}
+  const grainMap=new THREE.DataTexture(data,size,size,THREE.RGBAFormat);grainMap.wrapS=grainMap.wrapT=THREE.RepeatWrapping;grainMap.magFilter=THREE.LinearFilter;grainMap.minFilter=THREE.LinearMipmapLinearFilter;grainMap.generateMipmaps=true;grainMap.repeat.set(12,12);grainMap.needsUpdate=true;resources.push(grainMap);
+  limestone.bumpMap=grainMap;limestone.bumpScale=.006;
+  insideWall.bumpMap=grainMap;insideWall.bumpScale=.0015;
   // Metre-scale stone courses, restrained grain and staggered vertical joints.
   // Colours/profile follow the supplied facade photos; this is no scan claim.
   limestone.onBeforeCompile=shader=>{
@@ -148,16 +156,19 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
     batch(node,concrete,stairs,'building-duplex-32-stair',def.level);
    }
   }
-  // Reconstruct the two photographed continuous service-screen stacks on the
-  // south service recess, not extra AC condensers or private equipment.
+  // Owner photos 307552/307556: continuous dark louvers over the service
+  // recess, from the first-floor soffit to the last repeated storey.
   if(def.level>0&&def.level<=6&&!cut){
-   for(const x of [8.35,2*BUILDING_CENTER[0]-8.35]){
-    const z=7.08,width=.88;dark.push([x,base+1.43,z,width,2.86,.06]);
-    for(let y=.12;y<2.87;y+=.115)rails.push([x,base+y,z+.055,width,.033,.08]);
+   for(const [left,right] of [[8.34,10.2503],[13.1502,15.0597]]){
+    const x=(left+right)/2,z=LAUNDRY_SCREEN_Z,width=right-left,height=BUILDING.storey;
+    dark.push([x,base+height/2,z-.06,width,height,.045]);
+    for(const xx of [left+.025,right-.025])rails.push([xx,base+height/2,z,.05,height,.12]);
+    for(let y=.045;y<height;y+=.105)rails.push([x,base+y,z+.055,width,.045,.12]);
    }
   }
   batch(node,trimMat,trims,'building-interior-trim',def.level);batch(node,handleMat,handles,'building-door-hardware',def.level);batch(node,fascia,fascias,'building-balcony-fascia',def.level);
   batch(node,limestone,walls,'building-facade-wall',def.level);batch(node,insideWall,interiorWalls,'building-interior-wall',def.level);batch(node,metal,frames,'building-window-frame',def.level);batch(node,glass,panes,'building-glazing',def.level,false);batch(node,voidMat,dark,'building-fascia-and-service-screen',def.level);batch(node,metal,rails,'building-rail-and-louvres',def.level);batch(node,limestone,decks,'building-stone-sill',def.level);
+  if(def.level===0&&shown)buildCommonSpaces({parent:node,resources,settings,cut});
   if(def.level===0&&shown)buildResidentsClub({parent:node,resources,settings,cut,ceilingVisible:walking||limit>0});
   if(def.level===0&&shown)buildGroundApartments({root:node,resources,picks,settings,cut,mode,floorMaterial:interiorFloor});
   if(shown&&!cut&&(walking||def.level<limit||limit===9)){
@@ -176,15 +187,6 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
   for(const poly of BUILDING_ROOF.heads){closedWallLoop(poly,BUILDING_ROOF.elevation,BUILDING.roofHead,.2,heads);slab(poly,BUILDING_ROOF.elevation+BUILDING.roofHead,.18,roofMat,node,'building-roof-head-cap',9);}
   batch(node,limestone,parapets,'building-roof-parapet',9);batch(node,limestone,heads,'building-lift-stair-head',9);
  }
- // The dark continuous balcony surround is visible in the developer's
- // complex-5 references. Only repeated exposed PDF balcony edges receive it.
- if(shown)for(const frame of balconyFrameStacks()){
-  const levels=frame.levels.filter(level=>level<=limit);if(!levels.length)continue;
-  const low=Math.min(...levels)*BUILDING.storey-BUILDING.slab,topLevel=Math.max(...levels),cut=settings.cutaway===true&&!walking&&topLevel===limit&&limit<9,top=topLevel*BUILDING.storey+(cut?.85:BUILDING.storey),items=[],dx=frame.b[0]-frame.a[0],dz=frame.b[1]-frame.a[1],angle=-Math.atan2(dz,dx);
-  for(const at of [frame.a,frame.b])items.push([at[0],(low+top)/2,at[1],.22,top-low,.3,angle]);
-  if(!cut&&topLevel===Math.max(...frame.levels))segment(frame.a,frame.b,top-.23,.23,.3,items);
-  const surround=batch(root,fascia,items,'building-balcony-surround',topLevel);if(surround)surround.userData={...surround.userData,reference:'efi-complex-5',dimensionsInferred:true};
- }
  let elevators=null;
  if(shown){
   elevators=buildElevators({root,resources,picks,limit,shown,cube,settings});
@@ -198,7 +200,7 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
    batch(root,fence,bars,'building-garden-fence',0);
   }
   slab(BUILDING_SITE,-.09,.14,material('#b5baa1'),root,'building-site-base',null);
-  buildSiteContext({root,resources,picks,settings,cut:settings.cutaway===true&&!walking&&limit===0});
+  buildSiteContext({root,resources,picks,settings,ceilingVisible:walking||limit>0,cut:settings.cutaway===true&&!walking&&limit===0});
   // Highlight the original apartment footprint with an unobtrusive outline.
   // No large room labels cover the facade or its controls.
   const poly=apartmentOutline||BUILDING_FLOORS[0].units.find(u=>u.number===4).polygon,geo=new THREE.BufferGeometry().setFromPoints([...poly,poly[0]].map(([x,z])=>new THREE.Vector3(x,.08,z))),m=new THREE.LineBasicMaterial({color:'#e5a64b',transparent:true,opacity:.9});resources.push(geo,m);const line=new THREE.Line(geo,m);line.name='apartment-4-outline';line.userData.part='building-apartment-highlight';root.add(line);

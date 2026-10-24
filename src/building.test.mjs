@@ -67,7 +67,7 @@ test('the actual facade stone shader compiles and links with Three lighting and 
 
 
 test('reference-based facade details remain within selected-floor limits, while unspecified interior finishes carry no owner product',()=>{
- for(const level of [1,4,6,9]){const m=model({buildingLevel:level,cutaway:false});try{const all=nodes(m),surrounds=all.filter(o=>o.userData.part==='building-balcony-surround');assert(surrounds.length);for(const o of surrounds){assert.equal(o.userData.reference,'efi-complex-5');assert(o.userData.dimensionsInferred);const b=new THREE.Box3().setFromObject(o);assert(b.max.y<=Math.min(level+1,7)*BUILDING.storey+.01);}
+ for(const level of [1,4,6,9]){const m=model({buildingLevel:level,cutaway:false});try{const all=nodes(m);assert(!all.some(o=>o.userData.part==='building-balcony-surround'));for(const o of all.filter(o=>o.userData.part==='building-balcony-fascia')){const b=new THREE.Box3().setFromObject(o);assert(b.max.y<=Math.min(level,8)*BUILDING.storey+.01);}
   assert(all.some(o=>o.userData.part==='building-balcony-soffit'));assert(all.some(o=>o.userData.part==='building-door-hardware'));assert(all.some(o=>o.userData.part==='building-interior-trim'));for(const o of all.filter(o=>o.userData.part==='building-unit-finish')){assert.equal(o.material.userData.productId,null);assert(o.material.userData.finishInferred);}
  }finally{m.dispose();}}
 });

@@ -10,19 +10,19 @@ import {closeAllStudioOpenings} from './studio-state.mjs';
 const near=(a,b)=>assert(Math.abs(a-b)<.00001,`${a} ≈ ${b}`),bounds=o=>new THREE.Box3().setFromObject(o);
 const intersects=(a,b)=>a.minX<b.maxX&&a.maxX>b.minX&&a.minZ<b.maxZ&&a.maxZ>b.minZ;
 
-test('chamber follows the sewage/drainage symbol in the RG1 rear yard, rather than guessing a drain at the doorstep',()=>{
- const expected=point((1183.97+1240.81)/2,(868.17+925.01)/2);Y.manhole.position.forEach((v,i)=>near(v,expected[i]));
+test('chamber follows the new visible-lid photos and retains its original plan provenance',()=>{
+ const expected=point((1183.97+1240.81)/2,(868.17+925.01)/2);Y.manhole.planPosition.forEach((v,i)=>near(v,expected[i]));assert.deepEqual(Y.manhole.position,[11.05,16.76]);assert(Y.manhole.photoVerified);
  assert(insidePolygon(Y.manhole.position,PLOT));assert(!insidePolygon(Y.manhole.position,HOUSE_OUTLINE));
  const e=Y.elements.find(e=>e.id==='service-manhole');assert(!e.planned);assert(e.dimensionsInferred);assert.match(e.noteEn,/not a measured lid/);assert.match(e.noteEn,/not a verified regulatory clearance/);
  assert.equal(Y.manhole.accessSize,1.6);
 });
 
-test('the 2.5 by 2 metre proposal follows the neighbour boundary and keeps the chamber access square exposed',()=>{
+test('the 3 m deep by 3.5 m wide proposal follows the neighbour boundary and keeps the chamber access square exposed',()=>{
  const s=Y.shed,a=polygonBounds(Y.manhole.access),b=polygonBounds(s.polygon),plot=polygonBounds(PLOT);
- near(b.maxX-b.minX,2);near(b.maxZ-b.minZ,2.5);assert(!intersects(b,a));
+ near(b.maxX-b.minX,3.5);near(b.maxZ-b.minZ,3);assert(!intersects(b,a));
  near(a.minZ-b.maxZ,.1);near(Y.manhole.position[1]-b.maxZ-.5,.4);
  assert(b.minX>plot.minX&&b.maxX<plot.maxX&&b.minZ>plot.minZ&&b.maxZ<plot.maxZ);
- near(plot.maxX-b.maxX,.1);near(Y.shed.passage,1.249625);
+ near(plot.maxX-b.maxX,.1);near(Y.shed.passage,1.2503416666666647);
  for(let x=b.minX+.05;x<b.maxX;x+=.1)for(let z=b.minZ+.05;z<b.maxZ;z+=.1)assert(!insidePolygon([x,z],HOUSE_OUTLINE),'proposal never occupies an existing room');
 });
 
@@ -33,7 +33,7 @@ test('actual shed, open leaves and appliance meshes do not cover the maintenance
   for(const id of ['garden-shed','shed-fridge','shed-freezer']){
    const p=scene.gardenGroups.get(id);assert(p);p.traverse(o=>{if(!o.isMesh)return;const b=bounds(o);assert(!intersects({minX:b.min.x,maxX:b.max.x,minZ:b.min.z,maxZ:b.max.z},a),`${id} never covers access`);});
   }
-  const roof=scene.gardenGroups.get('garden-shed').children.find(o=>o.userData.part==='shed-roof'),b=bounds(roof);near(b.max.x-b.min.x,2);near(b.max.z-b.min.z,2.5);near(b.max.y,2.2);
+  const roof=scene.gardenGroups.get('garden-shed').children.find(o=>o.userData.part==='shed-roof'),b=bounds(roof);near(b.max.x-b.min.x,3.5);near(b.max.z-b.min.z,3);near(b.max.y,2.2);
   const cover=scene.gardenGroups.get('service-manhole').children.find(o=>o.userData.part==='inspection-cover'),c=bounds(cover);near((c.min.x+c.max.x)/2,Y.manhole.position[0]);near((c.min.z+c.max.z)/2,Y.manhole.position[1]);near(c.max.x-c.min.x,1);
   for(const e of Y.elements)assert(scene.picks.some(o=>o.userData.buildingId===e.id),`${e.id} has a dimension/source hit target`);
  }finally{scene.dispose();}
@@ -72,21 +72,21 @@ test('shed roof and new door states survive imports and Close all still closes e
 test('chamber identification keeps original PDF provenance and readable portable crop assets',()=>{
  const path=p=>new URL(`../public${p}`,import.meta.url),source=readFileSync(path('/house/house-plan.pdf')),record=JSON.parse(readFileSync(path('/house/service-yard/provenance.json')));
  assert.equal(createHash('sha256').update(source).digest('hex'),record.sourceSha256);
- assert.equal(record.items.length,4);for(const page of SERVICE_SOURCE.pages){const bytes=readFileSync(path(`${SERVICE_SOURCE.imagePrefix}${page}.jpg`));assert.equal(bytes.readUInt16BE(0),0xffd8);assert.equal(createHash('sha256').update(bytes).digest('hex'),record.items.find(i=>i.page===page).sha256);}
+ assert.equal(record.items.length,6);for(const page of SERVICE_SOURCE.pages){const bytes=readFileSync(path(SERVICE_SOURCE.references.find(r=>r.page===page)?.image||`${SERVICE_SOURCE.imagePrefix}${page}.jpg`));assert.equal(bytes.readUInt16BE(0),0xffd8);assert.equal(createHash('sha256').update(bytes).digest('hex'),record.items.find(i=>i.page===page).sha256);}
 });
 
 
 test('safe-room window frontage and full door-swing geometry stay outside the new shed',()=>{
  const w=WINDOWS.find(w=>w.id==='safe-window'),wall=WALLS.find(a=>a.id===w.wallId),p=openingPoint(w),clear=Y.safeWindow,s=Y.shed;
  near(clear.minX,w.start);near(clear.maxX,w.end);assert(clear.minZ>p[1]+wall.thickness/2);
- assert(s.minX>w.end+1.5,'shed is laterally outside the full opening, with more than 1.5 m plan separation');
+ assert(s.minX>w.end+.1,'shed stays laterally outside the full window opening');
  assert(!intersects(polygonBounds(clear.polygon),polygonBounds(s.polygon)));
  const scene=createHomeScene(normalizeHomeSettings(),{mode:'walk'});
  try{const door=scene.motions.find(m=>m.id==='garden-shed:door');for(let i=0;i<=12;i++){door.object.rotation.y=i*Math.PI*.49/12;scene.group.updateMatrixWorld(true);const b=bounds(door.object);assert(!intersects({minX:b.min.x,maxX:b.max.x,minZ:b.min.z,maxZ:b.max.z},polygonBounds(clear.polygon)),'opening the shed does not occupy the window frontage');}}finally{scene.dispose();}
 });
 
-test('new photos remain local evidence without falsely confirming the chamber lid',()=>{
- assert.equal(Y.manhole.photoVerified,false);
+test('new visible-lid photos supersede the older obscured views without claiming measured coordinates',()=>{
+ assert.equal(Y.manhole.photoVerified,true);assert(Y.manhole.positionInferred);
  const record=JSON.parse(readFileSync(new URL('../public/house/service-yard/provenance.json',import.meta.url)));
  for(const page of [3,4]){const item=record.items.find(i=>i.page===page);assert.equal(item.lidVisuallyConfirmed,false);assert.match(item.originalSha256,/^[a-f0-9]{64}$/);assert.match(SERVICE_SOURCE.references.find(r=>r.page===page).noteEn,/No (chamber )?lid is confidently/);}
 });

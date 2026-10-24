@@ -1,3 +1,5 @@
+import {LOBBY_BENCHES} from './lobby-reference.mjs';
+import {COMMON_SPACES,commonSpace,PUMP_OBSTACLES} from './common-spaces.mjs';
 import {RESIDENTS_CLUB,clubWindowProfile,isClubDestination,inResidentsClub} from './residents-club.mjs';
 import {connectedWallRuns,exposedBalconySegments,wallFootprint,duplexFlightRails,duplexLandingGuards} from './building-geometry.mjs';
 import {BUILDING,BUILDING_FLOORS,BUILDING_SITE} from './building-layout.mjs';
@@ -30,7 +32,7 @@ export function buildingBoxes(level,settings,cars=[]){
  if(level===0)for(const garden of f.gardens||[]){if(garden.unit===4)continue;garden.plot.forEach((a,i)=>{const b=garden.plot[(i+1)%garden.plot.length];if(!gardenFenceEdge(a,b,f))return;boxes.push(segmentBox(a,b,.05,{gardenFence:true}));});}
  if(level===0)boxes.push(...collisionBoxes(settings.openDoors,settings.furniture,settings.closedShutters,settings.openParts,settings.furnitureLayout,settings.yardDesign));
  if(level===0&&settings.furniture!==false)for(const unit of [1,2,3])boxes.push(...groundFurnitureBoxes(unit));
- if(level===0)boxes.push({...RESIDENTS_CLUB.cabinet,clubCabinet:true},...siteCollisionBoxes());
+ if(level===0)boxes.push({...RESIDENTS_CLUB.cabinet,clubCabinet:true},...siteCollisionBoxes(),...PUMP_OBSTACLES,...LOBBY_BENCHES.map(b=>({...b,lobbyBench:true})));
  if(level===0)for(const d of COMMON_ENTRY_DOORS)if(settings.closedBuildingDoors?.includes(d.id))boxes.push(segmentBox(d.hinge,d.closed,.06,{buildingDoorId:d.id}));
  return boxes;
 }
@@ -53,14 +55,14 @@ export function clearBuildingPosition(at,level,boxes,cars){
  return null;
 }
 export function parseDestination(value='unit:4:0'){
- if(isClubDestination(value))return {floor:0,unit:null,common:'club'};
+ if(commonSpace(value))return {floor:0,unit:null,common:commonSpace(value).id};
  const parts=String(value).split(':'),floor=Number(parts[parts[0]==='floor'?1:2]);
  if(Number.isInteger(floor)&&floor>=0&&floor<=8){if(parts[0]==='floor')return {floor,unit:null};const unit=Number(parts[1]);if(BUILDING_FLOORS[floor].units.some(u=>u.number===unit))return {floor,unit};}
  return {floor:0,unit:4};
 }
 export function destinationStart(destination,settings,cars){
  const {floor,unit}=parseDestination(destination),source=interiorsForFloor(floor),boxes=buildingBoxes(floor,settings,cars);
- if(isClubDestination(destination))return {position:clearBuildingPosition(RESIDENTS_CLUB.walk,0,boxes,cars)||RESIDENTS_CLUB.walk,floor:0,yaw:RESIDENTS_CLUB.yaw};
+ if(commonSpace(destination)){const c=commonSpace(destination);return {position:clearBuildingPosition(c.walk,0,boxes,cars)||c.walk,floor:0,yaw:c.yaw};}
  if(unit===4&&floor===0){const p=clearBuildingPosition(ROOMS[0].walk,floor,boxes,cars);return {position:p||ROOMS[0].walk,floor,yaw:Math.PI};}
  const entry=source.entries.find(e=>e.unit===unit),door=source.doors.find(d=>d.id===entry?.doorId);
  let at,yaw;
@@ -71,7 +73,7 @@ export function destinationStart(destination,settings,cars){
 }
 export function buildingLocation(p,floor){
  const f=BUILDING_FLOORS[floor],unit=f.units.find(u=>inPolygon(p,u.polygon))?.number||null;
- return {floor,unit,common:floor===0&&inResidentsClub(p)?'club':null,roomId:floor===0&&(unit===4||inPolygon(p,PLOT))?roomAt(p):null};
+ return {floor,unit,common:floor===0?(inResidentsClub(p)?'club':COMMON_SPACES.find(c=>c.id!=='club'&&inPolygon(p,c.polygon))?.id||null):null,roomId:floor===0&&(unit===4||inPolygon(p,PLOT))?roomAt(p):null};
 }
 export function nearbyLift(p,floor,cars){
  const source=interiorsForFloor(floor);

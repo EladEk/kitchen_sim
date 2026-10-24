@@ -83,8 +83,11 @@ export function exposedBalconySegments(floor){
  if(guardCache.has(floor))return guardCache.get(floor);const result=[],probe=.13;
  floor.balconies.forEach((poly,balcony)=>poly.forEach((a,edge)=>{const b=poly[(edge+1)%poly.length],r=[b[0]-a[0],b[1]-a[1]],length=Math.hypot(...r);if(length<.01)return;const n=[r[1]/length,-r[0]/length],cuts=[0,1];
   for(const sign of [-1,1]){const origin=[a[0]+n[0]*probe*sign,a[1]+n[1]*probe*sign];for(const p of floor.envelope)for(let i=0;i<p.polygon.length;i++){const c=p.polygon[i],d=p.polygon[(i+1)%p.polygon.length],s=[d[0]-c[0],d[1]-c[1]],den=cross(r,s);if(Math.abs(den)<1e-9)continue;const delta=[c[0]-origin[0],c[1]-origin[1]],t=cross(delta,s)/den,u=cross(delta,r)/den;if(t>0&&t<1&&u>=-1e-8&&u<=1+1e-8)cuts.push(t);}}
+  // Floor 7 terraces are tessellated into adjacent rectangles in the trace.
+  // Split at their vertices and suppress internal seams, not perimeter guards.
+  if(floor.level===7)for(const other of floor.balconies)for(const p of other){const t=((p[0]-a[0])*r[0]+(p[1]-a[1])*r[1])/(length*length);if(t>0&&t<1&&Math.abs(cross(r,[p[0]-a[0],p[1]-a[1]]))/length<.015)cuts.push(t);}
   const sorted=[...new Set(cuts.map(t=>Math.round(t*1e8)/1e8))].sort((x,y)=>x-y),at=t=>[a[0]+r[0]*t,a[1]+r[1]*t];
-  for(let i=1;i<sorted.length;i++){const start=sorted[i-1],end=sorted[i];if((end-start)*length<.012)continue;const middle=at((start+end)/2),covered=floor.envelope.some(p=>[-1,1].some(sign=>polygonContains([middle[0]+n[0]*probe*sign,middle[1]+n[1]*probe*sign],p.polygon)));if(!covered)result.push({a:at(start),b:at(end),balcony,edge,span:[start,end]});}
+  for(let i=1;i<sorted.length;i++){const start=sorted[i-1],end=sorted[i];if((end-start)*length<.012)continue;const middle=at((start+end)/2),covered=floor.envelope.some(p=>[-1,1].some(sign=>polygonContains([middle[0]+n[0]*probe*sign,middle[1]+n[1]*probe*sign],p.polygon)));const internal=floor.level===7&&[-1,1].every(sign=>floor.balconies.some(poly=>polygonContains([middle[0]+n[0]*.02*sign,middle[1]+n[1]*.02*sign],poly)));if(!covered&&!internal)result.push({a:at(start),b:at(end),balcony,edge,span:[start,end]});}
  }));guardCache.set(floor,result);return result;
 }
 export function commonStairRails(source,storey){

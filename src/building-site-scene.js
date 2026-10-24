@@ -1,10 +1,11 @@
+import {buildPhotoSite} from './site-photo-scene.js';
 import * as THREE from 'three';
 import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
 import {parkingCarPlacements,sitePlantingPositions} from './site-appearance.mjs';
 import {SITE_TRACE,SITE_CHAMBERS,COMMON_ENTRY_DOORS} from './building-site.mjs';
 import {createSurfacePalette,metricSurfaceUVs} from './surface-materials.mjs';
 
-export function buildSiteContext({root,resources,picks,settings,cut=false}){
+export function buildSiteContext({root,resources,picks,settings,cut=false,ceilingVisible=true}){
  const group=new THREE.Group();group.name='building-4102-surroundings';group.userData={part:'building-site-context',source:'building-plan',page:2};root.add(group);
  const mat=(color,extra={})=>{const m=new THREE.MeshStandardMaterial({color,roughness:.85,...extra});resources.push(m);return m;},surface=createSurfacePalette(resources),pavers=surface('cement','#c2c1bb'),drive=surface('cement','#777b7b',{roughness:.88,bumpScale:.0005}),paint=mat('#f2f1e9'),kerb=surface('cement','#d0cfc7'),cover=mat('#555b56',{metalness:.3,roughness:.72}),blue=mat('#467d9b');
  const cube=new THREE.BoxGeometry(1,1,1);resources.push(cube);
@@ -45,12 +46,20 @@ export function buildSiteContext({root,resources,picks,settings,cut=false}){
  const entryGlass=mat('#a8c4ce',{transparent:true,opacity:.27,depthWrite:false,roughness:.18});
  for(const d of COMMON_ENTRY_DOORS){const end=settings.closedBuildingDoors?.includes(d.id)?d.closed:d.opened,dx=end[0]-d.hinge[0],dz=end[1]-d.hinge[1],width=Math.hypot(dx,dz),height=cut?.82:2.28,angle=-Math.atan2(dz,dx),data={action:'building-door',doorId:d.id,part:'site-common-entry-door',source:'building-plan',page:3};const pane=box((d.hinge[0]+end[0])/2,height/2,(d.hinge[1]+end[1])/2,width,height,.025,entryGlass,data);pane.rotation.y=angle;for(const q of [d.hinge,end])box(q[0],height/2,q[1],.04,height,.04,cover,data);for(const y of [.035,height-.035]){const rail=line(d.hinge,end,y,.04,cover);rail.userData=data;picks.push(rail);}}
  const fixed=box(21.8239,1.14,(-3.6998-2.7005)/2,.018,cut?.82:2.28,.9993,entryGlass);fixed.userData={part:'site-entry-fixed-glazing'};if(cut)fixed.position.y=.41;
+ // Close the actual entrance head: the general facade skips door openings,
+ // so the complete glazed opening needs its own lintel up to storey height.
+ if(!cut){
+  box(21.8239,2.69,(-4.9498-2.7005)/2,.30,.82,2.2493,kerb,{part:'lobby-entry-lintel',source:'building-plan',heightInferred:true});
+  for(const z of [-4.9498,-3.6998,-2.7005])box(21.8239,1.14,z,.075,2.28,.055,cover,{part:'lobby-entry-fixed-frame'});
+  for(const y of [.035,2.25])box(21.8239,y,-3.20015,.075,.06,.9993,cover,{part:'lobby-entry-fixed-frame'});
+ }
  // Trace-defined entry points and common water rooms are inspectable at their
  // actual locations. No unrecorded meter-room equipment is invented.
  for(const f of SITE_TRACE.features.filter(f=>f.id!=='site-main-water-meter')){
   if(f.id.includes('entrance')){const [x,z]=f.position;box(x,2.38,z,.024,.08,1.2,cover,{action:'building',buildingId:f.id,part:'site-entry-header'});}
   else slab(f.polygon,.023,surface('cement',f.id==='site-water-reservoir'?'#a9bdc0':'#b5b6aa'),{action:'building',buildingId:f.id,part:'site-common-room-floor'});
  }
+ buildPhotoSite({group,resources,picks,cut,ceilingVisible});
  group.traverse(o=>{o.userData.buildingFloor=0;});return group;
 }
 

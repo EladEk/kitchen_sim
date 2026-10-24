@@ -1,3 +1,4 @@
+import {commonSpace} from './common-spaces.mjs';
 import {isClubDestination} from './residents-club.mjs';
 import {BUILDING_TRACE as T} from './building-trace.mjs';
 import {SITE_TRACE} from './building-site-trace.mjs';
@@ -20,7 +21,7 @@ export const BUILDING_BOUNDS={minX:Math.min(...points.map(p=>p[0])),maxX:Math.ma
 export const BUILDING_CENTER=[(BUILDING_BOUNDS.minX+BUILDING_BOUNDS.maxX)/2,BUILDING_BOUNDS.maxY/2,(BUILDING_BOUNDS.minZ+BUILDING_BOUNDS.maxZ)/2];
 export function normalizeBuildingLevel(value){return Number.isInteger(value)&&value>=0&&value<=9?value:9;}
 export function normalizeTourDestination(value){
- if(isClubDestination(value))return value;
+ if(commonSpace(value))return value;
  const p=String(value||'').split(':'),floor=Number(p[p[0]==='floor'?1:2]);
  if(Number.isInteger(floor)&&floor>=0&&floor<9){if(p[0]==='floor')return `floor:${floor}`;const unit=Number(p[1]);if(p[0]==='unit'&&BUILDING_FLOORS[floor].units.some(u=>u.number===unit))return `unit:${unit}:${floor}`;}
  return 'unit:4:0';
