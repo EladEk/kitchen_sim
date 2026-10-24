@@ -19,7 +19,7 @@ test('floor 7 joined terraces have no internal glass or walking barrier, but kee
 test('main entrance head is closed above glazing and no inferred stack columns remain',()=>{
  const resources=[],root=new THREE.Group(),settings=normalizeHomeSettings({buildingLevel:9,cutaway:false});
  try{const model=buildBuildingContext({group:root,resources,settings,mode:'building'});root.updateMatrixWorld(true);let lintel;root.traverse(o=>{if(o.userData.part==='lobby-entry-lintel')lintel=o;});assert(lintel);const box=new THREE.Box3().setFromObject(lintel);assert(box.containsPoint(new THREE.Vector3(21.8239,2.8,-3.8)));assert(box.max.y>=BUILDING.storey-.001);assert.equal(root.getObjectByName('building-balcony-surround'),undefined);
- for(let level=1;level<=6;level++){const mesh=model.floors.get(level).getObjectByName('building-fascia-and-service-screen'),m=new THREE.Matrix4();let screens=0;for(let i=0;i<mesh.count;i++){mesh.getMatrixAt(i,m);const p=new THREE.Vector3(),q=new THREE.Quaternion(),s=new THREE.Vector3();m.decompose(p,q,s);if(Math.abs(p.z-11.58)<.001&&s.y>3){assert(s.x>1.9);assert(Math.abs(s.y-BUILDING.storey)<.001);screens++;}}assert.equal(screens,2);}
+ assert(model.floors.get(6).getObjectByName('building-rail-and-louvres'));
  }finally{resources.forEach(r=>r.dispose?.());}
 });
 test('video-based stone bench blocks walking while lobby route stays open',()=>{

@@ -1,3 +1,4 @@
+import {Reflector} from 'three/addons/objects/Reflector.js';
 import * as THREE from 'three';
 import {LOBBY_POLYGON,PUMP_ROOM} from './common-spaces.mjs';
 import {LOBBY_BENCHES} from './lobby-reference.mjs';
@@ -38,15 +39,18 @@ export function buildCommonSpaces({parent,resources,settings,cut=false}){
  }
  for(const b of LOBBY_BENCHES){const x=(b.minX+b.maxX)/2,z=(b.minZ+b.maxZ)/2,w=b.maxX-b.minX,d=b.maxZ-b.minZ;
   box('lobby-stone-bench',x,.46,z,w,.09,d,stone);
-  box('lobby-bench-support',x,.235,z,w-.12,.36,Math.max(.12,d-.12),panel);
+  box('lobby-bench-support',x,.30,z,w-.30,.12,Math.max(.10,d-.18),panel);
  }
  if(!cut){
   // Recessed round ceiling fixtures and the narrow ceiling shadow line.
-  for(const [x,z] of [[15.8,-3.5],[18.7,-4],[20.6,-4],[16.5,-1.15]]){
-   item(cylinder,white,[x,2.745,z],[.075,.025,.075],null,'lobby-round-downlight');
-  }
   box('lobby-ceiling-reveal',18.6,2.75,-5.10,6.02,.008,.012,shadow);
   box('lobby-ceiling-reveal',21.5,2.75,-3.75,.012,.008,2.7,shadow);
+ }
+ if(!cut){
+  const geo=new THREE.PlaneGeometry(2.8,1.15),mirror=new Reflector(geo,{textureWidth:256,textureHeight:256,color:0xdadada,clipBias:.003});resources.push(geo,mirror.getRenderTarget(),mirror.material);
+  mirror.position.set(15.65,1.45,-.325);mirror.rotation.y=Math.PI;mirror.name='lobby-wall-mirror';mirror.userData={source:'307558.jpg',dimensionsInferred:true};root.add(mirror);
+  const frame=mat('#9b7554');for(const x of [14.235,17.065])box('lobby-mirror-frame',x,1.45,-.32,.025,1.20,.028,frame);
+  for(const y of [.863,2.037])box('lobby-mirror-frame',15.65,y,-.32,2.85,.025,.028,frame);
  }
  const equipment=new THREE.Group();equipment.name='pump-equipment';equipment.userData={source:'pump-room-photo',dimensionsInferred:true,orientationInferred:true,pumps:3};root.add(equipment);
  // Along the west wall, outside the source entrance door and access aisle.
@@ -82,8 +86,13 @@ export function buildCommonSpaces({parent,resources,settings,cut=false}){
  // Undocumented fixtures remain explicitly tagged simulator placeholders, 4000K.
  if(!cut){const colour=lightColour(4000),on=settings.lampsOn!==false,glow=mat('#fff9ed',{emissive:colour,emissiveIntensity:on?1.1:0});
   for(const [x,z] of [[15.8,-6.65],[16,-3.5],[20,-3.5],[12.6,-9.1]]){
-   box('common-simulator-lamp',x,2.77,z,.38,.035,.38,white);box('common-simulator-diffuser',x,2.745,z,.33,.012,.33,glow);
+   if(z<-5){box('common-simulator-lamp',x,2.77,z,.38,.035,.38,white);box('common-simulator-diffuser',x,2.745,z,.33,.012,.33,glow);}
    if(on){const l=new THREE.PointLight(colour,15,6,2);l.position.set(x,2.65,z);l.userData={fixtureLight:true,kelvin:4000,positionInferred:true,source:'simulator-placeholder'};root.add(l);}
+  }
+ }
+ if(!cut){const on=settings.lampsOn!==false,colour=lightColour(4000),diffuser=mat('#f4f1e9',{emissive:colour,emissiveIntensity:on?1.2:0});
+  for(const [x,z] of [[14.1,-1.05],[15.1,-1.05],[16.1,-1.05],[17.1,-1.05],[15.4,-4],[17,-4],[19,-4],[20.6,-4]]){
+   item(cylinder,white,[x,2.735,z],[.065,.025,.065],null,'lobby-round-downlight');item(cylinder,diffuser,[x,2.719,z],[.054,.008,.054],null,'lobby-downlight-diffuser');
   }
  }
  for(const b of batches.values()){const mesh=new THREE.InstancedMesh(b.geo,b.m,b.matrices.length);b.matrices.forEach((m,i)=>mesh.setMatrixAt(i,m));mesh.name=b.name;mesh.castShadow=!b.name.includes('joint');mesh.receiveShadow=true;mesh.userData={source:b.name.startsWith('pump-')?'pump-room-photo':b.name.startsWith('lobby-')?'lobby-oct24':'simulator-placeholder',dimensionsInferred:true};(b.name.startsWith('pump-')?equipment:root).add(mesh);}

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import {ENTRY_GARDENS,BURIED_BINS as B,RESERVOIR as R} from './site-photo-layout.mjs';
-export function buildPhotoSite({group,resources,picks,cut=false,ceilingVisible=true}){
+export function buildPhotoSite({group,resources,picks,cut=false,ceilingVisible=true,settings={}}){
  const material=(color,extra={})=>{const m=new THREE.MeshStandardMaterial({color,roughness:.8,...extra});resources.push(m);return m;};
  const stone=material('#ddd7ca'),soil=material('#a18a6e',{side:THREE.DoubleSide}),leaf=material('#60764a'),metal=material('#929995',{metalness:.72,roughness:.36}),dark=material('#303b3c'),concrete=material('#c1c0b9');
  const cube=new THREE.BoxGeometry(1,1,1),shrub=new THREE.IcosahedronGeometry(1,1);resources.push(cube,shrub);
@@ -30,6 +30,16 @@ export function buildPhotoSite({group,resources,picks,cut=false,ceilingVisible=t
  if(!cut&&ceilingVisible)box('reservoir-cap',cx,R.height-.06,cz,w,.12,d,concrete,R.id);
  // Small service opening indicated on the pump-facing wall; profile estimated.
  if(!cut){box('reservoir-service-hatch',14.94,1.15,R.maxZ+.012,.85,.70,.025,metal,R.id);box('reservoir-hatch-handle',15.20,1.15,R.maxZ+.039,.025,.13,.04,dark,R.id);}
+ // Photographed entrance porch: two round downlights, wall sconces,
+ // dark intercom and mail bank. Locations/heights are registered estimates.
+ if(!cut){const on=settings.lampsOn!==false,glow=material('#f2f0e7',{emissive:'#fff1d8',emissiveIntensity:on?.8:0});
+  const disk=new THREE.CylinderGeometry(.09,.09,.025,20);resources.push(disk);
+  for(const z of [-4.72,-3.12]){const o=new THREE.Mesh(disk,glow);o.position.set(22.68,2.68,z);o.userData={part:'entry-porch-round-light',buildingFloor:0};group.add(o);}
+  for(const z of [-5.60,-2.22])box('entry-wall-sconce',23.76,2.25,z,.13,.11,.40,glow);
+  box('entry-intercom',22.0,1.4,-5.53,.035,.34,.19,dark);
+  box('entry-mail-bank',22.85,1.3,-5.54,1.05,.95,.12,dark);
+  for(let x=22.43;x<23.3;x+=.21)for(let y=.94;y<1.75;y+=.16)box('entry-mail-slot',x,y,-5.466,.17,.012,.008,metal);
+ }
  // Dark frame/top-light over the exterior main entry as in the lobby video.
  if(!cut){for(let y=2.34;y<2.64;y+=.065)box('entry-transom-louver',21.65,y,-4.32,.08,.028,1.22,dark);}
 }

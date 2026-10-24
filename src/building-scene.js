@@ -1,3 +1,4 @@
+import {LAUNDRY_SCREENS} from './laundry-screens.mjs';
 import {LAUNDRY_SCREEN_Z} from './site-photo-layout.mjs';
 import {buildCommonSpaces} from './common-spaces-scene.js';
 import {clubWindowProfile} from './residents-club.mjs';
@@ -159,11 +160,12 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
   // Owner photos 307552/307556: continuous dark louvers over the service
   // recess, from the first-floor soffit to the last repeated storey.
   if(def.level>0&&def.level<=6&&!cut){
-   for(const [left,right] of [[8.34,10.2503],[13.1502,15.0597]]){
-    const x=(left+right)/2,z=LAUNDRY_SCREEN_Z,width=right-left,height=BUILDING.storey;
-    dark.push([x,base+height/2,z-.06,width,height,.045]);
-    for(const xx of [left+.025,right-.025])rails.push([xx,base+height/2,z,.05,height,.12]);
-    for(let y=.045;y<height;y+=.105)rails.push([x,base+y,z+.055,width,.045,.12]);
+   for(const screen of LAUNDRY_SCREENS){
+    const {a,b}=screen,dx=b[0]-a[0],dz=b[1]-a[1],width=Math.hypot(dx,dz),angle=-Math.atan2(dz,dx),x=(a[0]+b[0])/2,z=(a[1]+b[1])/2,height=BUILDING.storey;
+    // Actual slat gaps remain open: no opaque backing plate across the recess.
+    for(const q of [a,b])rails.push([q[0],base+height/2,q[1],.045,height,.08,angle]);
+    for(let y=.04;y<height;y+=.08)rails.push([x,base+y,z,width,.045,.105,angle]);
+    fascias.push([x,base-.06,z,width,.12,.13,angle]);
    }
   }
   batch(node,trimMat,trims,'building-interior-trim',def.level);batch(node,handleMat,handles,'building-door-hardware',def.level);batch(node,fascia,fascias,'building-balcony-fascia',def.level);

@@ -1,3 +1,9 @@
+# R56 — Lobby, entrance lights and service screens
+
+Rechecked both Oct 24 lobby videos and new photographs. Added a low-resolution real reflecting lobby mirror with thin warm frame, changed the bench to cantilevered supports, and replaced remaining lobby square fixture bodies with recessed round downlights. Entry details now include two round porch lights, wall sconces, intercom and mail bank. 4000 K remains the lighting target, not a measured colour-temperature claim.
+
+Four service-screen mouths now cover the repeated south, west and east recesses, with open horizontal slats and bottom caps instead of opaque backing sheets. Screen coordinates on unphotographed elevations remain plan-based estimates. Upper stepped floors outside the repeated recesses are retained; no claim is made that unseen sides are photographically verified. Mirror size, finish registration, lighting power and fixture heights remain estimates. Browser/mobile visual QA remains unavailable.
+
 # R55 — Shed 3.5 m wide × 3 m deep
 
 The default shed is enlarged to 350 cm across the yard and 300 cm along the neighbour wall, and moved rearward to end 10 cm before the chamber access reserve. Approximate clear passage beside the house is 125 cm; the neighbour-wall gap stays 10 cm, and the estimated lid-rim gap is 40 cm. The door faces the service exit and opens inward. Dimensions, roof, appliance placeholders, shelving, collision and inspector metrics share the updated footprint. Clearances depend on the photo-estimated chamber position and need field measurement. Existing individually saved yard designs remain editable.

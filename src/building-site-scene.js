@@ -59,7 +59,7 @@ export function buildSiteContext({root,resources,picks,settings,cut=false,ceilin
   if(f.id.includes('entrance')){const [x,z]=f.position;box(x,2.38,z,.024,.08,1.2,cover,{action:'building',buildingId:f.id,part:'site-entry-header'});}
   else slab(f.polygon,.023,surface('cement',f.id==='site-water-reservoir'?'#a9bdc0':'#b5b6aa'),{action:'building',buildingId:f.id,part:'site-common-room-floor'});
  }
- buildPhotoSite({group,resources,picks,cut,ceilingVisible});
+ buildPhotoSite({group,resources,picks,cut,ceilingVisible,settings});
  group.traverse(o=>{o.userData.buildingFloor=0;});return group;
 }
 
