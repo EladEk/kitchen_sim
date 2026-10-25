@@ -2,10 +2,12 @@ import {apartmentFurnitureBoxes} from './apartment-furniture-scene.js';
 import {laundryScreens} from './laundry-screens.mjs';
 import {LOBBY_BENCHES} from './lobby-reference.mjs';
 import {COMMON_SPACES,commonSpace,PUMP_OBSTACLES} from './common-spaces.mjs';
+import {serviceFloorHeight} from './service-access.mjs';
 import {RESIDENTS_CLUB,clubWindowProfile,isClubDestination,inResidentsClub} from './residents-club.mjs';
 import {connectedWallRuns,exposedBalconySegments,wallFootprint,duplexFlightRails,duplexLandingGuards} from './building-geometry.mjs';
 import {BUILDING,BUILDING_FLOORS,BUILDING_SITE} from './building-layout.mjs';
 import {BUILDING_INTERIORS} from './building-interiors.mjs';
+import {duplexForUnit,duplexOnFloor,duplexStair} from './building-duplexes.mjs';
 import {HOUSE,HOUSE_OUTLINE,PLOT,ENTRANCE_SERVICES,ROOMS,collisionBoxes,roomAt} from './home-model.mjs';
 import {liftIsOpen,carContains} from './elevator-model.mjs';
 import {groundFurnitureBoxes} from './ground-apartments.mjs';
@@ -31,8 +33,9 @@ export function buildingBoxes(level,settings,cars=[]){
  for(const lift of source.lifts){if(!liftIsOpen(cars[lift.id],level)){const [x,z]=lift.doorCenter;boxes.push(segmentBox([x+.01,z-.68],[x+.01,z+.68],.08,{liftDoor:true}));}}
  const stair=source.stairs.rect,[a,b]=stair,mx=(a[0]+b[0])/2;
  boxes.push({minX:mx-.12,maxX:mx+.12,minZ:a[1]+1.48,maxZ:b[1]-1.05,stairRail:true});
- if(level===5&&source.duplexStair)for(const r of duplexFlightRails(source.duplexStair,BUILDING.storey))boxes.push(segmentBox([r.a[0],r.a[2]],[r.b[0],r.b[2]],.04,{duplexGuard:true}));
- if(level===6&&source.duplexStair)for(const r of duplexLandingGuards(source.duplexStair))boxes.push(segmentBox(r.a,r.b,.04,{duplexGuard:true}));
+ const duplex=duplexOnFloor(level),privateStair=duplexStair(duplex);
+ if(privateStair)for(const r of duplexFlightRails(privateStair,BUILDING.storey))boxes.push(segmentBox([r.a[0],r.a[2]],[r.b[0],r.b[2]],.04,{duplexGuard:true,minY:duplex.entryFloor*BUILDING.storey+Math.min(r.a[1],r.b[1]),maxY:duplex.entryFloor*BUILDING.storey+Math.max(r.a[1],r.b[1])+1.1}));
+ if(level===duplex?.upperFloor)for(const r of duplexLandingGuards(privateStair))boxes.push(segmentBox(r.a,r.b,.04,{duplexGuard:true,duplexLandingGuard:true,minY:level*BUILDING.storey,maxY:level*BUILDING.storey+1.1}));
  if(level===0)for(const garden of f.gardens||[]){if(garden.unit===4)continue;garden.plot.forEach((a,i)=>{const b=garden.plot[(i+1)%garden.plot.length];if(!gardenFenceEdge(a,b,f))return;boxes.push(segmentBox(a,b,.05,{gardenFence:true}));});}
  if(level===0)boxes.push(...collisionBoxes(settings.openDoors,settings.furniture,settings.closedShutters,settings.openParts,settings.furnitureLayout,settings.yardDesign));
  if(level===0&&settings.furniture!==false)for(const unit of [1,2,3])boxes.push(...groundFurnitureBoxes(unit));
@@ -40,22 +43,51 @@ export function buildingBoxes(level,settings,cars=[]){
  if(level===0)for(const d of COMMON_ENTRY_DOORS)if(settings.closedBuildingDoors?.includes(d.id))boxes.push(segmentBox(d.hinge,d.closed,.06,{buildingDoorId:d.id}));
  return boxes;
 }
-export function buildingCanStand(p,level,boxes,cars=[],radius=HOUSE.playerRadius){
+export function buildingCanStand(p,level,boxes,cars=[],radius=HOUSE.playerRadius,feetY=level*BUILDING.storey){
  const f=BUILDING_FLOORS[level];if(!f||!p.every(Number.isFinite))return false;
  const domains=level===0?[BUILDING_SITE,PLOT,...(f.gardens||[]).map(g=>g.plot),...sitePolygons()]:[...f.envelope.map(p=>p.polygon),...f.balconies];
  if(!domains.some(poly=>inPolygon(p,poly)||poly.some((a,i)=>segmentDistance(p,a,poly[(i+1)%poly.length])<.18)))return false;
  for(const lift of interiorsForFloor(level).lifts){if(carContains(lift,p,-.02)&&!liftIsOpen(cars[lift.id],level))return false;}
- for(const b of boxes){const dx=p[0]-Math.max(b.minX,Math.min(b.maxX,p[0])),dz=p[1]-Math.max(b.minZ,Math.min(b.maxZ,p[1]));if(dx*dx+dz*dz<radius*radius)return false;}
+ for(const b of boxes){
+  // A guard at the upper landing must not become an invisible wall across
+  // the lower flight. Keep both the sloping rail and landing guards physical.
+  if(b.minY!=null&&(feetY+HOUSE.eyeHeight+.12<b.minY||feetY>b.maxY+.02))continue;
+  const dx=p[0]-Math.max(b.minX,Math.min(b.maxX,p[0])),dz=p[1]-Math.max(b.minZ,Math.min(b.maxZ,p[1]));if(dx*dx+dz*dz<radius*radius)return false;
+ }
  return true;
 }
-export function moveBuildingPlayer(position,delta,level,boxes,cars){
+export function moveBuildingPlayer(position,delta,level,boxes,cars,feetY=level*BUILDING.storey){
  let p=[...position];const steps=Math.max(1,Math.ceil(Math.hypot(...delta)/.055));
- for(let i=0;i<steps;i++){const x=[p[0]+delta[0]/steps,p[1]];if(buildingCanStand(x,level,boxes,cars))p=x;const z=[p[0],p[1]+delta[1]/steps];if(buildingCanStand(z,level,boxes,cars))p=z;}
+ const height=p=>typeof feetY==='function'?feetY(p):feetY;
+ for(let i=0;i<steps;i++){const x=[p[0]+delta[0]/steps,p[1]];if(buildingCanStand(x,level,boxes,cars,HOUSE.playerRadius,height(x)))p=x;const z=[p[0],p[1]+delta[1]/steps];if(buildingCanStand(z,level,boxes,cars,HOUSE.playerRadius,height(z)))p=z;}
  return p;
 }
-export function clearBuildingPosition(at,level,boxes,cars){
- if(buildingCanStand(at,level,boxes,cars))return [...at];
- for(let r=.08;r<4;r+=.08)for(let i=0;i<32;i++){const p=[at[0]+Math.cos(i*Math.PI/16)*r,at[1]+Math.sin(i*Math.PI/16)*r];if(buildingCanStand(p,level,boxes,cars))return p;}
+function privateStairPose(previous,next,floor,journey){
+ const duplex=duplexOnFloor(floor),stair=duplexStair(duplex),pose=duplexPose(next,floor);if(!stair||!pose)return null;
+ const active=journey?.kind==='duplex'&&journey.unit===duplex.unit,[a,b]=stair.longFlightRect,[c,e]=stair.shortFlightRect;
+ const lowerEntry=floor===duplex.entryFloor&&previous[1]>=b[1]-.08&&previous[0]>=a[0]&&previous[0]<=b[0];
+ const upperEntry=floor===duplex.upperFloor&&previous[0]<=c[0]+.08&&previous[1]>=c[1]&&previous[1]<=e[1];
+ return active||lowerEntry||upperEntry?pose:null;
+}
+// Update storey and height at each small movement step, including at ×3 speed.
+// The private-stair journey starts only at its two ends, never over a guard.
+export function moveBuildingWalker(position,delta,state,getBoxes,cars=[]){
+ let p=[...position],floor=state.floor,baseY=state.baseY??floor*BUILDING.storey,journey=state.stair??null;
+ const steps=Math.max(1,Math.ceil(Math.hypot(...delta)/.04)),part=delta.map(n=>n/steps);
+ for(let i=0;i<steps;i++){
+  const height=next=>privateStairPose(p,next,floor,journey)?.y??baseY;
+  const next=moveBuildingPlayer(p,part,floor,getBoxes(floor),cars,height),duplex=privateStairPose(p,next,floor,journey),common=duplex?null:stairPose(next,floor,journey?.kind==='duplex'?null:journey);
+  if(common?.blocked)break;
+  if(duplex){baseY=duplex.y;floor=duplex.floor;journey={kind:'duplex',unit:duplex.unit};}
+  else if(common){baseY=common.y;floor=common.floor;journey=common.base===null?null:common;}
+  else{journey=null;baseY=serviceFloorHeight(next,floor)??floor*BUILDING.storey;}
+  p=next;
+ }
+ return {position:p,floor,baseY,stair:journey};
+}
+export function clearBuildingPosition(at,level,boxes,cars,feetY=level*BUILDING.storey){
+ if(buildingCanStand(at,level,boxes,cars,HOUSE.playerRadius,feetY))return [...at];
+ for(let r=.08;r<4;r+=.08)for(let i=0;i<32;i++){const p=[at[0]+Math.cos(i*Math.PI/16)*r,at[1]+Math.sin(i*Math.PI/16)*r];if(buildingCanStand(p,level,boxes,cars,HOUSE.playerRadius,feetY))return p;}
  return null;
 }
 export function parseDestination(value='unit:4:0'){
@@ -65,18 +97,17 @@ export function parseDestination(value='unit:4:0'){
  return {floor:0,unit:4};
 }
 export function destinationStart(destination,settings,cars){
- const {floor,unit}=parseDestination(destination),source=interiorsForFloor(floor),boxes=buildingBoxes(floor,settings,cars);
+ const target=parseDestination(destination),unit=target.unit,duplex=duplexForUnit(unit,target.floor),floor=duplex?.entryFloor??target.floor,source=interiorsForFloor(floor),boxes=buildingBoxes(floor,settings,cars);
  if(commonSpace(destination)){const c=commonSpace(destination);return {position:clearBuildingPosition(c.walk,0,boxes,cars)||c.walk,floor:0,yaw:c.yaw};}
  if(unit===4&&floor===0){const p=clearBuildingPosition(ROOMS[0].walk,floor,boxes,cars);return {position:p||ROOMS[0].walk,floor,yaw:Math.PI};}
  const entry=source.entries.find(e=>e.unit===unit),door=source.doors.find(d=>d.id===entry?.doorId);
  let at,yaw;
  if(door){const midpoint=door.hinge.map((n,i)=>(n+door.closed[i])/2),normal=door.opened.map((n,i)=>(n-door.hinge[i])/(Math.hypot(...door.opened.map((x,k)=>x-door.hinge[k]))||1));at=midpoint.map((n,i)=>n+normal[i]*.85);yaw=Math.atan2(-normal[0],-normal[1]);}
- else if(unit===32&&floor===6){const poly=BUILDING_FLOORS[floor].units.find(u=>u.number===32).polygon;at=poly.reduce((s,p)=>s.map((n,i)=>n+p[i]/poly.length),[0,0]);yaw=Math.PI;}
  else{const lift=source.lifts[0];at=[lift.doorCenter[0]+1.1,lift.doorCenter[1]];yaw=Math.PI/2;}
  return {position:clearBuildingPosition(at,floor,boxes,cars)||at,floor,yaw};
 }
 export function buildingLocation(p,floor){
- const f=BUILDING_FLOORS[floor],unit=f.units.find(u=>inPolygon(p,u.polygon))?.number||null;
+ const f=BUILDING_FLOORS[floor],unit=f.units.find(u=>inPolygon(p,u.polygon))?.number||(floor===0?(f.gardens||[]).find(g=>inPolygon(p,g.plot))?.unit:null)||null;
  return {floor,unit,common:floor===0?(inResidentsClub(p)?'club':COMMON_SPACES.find(c=>c.id!=='club'&&inPolygon(p,c.polygon))?.id||null):null,roomId:floor===0&&(unit===4||inPolygon(p,PLOT))?roomAt(p):null};
 }
 export function nearbyLift(p,floor,cars){
@@ -99,12 +130,12 @@ export function stairPose(p,floor,journey=null){
  return {base,y:(base+rise)*BUILDING.storey,floor:p[1]<n+.03?(west?base:base+1):floor};
 }
 export function duplexPose(p,floor){
- if(floor!==5&&floor!==6)return null;
- const d=interiorsForFloor(5).duplexStair;if(!d)return null;
+ const duplex=duplexOnFloor(floor),d=duplexStair(duplex);if(!d)return null;
+ const lower=duplex.entryFloor,upper=duplex.upperFloor;
  const contains=([a,b],pad=0)=>p[0]>=a[0]-pad&&p[0]<=b[0]+pad&&p[1]>=a[1]-pad&&p[1]<=b[1]+pad;
  const [a,b]=d.longFlightRect,[c,e]=d.shortFlightRect;
- if(contains(d.longFlightRect,.035)){const t=Math.max(0,Math.min(1,(b[1]-p[1])/(b[1]-a[1])));return {y:(5+t*.75)*BUILDING.storey,floor:p[1]>b[1]-.08?5:floor};}
- if(contains(d.cornerLandingRect,.035))return {y:5.75*BUILDING.storey,floor};
- if(contains(d.shortFlightRect,.10)){const t=Math.max(0,Math.min(1,(e[0]-p[0])/(e[0]-c[0])));return {y:(5.75+t*.25)*BUILDING.storey,floor:p[0]<c[0]+.08?6:floor};}
+ if(contains(d.longFlightRect,.035)){const t=Math.max(0,Math.min(1,(b[1]-p[1])/(b[1]-a[1])));return {y:(lower+t*.75)*BUILDING.storey,floor:p[1]>b[1]-.08?lower:floor,unit:duplex.unit};}
+ if(contains(d.cornerLandingRect,.035))return {y:(lower+.75)*BUILDING.storey,floor,unit:duplex.unit};
+ if(contains(d.shortFlightRect,.10)){const t=Math.max(0,Math.min(1,(e[0]-p[0])/(e[0]-c[0])));return {y:(lower+.75+t*.25)*BUILDING.storey,floor:p[0]<c[0]+.08?upper:floor,unit:duplex.unit};}
  return null;
 }

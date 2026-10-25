@@ -2,11 +2,12 @@ import {commonSpace} from './common-spaces.mjs';
 import {isClubDestination} from './residents-club.mjs';
 import {BUILDING_TRACE as T} from './building-trace.mjs';
 import {SITE_TRACE} from './building-site-trace.mjs';
+import {duplexForUnit} from './building-duplexes.mjs';
 
 // Horizontal traces follow the original floor sheets. No elevation/section is
 // present: 3.10m storeys, slab thicknesses, sills and roof heads are estimates.
 export const BUILDING={number:4102,plot:1410,apartment:4,source:'/house/building-plan.pdf',storey:3.10,clearHeight:2.75,slab:.25,roofHead:2.5,levels:9,heightInferred:true,registration:T.registration};
-export const BUILDING_FLOORS=T.floors.map(f=>({...f,elevation:f.level*BUILDING.storey,id:`building-floor-${f.level}`,he:f.level?`קומה ${f.level}`:'קומת קרקע',en:f.level?`Floor ${f.level}`:'Ground floor',image:`/house/building-plan-${f.page}.jpg`,uniqueUnitCount:f.units.filter(u=>f.level!==6||u.number!==32).length}));
+export const BUILDING_FLOORS=T.floors.map(f=>({...f,elevation:f.level*BUILDING.storey,id:`building-floor-${f.level}`,he:f.level?`קומה ${f.level}`:'קומת קרקע',en:f.level?`Floor ${f.level}`:'Ground floor',image:`/house/building-plan-${f.page}.jpg`,uniqueUnitCount:f.units.filter(u=>{const duplex=duplexForUnit(u.number,f.level);return !duplex||f.level===duplex.entryFloor;}).length}));
 export const BUILDING_ROOF={...T.roof,elevation:BUILDING.levels*BUILDING.storey,id:'building-roof',image:'/house/building-plan-11.jpg'};
 export const BUILDING_SITE=T.site[0];
 export const BUILDING_PHOTOS=[

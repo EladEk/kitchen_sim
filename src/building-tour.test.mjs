@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import {BUILDING,BUILDING_FLOORS as FLOORS,normalizeTourDestination} from './building-layout.mjs';
 import {BUILDING_INTERIORS as INTERIORS} from './building-interiors.mjs';
+import {duplexForUnit} from './building-duplexes.mjs';
 import {normalizeHomeSettings,DOORS} from './home-model.mjs';
 import {buildingBoxes,buildingCanStand,moveBuildingPlayer,destinationStart,buildingLocation,stairPose,duplexPose} from './building-navigation.mjs';
 import {createElevators,requestElevator,stepElevators,liftIsOpen} from './elevator-model.mjs';
@@ -20,11 +21,11 @@ test('four garden units retain independent service-room outlines and different t
  assert(new Set(f.gardens.map(g=>Math.round(area(g.polygon)))).size===4);
 });
 
-test('all 43 physical entrances and both duplex destinations spawn inside the selected unit and cross their actual door opening',()=>{
+test('all 43 physical entrances spawn inside the selected unit, with either duplex destination using its single lower entry',()=>{
  const cars=createElevators();assert.equal(INTERIORS.floors.reduce((n,f)=>n+f.entries.length,0),43);
  assert.equal(INTERIORS.floors[6].entries.some(e=>e.unit===32),false);
  for(const f of FLOORS){const boxes=buildingBoxes(f.level,settings,cars);
-  for(const u of f.units){const target=`unit:${u.number}:${f.level}`,s=destinationStart(target,settings,cars);assert.equal(buildingLocation(s.position,f.level).unit,u.number,target);assert(buildingCanStand(s.position,f.level,boxes,cars),target);}
+  for(const u of f.units){const target=`unit:${u.number}:${f.level}`,s=destinationStart(target,settings,cars),entryFloor=duplexForUnit(u.number,f.level)?.entryFloor??f.level;assert.equal(s.floor,entryFloor,target);assert.equal(buildingLocation(s.position,s.floor).unit,u.number,target);assert(buildingCanStand(s.position,s.floor,s.floor===f.level?boxes:buildingBoxes(s.floor,settings,cars),cars),target);}
   for(const d of INTERIORS.floors[f.level].doors.filter(d=>d.unit)){
    const m=d.hinge.map((n,i)=>(n+d.closed[i])/2),l=Math.hypot(...d.opened.map((n,i)=>n-d.hinge[i])),normal=d.opened.map((n,i)=>(n-d.hinge[i])/l),hall=m.map((n,i)=>n-normal[i]*.6),inside=m.map((n,i)=>n+normal[i]*.6),p=moveBuildingPlayer(hall,inside.map((n,i)=>n-hall[i]),f.level,boxes,cars);
    assert(Math.hypot(...p.map((n,i)=>n-inside[i]))<.07,`floor ${f.level} / unit ${d.unit} entry must be walkable`);

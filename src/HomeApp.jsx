@@ -1,4 +1,5 @@
-import {BuildingTourBar,BuildingDestinationOptions,BuildingMiniMap} from './BuildingTour.jsx';
+import {ApartmentDirectory} from './ApartmentDirectory.jsx';
+import {BuildingTourBar,BuildingDestinationOptions} from './BuildingTour.jsx';
 import {BUILDING_FLOORS,normalizeTourDestination} from './building-layout.mjs';
 import {buildingDoor,segmentDistance,parseDestination} from './building-navigation.mjs';
 import {BuildingControls,BuildingEntry} from './BuildingControls.jsx';
@@ -24,6 +25,7 @@ import {ElectricalFacts,ElectricalInspector,ElectricalLegend} from './HomeElectr
 import {RenderControls} from './RenderControls.jsx';
 import {SceneUiLayer,SceneRestoreControls} from './SceneInterface.jsx';
 import {WalkingControls} from './WalkingControls.jsx';
+import {WalkingLocation} from './WalkingLocation.jsx';
 import {HomeViewChooser,HomePrimaryActions,HomePanelHeading,HomeFurnitureEditor,furnitureEditorSelection} from './HomeWorkspaceControls.jsx';
 import {FloorSpecification} from './FloorSpecification.jsx';
 import {applyOrderedFloors,orderedFloorForRoom} from './ordered-flooring.mjs';
@@ -118,9 +120,9 @@ export default function HomeApp({onKitchen,initialRoom='living',initialMode,init
  const roomShutters=SHUTTERS.filter(s=>s.opening.rooms.includes(activeRoom));
  const openable=FURNITURE.filter(f=>f.roomId===activeRoom&&furnitureParts(f).length);
  const selectMode=next=>{if(next==='walk')startWalk();else{if(next==='building')change('buildingLevel',9);moveMode(next);}};
- const minimap=<div className={`hs-minimap ${!mapOpen?'collapsed':''}`}><button className="hs-minimap-heading" aria-expanded={mapOpen} onClick={()=>setMapOpen(v=>!v)}><Navigation size={14}/>{t('המיקום שלי','Your location')}{mapOpen?<Minimize2 size={13}/>:<Maximize2 size={13}/>}</button>{mapOpen&&<HomePlan settings={settings} selectedRoom={activeRoom} position={position} onSelect={chooseRoom} mini/>}</div>;
  return <div className={`hs-app hs-simple ${panel&&!settings.cleanView?'has-panel':''} ${settings.cleanView?'is-clean':''}`} dir={he?'rtl':'ltr'}>
   <SceneRestoreControls hidden={settings.cleanView} lang={settings.lang} onRestore={()=>change('cleanView',false)}/>
+  {!settings.cleanView&&mode!=='walk'&&<ApartmentDirectory onChoose={chooseDestination}/>}
   <header className="hs-header" hidden={settings.cleanView}><a className="hs-brand" href="#/" onClick={e=>{e.preventDefault();moveMode('overview');}}><span className="hs-brand-icon"><House size={22}/></span><span>HOME<span className="hs-brand-light">STUDIO</span></span></a><button className="hs-button hs-outline hs-header-kitchen" onClick={onKitchen}><UtensilsCrossed size={16}/>{t('מטבח','Kitchen')}<ArrowUpRight size={15}/></button></header>
   <main className={`hs-workspace hs-mode-${mode}`}>
    <section className="hs-stage" aria-label={t('סימולטור הבית','House simulator')}>
@@ -129,7 +131,7 @@ export default function HomeApp({onKitchen,initialRoom='living',initialMode,init
     <SceneUiLayer hidden={settings.cleanView}>
     {panel==='yard'?<div className="hs-simple-topbar"><span>{t('תכנון החצר · מבט על','Yard planning · top view')}</span></div>:<HomeViewChooser tourDestination={settings.tourDestination} onDestination={chooseDestination} mode={mode} buildingLevel={settings.buildingLevel} onBuildingLevel={level=>change('buildingLevel',level)} roomId={activeRoom} lang={settings.lang} editing={panel==='furniture'} onMode={selectMode} onRoom={id=>panel==='furniture'?beginFurnitureEdit(undefined,id):chooseRoom(id)}/>}
     {['building','unit','walk'].includes(mode)&&!panel&&<BuildingTourBar walkSpeed={settings.walkSpeed||1} onSpeed={value=>change('walkSpeed',value)} lang={settings.lang} mode={mode} destination={settings.tourDestination} context={mode==='walk'?travelContext:null} closedDoors={settings.closedBuildingDoors} onStart={startWalk} onDoor={toggleBuildingDoor} onCall={id=>view.current?.callLift(id)} onRide={(id,floor)=>{if(!view.current?.rideLift(id,floor))notify(t('היכנסו עד הסוף לתא לפני הנסיעה.','Step fully inside the cabin before riding.'));}} onSource={page=>showSource('building-plan',page)} onClubSource={()=>showSource('residents-club-video',4)}/>}
-    {mode==='walk'&&mapOpen&&!panel&&<div className="hs-simple-minimap">{position?.floor>0||position?.unit!==4?<BuildingMiniMap floor={position?.floor||0} position={position} lang={settings.lang} onSource={page=>showSource('building-plan',page)}/>:minimap}</div>}
+    {mode==='walk'&&!panel&&<WalkingLocation position={position} context={travelContext} destination={settings.tourDestination} lang={settings.lang} mapOpen={mapOpen} onMap={setMapOpen} onSource={page=>showSource('building-plan',page)}/>}
     <div className="hs-simple-panel" hidden={!panel} data-active-panel={panel||undefined}>
      <HomePanelHeading title={panel==='rooms'?t('חדרים ועיצוב','Rooms and design'):panel==='furniture'?t('הזזת ריהוט','Move furniture'):panel==='yard'?t('תכנון החצר','Yard planning'):panel==='inspect'?t('פרטי הפריט','Item details'):t('אפשרויות','Options')} lang={settings.lang} onClose={()=>{if(['furniture','yard'].includes(panel))finishEditing();else setPanel(null);}}/>
      {['furniture','yard'].includes(panel)&&<HistoryButtons history={history} lang={settings.lang}/>}

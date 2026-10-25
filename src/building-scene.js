@@ -1,5 +1,7 @@
 import {serviceSlabHoles} from './service-access.mjs';
 import {buildApartmentFurniture} from './apartment-furniture-scene.js';
+import {createSurfacePalette} from './surface-materials.mjs';
+import {installBuildingSurfaceUVs} from './building-surface-uvs.mjs';
 import {laundryScreens} from './laundry-screens.mjs';
 import {buildCommonSpaces} from './common-spaces-scene.js';
 import {clubWindowProfile} from './residents-club.mjs';
@@ -9,6 +11,7 @@ import {BUILDING,BUILDING_FLOORS,BUILDING_ROOF,BUILDING_SITE,BUILDING_CENTER,nor
 import {BUILDING_INTERIORS} from './building-interiors.mjs';
 import {onDetailedGround,segmentDistance,parseDestination,isDoorOpening,gardenFenceEdge} from './building-navigation.mjs';
 import {connectedWallRuns,doorWallOpening,exposedBalconySegments,commonStairRails,duplexFlightRails,duplexLandingGuards} from './building-geometry.mjs';
+import {duplexOnFloor,duplexStair,duplexStairOpening} from './building-duplexes.mjs';
 import {COMMON_ENTRY_DOORS} from './building-site.mjs';
 import {buildElevators} from './building-elevators.js';
 import {buildingNumberPlate} from './building-signage.js';
@@ -25,15 +28,9 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
  if(kitchenAnchor){root.position.set(kitchenAnchor[0],0,kitchenAnchor[1]);root.rotation.y=Math.PI;}
  const floors=new Map(),cube=new THREE.BoxGeometry(1,1,1);resources.push(cube);
  function material(color,extra={}){const m=shown?new THREE.MeshStandardMaterial({color,roughness:.8,...extra}):new THREE.MeshBasicMaterial({colorWrite:false,depthWrite:false,transparent:true,opacity:0});resources.push(m);return m;}
- const limestone=material('#e2ddd3',{roughness:.83}),concrete=material('#d5d2ca'),deck=material('#d8d2c5'),metal=material('#303b3e',{roughness:.42,metalness:.45}),glass=material('#bdcdd1',{roughness:.09,metalness:.18,transparent:true,opacity:.28,depthWrite:false}),voidMat=material('#485052',{roughness:.4}),roofMat=material('#ddd9cc'),insideWall=material('#f1efe9',{roughness:.9}),doorMat=material('#e5e1d7',{roughness:.55}),interiorFloor=material('#dcd7ce',{roughness:.48}),soffit=material('#f4f2eb',{roughness:.91}),fascia=material('#606665',{roughness:.72}),trimMat=material('#eeece5',{roughness:.62}),handleMat=material('#a9afad',{metalness:.8,roughness:.27});
+ const surface=shown?createSurfacePalette(resources):null,finish=(kind,color,extra={})=>shown?surface(kind,color,extra):material(color,extra);
+ const limestone=finish('limestone','#e2ddd3',{roughness:.83}),concrete=finish('cement','#d5d2ca'),deck=finish('porcelain','#d8d2c5'),metal=material('#303b3e',{roughness:.42,metalness:.45}),glass=material('#bdcdd1',{roughness:.09,metalness:.18,transparent:true,opacity:.28,depthWrite:false}),voidMat=material('#485052',{roughness:.4}),roofMat=finish('cement','#ddd9cc'),insideWall=finish('plaster','#f1efe9',{roughness:.9}),doorMat=finish('paint','#e5e1d7',{roughness:.55}),interiorFloor=finish('porcelain','#dcd7ce',{roughness:.56}),soffit=finish('plaster','#f4f2eb',{roughness:.91}),fascia=finish('paint','#606665',{roughness:.72}),trimMat=finish('paint','#eeece5',{roughness:.62}),handleMat=material('#a9afad',{metalness:.8,roughness:.27});
  if(shown){
-  // Subtle mineral micro-relief, independent of tile borders. A material study,
-  // not a product scan; the documented facade colour and courses remain intact.
-  const size=64,data=new Uint8Array(size*size*4);let seed=4102;
-  for(let i=0;i<size*size;i++){seed=(Math.imul(seed,1664525)+1013904223)>>>0;const v=118+(seed%20);data.set([v,v,v,255],i*4);}
-  const grainMap=new THREE.DataTexture(data,size,size,THREE.RGBAFormat);grainMap.wrapS=grainMap.wrapT=THREE.RepeatWrapping;grainMap.magFilter=THREE.LinearFilter;grainMap.minFilter=THREE.LinearMipmapLinearFilter;grainMap.generateMipmaps=true;grainMap.repeat.set(12,12);grainMap.needsUpdate=true;resources.push(grainMap);
-  limestone.bumpMap=grainMap;limestone.bumpScale=.006;
-  insideWall.bumpMap=grainMap;insideWall.bumpScale=.0015;
   // Metre-scale stone courses, restrained grain and staggered vertical joints.
   // Colours/profile follow the supplied facade photos; this is no scan claim.
   limestone.onBeforeCompile=shader=>{
@@ -62,7 +59,8 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
     diffuseColor.rgb*=mix(vec3(1.0+speckle),vec3(.77),grout*.6);
    `);
   };interiorFloor.customProgramCacheKey=()=> 'building-neutral-floor-r48';
-  interiorFloor.userData={finishInferred:true,tile:[.8,.8],productId:null};
+  interiorFloor.userData={...interiorFloor.userData,finishInferred:true,tile:[.8,.8],productId:null};
+  for(const mat of [limestone,concrete,deck,roofMat,insideWall,doorMat,interiorFloor,soffit,fascia,trimMat])installBuildingSurfaceUVs(mat);
 
  }
  const matrix=new THREE.Matrix4(),rotation=new THREE.Quaternion(),position=new THREE.Vector3(),scale=new THREE.Vector3();
@@ -88,8 +86,9 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
   const node=new THREE.Group();node.name=def.id;node.userData={part:'building-storey',level:def.level,page:def.page,source:'building-plan'};root.add(node);floors.set(def.level,node);
   const cut=settings.cutaway===true&&shown&&!walking&&limit<9&&def.level===limit,base=def.elevation,h=cut?.85:BUILDING.storey,walls=[],frames=[],panes=[],dark=[],rails=[],decks=[],interiorWalls=[],trims=[],handles=[],fascias=[],source=BUILDING_INTERIORS.floors[def.level];
   const [sa,sb]=source.stairs.rect,rect=(a,b)=>[[a[0],a[1]],[b[0],a[1]],[b[0],b[1]],[a[0],b[1]]],holes=[rect(sa,sb),...source.lifts.map(l=>rect([l.minX-.12,l.minZ-.05],[l.doorCenter[0]-.04,l.maxZ+.05]))];
-  if(source.duplexStair){const d=source.duplexStair,[a,b]=d.longFlightRect,[c,e]=d.shortFlightRect;holes.push([[c[0],c[1]],[b[0],c[1]],[b[0],b[1]],[a[0],b[1]],[a[0],e[1]],[c[0],e[1]]]);}
-  const ceilingHoles=[...holes];if(def.level===0)holes.push(...serviceSlabHoles());
+  const ceilingHoles=[...holes],duplex=duplexOnFloor(def.level),privateStair=duplexStair(duplex);
+  if(privateStair)(def.level===duplex.entryFloor?ceilingHoles:holes).push(duplexStairOpening(privateStair));
+  if(def.level===0)holes.push(...serviceSlabHoles());
   for(const path of def.envelope){
    slab(path.polygon,base-.015,BUILDING.slab,concrete,node,'building-floor-slab',def.level,holes.filter(h=>pointInPolygon(h[0],path.polygon)));
    path.polygon.forEach((a,i)=>{
@@ -156,13 +155,13 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
    if(def.level<8&&!cut)steps.push([mx,base+BUILDING.storey/2-.07,(s+b[1])/2,b[0]-a[0],.14,b[1]-s]);
    batch(node,concrete,steps,'building-common-stair',def.level);
    if(!cut&&def.level<8)stairHandrails(commonStairRails(source,BUILDING.storey),base,node,def.level,'building-stair-guard');
-   if(!cut&&def.level===5&&source.duplexStair)stairHandrails(duplexFlightRails(source.duplexStair,BUILDING.storey),base,node,def.level,'building-duplex-guard');
-   if(!cut&&def.level===6&&source.duplexStair)stairHandrails(duplexLandingGuards(source.duplexStair).map(s=>({a:[s.a[0],0,s.a[1]],b:[s.b[0],0,s.b[1]]})),base,node,def.level,'building-duplex-landing-guard');
+   if(!cut&&def.level===duplex?.entryFloor)stairHandrails(duplexFlightRails(privateStair,BUILDING.storey),base,node,def.level,'building-duplex-guard');
+   if(!cut&&def.level===duplex?.upperFloor)stairHandrails(duplexLandingGuards(privateStair).map(s=>({a:[s.a[0],0,s.a[1]],b:[s.b[0],0,s.b[1]]})),base,node,def.level,'building-duplex-landing-guard');
 
-   if(def.level===5&&source.duplexStair){const d=source.duplexStair,[a,b]=d.longFlightRect,[c,e]=d.shortFlightRect,[la,lb]=d.cornerLandingRect,stairs=[];
+   if(def.level===duplex?.entryFloor){const d=privateStair,[a,b]=d.longFlightRect,[c,e]=d.shortFlightRect,[la,lb]=d.cornerLandingRect,stairs=[];
     for(let j=0;j<12;j++){const rise=(j+1)/16*BUILDING.storey;if(!cut||rise<=h)stairs.push([(a[0]+b[0])/2,base+rise/2,b[1]-(j+.5)*(b[1]-a[1])/12,b[0]-a[0],rise,(b[1]-a[1])/12]);}
     if(!cut)stairs.push([(la[0]+lb[0])/2,base+BUILDING.storey*.75-.07,(la[1]+lb[1])/2,lb[0]-la[0],.14,lb[1]-la[1]]);
-    for(let j=0;j<3;j++){const rise=(14+j)/16*BUILDING.storey;if(!cut||rise<=h)stairs.push([e[0]-(j+.5)*(e[0]-c[0])/3,base+rise/2,(c[1]+e[1])/2,(e[0]-c[0])/3,rise,e[1]-c[1]]);}
+    for(let j=0;j<3;j++){const rise=(13+j)/16*BUILDING.storey;if(!cut||rise<=h)stairs.push([e[0]-(j+.5)*(e[0]-c[0])/3,base+rise/2,(c[1]+e[1])/2,(e[0]-c[0])/3,rise,e[1]-c[1]]);}
     batch(node,concrete,stairs,'building-duplex-32-stair',def.level);
    }
   }
@@ -181,7 +180,7 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
   const screenMesh=batch(node,metal,louvres,'building-laundry-screen',def.level);if(screenMesh)screenMesh.userData.screens=laundryScreens(def.level);
   batch(node,trimMat,trims,'building-interior-trim',def.level);batch(node,handleMat,handles,'building-door-hardware',def.level);batch(node,fascia,fascias,'building-balcony-fascia',def.level);
   batch(node,limestone,walls,'building-facade-wall',def.level);batch(node,insideWall,interiorWalls,'building-interior-wall',def.level);batch(node,metal,frames,'building-window-frame',def.level);batch(node,glass,panes,'building-glazing',def.level,false);batch(node,voidMat,dark,'building-fascia-and-service-screen',def.level);batch(node,metal,rails,'building-rail-and-louvres',def.level);batch(node,limestone,decks,'building-stone-sill',def.level);
-  if(shown)buildApartmentFurniture({parent:node,resources,level:def.level,base,settings});
+  if(shown)buildApartmentFurniture({parent:node,resources,level:def.level,base,settings,surfaces:surface});
   if(def.level===0&&shown)buildCommonSpaces({parent:node,resources,settings,cut});
   if(def.level===0&&shown)buildResidentsClub({parent:node,resources,settings,cut,ceilingVisible:walking||limit>0});
   if(def.level===0&&shown)buildGroundApartments({root:node,resources,picks,settings,cut,mode,floorMaterial:interiorFloor});

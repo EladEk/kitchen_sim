@@ -1,0 +1,13 @@
+{
+  "revision": 62,
+  "upper": {
+    "beds": 138,
+    "kitchens": 39,
+    "livingRooms": 39
+  },
+  "ground": {
+    "beds": 15,
+    "livingRooms": 3
+  },
+  "failures": []
+}
