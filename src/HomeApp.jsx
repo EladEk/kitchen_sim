@@ -1,3 +1,4 @@
+import {DocumentGate} from './DocumentAccess.jsx';
 import {ApartmentDirectory} from './ApartmentDirectory.jsx';
 import {BuildingTourBar,BuildingDestinationOptions} from './BuildingTour.jsx';
 import {BUILDING_FLOORS,normalizeTourDestination} from './building-layout.mjs';
@@ -122,7 +123,6 @@ export default function HomeApp({onKitchen,initialRoom='living',initialMode,init
  const selectMode=next=>{if(next==='walk')startWalk();else{if(next==='building')change('buildingLevel',9);moveMode(next);}};
  return <div className={`hs-app hs-simple ${panel&&!settings.cleanView?'has-panel':''} ${settings.cleanView?'is-clean':''}`} dir={he?'rtl':'ltr'}>
   <SceneRestoreControls hidden={settings.cleanView} lang={settings.lang} onRestore={()=>change('cleanView',false)}/>
-  {!settings.cleanView&&mode!=='walk'&&<ApartmentDirectory onChoose={chooseDestination}/>}
   <header className="hs-header" hidden={settings.cleanView}><a className="hs-brand" href="#/" onClick={e=>{e.preventDefault();moveMode('overview');}}><span className="hs-brand-icon"><House size={22}/></span><span>HOME<span className="hs-brand-light">STUDIO</span></span></a><button className="hs-button hs-outline hs-header-kitchen" onClick={onKitchen}><UtensilsCrossed size={16}/>{t('מטבח','Kitchen')}<ArrowUpRight size={15}/></button></header>
   <main className={`hs-workspace hs-mode-${mode}`}>
    <section className="hs-stage" aria-label={t('סימולטור הבית','House simulator')}>
@@ -166,6 +166,7 @@ export default function HomeApp({onKitchen,initialRoom='living',initialMode,init
      <div hidden={panel!=='furniture'}><HomeFurnitureEditor onChange={change} onSelectService={setEditorPoint} servicePoint={editorPoint} onServiceSource={point=>{setSelectedBuilding(point.id);showSource('electrical-survey',point.evidence[0].page);}} settings={settings} roomId={activeRoom} itemId={selectedFurniture} lang={settings.lang} onSelect={id=>{setSelectedFurniture(id);setFurnitureError(null);}} onMove={repositionFurniture} error={furnitureError}/></div>
      <div hidden={panel!=='yard'}><HomeYardEditor settings={settings} selectedId={selectedYard} onSelect={selectYard} onChange={changeYard} error={yardError}/></div>
      <div className="hs-simple-options" hidden={panel!=='options'}>
+      {panel==='options'&&<details className="hs-directory-option"><summary>{t('דירות הבניין — פירוט ומפרט','Building apartments — details & specifications')}</summary><DocumentGate lang={settings.lang}><ApartmentDirectory onChoose={chooseDestination}/></DocumentGate></details>}
       <button className="hs-button hs-outline" onClick={()=>{setMeasureMode(true);setPanel(null);if(mode==='plan')moveMode('overview');}}>{t('מדידה בין שתי נקודות','Measure between two points')}</button>
       <BuildingControls onInspect={inspectBuilding} settings={settings} mode={mode} onMode={moveMode} onChange={change} onSource={showSource}/>
       <EntranceServiceFacts lang={settings.lang} onInspect={inspectBuilding} onSource={showSource}/>
