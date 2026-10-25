@@ -1,0 +1,4 @@
+import {Vector3} from 'three';
+const down=new Vector3(0,-1,0);
+export function visibleHits(ray,meshes,origin,direction,far){ray.set(origin,direction);ray.far=far;return ray.intersectObjects(meshes,false).filter(h=>{let o=h.object;while(o){if(!o.visible)return false;o=o.parent;}return true;});}
+export function stepWalker(position,dx,dz,meshes,ray){const length=Math.hypot(dx,dz);if(!length)return false;const direction=new Vector3(dx,0,dz).normalize();for(const height of [.5,1.2]){const o=position.clone();o.y+=height-1.62;if(visibleHits(ray,meshes,o,direction,length+.18).length)return false;}const next=position.clone().add(new Vector3(dx,0,dz));next.y=position.y-1.62+.32;const floor=visibleHits(ray,meshes,next,down,.72).find(h=>h.face&&Math.abs(h.face.normal.y)>.65);if(!floor)return false;position.x+=dx;position.z+=dz;position.y=floor.point.y+1.62;return true;}

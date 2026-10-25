@@ -21,12 +21,12 @@
       "destination": "/api/documents?resource=plans/:path*"
     },
     {
-      "source": "/materials/owner-products/:path*",
-      "destination": "/api/documents?resource=materials/owner-products/:path*"
+      "source": "/_personal/:path*",
+      "destination": "/api/documents?resource=_personal/:path*"
     },
     {
-      "source": "/materials/harash/:path*",
-      "destination": "/api/documents?resource=materials/harash/:path*"
+      "source": "/materials/:path*",
+      "destination": "/api/documents?resource=materials/:path*"
     }
   ]
 }

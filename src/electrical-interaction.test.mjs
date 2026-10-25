@@ -565,7 +565,7 @@ test('the whole-building view has only a floor/view chooser, an in-flow apartmen
 
 test('source viewers never render photos or PDF previews before the real server session has been checked',()=>{
  const content=React.createElement(UI.DocumentAccessProvider,null,React.createElement(UI.HomeSources,{sourceId:'plan',lang:'he',onPage(){},onSourceId(){}})),html=renderToStaticMarkup(content);
- assert(html.includes('מסמכים ותמונות מוגנים'));assert(!html.includes('src="/house/'));assert(!html.includes('house-plan.jpg'));assert(!html.includes('Welcome1'));
+ assert(html.includes('גישה מוגנת'));assert(!html.includes('src="/house/'));assert(!html.includes('house-plan.jpg'));assert(!html.includes('Welcome1'));
  const thumbnail=renderToStaticMarkup(React.createElement(UI.DocumentAccessProvider,null,React.createElement(UI.ProtectedImage,{src:'/house/photos/photo-1.jpg',alt:'Original'})));assert(thumbnail.includes('document-image-lock'));assert(!thumbnail.includes('<img'));
  const material=renderToStaticMarkup(React.createElement(UI.DocumentAccessProvider,null,React.createElement(UI.ProtectedImage,{src:'/materials/runtime/MI402439-sample.png',alt:'Rendering material'})));assert(material.includes('<img'));
 });

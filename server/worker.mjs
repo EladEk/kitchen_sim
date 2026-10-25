@@ -7,12 +7,13 @@ export default {async fetch(request,env){
  if(isProtectedDocument(path)){
   if(!['GET','HEAD'].includes(request.method))return new Response(null,{status:405});
   if(!await documentSession(request,env))return documentLockedResponse(request);
-  const entry=DOCUMENT_MANIFEST[path];if(!entry)return new Response('Not found',{status:404,headers:{'Cache-Control':'private, no-store'}});
+  const entry=DOCUMENT_MANIFEST[path==='/_personal'||path==='/_personal/'?'/_personal/index.html':path];if(!entry)return new Response('Not found',{status:404,headers:{'Cache-Control':'private, no-store'}});
   const assetUrl=new URL(entry.asset,url.origin),encrypted=await env.ASSETS.fetch(new Request(assetUrl,{method:'GET'}));if(!encrypted.ok)return new Response('Document unavailable',{status:503});
   return decryptedDocumentResponse(request,env,entry,await encrypted.arrayBuffer());
  }
+ if(path.startsWith('/_vault/'))return new Response('Not found',{status:404});
  if(path.startsWith('/api/'))return new Response('Not found',{status:404});
  const asset=await env.ASSETS.fetch(request);if(asset.status!==404)return asset;
- if(request.method==='GET'&&(request.headers.get('accept')||'').includes('text/html')&&!path.startsWith('/_vault/'))return env.ASSETS.fetch(new Request(new URL('/index.html',url.origin),request));
+ if(request.method==='GET'&&(request.headers.get('accept')||'').includes('text/html')&&!/\.[a-z0-9]+$/i.test(path))return env.ASSETS.fetch(new Request(new URL('/index.html',url.origin),request));
  return asset;
 }};

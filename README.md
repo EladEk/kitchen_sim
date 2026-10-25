@@ -1,3 +1,21 @@
+# R68 — Visible mobile Options dialog
+
+The public Options button now opens a native modal dialog in the top layer instead of appending content below the viewport. The password form is immediately visible. The panel has a sticky close button, Escape/backdrop closing, viewport-limited internal scrolling and focus handling. Background scrolling and walking input pause while it is open; existing password protection is unchanged. Browser visual QA remains waived.
+
+# R67 — Horizontal terrain and floor export
+
+Public export now saves final BufferGeometry vertices, normals, UVs and indices rather than parametric constructor settings. This preserves baked rotations on terrain, slabs and floor surfaces after ObjectLoader reload. Equal geometry buffers are deduplicated to keep the download small. A full-model round-trip regression checks all geometry and world/instance transforms and large horizontal site surfaces. Privacy separation is unchanged. Browser visual QA remains waived.
+
+# R66 — Public baseline and password-protected personal simulator
+
+The root URL is a read-only public building viewer. Apartment 4 uses the audited original ground-apartment template, original L-shaped kitchen, generic neighbour furnishing, and the standard garden boundary. The owner's cabinet/island layout, office conversion, product orders, custom fence, shed, paving and outdoor kitchen are not included. Public viewing supports apartment/floor selection, walking with physical collision, speed choices and a floor map.
+
+Options → Protected access uses the existing document password. After unlocking, open the personal simulator at `/_personal/index.html`. The complete original application and detailed kitchen remain there; existing localStorage keys, saved drafts, layouts, export/import and personal editing tools are unchanged. The public viewer never reads those keys. Locking or session expiry hides/unmounts the personal app and returns to the public root.
+
+Security boundary: two separate Vite entrypoints. All personal HTML, JS, lazy chunks, CSS and original assets are AES-GCM encrypted during the build and served only after Worker session authorization, with `private, no-store`. The public app imports only generic viewer code and the authentication form. Its geometry is generated at build time from approved base-model builders, with a strict metadata allowlist and procedural textures. It never imports owner model modules in the browser. All material assets are protected too; no owner product samples remain public. Secrets are supplied only through server/build environment variables, never committed. `DOCUMENTS_PASSWORD` is unchanged; `DOCUMENTS_SECRET` must match the build and deployment.
+
+Validation: `node --test public-view/privacy.test.mjs src/document-access.test.mjs`; after building, run `node --test scripts/public-build.test.mjs` with the same build key in the environment. The latter checks every protected asset anonymously, correct/incorrect passwords, direct/encoded/HEAD/range requests, preserved private JS, no public owner imports, 43 apartment destinations, and parsing of the complete exported 3D scene. Browser/mobile visual QA was not repeated, as requested. Older revision notes below describe the retained personal editor; their public-asset statements are superseded by this section.
+
 # R57 — Mirror wall, walking speed and service access
 
 Moved the lobby mirror to the perpendicular west lobby wall, facing the entrance. Walking speed now has Normal, ×2 and ×3 choices in the building/3D toolbar; joystick, keyboard and guided walking share the selected multiplier and existing movement collision substeps. Removed the two ground-plane service door leaves/lintels at the pump/meter stair access and their closed-door collision; these access passages remain open. Added plan-inferred northern service screen mouths to the existing south/east/west screens. Unphotographed screen registration and mirror placement remain estimates requiring visual review. This revision does not reconstruct unmeasured service-stair elevations.

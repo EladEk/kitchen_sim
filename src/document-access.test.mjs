@@ -29,7 +29,7 @@ test('direct file URLs show an unlock form; redirects stay on the same origin an
  const logout=await documentAuthRoute(new Request(origin+'/api/documents/logout',{method:'POST',headers:{Origin:origin}}),env);assert.match(logout.headers.get('set-cookie'),/Max-Age=0/);
 });
 test('only canonical private paths are accepted',()=>{
- assert(isProtectedDocument('/house/plan.pdf'));assert(isProtectedDocument('/plans/main.jpg'));assert(isProtectedDocument('/materials/owner-products/tile.jpg'));assert(isProtectedDocument('/materials/harash/source.jpeg'));assert(!isProtectedDocument('/materials/runtime/MI402439-sample.png'));assert.equal(canonicalDocumentPath('/house/%2e%2e/file'),null);assert.equal(canonicalDocumentPath('/house/%5cfoo'),null);assert.equal(canonicalDocumentPath('/house/%00file'),null);
+ assert(isProtectedDocument('/house/plan.pdf'));assert(isProtectedDocument('/plans/main.jpg'));assert(isProtectedDocument('/materials/owner-products/tile.jpg'));assert(isProtectedDocument('/materials/harash/source.jpeg'));assert(isProtectedDocument('/materials/runtime/MI402439-sample.png'));assert.equal(canonicalDocumentPath('/house/%2e%2e/file'),null);assert.equal(canonicalDocumentPath('/house/%5cfoo'),null);assert.equal(canonicalDocumentPath('/house/%00file'),null);
 });
 test('encrypted sources require the correct server key and authenticated path; media supports byte ranges and HEAD',async()=>{
  const raw=Buffer.from('source-image-original-bytes'),iv=randomBytes(12),path='/house/original.jpg',cipher=createCipheriv('aes-256-gcm',Buffer.from(env.DOCUMENTS_SECRET,'base64'),iv);cipher.setAAD(Buffer.from(path));const encrypted=Buffer.concat([cipher.update(raw),cipher.final(),cipher.getAuthTag()]),entry={path,iv:iv.toString('base64'),type:'image/jpeg'};
