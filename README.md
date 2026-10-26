@@ -1,3 +1,19 @@
+## R73 — relocate C2 to the marked service-porch return
+C2 now mounts near the courtyard end of the return wall beside the service exit, facing the shed. Older C2 placements migrate once; C1/C3 and later C2 adjustments are preserved.
+
+## R72 — fixed optical camera preview and owner parking cars
+Clickable camera bodies/markers open a letterboxed 87×44 degree model view with a close control; orbit and walking do not change its optics. Two private illustrative cars occupy bays 24/25 and participate in target occlusion. Includes R71 viewport fix.
+
+## R71 — mobile controls stay inside the viewport
+The protected access banner and active simulator now share a single dynamic-viewport grid. Home and kitchen use the remaining height; short landscape screens can scroll instead of clipping controls.
+
+## R70 — private camera planning and residents club section
+Three adjustable mounts restricted to apartment 4 external walls; parking 24/25 per owner. Private Options includes plan, approximate target visibility, fixed-lens specs, 3D bodies/frusta and preview. Occlusion checks cover apartment walls, shed and pergola posts; no full-coverage claim. Original R69 club ceiling metadata fix included.
+
+# R69 — Residents’ club visible in ground-floor section
+
+The club's 2.85 m ceiling lacked the semantic metadata used by the public section filter. It is now explicitly tagged as a ground-floor ceiling; export also recognises existing named ceiling meshes before stripping names. The club ceiling hides in floor sections and remains present during walking. The complete model round-trip test checks this behavior after serialisation. Browser visual QA remains waived.
+
 # R68 — Visible mobile Options dialog
 
 The public Options button now opens a native modal dialog in the top layer instead of appending content below the viewport. The password form is immediately visible. The panel has a sticky close button, Escape/backdrop closing, viewport-limited internal scrolling and focus handling. Background scrolling and walking input pause while it is open; existing password protection is unchanged. Browser visual QA remains waived.
@@ -806,3 +822,5 @@ The previous upper-landing guard acted as an invisible barrier across the bottom
 The private stair cuts only the slab between floors 5 and 6. The base under the lower flight and the ceiling over the upper rooms are closed. The short-flight treads use the next three risers after the corner landing, with the upper floor completing the final riser. Original wall traces and apartment 4's layout are unchanged.
 
 All 304 tests pass. New tests walk the furnished duplex up and down at normal, double and triple speeds, require the upper rooms to stay disconnected from the common hall with every real door open, prevent entry over upper guards, raycast the real slabs/ceilings and hall wall, and verify the actual bilingual React destinations and map. The production build protects the same 178 source files. Browser rendering remains unverified because the owner requested that browser checking be skipped. Storey rise and vertical stair details retain the existing illustrative assumptions.
+
+REV 74: public full-building view retains ceilings; floor sections remove only the selected floor ceiling. Public snapshot restores shared stone-course/tile shaders and metric texture mapping after JSON loading. Private design and assets remain encrypted.

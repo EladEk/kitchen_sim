@@ -1,3 +1,5 @@
+import {buildOwnerCars} from './owner-parking-scene.mjs';
+import {buildSecurityCameras} from './security-cameras.mjs';
 import {commonSpace} from './common-spaces.mjs';
 import {RESIDENTS_CLUB} from './residents-club.mjs';
 import {buildEntranceServices} from './entrance-services-scene.js';
@@ -259,6 +261,8 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
   box((w.a[0]+w.b[0])/2,HOUSE.height+h/2,(w.a[1]+w.b[1])/2,v?w.thickness:Math.abs(w.b[0]-w.a[0]),h,v?Math.abs(w.b[1]-w.a[1]):w.thickness,surface('limestone','#d9d2c5'),group,{part:'building-apartment-top-band'});
  }
  const buildingContext=buildBuildingContext({group,resources,settings,mode,picks,apartmentOutline:HOUSE_OUTLINE});
+ buildSecurityCameras({group,resources,settings,picks});
+ buildOwnerCars({group,resources});
  const updateDaylight=buildDaylight({group,settings,resources,center:BUILDING_CENTER,radius:Math.max(BUILDING_BOUNDS.maxX-BUILDING_BOUNDS.minX,BUILDING_BOUNDS.maxZ-BUILDING_BOUNDS.minZ)*.8,distance:100});
  for(const [id,p] of buildLightingPoints({group,box,cylinder,mat,resources,settings,points:LIGHTING_LAYOUT.points,picks,selectedRoom}))gardenGroups.set(id,p);
  // One shadow budget for the apartment and common rooms together on mobile.

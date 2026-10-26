@@ -1,3 +1,4 @@
+import {SecurityCameraPlanner} from './SecurityCameraPlanner.jsx';
 import {DocumentGate} from './DocumentAccess.jsx';
 import {ApartmentDirectory} from './ApartmentDirectory.jsx';
 import {BuildingTourBar,BuildingDestinationOptions} from './BuildingTour.jsx';
@@ -166,6 +167,7 @@ export default function HomeApp({onKitchen,initialRoom='living',initialMode,init
      <div hidden={panel!=='furniture'}><HomeFurnitureEditor onChange={change} onSelectService={setEditorPoint} servicePoint={editorPoint} onServiceSource={point=>{setSelectedBuilding(point.id);showSource('electrical-survey',point.evidence[0].page);}} settings={settings} roomId={activeRoom} itemId={selectedFurniture} lang={settings.lang} onSelect={id=>{setSelectedFurniture(id);setFurnitureError(null);}} onMove={repositionFurniture} error={furnitureError}/></div>
      <div hidden={panel!=='yard'}><HomeYardEditor settings={settings} selectedId={selectedYard} onSelect={selectYard} onChange={changeYard} error={yardError}/></div>
      <div className="hs-simple-options" hidden={panel!=='options'}>
+      {panel==='options'&&<SecurityCameraPlanner settings={settings} onChange={change} onView={c=>{setPanel(null);view.current?.securityView(c);}}/>}
       {panel==='options'&&<details className="hs-directory-option"><summary>{t('דירות הבניין — פירוט ומפרט','Building apartments — details & specifications')}</summary><DocumentGate lang={settings.lang}><ApartmentDirectory onChoose={chooseDestination}/></DocumentGate></details>}
       <button className="hs-button hs-outline" onClick={()=>{setMeasureMode(true);setPanel(null);if(mode==='plan')moveMode('overview');}}>{t('מדידה בין שתי נקודות','Measure between two points')}</button>
       <BuildingControls onInspect={inspectBuilding} settings={settings} mode={mode} onMode={moveMode} onChange={change} onSource={showSource}/>

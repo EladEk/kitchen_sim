@@ -1,0 +1,2 @@
+import {SITE_TRACE} from './building-site-trace.mjs';
+export function ownerCars(){return ['24','25'].map(label=>{const bay=SITE_TRACE.parking.find(b=>b.label===label),xs=bay.polygon.map(p=>p[0]),zs=bay.polygon.map(p=>p[1]);return {id:bay.id,label,x:(Math.min(...xs)+Math.max(...xs))/2,z:(Math.min(...zs)+Math.max(...zs))/2,width:1.8,length:4.05,height:1.6,color:label==='24'?'#aebac0':'#ece8df',illustrative:true};});}

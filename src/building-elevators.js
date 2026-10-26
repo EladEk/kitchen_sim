@@ -7,17 +7,18 @@ export function buildElevators({root,resources,picks,limit=9,shown=true,cube,set
  const power=settings.lampsOn!==false?1:0;
  const material=(color,extra={})=>{const m=new THREE.MeshStandardMaterial({color,roughness:.5,...extra});resources.push(m);return m;};
  const steel=material('#87918e',{metalness:.62}),dark=material('#323e3b'),wall=material('#ddd9cc'),floor=material('#777f77'),button=material('#9acfb8',{emissive:'#448568',emissiveIntensity:.6*power});
- function box(parent,w,h,d,x,y,z,mat,part,data={}){const mesh=new THREE.Mesh(cube,mat);mesh.scale.set(w,h,d);mesh.position.set(x,y,z);mesh.castShadow=mesh.receiveShadow=true;mesh.userData={part,source:'building-plan',buildingFloor:data.landing??0,...data};parent.add(mesh);if(data.action)picks.push(mesh);return mesh;}
+ function box(parent,w,h,d,x,y,z,mat,part,data={}){const mesh=new THREE.Mesh(cube,mat);mesh.scale.set(w,h,d);mesh.position.set(x,y,z);mesh.castShadow=mesh.receiveShadow=true;mesh.userData={part,source:'building-plan',buildingFloor:data.landing??parent.userData.level??0,...data};parent.add(mesh);if(data.action)picks.push(mesh);return mesh;}
  const hallDoors=[],cars=[];
  for(const f of BUILDING_INTERIORS.floors){
   if(f.level>limit)continue;
+  const landing=new THREE.Group();landing.userData={part:"lift-landing",level:f.level};root.add(landing);
   for(const l of f.lifts){
    const [x,z]=l.doorCenter,y=f.level*BUILDING.storey;
-   box(root,.11,2.27,.045,x+.06,y+1.13,z-.48,steel,'lift-hall-frame');box(root,.11,2.27,.045,x+.06,y+1.13,z+.48,steel,'lift-hall-frame');box(root,.11,.09,1.01,x+.06,y+2.24,z,steel,'lift-hall-frame');
-   for(const sign of [-1,1])box(root,.16,2.25,.18,x,y+1.125,z+sign*.56,wall,'lift-structural-jamb');
-   const leaves=[-1,1].map(sign=>box(root,.045,2.18,.45,x+.035,y+1.09,z+sign*.225,steel,'lift-hall-door',{action:'elevator-call',elevatorId:l.id,landing:f.level}));
+   box(landing,.11,2.27,.045,x+.06,y+1.13,z-.48,steel,'lift-hall-frame');box(landing,.11,2.27,.045,x+.06,y+1.13,z+.48,steel,'lift-hall-frame');box(landing,.11,.09,1.01,x+.06,y+2.24,z,steel,'lift-hall-frame');
+   for(const sign of [-1,1])box(landing,.16,2.25,.18,x,y+1.125,z+sign*.56,wall,'lift-structural-jamb');
+   const leaves=[-1,1].map(sign=>box(landing,.045,2.18,.45,x+.035,y+1.09,z+sign*.225,steel,'lift-hall-door',{action:'elevator-call',elevatorId:l.id,landing:f.level}));
    hallDoors.push({level:f.level,id:l.id,z,leaves});
-   box(root,.035,.26,.13,x+.13,y+1.16,z+.83,dark,'lift-call-panel',{action:'elevator-call',elevatorId:l.id,landing:f.level});box(root,.043,.075,.075,x+.16,y+1.16,z+.83,button,'lift-call-button',{action:'elevator-call',elevatorId:l.id,landing:f.level});
+   box(landing,.035,.26,.13,x+.13,y+1.16,z+.83,dark,'lift-call-panel',{action:'elevator-call',elevatorId:l.id,landing:f.level});box(landing,.043,.075,.075,x+.16,y+1.16,z+.83,button,'lift-call-button',{action:'elevator-call',elevatorId:l.id,landing:f.level});
   }
  }
  for(const l of BUILDING_INTERIORS.floors[0].lifts){

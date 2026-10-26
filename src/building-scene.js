@@ -1,3 +1,4 @@
+import {installStoneCourses,installFloorCourses} from './building-finish-shaders.mjs';
 import {serviceSlabHoles} from './service-access.mjs';
 import {buildApartmentFurniture} from './apartment-furniture-scene.js';
 import {createSurfacePalette} from './surface-materials.mjs';
@@ -29,36 +30,12 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
  const floors=new Map(),cube=new THREE.BoxGeometry(1,1,1);resources.push(cube);
  function material(color,extra={}){const m=shown?new THREE.MeshStandardMaterial({color,roughness:.8,...extra}):new THREE.MeshBasicMaterial({colorWrite:false,depthWrite:false,transparent:true,opacity:0});resources.push(m);return m;}
  const surface=shown?createSurfacePalette(resources):null,finish=(kind,color,extra={})=>shown?surface(kind,color,extra):material(color,extra);
- const limestone=finish('limestone','#e2ddd3',{roughness:.83}),concrete=finish('cement','#d5d2ca'),deck=finish('porcelain','#d8d2c5'),metal=material('#303b3e',{roughness:.42,metalness:.45}),glass=material('#bdcdd1',{roughness:.09,metalness:.18,transparent:true,opacity:.28,depthWrite:false}),voidMat=material('#485052',{roughness:.4}),roofMat=finish('cement','#ddd9cc'),insideWall=finish('plaster','#f1efe9',{roughness:.9}),doorMat=finish('paint','#e5e1d7',{roughness:.55}),interiorFloor=finish('porcelain','#dcd7ce',{roughness:.56}),soffit=finish('plaster','#f4f2eb',{roughness:.91}),fascia=finish('paint','#606665',{roughness:.72}),trimMat=finish('paint','#eeece5',{roughness:.62}),handleMat=material('#a9afad',{metalness:.8,roughness:.27});
+ const limestone=finish('limestone','#e2ddd3',{roughness:.83}),concrete=finish('cement','#d5d2ca'),deck=finish('porcelain','#d8d2c5'),metal=material('#303b3e',{roughness:.42,metalness:.45}),glass=material('#b3c6ca',{roughness:.12,metalness:.3,envMapIntensity:.85,transparent:true,opacity:.32,depthWrite:false}),voidMat=material('#485052',{roughness:.4}),roofMat=finish('cement','#ddd9cc'),insideWall=finish('plaster','#f1efe9',{roughness:.9}),doorMat=finish('paint','#e5e1d7',{roughness:.55}),interiorFloor=finish('porcelain','#dcd7ce',{roughness:.56}),soffit=finish('plaster','#f4f2eb',{roughness:.91}),fascia=finish('paint','#606665',{roughness:.72}),trimMat=finish('paint','#eeece5',{roughness:.62}),handleMat=material('#a9afad',{metalness:.8,roughness:.27});
  if(shown){
   // Metre-scale stone courses, restrained grain and staggered vertical joints.
   // Colours/profile follow the supplied facade photos; this is no scan claim.
-  limestone.onBeforeCompile=shader=>{
-   shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vBuildingWorld;').replace('#include <worldpos_vertex>','#include <worldpos_vertex>\nvec4 bw=vec4(transformed,1.0);\n#ifdef USE_INSTANCING\nbw=instanceMatrix*bw;\n#endif\nvBuildingWorld=(modelMatrix*bw).xyz;');
-   shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nvarying vec3 vBuildingWorld;').replace('#include <color_fragment>',`#include <color_fragment>
-    float course=floor(vBuildingWorld.y/.48);
-    vec3 n=normalize(cross(dFdx(vBuildingWorld),dFdy(vBuildingWorld)));
-    float horizontal=abs(n.x)>abs(n.z)?vBuildingWorld.z:vBuildingWorld.x;
-    float row=abs(fract(vBuildingWorld.y/.48+.5)-.5)*.48;
-    float col=abs(fract((horizontal+mod(course,2.0)*.46)/.94+.5)-.5)*.94;
-    float aa=max(fwidth(horizontal),fwidth(vBuildingWorld.y));
-    float joint=max(1.0-smoothstep(.0015,.0025+aa,row),1.0-smoothstep(.001,.002+aa,col));
-    vec2 stoneId=vec2(floor((horizontal+mod(course,2.0)*.46)/.94),course);
-    float variation=fract(sin(dot(stoneId,vec2(127.1,311.7)))*43758.5453);
-    float grain=sin(horizontal*41.0+sin(vBuildingWorld.y*27.0))*sin(vBuildingWorld.y*57.0)*.004;
-    diffuseColor.rgb*=mix(.98+variation*.035+grain,.86,joint*.6);
-   `);
-  };limestone.customProgramCacheKey=()=> 'building-stone-courses-r48';
-  interiorFloor.onBeforeCompile=shader=>{
-   shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vInteriorWorld;').replace('#include <worldpos_vertex>','#include <worldpos_vertex>\nvInteriorWorld=(modelMatrix*vec4(transformed,1.0)).xyz;');
-   shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nvarying vec3 vInteriorWorld;').replace('#include <color_fragment>',`#include <color_fragment>
-    vec2 tileEdge=(.5-abs(fract(vInteriorWorld.xz/.8)-.5))*.8;
-    float aa=max(fwidth(vInteriorWorld.x),fwidth(vInteriorWorld.z));
-    float grout=1.0-smoothstep(.0008,.0015+aa,min(tileEdge.x,tileEdge.y));
-    float speckle=sin(vInteriorWorld.x*63.0+sin(vInteriorWorld.z*31.0))*sin(vInteriorWorld.z*57.0)*.004;
-    diffuseColor.rgb*=mix(vec3(1.0+speckle),vec3(.77),grout*.6);
-   `);
-  };interiorFloor.customProgramCacheKey=()=> 'building-neutral-floor-r48';
+  installStoneCourses(limestone);installFloorCourses(interiorFloor);
+  limestone.userData.publicFinish="stone";interiorFloor.userData.publicFinish="floor";
   interiorFloor.userData={...interiorFloor.userData,finishInferred:true,tile:[.8,.8],productId:null};
   for(const mat of [limestone,concrete,deck,roofMat,insideWall,doorMat,interiorFloor,soffit,fascia,trimMat])installBuildingSurfaceUVs(mat);
 

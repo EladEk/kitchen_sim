@@ -55,6 +55,6 @@ export function buildResidentsClub({parent,resources,settings,cut=false,ceilingV
   if(on){const light=new THREE.SpotLight(colour,22,8,Math.PI*.44,.55,2);light.position.set(x,C.ceiling-.09,z);light.target.position.set(x,.1,z);light.userData={fixtureLight:true,kelvin:4000,source:'residents-club-video',positionInferred:true};light.castShadow=i<2;light.shadow.mapSize.set(256,256);light.shadow.camera.near=.05;light.shadow.bias=-.0002;light.shadow.normalBias=.01;resources.push({dispose:()=>light.shadow.dispose()});root.add(light,light.target);}
  }
  // The selected room overview leaves its ceiling open; walk/full-building close it.
- if(ceilingVisible){const cg=fg.clone();resources.push(cg);const cm=white.clone();cm.side=THREE.DoubleSide;resources.push(cm);const ceiling=new THREE.Mesh(cg,cm);ceiling.position.y=C.ceiling;ceiling.name='club-ceiling';ceiling.castShadow=ceiling.receiveShadow=true;root.add(ceiling);}
+ if(ceilingVisible){const cg=fg.clone();resources.push(cg);const cm=white.clone();cm.side=THREE.DoubleSide;resources.push(cm);const ceiling=new THREE.Mesh(cg,cm);ceiling.position.y=C.ceiling;ceiling.name='club-ceiling';ceiling.userData={part:'club-ceiling',buildingFloor:0};ceiling.castShadow=ceiling.receiveShadow=true;root.add(ceiling);}
  return root;
 }

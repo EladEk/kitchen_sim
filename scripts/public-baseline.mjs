@@ -30,7 +30,7 @@ export async function createPublicBaseline(directory){
  const box=(x,y,z,w,h,d,angle=0)=>{const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),fenceMat);o.position.set(x,y,z);o.rotation.y=angle;o.userData={level:0};root.add(o);};
  garden.plot.forEach((a,i)=>{const b=garden.plot[(i+1)%garden.plot.length];if(!gardenFenceEdge(a,b))return;const len=Math.hypot(b[0]-a[0],b[1]-a[1]);for(const y of [.09,1.05])box((a[0]+b[0])/2,y,(a[1]+b[1])/2,len,.045,.055,-Math.atan2(b[1]-a[1],b[0]-a[0]));for(let j=0,n=Math.ceil(len/.13);j<=n;j++)box(a[0]+(b[0]-a[0])*j/n,.56,a[1]+(b[1]-a[1])*j/n,.025,1.05,.025);});
  // Strict metadata allowlist, no inspection descriptions, product IDs or sources.
- function clean(o,inherited=0){const f=o.userData.level??o.userData.buildingFloor??inherited;const part=o.userData.part||'';o.userData={level:f,ceiling:/ceiling/.test(part)||(o.geometry?.type==='ShapeGeometry'&&Math.abs(o.position.y-2.75)<.01),roof:/roof|lift-stair-head/.test(part)};o.name='';for(const child of o.children)clean(child,f);}
+ function clean(o,inherited=0){const f=o.userData.level??o.userData.buildingFloor??inherited;const part=o.userData.part||o.name||'';o.userData={level:f,ceiling:/ceiling/.test(part)||(o.geometry?.type==='ShapeGeometry'&&Math.abs(o.position.y-2.75)<.01),roof:/roof|lift-stair-head/.test(part)};o.name='';for(const child of o.children)clean(child,f);}
  clean(root);root.updateMatrixWorld(true);
  const geometryCache=new Map(),geometryByContent=new Map();root.traverse(o=>{
   // Parametric toJSON rebuilds constructor defaults and loses baked transforms.
@@ -48,10 +48,10 @@ export async function createPublicBaseline(directory){
   if(o.isMesh&&!o.isInstancedMesh)o.type='Mesh';
   if(o.material?.isShaderMaterial)o.material=new THREE.MeshStandardMaterial({color:'#9daaa7',metalness:.75,roughness:.16});
  });
- const seen=new Set(),textureCache=new Map();root.traverse(o=>{if(o.geometry)o.geometry.userData={};for(const mat of [o.material].flat().filter(Boolean)){if(seen.has(mat))continue;seen.add(mat);mat.userData={};mat.name='';for(const [key,value] of Object.entries(mat))if(value?.isTexture&&!value.image?.data)mat[key]=null;for(const key of ['map','bumpMap','roughnessMap','normalMap']){const tex=mat[key];if(tex){
+ const seen=new Set(),textureCache=new Map();root.traverse(o=>{if(o.geometry)o.geometry.userData={};for(const mat of [o.material].flat().filter(Boolean)){if(seen.has(mat))continue;seen.add(mat);mat.userData={...(mat.userData.metricInstancedUVs?{metricInstancedUVs:true}:{}),...(["stone","floor"].includes(mat.userData.publicFinish)?{publicFinish:mat.userData.publicFinish}:{})};mat.name='';for(const [key,value] of Object.entries(mat))if(value?.isTexture&&!value.image?.data)mat[key]=null;for(const key of ['map','bumpMap','roughnessMap','normalMap']){const tex=mat[key];if(tex){
      // Compact procedural colours; external images and render-target mirrors
      // are never copied into the public snapshot.
-     if(!tex.image?.data||key!=='map'){mat[key]=null;continue;}
+     if(!tex.image?.data||!['map','bumpMap','roughnessMap'].includes(key)){mat[key]=null;continue;}
      const image=tex.image,size=64,bytes=new Uint8Array(size*size*4);
      for(let y=0;y<size;y++)for(let x=0;x<size;x++){const from=(Math.floor(y*image.height/size)*image.width+Math.floor(x*image.width/size))*4;bytes.set(image.data.subarray(from,from+4),(y*size+x)*4);}
      const fingerprint=createHash('sha256').update(bytes).update(JSON.stringify([tex.repeat.x,tex.repeat.y,tex.colorSpace,tex.wrapS,tex.wrapT])).digest('hex');
@@ -62,7 +62,7 @@ export async function createPublicBaseline(directory){
  const destinations=[];
  for(const f of BUILDING_FLOORS)for(const u of f.units){const duplex=duplexForUnit(u.number,f.level);if(duplex&&f.level!==duplex.entryFloor)continue;const source=BUILDING_INTERIORS.floors[f.level],entry=source.entries.find(e=>e.unit===u.number),door=source.doors.find(d=>d.id===entry?.doorId);let position,yaw=0;if(u.number===4){position=[6.1,2.8];yaw=Math.PI;}else if(door){const normal=door.opened.map((n,i)=>(n-door.hinge[i])/(Math.hypot(...door.opened.map((x,k)=>x-door.hinge[k]))||1));position=door.hinge.map((n,i)=>(n+door.closed[i])/2+normal[i]*.85);yaw=Math.atan2(-normal[0],-normal[1]);}else{position=[...u.polygon[0]];}destinations.push({id:`unit:${u.number}:${f.level}`,label:`דירה ${u.number}`,floor:f.level,unit:u.number,position,yaw,polygon:u.polygon});}
  for(const c of COMMON_SPACES)destinations.push({id:c.id,label:c.he||c.nameHe||c.id,floor:0,position:c.walk,yaw:c.yaw||0,polygon:c.polygon});
- await mkdir(directory,{recursive:true});await writeFile(directory+'/building.json',JSON.stringify(root.toJSON()));await writeFile(directory+'/navigation.json',JSON.stringify({revision:68,center:BUILDING_CENTER,storey:BUILDING.storey,floors,destinations}));
+ await mkdir(directory,{recursive:true});await writeFile(directory+'/building.json',JSON.stringify(root.toJSON()));await writeFile(directory+'/navigation.json',JSON.stringify({revision:76,center:BUILDING_CENTER,storey:BUILDING.storey,floors,destinations}));
  console.log('Public baseline: 43 apartments; original unit-4 kitchen and standard garden; owner geometry excluded.');
  return {root,floors,destinations};
 }
