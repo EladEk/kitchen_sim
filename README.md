@@ -824,3 +824,5 @@ The private stair cuts only the slab between floors 5 and 6. The base under the 
 All 304 tests pass. New tests walk the furnished duplex up and down at normal, double and triple speeds, require the upper rooms to stay disconnected from the common hall with every real door open, prevent entry over upper guards, raycast the real slabs/ceilings and hall wall, and verify the actual bilingual React destinations and map. The production build protects the same 178 source files. Browser rendering remains unverified because the owner requested that browser checking be skipped. Storey rise and vertical stair details retain the existing illustrative assumptions.
 
 REV 74: public full-building view retains ceilings; floor sections remove only the selected floor ceiling. Public snapshot restores shared stone-course/tile shaders and metric texture mapping after JSON loading. Private design and assets remain encrypted.
+
+REV 77: touch joystick in public and personal walking views; proportional movement and release-to-stop.

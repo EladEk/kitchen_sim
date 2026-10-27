@@ -8,3 +8,5 @@
 .options-heading h2{margin:0;font-size:21px}.options-heading button{padding:10px 14px;min-height:44px}
 .options-content{padding:18px}.options-content .document-lock-form{margin:0;max-width:100%;width:100%;box-shadow:none}.options-content .hint{padding:12px 0 0;margin-bottom:0;line-height:1.6}
 @media(max-width:600px){.options-dialog{max-height:calc(100dvh - 20px);width:calc(100vw - 20px)}.options-content{padding:14px}}
+
+.public-joystick{position:absolute;bottom:18px;left:18px;z-index:3;touch-action:none}
