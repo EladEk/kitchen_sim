@@ -4,9 +4,9 @@ import {GTAOPass} from 'three/addons/postprocessing/GTAOPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {ShaderPass} from 'three/addons/postprocessing/ShaderPass.js';
 import {FXAAShader} from 'three/addons/shaders/FXAAShader.js';
-export function createArchitecturalPresentation(renderer,scene,camera,{mobile=false}={}){
+export function createArchitecturalPresentation(renderer,scene,camera,{mobile=false,quality=null}={}){
  const composer=new EffectComposer(renderer),render=new RenderPass(scene,camera),ao=new GTAOPass(scene,camera,512,512),aa=new ShaderPass(FXAAShader),output=new OutputPass();
- const ratio=Math.min(renderer.getPixelRatio(),mobile?1.1:1.75);composer.setPixelRatio(ratio);
+ const ratio=Math.min(renderer.getPixelRatio(),quality?.tier==='ultra'?(mobile?1.6:2.25):(mobile?1.1:1.75));composer.setPixelRatio(ratio);
  ao.blendIntensity=.65;ao.updateGtaoMaterial({radius:.55,thickness:1,distanceFallOff:1,scale:1});ao.updatePdMaterial({radius:4,lumaPhi:8,depthPhi:2,normalPhi:3});
  composer.addPass(render);composer.addPass(ao);composer.addPass(aa);composer.addPass(output);
  // Transparent balcony panes must not become opaque occluders in the normal pass.
@@ -15,6 +15,6 @@ export function createArchitecturalPresentation(renderer,scene,camera,{mobile=fa
  return {resize(w,h){composer.setSize(w,h);aa.material.uniforms.resolution.value.set(1/(w*ratio),1/(h*ratio));},render(now){
   const dt=now-previous;previous=now;if(dt>0&&dt<250){slow=dt>50?slow+1:Math.max(0,slow-1);if(slow>45)reduced=true;}
   if(renderer.xr.isPresenting||failed){renderer.render(scene,camera);return;}
-  ao.enabled=!reduced;try{composer.render();}catch{failed=true;renderer.setRenderTarget(null);renderer.render(scene,camera);}
+  ao.enabled=quality?.ao!==false&&!reduced;try{composer.render();}catch{failed=true;renderer.setRenderTarget(null);renderer.render(scene,camera);}
  },dispose(){for(const pass of [render,ao,aa,output])pass.dispose?.();composer.dispose();}};
 }

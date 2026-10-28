@@ -834,3 +834,7 @@ All 304 tests pass. New tests walk the furnished duplex up and down at normal, d
 REV 74: public full-building view retains ceilings; floor sections remove only the selected floor ceiling. Public snapshot restores shared stone-course/tile shaders and metric texture mapping after JSON loading. Private design and assets remain encrypted.
 
 REV 77: touch joystick in public and personal walking views; proportional movement and release-to-stop.
+
+## R81 — Browser/XR visual quality upgrade
+
+The existing Three.js WebGL renderer is intentionally retained: it already has a working WebXR runtime (headset tracking, controllers and locomotion), while switching to WebGPURenderer or a native-only engine would risk headset/browser compatibility. Public building view now supports `?quality=ultra`, `?quality=balanced`, or `?quality=eco`; desktop defaults to Ultra and touch devices to Balanced. Ultra increases raster resolution, contact-shading resolution, shadow resolution and material texture anisotropy. The personal home and kitchen viewers use the shared resolution quality policy. WebXR bypasses postprocessing as before to preserve stereo rendering. This is a real rendering upgrade, not a claim of ray tracing or photorealistic geometry: fidelity still depends on accurate building models and source photos.
