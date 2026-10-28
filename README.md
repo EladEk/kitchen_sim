@@ -1,3 +1,7 @@
+## REV 79 — מחסן 3×2 מ׳
+
+המחסן מוצב עם 3 מ׳ לאורך קיר השכן ו־2 מ׳ לרוחב החצר (מידות חוץ, שטח 6 מ״ר). המעבר המתוכנן לצד הבית גדל לכ־2.75 מ׳. הדלת לכיוון יציאת השירות; מיקום השוחה, רצועת החלון והמזגנים נשמרו. שמירות התואמות בדיוק למחסן ברירת המחדל הישן 3.5×3 מתעדכנות; בחירות מיקום/מידות אחרות נשמרות. הגבהים והמרווחים הם נתוני מודל ולא מדידת שטח. מיקומי המצלמות לא שונו בעדכון זה.
+
 ## R73 — relocate C2 to the marked service-porch return
 C2 now mounts near the courtyard end of the return wall beside the service exit, facing the shed. Older C2 placements migrate once; C1/C3 and later C2 adjustments are preserved.
 

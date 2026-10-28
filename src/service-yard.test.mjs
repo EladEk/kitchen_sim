@@ -17,12 +17,12 @@ test('chamber follows the new visible-lid photos and retains its original plan p
  assert.equal(Y.manhole.accessSize,1.6);
 });
 
-test('the 3 m deep by 3.5 m wide proposal follows the neighbour boundary and keeps the chamber access square exposed',()=>{
+test('the 3 m deep by 2 m wide proposal follows the neighbour boundary and keeps the chamber access square exposed',()=>{
  const s=Y.shed,a=polygonBounds(Y.manhole.access),b=polygonBounds(s.polygon),plot=polygonBounds(PLOT);
- near(b.maxX-b.minX,3.5);near(b.maxZ-b.minZ,3);assert(!intersects(b,a));
+ near(b.maxX-b.minX,2);near(b.maxZ-b.minZ,3);assert(!intersects(b,a));
  near(a.minZ-b.maxZ,.1);near(Y.manhole.position[1]-b.maxZ-.5,.4);
  assert(b.minX>plot.minX&&b.maxX<plot.maxX&&b.minZ>plot.minZ&&b.maxZ<plot.maxZ);
- near(plot.maxX-b.maxX,.1);near(Y.shed.passage,1.2503416666666647);
+ near(plot.maxX-b.maxX,.1);near(Y.shed.passage,2.7503416666666647);
  for(let x=b.minX+.05;x<b.maxX;x+=.1)for(let z=b.minZ+.05;z<b.maxZ;z+=.1)assert(!insidePolygon([x,z],HOUSE_OUTLINE),'proposal never occupies an existing room');
 });
 
@@ -33,7 +33,7 @@ test('actual shed, open leaves and appliance meshes do not cover the maintenance
   for(const id of ['garden-shed','shed-fridge','shed-freezer']){
    const p=scene.gardenGroups.get(id);assert(p);p.traverse(o=>{if(!o.isMesh)return;const b=bounds(o);assert(!intersects({minX:b.min.x,maxX:b.max.x,minZ:b.min.z,maxZ:b.max.z},a),`${id} never covers access`);});
   }
-  const roof=scene.gardenGroups.get('garden-shed').children.find(o=>o.userData.part==='shed-roof'),b=bounds(roof);near(b.max.x-b.min.x,3.5);near(b.max.z-b.min.z,3);near(b.max.y,2.2);
+  const roof=scene.gardenGroups.get('garden-shed').children.find(o=>o.userData.part==='shed-roof'),b=bounds(roof);near(b.max.x-b.min.x,2);near(b.max.z-b.min.z,3);near(b.max.y,2.2);
   const cover=scene.gardenGroups.get('service-manhole').children.find(o=>o.userData.part==='inspection-cover'),c=bounds(cover);near((c.min.x+c.max.x)/2,Y.manhole.position[0]);near((c.min.z+c.max.z)/2,Y.manhole.position[1]);near(c.max.x-c.min.x,1);
   for(const e of Y.elements)assert(scene.picks.some(o=>o.userData.buildingId===e.id),`${e.id} has a dimension/source hit target`);
  }finally{scene.dispose();}

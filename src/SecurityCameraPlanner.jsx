@@ -19,7 +19,7 @@ export function SecurityCameraPlanner({settings,onChange,onView}){
  <small>מבט המצלמה משתמש בזוויות קבועות ואינו מתרחב עם מסך הטלפון. המניפות הן חתך אופקי בגובה המצלמה; הטבלה בודקת גם הטיה אנכית וחסימת קירות, מחסן ורכבים במודל. נקודה ירוקה אינה הבטחת כיסוי של כל האובייקט.</small>
  <div className="security-tabs">{cameras.map(cam=><button type="button" key={cam.id} aria-pressed={selected===cam.id} onClick={()=>setSelected(cam.id)} style={{borderColor:cam.color}}>{cam.id}</button>)}</div><strong>{c.id} · {c.label}</strong>
  <label>מיקום לאורך הקיר: {Math.round(c.t*100)}%<input type="range" min=".04" max=".96" step=".01" value={c.t} onChange={e=>edit('t',e.target.value)}/></label>
- <label>גובה התקנה משוער: {c.height.toFixed(2)} מ׳<input type="range" min={c.id==='C2'?2.2:2.4} max="2.7" step=".05" value={c.height} onChange={e=>edit('height',e.target.value)}/></label>
+ <label>גובה בפס בין הקומות (משוער): {c.height.toFixed(2)} מ׳<input type="range" min="2.85" max="3.10" step=".025" value={c.height} onChange={e=>edit('height',e.target.value)}/></label>
  <label>כיוון אופקי: {c.yaw}°<input type="range" min="-180" max="180" step="1" value={c.yaw} onChange={e=>edit('yaw',e.target.value)}/></label>
  <label>הטיה כלפי מטה: {c.tilt}°<input type="range" min="0" max="55" step="1" value={c.tilt} onChange={e=>edit('tilt',e.target.value)}/></label>
  <button type="button" className="hs-button hs-outline" onClick={()=>onView(c)}>מבט דרך המצלמה {c.id}</button>

@@ -20,7 +20,7 @@ test('yard choices save, import and close independently while source boundaries,
 });
 
 test('shed edits reject chamber, window and condenser reserves; pergola stays in its strip and invalid imports are discarded',()=>{
- const s=normalizeHomeSettings(),cases=[['shed',{position:[9.95,14.5]},'chamber'],['shed',{position:[9.7,12.8]},'window'],['shed',{position:[9.95,10.8]},'ac'],['shed',{position:[20,20]},'outside'],['shed',{dimensions:{w:1,d:2.5,h:2.2}},'size'],['pergola',{position:[5,5]},'paving'],['fence',{dimensions:{h:8}},'size']];
+ const s=normalizeHomeSettings(),cases=[['shed',{position:[9.95,14.5]},'chamber'],['shed',{position:[8.7,12.8]},'window'],['shed',{position:[9.95,10.8]},'ac'],['shed',{position:[20,20]},'outside'],['shed',{dimensions:{w:1,d:2.5,h:2.2}},'size'],['pergola',{position:[5,5]},'paving'],['fence',{dimensions:{h:8}},'size']];
  for(const [id,command,error] of cases){const r=editHomeYard(s,id,command);assert.equal(r.error,error);assert.equal(r.settings,s,'failed edit preserves last valid state');}
  const bad=normalizeHomeSettings({yardDesign:{shed:{x:Infinity},pergola:{w:NaN},fence:{h:9,color:'url(x)'}}});assert.deepEqual(bad.yardDesign,{});
  const moved=edit(s,'shed',{dx:-.05}),back=yardForSettings(moved).service;assert(back.shed.passage<SERVICE_YARD.shed.passage);
@@ -38,4 +38,15 @@ test('actual shed walls, appliances, pergola posts/roof and fence meshes use the
   for(const p of layout.garden.posts)assert(!canStand([p.x,p.z],boxes));
   for(const run of layout.garden.fence.runs){const b=new THREE.Box3().setFromObject(scene.gardenGroups.get(run.id));near(b.max.y,run.style==='shared-wall'?1.5:1.8);}
  }finally{scene.dispose();}
+});
+
+
+test('legacy default shed migrates to 2 across by 3 along the boundary without changing custom plans',()=>{
+ const base=SERVICE_YARD.shed,legacy={x:base.maxX-1.75,z:(base.minZ+base.maxZ)/2,w:3.5,d:3,h:2.3};
+ const saved=normalizeHomeSettings({yardDesign:{shed:legacy}}),actual=yardForSettings(saved).service.shed;
+ near(actual.w,2);near(actual.d,3);near(actual.maxX,base.maxX);near(actual.maxZ,base.maxZ);near(actual.h,2.3);
+ assert.deepEqual(normalizeHomeSettings(saved).yardDesign,saved.yardDesign,'migration is idempotent');
+ const custom={...legacy,w:2.4,x:base.maxX-1.2};
+ assert.deepEqual(normalizeHomeSettings({yardDesign:{shed:custom}}).yardDesign.shed,custom);
+ assert.equal(actual.w*actual.d,6);assert(actual.passage>2.7);
 });

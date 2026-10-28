@@ -11,6 +11,7 @@ export const ownerParking=SITE_TRACE.parking.filter(b=>['24','25'].includes(b.la
 export function cameraTargets(settings={}){const shed=yardForSettings(settings).service.shed,k=furnitureForSettings(settings).find(f=>f.id==='outdoor-kitchen')||FURNITURE.find(f=>f.id==='outdoor-kitchen');return [
  ...[...WINDOWS,DOORS.find(d=>d.id==='patio')].map(w=>{const wall=WALLS.find(x=>x.id===w.wallId),p=w.vertical?[wall.a[0],(w.start+w.end)/2]:[(w.start+w.end)/2,wall.a[1]],n=w.wallId==='west'||w.wallId==='patio-west'?[-1,0]:w.wallId==='utility-east'?[1,0]:[0,1];return {id:w.id,label:w.he,point:[p[0]+n[0]*(wall.thickness/2+.035),w.sill+w.height/2,p[1]+n[1]*(wall.thickness/2+.035)]};}),
  {id:'outdoor-kitchen',label:'מטבח חוץ',point:[k.position[0],k.h||.9,k.position[1]]},
+ {id:'bins-fence-corner',label:'פינת הגדר ליד הפחים',point:[-5.858933333333334,1.5,17.413816666666666]},
  {id:'shed-entry',label:'כניסה למחסן',point:[shed.door.x,1.1,shed.minZ-.05]},
  ...ownerParking.map(b=>({id:b.id,label:`רכב בחניה ${b.label}`,point:[b.polygon.reduce((s,p)=>s+p[0],0)/4,1.1,b.polygon.reduce((s,p)=>s+p[1],0)/4]}))];}
 function block(a,b,height){return new THREE.Box3(new THREE.Vector3(Math.min(a[0],b[0]),0,Math.min(a[1],b[1])),new THREE.Vector3(Math.max(a[0],b[0]),height,Math.max(a[1],b[1])));}

@@ -42,7 +42,11 @@ export function normalizeYardDesign(context,value){
  const result={};if(!value||typeof value!=='object'||Array.isArray(value))return result;
  for(const id of ['shed','pergola','fence']){
   const raw=value[id];if(!raw||typeof raw!=='object'||Array.isArray(raw))continue;
-  const base=defaultYardItem(context,id),candidate=Object.fromEntries(Object.entries(base).map(([k,v])=>[k,raw[k]??v]));
+  const base=defaultYardItem(context,id);
+  // Migrate only the former default footprint. Keep deliberately moved/resized sheds.
+  const legacyShed=id==='shed'&&Math.abs(raw.w-3.5)<1e-5&&Math.abs(raw.d-3)<1e-5&&Math.abs(raw.x-(context.service.shed.maxX-1.75))<1e-5&&Math.abs(raw.z-base.z)<1e-5;
+  const source=legacyShed?{...raw,x:base.x,z:base.z,w:base.w,d:base.d}:raw;
+  const candidate=Object.fromEntries(Object.entries(base).map(([k,v])=>[k,source[k]??v]));
   if(!yardEditError(context,id,candidate))result[id]=candidate;
  }return result;
 }
