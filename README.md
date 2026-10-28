@@ -1,3 +1,7 @@
+## REV 80 — תאורה וחומרים
+
+Public viewer: HDR sky probe, GTAO contact shading with denoising and adaptive fallback, FXAA, closer walking shadows, dielectric glass, subtle distance haze. Private views use the shared sky probe and retain calibrated neutral tone mapping. Includes the REV79 2×3 shed.
+
 ## REV 79 — מחסן 3×2 מ׳
 
 המחסן מוצב עם 3 מ׳ לאורך קיר השכן ו־2 מ׳ לרוחב החצר (מידות חוץ, שטח 6 מ״ר). המעבר המתוכנן לצד הבית גדל לכ־2.75 מ׳. הדלת לכיוון יציאת השירות; מיקום השוחה, רצועת החלון והמזגנים נשמרו. שמירות התואמות בדיוק למחסן ברירת המחדל הישן 3.5×3 מתעדכנות; בחירות מיקום/מידות אחרות נשמרות. הגבהים והמרווחים הם נתוני מודל ולא מדידת שטח. מיקומי המצלמות לא שונו בעדכון זה.

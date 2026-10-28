@@ -40,3 +40,15 @@ test('encrypted sources require the correct server key and authenticated path; m
  assert.equal((await decryptedDocumentResponse(req(path),env,{...entry,path:'/house/other.jpg'},encrypted)).status,503);
  assert.equal((await decryptedDocumentResponse(req(path),{...env,DOCUMENTS_SECRET:randomBytes(32).toString('base64')},entry,encrypted)).status,503);
 });
+
+test('separate asset encryption preserves existing password sessions and rejects the session key for asset decryption',async()=>{
+ const assetKey=randomBytes(32),configured={...env,DOCUMENTS_ASSET_SECRET:assetKey.toString('base64')};
+ const response=await login(env.DOCUMENTS_PASSWORD),cookie=response.headers.get('set-cookie').split(';')[0];
+ assert(await documentSession(req('/',cookie),configured,now+1));
+ const raw=Buffer.from('private asset with separate key'),iv=randomBytes(12),path='/_personal/index.html';
+ const cipher=createCipheriv('aes-256-gcm',assetKey,iv);cipher.setAAD(Buffer.from(path));
+ const bytes=Buffer.concat([cipher.update(raw),cipher.final(),cipher.getAuthTag()]),entry={path,iv:iv.toString('base64'),type:'text/html'};
+ const opened=await decryptedDocumentResponse(req(path),configured,entry,bytes);
+ assert.equal(opened.status,200);assert.deepEqual(Buffer.from(await opened.arrayBuffer()),raw);
+ assert.equal((await decryptedDocumentResponse(req(path),env,entry,bytes)).status,503);
+});

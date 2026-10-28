@@ -1,5 +1,5 @@
 import {PMREMGenerator,NeutralToneMapping,SRGBColorSpace} from 'three';
-import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
+import {architecturalEnvironment} from './architectural-environment.mjs';
 
 // Both viewers use the same neutral colour pipeline. Filmic mid-tone lift made
 // the photographed grey/greige tile look bleached and reduced its fine detail.
@@ -10,8 +10,6 @@ export function configureSurfaceRenderer(renderer){
 }
 
 export function installSceneEnvironment(renderer,scene){
- const environment=new RoomEnvironment(),generator=new PMREMGenerator(renderer),target=generator.fromScene(environment,.04);
- scene.environment=target.texture;scene.environmentIntensity=.38;
- environment.dispose();generator.dispose();
+ const target=architecturalEnvironment(renderer);scene.environment=target.texture;scene.environmentIntensity=.38;
  return ()=>{scene.environment=null;target.dispose();};
 }
