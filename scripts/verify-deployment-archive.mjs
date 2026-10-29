@@ -1,0 +1,10 @@
+import {spawnSync} from 'node:child_process';
+const archive=process.argv[2];
+if(!archive)throw Error('Pass the deployment archive to verify.');
+const result=spawnSync('tar',['-tzf',archive],{encoding:'utf8',maxBuffer:4*1024*1024});
+if(result.status!==0)throw Error('Unable to inspect deployment archive.');
+const entries=result.stdout.split('\n').filter(Boolean);
+const forbidden=entries.filter(path=>/^\.?\/?dist\/client\/(?:_personal|house|plans|materials)(?:\/|$)/.test(path));
+if(forbidden.length)throw Error(`Deployment contains ${forbidden.length} unsealed private paths.`);
+if(!entries.includes('dist/.openai/hosting.json'))throw Error('Missing Site identity.');
+console.log(JSON.stringify({privatePlaintext:false,entries:entries.length}));

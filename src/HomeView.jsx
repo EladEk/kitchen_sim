@@ -1,3 +1,6 @@
+import {installCelestialSky} from './celestial-sky-scene.mjs';
+import './photoreal.css';
+import {installPhotorealRenderer} from './photoreal-renderer.mjs';
 import {drawSecurityPreview} from './security-preview.mjs';
 import {opticalCamera,cameraPlacements} from './security-cameras.mjs';
 import {serviceFloorHeight} from './service-access.mjs';
@@ -48,7 +51,7 @@ export const HomeView=forwardRef(function HomeView({settings,mode,selectedRoom,c
   securityView(c){runtime.current?.openSecurityPreview(c);},
   home(){runtime.current?.fit();},
   zoom(dir){const r=runtime.current;if(!r||latest.current.mode==='walk')return;r.camera.position.copy(r.controls.target.clone().add(r.camera.position.clone().sub(r.controls.target).multiplyScalar(dir>0?.85:1.18)));r.controls.update();},
-  capture(){const r=runtime.current;if(!r)return null;r.draw();return r.renderer.domElement.toDataURL('image/png');}
+  capture(){const r=runtime.current;if(!r)return null;r.draw();return r.photo?.capture()||r.renderer.domElement.toDataURL('image/png');}
  }));
  useEffect(()=>{
   let renderer;try{renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});}catch{recovery.unavailable();latest.current.onVRState?.({status:'unsupported',reason:'webgl'});return;}
@@ -57,7 +60,9 @@ export const HomeView=forwardRef(function HomeView({settings,mode,selectedRoom,c
   const presentation=createScenePresentation(renderer,scene,camera);
   const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=.075;controls.minDistance=1.2;controls.maxDistance=250;controls.minPolarAngle=.08;controls.maxPolarAngle=Math.PI/2-.03;
   host.current.appendChild(renderer.domElement);renderer.domElement.setAttribute('aria-label','Interactive house simulator. Drag to look around. In walking mode use WASD or arrow keys.');renderer.domElement.tabIndex=0;
-  const r={scene,camera,controls,renderer,boxes:[],boxCache:new Map(),floor:0,baseY:0,cars:createElevators(),riding:null,stair:null,yaw:Math.PI,pitch:0,route:null,keys:new Set(),lastTime:performance.now(),lastPosition:0};runtime.current=r;r.draw=()=>r.securityCamera?drawSecurityPreview(renderer,scene,r.securityCamera):presentation.render(budget.light?'light':latest.current.settings.renderQuality);
+  const sky=installCelestialSky({renderer,scene,camera,getSettings:()=>latest.current.settings,onDaylight:value=>model.current?.updateDaylight(value),mobile:budget.mobile});
+  const photo=installPhotorealRenderer({renderer,scene,camera,host:host.current,lang:()=>latest.current.settings.lang,mobile:()=>budget.mobile});
+  const r={scene,camera,controls,renderer,boxes:[],boxCache:new Map(),floor:0,baseY:0,cars:createElevators(),riding:null,stair:null,yaw:Math.PI,pitch:0,route:null,keys:new Set(),lastTime:performance.now(),lastPosition:0};runtime.current=r;r.photo=photo;r.draw=()=>{sky.update({focus:camera.position});if(r.securityCamera)drawSecurityPreview(renderer,scene,r.securityCamera);else presentation.render(budget.light?'light':latest.current.settings.renderQuality);photo.render(performance.now(),{suspend:!!r.securityCamera});};
   r.openSecurityPreview=c=>{if(renderer.xr.isPresenting)return;stopTour();r.keys.clear();r.securityCamera=opticalCamera(c);r.securityCamera.far=150;r.securityCamera.updateProjectionMatrix();controls.enabled=false;setPreviewCamera(c);};
   r.closeSecurityPreview=()=>{r.securityCamera=null;controls.enabled=latest.current.mode!=='walk';setPreviewCamera(null);};
   r.getBoxes=(floor=r.floor)=>{const key=floor+':'+r.cars.map(c=>liftIsOpen(c,floor)?1:0).join('');if(!r.boxCache.has(key))r.boxCache.set(key,buildingBoxes(floor,latest.current.settings,r.cars));return r.boxCache.get(key);};
@@ -115,7 +120,7 @@ export const HomeView=forwardRef(function HomeView({settings,mode,selectedRoom,c
    labels.current.forEach(el=>{if(!el)return;const p=new THREE.Vector3(...el.dataset.point.split(',').map(Number)).project(camera);el.style.left=(p.x*.5+.5)*host.current.clientWidth+'px';el.style.top=(-p.y*.5+.5)*host.current.clientHeight+'px';el.style.visibility=p.z<1&&Math.abs(p.x)<.98&&Math.abs(p.y)<.98?'visible':'hidden';});
   };renderer.setAnimationLoop(tick);
   const lifecycle=bindSceneLifecycle({canvas:renderer.domElement,renderer,onLost(){recovery.lost();void r.vr.end();},onSuspend(){r.keys.clear();drag=null;pointers.clear();renderer.setAnimationLoop(null);},onResume(){r.lastTime=performance.now();renderer.setAnimationLoop(tick);},onRestart:()=>recovery.restart(true)});
-  return()=>{savedPose.current=saveScenePose(r,poseKey());lifecycle.dispose();renderer.setAnimationLoop(null);r.vr.dispose();observer.disconnect();controls.dispose();for(const [name,handler] of [['pointerdown',start],['pointermove',move],['pointerup',end],['pointercancel',cancel]])renderer.domElement.removeEventListener(name,handler);window.removeEventListener('keydown',keydown);window.removeEventListener('keyup',keyup);window.removeEventListener('blur',blur);if(model.current){scene.remove(model.current.group);model.current.dispose();model.current=null;}r.clearMeasure();scene.remove(measureGroup);presentation.dispose();disposeEnvironment();releaseSceneRenderer(renderer);runtime.current=null;};
+  return()=>{savedPose.current=saveScenePose(r,poseKey());lifecycle.dispose();renderer.setAnimationLoop(null);r.vr.dispose();observer.disconnect();controls.dispose();for(const [name,handler] of [['pointerdown',start],['pointermove',move],['pointerup',end],['pointercancel',cancel]])renderer.domElement.removeEventListener(name,handler);window.removeEventListener('keydown',keydown);window.removeEventListener('keyup',keyup);window.removeEventListener('blur',blur);if(model.current){scene.remove(model.current.group);model.current.dispose();model.current=null;}r.clearMeasure();scene.remove(measureGroup);sky.dispose();photo.dispose();presentation.dispose();disposeEnvironment();releaseSceneRenderer(renderer);runtime.current=null;};
  },[generation]);
  useEffect(()=>{if(navigationLocked){runtime.current?.keys.clear();stopTour();}},[navigationLocked]);
  const visualKey=JSON.stringify([previewCamera?.id,settings.showSecurityCameras,settings.cameraPlan,settings.buildingLevel,settings.buildingShadows,settings.tourDestination,settings.closedBuildingDoors,settings.rooms,settings.furnitureLayout,settings.yardDesign,settings.openDoors,settings.openParts,settings.closedShutters,settings.furniture,settings.lampsOn,selectedRoom,settings.light,settings.cutaway,settings.pergolaRoof,settings.shedRoof,settings.showElectrical,settings.showWater,settings.showLighting,settings.lightControls,settings.electricalInferred,mode,kitchenSettings?.base,kitchenSettings?.upper,kitchenSettings?.stone,vrActive]);

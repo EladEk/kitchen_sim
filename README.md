@@ -1,3 +1,13 @@
+## REV 82 — Date/location based Sun and Moon sky
+
+Infinite equirectangular HDR sky shared by real-time, immersive WebXR and progressive photo rendering. Sun direction uses the existing NOAA calculation; Moon altitude, azimuth, illuminated fraction and bright-limb angle use SunCalc 2.1.1. Ofakim area coordinates 31.31 N / 34.62 E and the plan's 135° north bearing are approximate existing references, not surveyed GPS. Live mode follows Asia/Jerusalem with daylight saving time, updating each minute. Date/time inputs freeze the simulation to a chosen instant. Private lamp-only mode is preserved. Night skies, above-horizon Moon including in daylight, and its changing phase are supported. Atmospheric colours and stars are illustrative clear-sky artwork, not weather measurements or a star catalogue.
+
+## REV 81 — Progressive photo renderer + immersive VR
+
+Three.js r185 with three-gpu-pathtracer 0.0.27. Photo quality selects native WebGPU path tracing where available, or WebGL2 path tracing on float-target capable devices. 10/8 light bounces, physically transmissive glass, baked stone joints and an unfiltered HDR sky feed a progressive image while the camera and model are stationary. Press **איכות צילום** inside any 3D view. Movement immediately reveals the real-time renderer; wait briefly to refine again. Native immersive WebXR always uses the existing real-time stereo renderer with head tracking, controllers and navigation. Path tracing is not performed in the headset. Large scenes are capped with a clear fallback; select an apartment or floor if necessary. UI React remains independent from both render paths.
+
+Photo snapshots own geometry and materials, and filter hidden scene branches. Source scene, privacy model and apartment constraints remain unchanged. 3×2 m shed is retained. No production secrets are included in this repository.
+
 ## REV 80 — תאורה וחומרים
 
 Public viewer: HDR sky probe, GTAO contact shading with denoising and adaptive fallback, FXAA, closer walking shadows, dielectric glass, subtle distance haze. Private views use the shared sky probe and retain calibrated neutral tone mapping. Includes the REV79 2×3 shed.
@@ -834,7 +844,3 @@ All 304 tests pass. New tests walk the furnished duplex up and down at normal, d
 REV 74: public full-building view retains ceilings; floor sections remove only the selected floor ceiling. Public snapshot restores shared stone-course/tile shaders and metric texture mapping after JSON loading. Private design and assets remain encrypted.
 
 REV 77: touch joystick in public and personal walking views; proportional movement and release-to-stop.
-
-## R81 — Browser/XR visual quality upgrade
-
-The existing Three.js WebGL renderer is intentionally retained: it already has a working WebXR runtime (headset tracking, controllers and locomotion), while switching to WebGPURenderer or a native-only engine would risk headset/browser compatibility. Public building view now supports `?quality=ultra`, `?quality=balanced`, or `?quality=eco`; desktop defaults to Ultra and touch devices to Balanced. Ultra increases raster resolution, contact-shading resolution, shadow resolution and material texture anisotropy. The personal home and kitchen viewers use the shared resolution quality policy. WebXR bypasses postprocessing as before to preserve stereo rendering. This is a real rendering upgrade, not a claim of ray tracing or photorealistic geometry: fidelity still depends on accurate building models and source photos.

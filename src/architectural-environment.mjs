@@ -11,5 +11,5 @@ export function architecturalEnvironment(renderer){
   data.set([c.r+cloud+glow,c.g+cloud+glow*.88,c.b+cloud+glow*.7,1],(y*width+x)*4);
  }
  const source=new THREE.DataTexture(data,width,height,THREE.RGBAFormat,THREE.FloatType);source.mapping=THREE.EquirectangularReflectionMapping;source.needsUpdate=true;
- const generator=new THREE.PMREMGenerator(renderer),target=generator.fromEquirectangular(source);source.dispose();generator.dispose();return target;
+ const generator=new THREE.PMREMGenerator(renderer),target=generator.fromEquirectangular(source);generator.dispose();target.sourceEnvironment=source;return target;
 }

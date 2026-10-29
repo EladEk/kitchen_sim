@@ -1,0 +1,8 @@
+import {useEffect,useState} from 'react';
+import {effectiveSolar,celestialState} from './celestial-sky.mjs';
+export function useSkyClock(value){const [now,setNow]=useState(()=>new Date());useEffect(()=>{const id=setInterval(()=>setNow(new Date()),30000);return()=>clearInterval(id);},[]);return effectiveSolar(value,now);}
+export function SkyControls({solar,onChange,lang='he'}){
+ const he=lang==='he',s=useSkyClock(solar),clock=`${String(Math.floor(s.minutes/60)).padStart(2,'0')}:${String(s.minutes%60).padStart(2,'0')}`,moon=celestialState({solar:s}).moon;
+ const change=patch=>onChange({...s,live:false,...patch});
+ return <section className="sky-controls" aria-label={he?'שמיים ותאריך':'Sky and date'}><h3>{he?'שמיים, שמש וירח':'Sky, Sun and Moon'}</h3><label><input type="checkbox" aria-label={he?'זמן אמיתי':'Live time'} checked={s.live} onChange={e=>change({live:e.target.checked})}/>{he?'עכשיו · שעון ישראל':'Now · Israel time'}</label><div className="sky-time"><label>{he?'תאריך':'Date'}<input type="date" value={s.date} min="2000-01-01" max="2099-12-31" onChange={e=>change({date:e.target.value})}/></label><label>{he?'שעה בישראל':'Israel time'}<input type="time" value={clock} onChange={e=>{const [h,m]=e.target.value.split(':').map(Number);if(Number.isFinite(h+m))change({minutes:h*60+m});}}/></label></div><p>{he?'אופקים · כיוון צפון לפי התוכנית':'Ofakim · plan-based north'}<br/>{he?'ירח מואר':'Moon illuminated'}: {Math.round(moon.fraction*100)}% · {moon.aboveHorizon?(he?'מעל האופק':'above horizon'):(he?'מתחת לאופק':'below horizon')}</p><small>{he?'שמיים בהירים להמחשה; מיקום השמש והירח מחושב. זה אינו דיווח מזג אוויר.':'Illustrative clear sky; calculated Sun and Moon positions, not live weather.'}</small></section>;
+}

@@ -1,19 +1,24 @@
+import {celestialState,effectiveSolar} from './celestial-sky.mjs';
+import {useSkyClock} from './SkyControls.jsx';
+import './celestial-sky.css';
 import {ProtectedImage} from './DocumentAccess.jsx';
 import {Sun,Moon} from 'lucide-react';
 import {normalizeSolar,solarPosition,solarDefaults,lampsOnly,SOLAR_SITE,SOLAR_SOURCE} from './solar-lighting.mjs';
 import {ALL_LIGHTING_DEFINITIONS} from './home-lighting.mjs';
 import {lightControl} from './lighting-controls.mjs';
 import './sunlight.css';
-export function SunlightControls({settings,onChange}){
- const he=settings.lang==='he',s=normalizeSolar(settings.solar),sun=solarPosition(s),dark=lampsOnly(settings),clock=`${String(Math.floor(s.minutes/60)).padStart(2,'0')}:${String(s.minutes%60).padStart(2,'0')}`,change=patch=>onChange('solar',{...s,...patch});
+export function SunlightControls(props){const solar=useSkyClock(props.settings.solar);return <SunlightControlsContent {...props} solar={solar}/>;}
+export function SunlightControlsContent({settings,onChange,solar}){
+ const he=settings.lang==='he',s=solar||effectiveSolar(settings.solar),astronomy=celestialState({solar:s}),sun=astronomy.sun,moon=astronomy.moon,dark=lampsOnly(settings),clock=`${String(Math.floor(s.minutes/60)).padStart(2,'0')}:${String(s.minutes%60).padStart(2,'0')}`,change=patch=>onChange('solar',{...s,live:false,...patch});
  const angle=(sun.azimuth-s.northBearing)*Math.PI/180,sx=64+Math.sin(angle)*39,sy=64-Math.cos(angle)*39;
  return <section className="sunlight-controls" aria-label={he?'שעה, שמש ומנורות':'Time, sunlight and lamps'}>
   <h3><Sun size={17}/>{he?'שמש ותאורת הבית':'Sunlight and home lighting'}</h3>
   <div className="sunlight-modes"><button aria-pressed={!dark} onClick={()=>onChange('light','day')}><Sun size={17}/>{he?'לפי השעה':'By time of day'}</button><button aria-pressed={dark} onClick={()=>onChange('light','night')}><Moon size={17}/>{he?'מנורות בלבד':'Lamps only'}</button></div>
-  <div className="sunlight-time"><label>{he?'תאריך':'Date'}<input type="date" value={s.date} min="2000-01-01" max="2099-12-31" onChange={e=>change({date:e.target.value})}/></label><label>{he?'שעה בישראל':'Israel time'}<input type="time" value={clock} onChange={e=>{const [h,m]=e.target.value.split(':').map(Number);if(Number.isFinite(h+m))change({minutes:h*60+m});}}/></label></div>
+  <label className="sky-live-control"><input type="checkbox" aria-label={he?'זמן אמיתי':'Live time'} checked={s.live} onChange={e=>change({live:e.target.checked})}/>{he?'עכשיו · שעון ישראל':'Now · Israel time'}</label><div className="sunlight-time"><label>{he?'תאריך':'Date'}<input type="date" value={s.date} min="2000-01-01" max="2099-12-31" onChange={e=>change({date:e.target.value})}/></label><label>{he?'שעה בישראל':'Israel time'}<input type="time" value={clock} onChange={e=>{const [h,m]=e.target.value.split(':').map(Number);if(Number.isFinite(h+m))change({minutes:h*60+m});}}/></label></div>
   <input className="sunlight-hour" aria-label={he?'שעה ביום':'Time of day'} type="range" min="0" max="1439" step="1" value={s.minutes} onChange={e=>change({minutes:Number(e.target.value)})}/>
   <div className="sunlight-presets">{[8,12,16,20].map(hour=><button key={hour} onClick={()=>change({minutes:hour*60})}>{String(hour).padStart(2,'0')}:00</button>)}</div>
   <div className="sunlight-position"><svg viewBox="0 0 128 128" role="img" aria-label={he?'כיוון השמש ביחס לתוכנית הבית':'Sun direction relative to the house plan'}><circle cx="64" cy="64" r="40" fill="none" stroke="currentColor" opacity=".3"/>{['N','E','S','W'].map((label,i)=>{const a=(i*90-s.northBearing)*Math.PI/180;return <text key={label} x={64+Math.sin(a)*54} y={68-Math.cos(a)*54} textAnchor="middle" fontSize="11">{label}</text>;})}<rect x="55" y="53" width="18" height="22" rx="2" fill="#73886f"/>{sun.aboveHorizon&&<><line x1="64" y1="64" x2={sx} y2={sy} stroke="#b88932" strokeDasharray="3 3"/><circle cx={sx} cy={sy} r="7" fill={dark?'#8f9295':'#efb641'}/></>}</svg><p><strong>{clock} · UTC+{sun.utcOffset}</strong><span>{he?'כיוון מהצפון':'Azimuth'}: {sun.azimuth.toFixed(0)}°</span><span>{he?'גובה מעל האופק':'Elevation'}: {sun.elevation.toFixed(0)}°</span><small>{dark?(he?'השמש ואור הסביבה כבויים':'Sun and ambient light are off'):sun.aboveHorizon?(he?'השמש מעל האופק':'Sun above horizon'):(he?'השמש מתחת לאופק':'Sun below horizon')}</small></p></div>
+  <p>{he?'ירח מואר':'Moon illuminated'}: {Math.round(moon.fraction*100)}% · {moon.aboveHorizon?(he?'מעל האופק':'above horizon'):(he?'מתחת לאופק':'below horizon')}</p>
   <label className="sunlight-lamps"><input type="checkbox" checked={settings.lampsOn!==false} onChange={e=>onChange('lampsOn',e.target.checked)}/>{he?'הדלקת המנורות':'Lamps on'}</label>
   <button className="sunlight-neutral" onClick={()=>onChange('lightControls',Object.fromEntries(ALL_LIGHTING_DEFINITIONS.map(p=>[p.id,{...lightControl(settings,p.id),kelvin:4000}])))}>{he?'כל המנורות ל־4000K':'Set all lamps to 4000K'}</button>
   <p className="sunlight-note">{he?'ברירת מחדל: 4000K. גופי התאורה והעוצמות להמחשה, ללא מדידת לוקס. לבדיקת אור דרך החלונות השתמשו בסיור רגלי; חתך פתוח מכניס אור גם מלמעלה. חדרים ללא תיעוד מסומנים בסגול כמנורות זמניות להחלפה לפי צילום עתידי.':'Default: 4000K. Fixtures and brightness are illustrative, without measured lux. Use walking mode to inspect window light; an open cutaway also admits light from above. Undocumented rooms use purple temporary lamps to be replaced from future photos.'}</p>

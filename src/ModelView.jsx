@@ -1,3 +1,6 @@
+import {installCelestialSky} from './celestial-sky-scene.mjs';
+import './photoreal.css';
+import {installPhotorealRenderer} from './photoreal-renderer.mjs';
 import {SceneRecoveryNotice,useSceneRecovery} from './SceneRecovery.jsx';
 import {bindSceneLifecycle,saveScenePose,restoreScenePose,releaseSceneRenderer} from './scene-lifecycle.mjs';
 import {useEffect,useRef,useState,forwardRef,useImperativeHandle} from 'react';
@@ -30,7 +33,7 @@ export const ModelView=forwardRef(function ModelView({settings,onSelect,onPartCl
   home(){const r=runtime.current;if(!r)return;if(r.fitInspection){r.fitInspection();return;}const p=CAMERAS.perspective;r.camera.position.set(...p.pos);r.controls.target.set(...p.target);r.controls.update();},
   hoodDetail(){const r=runtime.current;if(!r||!model.current?.moduleGroups.has(HOOD.cabinetId))return;const fit=appliancePlacement();r.controls.target.set(fit.hoodX*.001,fit.hoodBottom*.001,(fit.hoodRear+HOOD.depth/2)*.001);r.camera.position.copy(r.controls.target).add(new THREE.Vector3(.32,-.54,.86));r.controls.minDistance=.35;r.controls.maxPolarAngle=Math.PI*.9;r.controls.update();},
   focusElectrical(id){const r=runtime.current,p=model.current?.serviceGroups.get(id);if(!r||!p)return;const v=p.userData.inspectionView;r.controls.target.set(...v.target);r.camera.position.set(...v.from);r.controls.minDistance=.35;r.controls.maxDistance=15;r.controls.update();},
-  capture(){const r=runtime.current;if(!r)return null;r.draw();return r.renderer.domElement.toDataURL('image/png');}
+  capture(){const r=runtime.current;if(!r)return null;r.draw();return r.photo?.capture()||r.renderer.domElement.toDataURL('image/png');}
  }));
  useEffect(()=>{
   let renderer;
@@ -41,7 +44,9 @@ export const ModelView=forwardRef(function ModelView({settings,onSelect,onPartCl
   const presentation=createScenePresentation(renderer,scene,camera);
   const controls=new OrbitControls(camera,renderer.domElement);controls.target.set(...CAMERAS.perspective.target);controls.enableDamping=true;controls.dampingFactor=.065;controls.minDistance=2;controls.maxDistance=15;controls.minPolarAngle=.18;controls.maxPolarAngle=Math.PI/2-.02;controls.enablePan=true;controls.update();
   host.current.appendChild(renderer.domElement);renderer.domElement.setAttribute('aria-label','Interactive 3D kitchen. Drag to orbit, scroll to zoom, click a specific door or drawer to open or close it.');renderer.domElement.setAttribute('role','img');
-  const r={scene,camera,controls,renderer};runtime.current=r;r.draw=()=>presentation.render(latestServices.current.renderQuality,{transparentCabinets:latestServices.current.cabinetVisibility==='translucent'});
+  const sky=installCelestialSky({renderer,scene,camera,getSettings:()=>latestServices.current,onDaylight:value=>model.current?.updateDaylight(value),kitchen:true});
+  const photo=installPhotorealRenderer({renderer,scene,camera,host:host.current,lang:()=>latestServices.current.lang});
+  const r={scene,camera,controls,renderer};runtime.current=r;r.photo=photo;r.draw=()=>{sky.update({focus:camera.position});presentation.render(latestServices.current.renderQuality,{transparentCabinets:latestServices.current.cabinetVisibility==='translucent'});photo.render();};
   r.vr=createVrRuntime({renderer,scene,camera,controls,getModel:()=>model.current,getStart:()=>({position:[r.navigation?.start[0]||2.725,0,r.navigation?.start[1]||1.1],yaw:0}),move:(p,d)=>r.navigation?.move(p,d)||p,canTeleport:p=>r.navigation?.canStand(p)===true,onState:s=>{setVrActive(s.status==='presenting');vrCallbacks.current.onVRState?.(s);},onSelect:d=>{if(d.openingId)vrCallbacks.current.onVRPartClick?.(d.openingId);}});
   const resize=()=>{const w=host.current?.clientWidth||900,h=host.current?.clientHeight||600;renderer.setSize(w,h);presentation.resize(w,h);camera.aspect=w/h;camera.fov=camera.aspect<1?55:camera.aspect<1.2?45:39;camera.updateProjectionMatrix();};const observer=new ResizeObserver(resize);observer.observe(host.current);resize();
   const tick=(time,frame)=>{if(renderer.xr.isPresenting)r.vr.update(time,frame);else controls.update();r.draw();if(renderer.xr.isPresenting)return;
@@ -56,7 +61,7 @@ export const ModelView=forwardRef(function ModelView({settings,onSelect,onPartCl
   const cancel=e=>{pointers.delete(e.pointerId);down=null;};
   renderer.domElement.addEventListener('pointerdown',start);renderer.domElement.addEventListener('pointerup',end);renderer.domElement.addEventListener('pointermove',hover);renderer.domElement.addEventListener('pointercancel',cancel);
   const lifecycle=bindSceneLifecycle({canvas:renderer.domElement,renderer,onLost(){recovery.lost();void r.vr.end();},onSuspend(){down=null;pointers.clear();renderer.setAnimationLoop(null);},onResume(){renderer.setAnimationLoop(tick);},onRestart:()=>recovery.restart(true)});
-  return()=>{savedPose.current=saveScenePose(r,poseKey());lifecycle.dispose();renderer.setAnimationLoop(null);r.vr.dispose();observer.disconnect();controls.dispose();renderer.domElement.removeEventListener('pointerdown',start);renderer.domElement.removeEventListener('pointerup',end);renderer.domElement.removeEventListener('pointermove',hover);renderer.domElement.removeEventListener('pointercancel',cancel);if(model.current){scene.remove(model.current.group);model.current.dispose();model.current=null;}presentation.dispose();disposeEnvironment();releaseSceneRenderer(renderer);runtime.current=null;};
+  return()=>{savedPose.current=saveScenePose(r,poseKey());lifecycle.dispose();renderer.setAnimationLoop(null);r.vr.dispose();observer.disconnect();controls.dispose();renderer.domElement.removeEventListener('pointerdown',start);renderer.domElement.removeEventListener('pointerup',end);renderer.domElement.removeEventListener('pointermove',hover);renderer.domElement.removeEventListener('pointercancel',cancel);if(model.current){scene.remove(model.current.group);model.current.dispose();model.current=null;}sky.dispose();photo.dispose();presentation.dispose();disposeEnvironment();releaseSceneRenderer(renderer);runtime.current=null;};
  },[generation]);
  const visualKey=JSON.stringify([settings.base,settings.upper,settings.stone,settings.hardware,settings.floor,settings.buildingShadows,settings.lampsOn,settings.light,settings.intensity,settings.led,settings.openParts,settings.activePart,settings.inspection,settings.selected,settings.dimensions,settings.showElectrical,settings.showWater,settings.showLighting,settings.lightControls,settings.cabinetVisibility,selectedElectricalId,vrActive]);
  useEffect(()=>{const r=runtime.current;if(!r)return;if(model.current){r.scene.remove(model.current.group);model.current.dispose();}model.current=createKitchen({...settings,inspection:vrActive?false:settings.inspection,selectedElectricalId});r.scene.add(model.current.group);r.navigation=createKitchenVrNavigation(model.current);applyDaylightPresentation(r.scene,settings);},[visualKey,generation]);

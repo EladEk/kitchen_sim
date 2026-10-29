@@ -6,12 +6,12 @@ export function israelDate(now=new Date()){
  const p=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Jerusalem',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(now).map(p=>[p.type,p.value]));return `${p.year}-${p.month}-${p.day}`;
 }
 export const SOLAR_SITE={cityHe:'אופקים',cityEn:'Ofakim',plot:'1410',building:'4102',apartment:'4',source:'/house/house-plan.pdf',northImage:'/house/solar-north.png',northBearing:135};
-export function solarDefaults(){return {date:israelDate(),minutes:12*60,latitude:31.31,longitude:34.62,northBearing:SOLAR_SITE.northBearing};}
+export function solarDefaults(){return {date:israelDate(),minutes:12*60,latitude:31.31,longitude:34.62,northBearing:SOLAR_SITE.northBearing,live:true};}
 export function normalizeSolar(value){
  const base=solarDefaults(),v=value&&typeof value==='object'?value:{};
  const stamp=typeof v.date==='string'&&/^20\d\d-\d\d-\d\d$/.test(v.date)?new Date(v.date+'T12:00:00Z'):null;
  const date=stamp&&Number.isFinite(stamp.getTime())&&stamp.toISOString().slice(0,10)===v.date?v.date:base.date;
- return {date,minutes:Number.isFinite(v.minutes)?clamp(Math.round(v.minutes),0,1439):base.minutes,latitude:Number.isFinite(v.latitude)?clamp(v.latitude,-89,89):base.latitude,longitude:Number.isFinite(v.longitude)?clamp(v.longitude,-180,180):base.longitude,northBearing:Number.isFinite(v.northBearing)?((v.northBearing%360)+360)%360:base.northBearing};
+ return {date,live:v.live!==false,minutes:Number.isFinite(v.minutes)?clamp(Math.round(v.minutes),0,1439):base.minutes,latitude:Number.isFinite(v.latitude)?clamp(v.latitude,-89,89):base.latitude,longitude:Number.isFinite(v.longitude)?clamp(v.longitude,-180,180):base.longitude,northBearing:Number.isFinite(v.northBearing)?((v.northBearing%360)+360)%360:base.northBearing};
 }
 export function israelUtcOffset(date,minutes){
  // Iterate UTC -> civil time, so winter/summer offsets come from the timezone
@@ -20,9 +20,9 @@ export function israelUtcOffset(date,minutes){
  for(let i=0;i<3;i++){const p=Object.fromEntries(new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Jerusalem',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(utc)).map(p=>[p.type,p.value]));offset=(Date.UTC(+p.year,+p.month-1,+p.day,+p.hour,+p.minute)-utc)/3600000;utc=wall-offset*3600000;}
  return offset;
 }
-export function solarPosition(value){
+export function solarPosition(value,utcOffsetOverride=null){
  const s=normalizeSolar(value),[year,month,day]=s.date.split('-').map(Number),days=year%4===0&&(year%100!==0||year%400===0)?366:365,doy=(Date.UTC(year,month-1,day)-Date.UTC(year,0,0))/86400000;
- const hour=s.minutes/60,gamma=2*Math.PI/days*(doy-1+(hour-12)/24),offset=israelUtcOffset(s.date,s.minutes);
+ const hour=s.minutes/60,gamma=2*Math.PI/days*(doy-1+(hour-12)/24),offset=Number.isFinite(utcOffsetOverride)?utcOffsetOverride:israelUtcOffset(s.date,s.minutes);
  const equation=229.18*(.000075+.001868*Math.cos(gamma)-.032077*Math.sin(gamma)-.014615*Math.cos(2*gamma)-.040849*Math.sin(2*gamma));
  const declination=.006918-.399912*Math.cos(gamma)+.070257*Math.sin(gamma)-.006758*Math.cos(2*gamma)+.000907*Math.sin(2*gamma)-.002697*Math.cos(3*gamma)+.00148*Math.sin(3*gamma);
  const ha=(s.minutes+equation+4*s.longitude-60*offset)/4-180,lat=s.latitude*rad,h=ha*rad;

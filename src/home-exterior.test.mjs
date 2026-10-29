@@ -59,8 +59,8 @@ test('two distinct condensers follow the photographed order, face outward and pr
  }finally{scene.dispose();}
 });
 
-test('enlarged rear neighbour-side shed and full inward door sweep avoid both proposed AC frontage reserves',()=>{
- const s=Y.shed;near(s.d,3);near(s.w,3.5);near((s.w-.12)*(s.d-.12),3.38*2.88);assert.equal(s.door.hinge,'end');assert.equal(s.door.swing,1);
+test('compact rear neighbour-side shed and full inward door sweep avoid both proposed AC frontage reserves',()=>{
+ const s=Y.shed;near(s.d,3);near(s.w,2);near((s.w-.12)*(s.d-.12),1.88*2.88);assert.equal(s.door.hinge,'end');assert.equal(s.door.swing,1);
  for(const a of E.units){assert(!intersects(polygonBounds(s.polygon),a.front));assert(!intersects(polygonBounds(Y.manhole.access),a.body));assert(s.minZ>a.front.maxZ);}
  const scene=createHomeScene(normalizeHomeSettings({openParts:Y.parts.map(p=>p.id)}),{mode:'walk'});
  try{

@@ -1,0 +1,10 @@
+.photo-controls{position:absolute;top:64px;inset-inline-end:14px;z-index:12;display:flex;align-items:flex-end;flex-direction:column;gap:5px;max-width:min(330px,calc(100% - 28px));pointer-events:none;font:12px/1.4 system-ui,sans-serif;direction:rtl}
+.photo-toggle{pointer-events:auto;min-height:44px;border:1px solid #b1beae!important;border-radius:10px!important;background:#fffffff2!important;color:#294733!important;padding:10px 14px!important;box-shadow:0 4px 18px #152b3920;font:600 13px system-ui,sans-serif!important;touch-action:manipulation}
+.photo-toggle[aria-pressed=true]{background:#2d4b38!important;color:#fff!important}
+.photo-status:not(:empty){background:#fffffff0;color:#344638;padding:6px 9px;border-radius:7px;max-width:100%;text-wrap:balance}
+.photo-canvas{position:absolute;inset:0;width:100%!important;height:100%!important;pointer-events:none!important;z-index:0}
+.photo-controls button:focus-visible{outline:3px solid #f0ab4f;outline-offset:2px}
+
+.viewport .photo-controls{inset-inline-end:auto;inset-inline-start:14px;top:14px;align-items:flex-start;max-width:min(310px,45%)}
+
+.is-clean .photo-controls{display:none!important}

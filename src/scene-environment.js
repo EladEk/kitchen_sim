@@ -1,4 +1,3 @@
-import {graphicsProfile} from './graphics-quality.mjs';
 import {PMREMGenerator,NeutralToneMapping,SRGBColorSpace} from 'three';
 import {architecturalEnvironment} from './architectural-environment.mjs';
 
@@ -8,11 +7,9 @@ export function configureSurfaceRenderer(renderer){
  renderer.toneMapping=NeutralToneMapping;
  renderer.toneMappingExposure=1;
  renderer.outputColorSpace=SRGBColorSpace;
- // Keep WebGL for browser WebXR; higher sampling on capable devices.
- renderer.setPixelRatio(graphicsProfile({search:typeof location!=='undefined'?location.search:'',mobile:typeof matchMedia!=='undefined'&&matchMedia('(pointer: coarse)').matches,dpr:typeof devicePixelRatio!=='undefined'?devicePixelRatio:1}).pixelRatio);
 }
 
 export function installSceneEnvironment(renderer,scene){
- const target=architecturalEnvironment(renderer);scene.environment=target.texture;scene.environmentIntensity=.38;
- return ()=>{scene.environment=null;target.dispose();};
+ const target=architecturalEnvironment(renderer);scene.environment=target.texture;scene.userData.photoEnvironment=target.sourceEnvironment;scene.environmentIntensity=.38;
+ return ()=>{scene.environment=null;delete scene.userData.photoEnvironment;target.sourceEnvironment?.dispose();target.dispose();};
 }
