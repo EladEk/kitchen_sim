@@ -6,13 +6,15 @@ export function israelDate(now=new Date()){
  const p=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Jerusalem',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(now).map(p=>[p.type,p.value]));return `${p.year}-${p.month}-${p.day}`;
 }
 export const SOLAR_SITE={cityHe:'אופקים',cityEn:'Ofakim',plot:'1410',building:'4102',apartment:'4',source:'/house/house-plan.pdf',northImage:'/house/solar-north.png',northBearing:135};
-export function solarDefaults(){return {date:israelDate(),minutes:12*60,latitude:31.31,longitude:34.62,northBearing:SOLAR_SITE.northBearing,live:true};}
+export function solarDefaults(){return {date:israelDate(),minutes:12*60,latitude:31.31,longitude:34.62,northBearing:SOLAR_SITE.northBearing,live:false};}
 export function normalizeSolar(value){
  const base=solarDefaults(),v=value&&typeof value==='object'?value:{};
  const stamp=typeof v.date==='string'&&/^20\d\d-\d\d-\d\d$/.test(v.date)?new Date(v.date+'T12:00:00Z'):null;
  const date=stamp&&Number.isFinite(stamp.getTime())&&stamp.toISOString().slice(0,10)===v.date?v.date:base.date;
- return {date,live:v.live!==false,minutes:Number.isFinite(v.minutes)?clamp(Math.round(v.minutes),0,1439):base.minutes,latitude:Number.isFinite(v.latitude)?clamp(v.latitude,-89,89):base.latitude,longitude:Number.isFinite(v.longitude)?clamp(v.longitude,-180,180):base.longitude,northBearing:Number.isFinite(v.northBearing)?((v.northBearing%360)+360)%360:base.northBearing};
+ return {date,live:v.live===true,minutes:Number.isFinite(v.minutes)?clamp(Math.round(v.minutes),0,1439):base.minutes,latitude:Number.isFinite(v.latitude)?clamp(v.latitude,-89,89):base.latitude,longitude:Number.isFinite(v.longitude)?clamp(v.longitude,-180,180):base.longitude,northBearing:Number.isFinite(v.northBearing)?((v.northBearing%360)+360)%360:base.northBearing};
 }
+// Opening either simulator starts at noon; live time is an explicit session choice.
+export function openingSolar(value){return normalizeSolar({...value,date:israelDate(),minutes:720,live:false});}
 export function israelUtcOffset(date,minutes){
  // Iterate UTC -> civil time, so winter/summer offsets come from the timezone
  // database rather than a hardcoded season. UI solar hours are local clock time.
@@ -34,6 +36,6 @@ export function solarPosition(value,utcOffsetOverride=null){
 export const lampsOnly=settings=>['night','evening'].includes(settings.light);
 export function daylightState(settings){
  const sun=solarPosition(settings.solar),amount=lampsOnly(settings)?0:clamp(Math.sin(sun.elevation*rad),0,1);
- return {sun,amount,intensity:amount>0?3*Math.sqrt(amount):0,sky:amount*.65,environment:amount*.22,background:lampsOnly(settings)||sun.elevation<-6?'#030508':sun.elevation<=0?'#343a48':'#e3e9e9'};
+ return {sun,amount,intensity:amount>0?3*Math.sqrt(amount):0,sky:amount*1.15,environment:amount*.8,background:lampsOnly(settings)||sun.elevation<-6?'#030508':sun.elevation<=0?'#343a48':'#e3e9e9'};
 }
 export const SHARED_LIGHT_SETTINGS=['solar','light','lampsOn','lightControls','buildingShadows'];

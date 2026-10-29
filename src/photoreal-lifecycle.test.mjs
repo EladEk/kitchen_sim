@@ -5,6 +5,7 @@ import {installPhotorealRenderer} from './photoreal-renderer.mjs';
 class Element extends THREE.EventDispatcher{
  constructor(){super();this.children=[];this.style={};this.dataset={};this.attributes={};this.clientWidth=800;this.clientHeight=600;}
  append(...v){this.children.push(...v);v.forEach(o=>o.parent=this);}
+ closest(){return null;}
  setAttribute(k,v){this.attributes[k]=v;}
  remove(){if(this.parent)this.parent.children=this.parent.children.filter(v=>v!==this);}
  click(){this.dispatchEvent({type:'click'});}

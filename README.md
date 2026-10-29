@@ -844,3 +844,21 @@ All 304 tests pass. New tests walk the furnished duplex up and down at normal, d
 REV 74: public full-building view retains ceilings; floor sections remove only the selected floor ceiling. Public snapshot restores shared stone-course/tile shaders and metric texture mapping after JSON loading. Private design and assets remain encrypted.
 
 REV 77: touch joystick in public and personal walking views; proportional movement and release-to-stop.
+
+REV83: photo quality controls occupy a wrapping header slot; stronger daytime sky fill/environment and softer contact occlusion preserve solar direction and night modes.
+
+REV84: noon on opening (live time opt-in), analytic Sun/Moon disks at screen resolution with calculated direction and lunar phase; disks stay behind geometry and share sky orientation in VR.
+
+REV84 also adds real loading indicators during bootstrap, access checks, lazy kitchen imports, initial scene rendering, photographic materials, public building/texture parsing and photo renderer preparation. Failures leave the spinner and show recovery/errors.
+
+REV85: eight-building public district (4102 default), copies built exclusively from sanitized public snapshot with shared instanced batches. Layout and rotations estimated from owner aerial render, public park, roads, sidewalks, parking and green promenade are illustrative pending a dimensioned development plan. Sources: https://efficapital.co.il/Effi-Afikim/ and owner labelled aerial rendering.
+
+REV86: default building and district cameras view the street corner beside ground apartment 1 (negative local X/Z); preserve the source-plan geometry and 4102 street-corner registration.
+
+REV87: rotate building geometry 90 degrees around each plot centre per owner orange-to-blue annotation. Apply same world rotation to solar/lunar north mapping. Keep original apartment IDs, polygons, floor numbers and entry records; inverse transform walking/map coordinates. Private plan coordinates remain unchanged.
+
+REV88: 4103 and 4091 quarter-turn relative to 4102; 3461 and 3471 true reflected copies, with corrected triangle winding and positive instance matrices. 4101 and 4093 shifted 8m toward street (estimated from supplied image) relative to aligned 4102/4092. 4102 solar frame and plan apartment numbering unchanged.
+
+REV89: reconstruct all eight building centres using plot-1410 plan anchors and a perspective fit of the official aerial. 3461 is set back from 4103, 3471 is between 4093 and 4091 along the block, and the previous uniform 65m grid is removed. See scripts/district-layout-calibration.json for manual controls, alignment assumptions and uncertainty. Shared roads/parking/promenade follow the revised extents and avoid the building envelopes. HOME STUDIO public header text is 12.5px instead of 25px (50% smaller), with less header padding and unchanged touch targets.
+
+REV90: add standard garden lawns and complete perimeter fences to all 32 ground apartments, with facade-clipped shared dividers. Preserve all 46 source-traced adjacent parking bays of 4102, including 13 tandem pairs and N1, in a separate sanitised public site snapshot. Reconstruct the other parking courts with 2.5m x 5m bays, access aprons, representative cars and a continuous connected drive network. Replace the earlier generic grid with clipped sidewalks, open driveway kerbs, zebra crossings and landscape islands. Additional parking counts, street geometry and fence heights remain illustrative, not a surveyed allocation.

@@ -8,3 +8,16 @@
 .viewport .photo-controls{inset-inline-end:auto;inset-inline-start:14px;top:14px;align-items:flex-start;max-width:min(310px,45%)}
 
 .is-clean .photo-controls{display:none!important}
+
+/* Header controls participate in layout: no overlay on location, map or VR. */
+.photo-header-slot{min-width:0;flex:0 1 auto;margin-inline-start:auto}
+.photo-header-slot .photo-controls{position:static;max-width:100%;pointer-events:auto;align-items:stretch}
+.photo-header-slot .photo-toggle{white-space:normal;max-width:100%}
+.photo-header-slot .photo-status:not(:empty){font-size:11px;box-shadow:none;padding:2px 0}
+.hs-app.hs-simple .hs-header:has(.photo-header-slot),.kitchen-app .header:has(.photo-header-slot){height:auto;min-height:56px;flex-wrap:wrap;padding-block:6px;gap:8px}
+main>header:has(.photo-header-slot){flex-wrap:wrap;gap:12px}
+@media(max-width:380px){.photo-header-slot{flex-basis:100%;margin:0}.photo-header-slot .photo-controls{align-items:flex-start}}
+
+.photo-controls[aria-busy=true] .photo-status::before{content:'';display:inline-block;width:12px;height:12px;border:2px solid #cdd8c7;border-top-color:#3e6146;border-radius:50%;margin-inline-end:6px;vertical-align:middle;animation:photo-loading-spin .9s linear infinite}
+@keyframes photo-loading-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.photo-controls[aria-busy=true] .photo-status::before{animation:none;border-style:dotted}}

@@ -2,6 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import {celestialState,effectiveSolar,israelClock,skyDirection,skyPixels} from './celestial-sky.mjs';
+import {solarDefaults,normalizeSolar,openingSolar} from './solar-lighting.mjs';
+import {createCelestialDisks} from './celestial-disks.mjs';
+import {createPhotoScene} from './photoreal-scene.mjs';
 import {installCelestialSky} from './celestial-sky-scene.mjs';
 const near=(a,b,t=1e-6)=>assert(Math.abs(a-b)<t,`${a} ≈ ${b}`),manual=(date,minutes,extra={})=>({solar:{date,minutes,live:false,...extra}});
 
@@ -51,4 +54,37 @@ test('Sun disk pixels match Three equirectUv coordinates, so north and the horiz
  assert(image.data[index]>10,'Sun disk is at the astronomical world direction');
  const opposite=((image.height-1-iy)*image.width+(image.width-1-ix))*4;
  assert(image.data[opposite]<1,'mirrored sky position must not contain the Sun');
+});
+
+test('noon diffuse illumination is useful indoors and fades with the Sun without brightening lamps-only mode',()=>{
+ const noon=celestialState(manual('2026-06-21',720));
+ const night=celestialState(manual('2026-06-21',0));
+ const dark=celestialState({...manual('2026-06-21',720),light:'night'});
+ assert(noon.environmentIntensity>.8);assert(night.environmentIntensity<.02);assert.equal(dark.environmentIntensity,0);assert.equal(dark.sunIntensity,0);
+});
+
+test('opening defaults to noon and old saved live settings cannot turn on the clock implicitly',()=>{
+ assert.equal(solarDefaults().live,false);assert.equal(normalizeSolar().live,false);
+ const old={live:true,minutes:7,date:'2024-01-01',northBearing:82};
+ const restored=openingSolar(old);assert.equal(restored.minutes,720);assert.equal(restored.live,false);assert.equal(restored.northBearing,82);
+ const now=new Date('2026-10-28T22:30:00Z');assert.equal(effectiveSolar(undefined,now).minutes,720);
+ assert.equal(effectiveSolar({live:true},now).minutes,30);
+});
+test('screen-resolution celestial disks keep direction, phase and horizon visibility and do not enter the photo BVH',()=>{
+ const disks=createCelestialDisks(),scene=new THREE.Scene();scene.add(disks.mesh);
+ const day=celestialState(manual('2026-06-21',720));disks.update(day);
+ assert.equal(disks.mesh.material.uniforms.sunVisible.value,1);
+ assert.deepEqual(disks.mesh.material.uniforms.sunDirection.value.toArray(),day.sun.direction);
+ assert.equal(disks.mesh.material.depthWrite,false);assert.equal(disks.mesh.material.depthTest,true);assert.equal(disks.mesh.frustumCulled,false);
+ const night=celestialState(manual('2026-10-28',22*60));disks.update(night);
+ assert.equal(disks.mesh.material.uniforms.sunVisible.value,0);assert.equal(disks.mesh.material.uniforms.moonVisible.value,1);
+ assert.equal(disks.mesh.material.uniforms.moonFraction.value,night.moon.fraction);
+ const photo=createPhotoScene(scene);assert.equal(photo.meshes,0);photo.dispose();
+ disks.update({...night,dark:true});assert.equal(disks.mesh.visible,false);disks.dispose();
+});
+test('manual noon sky does not regenerate each minute and toggling live time resumes the clock',()=>{
+ let settings={};let builds=0;const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera();
+ const sky=installCelestialSky({renderer:{},scene,camera,getSettings:()=>settings,mobile:true,environmentFactory:()=>{builds++;return {texture:new THREE.Texture(),dispose(){}};}});
+ sky.update({now:new Date('2026-10-28T20:00:00Z')});sky.update({now:new Date('2026-10-28T20:01:00Z')});assert.equal(builds,1);assert.equal(sky.state.solar.minutes,720);
+ settings={solar:{live:true}};sky.update({now:new Date('2026-10-28T20:02:00Z')});assert.equal(sky.state.solar.minutes,22*60+2);sky.dispose();
 });

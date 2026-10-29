@@ -10,8 +10,8 @@ import {BUILDING_INTERIORS} from '../src/building-interiors.mjs';
 import {groundTransform} from '../src/ground-apartments.mjs';
 import {COMMON_SPACES} from '../src/common-spaces.mjs';
 import {duplexForUnit} from '../src/building-duplexes.mjs';
-import {gardenFenceEdge} from '../src/building-navigation.mjs';
 import {normalizeHomeSettings} from '../src/home-model.mjs';
+import {publicSiteData} from './public-site.mjs';
 
 export async function createPublicBaseline(directory){
  const resources=[],picks=[],root=new THREE.Group(),settings={...normalizeHomeSettings(),openDoors:[],openParts:[],closedBuildingDoors:[],cutaway:false,furniture:true,showLighting:true,buildingLevel:9,tourDestination:'unit:1:0'};
@@ -23,12 +23,11 @@ export async function createPublicBaseline(directory){
  const furniture=new THREE.Group();buildApartmentFurniture({parent:furniture,resources,level:0,base:0,settings});
  const t=groundTransform(1),[a,b,c,d]=t.matrix,inverse=new THREE.Matrix4().set(a,0,b,t.offset[0],0,1,0,0,c,0,d,t.offset[1],0,0,0,1).invert(),m=new THREE.Matrix4();
  for(const mesh of furniture.children){const indices=mesh.userData.placements.map((v,i)=>v.unit===1?i:-1).filter(i=>i>=0);if(!indices.length)continue;const clone=new THREE.InstancedMesh(mesh.geometry,mesh.material,indices.length);indices.forEach((i,j)=>{mesh.getMatrixAt(i,m);m.premultiply(inverse);clone.setMatrixAt(j,m);});clone.userData={level:0};clone.castShadow=clone.receiveShadow=true;root.add(clone);}
- // Original plot lawn and standard boundary only. No custom shed, raised fence,
- // paving, pergola, outdoor kitchen or personal yard configuration is imported.
- const garden=BUILDING_FLOORS[0].gardens.find(g=>g.unit===4),shape=new THREE.Shape();garden.polygon.forEach(([x,z],i)=>i?shape.lineTo(x,z):shape.moveTo(x,z));shape.closePath();const geo=new THREE.ShapeGeometry(shape);geo.rotateX(Math.PI/2);const lawn=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:'#8d9d71',side:THREE.DoubleSide}));lawn.position.y=-.025;lawn.userData={level:0};root.add(lawn);
- const fenceMat=new THREE.MeshStandardMaterial({color:'#394843',roughness:.6});
- const box=(x,y,z,w,h,d,angle=0)=>{const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),fenceMat);o.position.set(x,y,z);o.rotation.y=angle;o.userData={level:0};root.add(o);};
- garden.plot.forEach((a,i)=>{const b=garden.plot[(i+1)%garden.plot.length];if(!gardenFenceEdge(a,b))return;const len=Math.hypot(b[0]-a[0],b[1]-a[1]);for(const y of [.09,1.05])box((a[0]+b[0])/2,y,(a[1]+b[1])/2,len,.045,.055,-Math.atan2(b[1]-a[1],b[0]-a[0]));for(let j=0,n=Math.ceil(len/.13);j<=n;j++)box(a[0]+(b[0]-a[0])*j/n,.56,a[1]+(b[1]-a[1])*j/n,.025,1.05,.025);});
+ // Development is rendered once for the whole district. Remove the old
+ // unrotated site surfaces and partial fences before sanitising the building.
+ // Entrance doors, lintels and service-room geometry remain in the building.
+ const siteParts=new Set(['building-garden-ground','building-garden-fence','building-site-base','site-drive-lane','site-sidewalk','site-parking-bay','site-parking-number','site-raised-curb','site-illustrative-cars','site-car-glass','site-car-tyres','site-illustrative-planting']);
+ const obsolete=[];root.traverse(o=>{if(siteParts.has(o.userData.part))obsolete.push(o);});obsolete.forEach(o=>o.removeFromParent());
  // Strict metadata allowlist, no inspection descriptions, product IDs or sources.
  function clean(o,inherited=0){const f=o.userData.level??o.userData.buildingFloor??inherited;const part=o.userData.part||o.name||'';o.userData={level:f,ceiling:/ceiling/.test(part)||(o.geometry?.type==='ShapeGeometry'&&Math.abs(o.position.y-2.75)<.01),roof:/roof|lift-stair-head/.test(part)};o.name='';for(const child of o.children)clean(child,f);}
  clean(root);root.updateMatrixWorld(true);
@@ -62,7 +61,7 @@ export async function createPublicBaseline(directory){
  const destinations=[];
  for(const f of BUILDING_FLOORS)for(const u of f.units){const duplex=duplexForUnit(u.number,f.level);if(duplex&&f.level!==duplex.entryFloor)continue;const source=BUILDING_INTERIORS.floors[f.level],entry=source.entries.find(e=>e.unit===u.number),door=source.doors.find(d=>d.id===entry?.doorId);let position,yaw=0;if(u.number===4){position=[6.1,2.8];yaw=Math.PI;}else if(door){const normal=door.opened.map((n,i)=>(n-door.hinge[i])/(Math.hypot(...door.opened.map((x,k)=>x-door.hinge[k]))||1));position=door.hinge.map((n,i)=>(n+door.closed[i])/2+normal[i]*.85);yaw=Math.atan2(-normal[0],-normal[1]);}else{position=[...u.polygon[0]];}destinations.push({id:`unit:${u.number}:${f.level}`,label:`דירה ${u.number}`,floor:f.level,unit:u.number,position,yaw,polygon:u.polygon});}
  for(const c of COMMON_SPACES)destinations.push({id:c.id,label:c.he||c.nameHe||c.id,floor:0,position:c.walk,yaw:c.yaw||0,polygon:c.polygon});
- await mkdir(directory,{recursive:true});await writeFile(directory+'/building.json',JSON.stringify(root.toJSON()));await writeFile(directory+'/navigation.json',JSON.stringify({revision:82,center:BUILDING_CENTER,storey:BUILDING.storey,floors,destinations}));
+ await mkdir(directory,{recursive:true});await writeFile(directory+'/building.json',JSON.stringify(root.toJSON()));await writeFile(directory+'/site.json',JSON.stringify(publicSiteData()));await writeFile(directory+'/navigation.json',JSON.stringify({revision:90,center:BUILDING_CENTER,storey:BUILDING.storey,floors,destinations}));
  console.log('Public baseline: 43 apartments; original unit-4 kitchen and standard garden; owner geometry excluded.');
  return {root,floors,destinations};
 }

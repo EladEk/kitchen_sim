@@ -1,3 +1,4 @@
+import {trackSceneAsset} from './scene-loading.mjs';
 import {orderedSurface} from './ordered-flooring.mjs';
 import {prepareFloorPhoto} from './floor-photo-preparation.mjs';
 const tasks=new Map();
@@ -5,7 +6,7 @@ export function orderedFloorPhotoData(productId){
  const photo=orderedSurface(productId)?.photo;
  if(!photo||typeof Image==='undefined'||typeof document==='undefined')return null;
  const key=photo.image+':'+(photo.rotate||0);
- if(!tasks.has(key))tasks.set(key,new Promise((resolve,reject)=>{
+ if(!tasks.has(key))tasks.set(key,trackSceneAsset(new Promise((resolve,reject)=>{
   const image=new Image();
   image.onerror=()=>{tasks.delete(key);reject(Error('The source product image could not load: '+productId));};
   image.onload=()=>{
@@ -24,6 +25,6 @@ export function orderedFloorPhotoData(productId){
    }catch(error){tasks.delete(key);reject(error);}
   };
   image.src=photo.runtimeImage||photo.image;
- }));
+ })));
  return tasks.get(key);
 }

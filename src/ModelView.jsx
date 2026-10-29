@@ -1,3 +1,4 @@
+import {SceneLoading} from './LoadingIndicator.jsx';
 import {installCelestialSky} from './celestial-sky-scene.mjs';
 import './photoreal.css';
 import {installPhotorealRenderer} from './photoreal-renderer.mjs';
@@ -21,6 +22,7 @@ import {pickKitchenElectrical} from './electrical-picking.mjs';
 const CAMERAS={eye:{pos:[2.7,1.62,3.15],target:[2.65,1.18,.3]},perspective:{pos:[7.25,4.6,7.7],target:[2.6,1.05,1.05]},front:{pos:[2.75,2.0,8.9],target:[2.75,1.18,.4]},island:{pos:[5.1,2.6,.9],target:[3.4,.9,1.95]}};
 export const ModelView=forwardRef(function ModelView({settings,onSelect,onPartClick,onElectricalSelect,selectedElectricalId,cameraPreset='perspective',cameraRequest=0,onVRState,onVRPartClick},ref){
  const electricalOverlay=useRef(),latestServices=useRef(settings),vrCallbacks=useRef();latestServices.current=settings;vrCallbacks.current={onVRState,onVRPartClick};
+ const [scenePending,setScenePending]=useState(true);
  const [vrActive,setVrActive]=useState(false);
  const recovery=useSceneRecovery(),generation=recovery.generation,savedPose=useRef(null),presetRef=useRef(cameraPreset);presetRef.current=cameraPreset;
  const poseKey=()=>JSON.stringify([latestServices.current.inspection,latestServices.current.selected,presetRef.current]);
@@ -36,6 +38,7 @@ export const ModelView=forwardRef(function ModelView({settings,onSelect,onPartCl
   capture(){const r=runtime.current;if(!r)return null;r.draw();return r.photo?.capture()||r.renderer.domElement.toDataURL('image/png');}
  }));
  useEffect(()=>{
+  setScenePending(true);
   let renderer;
   try{renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,preserveDrawingBuffer:true});}catch{recovery.unavailable();vrCallbacks.current.onVRState?.({status:'unsupported',reason:'webgl'});return;}
   renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;configureSurfaceRenderer(renderer);
@@ -49,7 +52,7 @@ export const ModelView=forwardRef(function ModelView({settings,onSelect,onPartCl
   const r={scene,camera,controls,renderer};runtime.current=r;r.photo=photo;r.draw=()=>{sky.update({focus:camera.position});presentation.render(latestServices.current.renderQuality,{transparentCabinets:latestServices.current.cabinetVisibility==='translucent'});photo.render();};
   r.vr=createVrRuntime({renderer,scene,camera,controls,getModel:()=>model.current,getStart:()=>({position:[r.navigation?.start[0]||2.725,0,r.navigation?.start[1]||1.1],yaw:0}),move:(p,d)=>r.navigation?.move(p,d)||p,canTeleport:p=>r.navigation?.canStand(p)===true,onState:s=>{setVrActive(s.status==='presenting');vrCallbacks.current.onVRState?.(s);},onSelect:d=>{if(d.openingId)vrCallbacks.current.onVRPartClick?.(d.openingId);}});
   const resize=()=>{const w=host.current?.clientWidth||900,h=host.current?.clientHeight||600;renderer.setSize(w,h);presentation.resize(w,h);camera.aspect=w/h;camera.fov=camera.aspect<1?55:camera.aspect<1.2?45:39;camera.updateProjectionMatrix();};const observer=new ResizeObserver(resize);observer.observe(host.current);resize();
-  const tick=(time,frame)=>{if(renderer.xr.isPresenting)r.vr.update(time,frame);else controls.update();r.draw();if(renderer.xr.isPresenting)return;
+  const tick=(time,frame)=>{if(renderer.xr.isPresenting)r.vr.update(time,frame);else controls.update();r.draw();if(model.current&&!r.firstFrame){r.firstFrame=true;setScenePending(false);}if(renderer.xr.isPresenting)return;
    labels.current.forEach(el=>{if(!el)return;const point=new THREE.Vector3(...el.dataset.point.split(',').map(Number)).project(camera);el.style.left=(point.x*.5+.5)*host.current.clientWidth+'px';el.style.top=(-point.y*.5+.5)*host.current.clientHeight+'px';el.style.opacity=point.z<1?'1':'0';});
    if(electricalOverlay.current){const width=host.current.clientWidth,height=host.current.clientHeight;const anchors=KITCHEN_SERVICE_POINTS.filter(p=>!p.water||latestServices.current.showWater!==false).map(p=>{const v=new THREE.Vector3(...p.position).project(camera);return {id:p.id,x:(v.x*.5+.5)*width,y:(-v.y*.5+.5)*height,visible:v.z>-1&&v.z<1&&Math.abs(v.x)<1.15&&Math.abs(v.y)<1.15};});electricalOverlay.current.update(anchors,width,height,{top:8,bottom:8});}
   };renderer.setAnimationLoop(tick);
@@ -88,5 +91,5 @@ export const ModelView=forwardRef(function ModelView({settings,onSelect,onPartCl
  useEffect(()=>{if(savedPose.current){restoreScenePose(runtime.current,savedPose.current,poseKey());savedPose.current=null;}},[generation]);
  const dimLabels=[['5,450 mm',[2.725,2.83,-.15]],['3,300 mm',[-.15,2.83,1.65]],['2,440 mm',[3.4,1.02,2.58]],['≈ 980 mm',[4.79,.12,1.11]]];
  const nameLabels=settings.lang==='he'?[['כיור',[1.91,1.15,.4]],['כיריים',[3.88,1.15,.4]],['מקרר',[.6,1.98,2.78]],['אי',[3.4,1.15,2.1]]]:[['Sink',[1.91,1.15,.4]],['Induction',[3.88,1.15,.4]],['Fridge',[.6,1.98,2.78]],['Island',[3.4,1.15,2.1]]];
- return <div className="model-surface" ref={host}><SceneRecoveryNotice status={recovery.status} dismissed={recovery.dismissed} lang={settings.lang} onRetry={()=>recovery.restart()} onDismiss={recovery.dismiss}/><><div className="projection-labels" hidden={settings.cleanView||vrActive}>{[...(settings.dimensions&&!settings.inspection?dimLabels:[]),...(settings.labels&&!settings.inspection?nameLabels:[])].map(([name,p],i)=><span className={i<dimLabels.length&&settings.dimensions?'dimension-label':'object-label'} ref={el=>labels.current[i]=el} data-point={p.join(',')} key={name}>{name}</span>)}</div>{!settings.cleanView&&!vrActive&&settings.showElectrical&&electricalLabelsVisible(settings)&&!settings.inspection&&<ElectricalCallouts ref={electricalOverlay} points={KITCHEN_SERVICE_POINTS.filter(p=>!p.water||settings.showWater!==false)} selectedId={selectedElectricalId} lang={settings.lang} onSelect={onElectricalSelect}/>}</></div>;
+ return <div className="model-surface" ref={host}>{recovery.status==='ready'&&!vrActive&&<SceneLoading pending={scenePending} lang={settings.lang} message={settings.lang==='he'?'טוען את המטבח…':'Loading kitchen…'}/>}<SceneRecoveryNotice status={recovery.status} dismissed={recovery.dismissed} lang={settings.lang} onRetry={()=>recovery.restart()} onDismiss={recovery.dismiss}/><><div className="projection-labels" hidden={settings.cleanView||vrActive}>{[...(settings.dimensions&&!settings.inspection?dimLabels:[]),...(settings.labels&&!settings.inspection?nameLabels:[])].map(([name,p],i)=><span className={i<dimLabels.length&&settings.dimensions?'dimension-label':'object-label'} ref={el=>labels.current[i]=el} data-point={p.join(',')} key={name}>{name}</span>)}</div>{!settings.cleanView&&!vrActive&&settings.showElectrical&&electricalLabelsVisible(settings)&&!settings.inspection&&<ElectricalCallouts ref={electricalOverlay} points={KITCHEN_SERVICE_POINTS.filter(p=>!p.water||settings.showWater!==false)} selectedId={selectedElectricalId} lang={settings.lang} onSelect={onElectricalSelect}/>}</></div>;
 });

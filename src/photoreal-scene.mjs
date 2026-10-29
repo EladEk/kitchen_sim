@@ -5,7 +5,7 @@ import {metricSurfaceUVs} from './metric-surface-geometry.mjs';
 export class PhotoSceneLimit extends Error {}
 export function photoSceneSignature(scene){
  let hash=2166136261,count=0;const add=s=>{for(let i=0;i<s.length;i++)hash=Math.imul(hash^s.charCodeAt(i),16777619);};
- scene.updateMatrixWorld(true);scene.traverseVisible(o=>{if(!o.isMesh&&!o.isLight)return;if(o.userData.securityOverlay||o.userData.sceneUi)return;count++;add(o.uuid);if(o.isMesh){add(String(o.geometry?.version||0));add(String(o.geometry?.attributes.position?.version||0));add(String(o.instanceMatrix?.version||0));}
+ scene.updateMatrixWorld(true);scene.traverseVisible(o=>{if(!o.isMesh&&!o.isLight)return;if(o.userData.celestialBackground||o.userData.securityOverlay||o.userData.sceneUi)return;count++;add(o.uuid);if(o.isMesh){add(String(o.geometry?.version||0));add(String(o.geometry?.attributes.position?.version||0));add(String(o.instanceMatrix?.version||0));}
  for(const v of o.matrixWorld.elements)add(String(Math.round(v*10000)));
  if(o.isLight)add(`${o.intensity}:${o.color.getHex()}`);
  for(const m of [o.material].flat().filter(Boolean))add(`${m.uuid}:${m.version}:${m.opacity}:${m.map?.version}:${m.bumpMap?.version}:${m.color?.getHex()}`);
@@ -52,7 +52,7 @@ export function createPhotoScene(source,{maxTriangles=2500000,maxMeshes=60000}={
  };
  const dispose=()=>{ownedGeometry.forEach(g=>g.dispose());ownedMaterial.forEach(m=>m.dispose());ownedTexture.forEach(t=>t.dispose());scene.clear();};
  try{source.traverseVisible(o=>{
-  if(o.userData.securityOverlay||o.userData.electricalId||o.userData.waterId||o.userData.sceneUi||o.userData.part==='sun-position-marker')return;
+  if(o.userData.celestialBackground||o.userData.securityOverlay||o.userData.electricalId||o.userData.waterId||o.userData.sceneUi||o.userData.part==='sun-position-marker')return;
   if(o.isMesh&&o.geometry?.attributes.position){
    if(o.isInstancedMesh){for(let i=0;i<o.count;i++){const mat=new THREE.Matrix4();o.getMatrixAt(i,mat);let color=null;if(o.instanceColor){color=new THREE.Color();o.getColorAt(i,color);}add(o,o.matrixWorld.clone().multiply(mat),color);}}
    else if(!o.isSkinnedMesh)add(o,o.matrixWorld.clone());

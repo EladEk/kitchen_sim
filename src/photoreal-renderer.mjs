@@ -7,10 +7,10 @@ export function installPhotorealRenderer({renderer,scene,camera,host,lang=()=> '
  const release=(...objects)=>{for(const object of objects){try{object?.dispose?.();}catch{/* A renderer teardown still releases the backing GPU device resources. */}}};
  const controls=document.createElement('div');controls.className='photo-controls';controls.dataset.sceneUiToggle='';
  const button=document.createElement('button');button.type='button';button.className='photo-toggle';button.setAttribute('aria-pressed','false');
- const label=document.createElement('span');label.className='photo-status';label.setAttribute('role','status');label.setAttribute('aria-live','polite');controls.append(button,label);host.append(controls);
+ const label=document.createElement('span');label.className='photo-status';label.setAttribute('role','status');label.setAttribute('aria-live','polite');controls.append(button,label);const slot=host.closest('.hs-app,.kitchen-app,main')?.querySelector('[data-photo-controls-slot]');(slot||host).append(controls);
  const he=()=>lang()==='he',say=(a,b)=>{label.textContent=he()?a:b;},hide=()=>{if(canvas)canvas.style.visibility='hidden';};
  function updateButton(){lastLang=lang();button.textContent=enabled?(he()?'חזרה לסיור חלק':'Back to live view'):(he()?'✦ איכות צילום':'✦ Photo quality');button.setAttribute('aria-pressed',String(enabled));button.title=he()?'חישוב תאורה והשתקפויות בזמן שהמבט עומד. VR משתמש בתצוגה בזמן אמת.':'Progressive light transport while still. VR uses live rendering.';}
- function cleanup(){token++;const old=[tracer,worker,snapshot,photoRenderer],oldCanvas=canvas;tracer=null;worker=null;snapshot=null;photoRenderer=null;canvas=null;backend=null;busy=false;dirty=true;steps=0;release(...old);oldCanvas?.remove();}
+ function cleanup(){controls.setAttribute('aria-busy','false');token++;const old=[tracer,worker,snapshot,photoRenderer],oldCanvas=canvas;tracer=null;worker=null;snapshot=null;photoRenderer=null;canvas=null;backend=null;busy=false;dirty=true;steps=0;release(...old);oldCanvas?.remove();}
  function off(){enabled=false;hide();cleanup();updateButton();say('סיור ו־VR בזמן אמת','Live tour and VR');}
  button.addEventListener('click',()=>{if(enabled){off();return;}enabled=true;lastError='';stableAt=performance.now();dirty=true;updateButton();say('עצור את המבט לחישוב התמונה','Hold the view still to render');});updateButton();
  async function createBackend(){
@@ -32,7 +32,7 @@ export function installPhotorealRenderer({renderer,scene,camera,host,lang=()=> '
   photoRenderer.setPixelRatio(ratio);photoRenderer.setSize(w,h,false);tracer?.updateCamera();steps=0;
  }
  async function prepare(){
-  if(disposed||busy||!enabled||renderer.xr.isPresenting)return;busy=true;const current=++token,buildKey=sceneKey;say('מכין תאורה מציאותית…','Preparing photo lighting…');
+  if(disposed||busy||!enabled||renderer.xr.isPresenting)return;busy=true;controls.setAttribute('aria-busy','true');const current=++token,buildKey=sceneKey;say('מכין תאורה מציאותית…','Preparing photo lighting…');
   try{
    if(!tracer){const result=await (backendFactory||createBackend)();if(disposed||current!==token){release(result.tracer,result.worker,result.renderer);return;}tracer=result.tracer;photoRenderer=result.renderer;worker=result.worker||null;backend=result.backend;
     photoRenderer.toneMapping=renderer.toneMapping;photoRenderer.toneMappingExposure=renderer.toneMappingExposure;photoRenderer.outputColorSpace=THREE.SRGBColorSpace;canvas=photoRenderer.domElement;canvas.className='photo-canvas';canvas.style.visibility='hidden';host.append(canvas);lastWidth=lastHeight=0;size();
@@ -41,7 +41,7 @@ export function installPhotorealRenderer({renderer,scene,camera,host,lang=()=> '
    if(backend==='WebGL2')await tracer.setSceneAsync(snapshot.scene,camera);else tracer.setScene(snapshot.scene,camera);
    if(disposed||current!==token)return;dirty=sceneKey!==buildKey;steps=0;say('התמונה מתנקה בהדרגה…','Image refining progressively…');
   }catch(error){if(disposed||current!==token)return;lastError=error instanceof PhotoSceneLimit?'complex':'unsupported';enabled=false;cleanup();updateButton();say(lastError==='complex'?'הסצנה גדולה לצילום במכשיר הזה; נסה קומה או דירה':'צילום לא זמין במכשיר הזה — הסיור ו־VR נשארו זמינים',lastError==='complex'?'Select a floor or apartment for photo mode':'Photo mode unavailable; live tour and VR remain available');}
-  finally{if(current===token)busy=false;}
+  finally{if(current===token){busy=false;controls.setAttribute('aria-busy','false');}}
  }
  const onXR=()=>{hide();cleanup();stableAt=performance.now();if(enabled)say('VR · תצוגה סטריאוסקופית בזמן אמת','VR · real-time stereo');};renderer.xr.addEventListener('sessionstart',onXR);renderer.xr.addEventListener('sessionend',onXR);
  const onPointer=()=>{stableAt=performance.now();hide();};host.addEventListener('pointerdown',onPointer);host.addEventListener('wheel',onPointer,{passive:true});

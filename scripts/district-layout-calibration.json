@@ -1,0 +1,134 @@
+{
+  "image": "official-labelled-aerial-1920x1080",
+  "method": "Same-height roof-centre perspective fit, anchored by registered plot1410 plan centres; not a site survey",
+  "planAnchors": {
+    "4102": [
+      0,
+      0
+    ],
+    "4101": [
+      -5.071180555555555,
+      54.019097222222214
+    ],
+    "4103": [
+      69.36493055555555,
+      1.8961805555555553
+    ]
+  },
+  "imageCentres": {
+    "4102": [
+      580,
+      233
+    ],
+    "4101": [
+      550,
+      345
+    ],
+    "4093": [
+      554,
+      490
+    ],
+    "4092": [
+      582,
+      685
+    ],
+    "4103": [
+      883,
+      225
+    ],
+    "3461": [
+      1202,
+      249
+    ],
+    "3471": [
+      1378,
+      435
+    ],
+    "4091": [
+      1093,
+      630
+    ]
+  },
+  "imageFromDistrict": [
+    [
+      5.012965435296275,
+      -1.6524979941459905,
+      578.6254193650542
+    ],
+    [
+      0.007806453319231549,
+      1.0624226850010217,
+      232.82026932542956
+    ],
+    [
+      0.0007333458871970989,
+      -0.002875341770765409,
+      1.0
+    ]
+  ],
+  "reprojectionErrorPixels": 1.6773489893346323,
+  "centres": {
+    "4102": [
+      0.3,
+      0.13
+    ],
+    "4101": [
+      -5.38,
+      53.96
+    ],
+    "4093": [
+      -4.01,
+      103.49
+    ],
+    "4092": [
+      0.05,
+      149.14
+    ],
+    "4103": [
+      69.36,
+      1.8
+    ],
+    "3461": [
+      140.87,
+      22.94
+    ],
+    "3471": [
+      138.53,
+      106.04
+    ],
+    "4091": [
+      69.35,
+      149.16
+    ]
+  },
+  "source": "https://efficapital.co.il/Effi-Afikim/wp-content/uploads/2024/06/104187-5_effi_hadmaya_c-1-1.pdf",
+  "planSource": "public/house/building-plan-2.jpg, 1332x1488 normalized page view, 0.0881944444 metres per point",
+  "planControlBounds": {
+    "4102": [
+      856,
+      156,
+      1215,
+      603
+    ],
+    "4101": [
+      243,
+      99,
+      603,
+      545
+    ],
+    "4103": [
+      812,
+      986,
+      1216,
+      1346
+    ]
+  },
+  "assumptions": [
+    "4102/4092 share the outer alignment, per owner correction.",
+    "4103/4091 share the central alignment in the reference.",
+    "Roof-centre pixels are manual visual picks; the marketing render is not a survey.",
+    "No site-accuracy claim follows from small reprojection residuals.",
+    "4102 stays fixed, including its accepted 90 degree rotation and solar/lunar north reference."
+  ],
+  "uncertainty": "Several metres for image-derived positions; dimensions and plot-1410 centre picks also need survey confirmation."
+}

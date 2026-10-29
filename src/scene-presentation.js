@@ -12,7 +12,7 @@ export function createScenePresentation(renderer,scene,camera){
  const ratio=Math.min(renderer.getPixelRatio(),1.5);composer.setPixelRatio(ratio);
  ao.kernelRadius=.28;ao.minDistance=.006/(camera.far-camera.near);ao.maxDistance=.45/(camera.far-camera.near);
  const drawAO=ao.render.bind(ao);
- ao.render=(...args)=>{const hidden=[];scene.traverse(o=>{if(o.isMesh&&o.visible&&(o.userData.electricalId||(Array.isArray(o.material)?o.material:[o.material]).some(m=>m.transparent&&m.opacity<.98))){hidden.push(o);o.visible=false;}});try{drawAO(...args);}finally{hidden.forEach(o=>{o.visible=true;});}};
+ ao.render=(...args)=>{const hidden=[];scene.traverse(o=>{if(o.isMesh&&o.visible&&(o.userData.celestialBackground||o.userData.electricalId||(Array.isArray(o.material)?o.material:[o.material]).some(m=>m.transparent&&m.opacity<.98))){hidden.push(o);o.visible=false;}});try{drawAO(...args);}finally{hidden.forEach(o=>{o.visible=true;});}};
  composer.addPass(render);composer.addPass(ao);composer.addPass(aa);composer.addPass(output);
  let failed=false;
  return {

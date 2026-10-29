@@ -21,7 +21,7 @@ export function celestialState(settings={},now=new Date(),{kitchen=false}={}){
  return {solar,instant,sun:{...sun,direction:skyDirection(sun.azimuth,sun.elevation,solar.northBearing,kitchen)},moon:{...moon,elevation:moon.altitude,aboveHorizon:moonUp,direction:skyDirection(moon.azimuth,moon.altitude,solar.northBearing,kitchen),fraction:illumination.fraction,phase:illumination.phase,limbAngle:(illumination.angle-moon.parallacticAngle)*RAD,angularRadius:Math.asin(1737.4/moon.distance)},dark,daylight,twilight,
   sunIntensity:dark?0:daylight>0?3*Math.sqrt(daylight):0,
   moonIntensity:dark?0:moonUp?.025*illumination.fraction*clamp((6-sun.elevation)/12,0,1):0,
-  environmentIntensity:dark?0:Math.max(.015,daylight*.42+twilight*.05),
+  environmentIntensity:dark?0:Math.max(.015,daylight*1.15+twilight*.09),
   settings:{...settings,solar}};
 }
 // Analytic all-sky HDR. Sun and Moon directions/phase are astronomical;

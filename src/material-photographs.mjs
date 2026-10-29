@@ -1,3 +1,4 @@
+import {trackSceneAsset} from './scene-loading.mjs';
 // Bitmap texture detail is integrated into the actual Three.js materials.
 // Nothing in this module alters survey geometry or source photographs.
 export const MATERIAL_ATLAS='/materials/interior-atlas-r22.png';
@@ -5,7 +6,7 @@ export const PHOTO_MATERIALS={stone:{cell:[0,0],repeat:.4},wood:{cell:[1,0],repe
 let atlas;
 const cache=new Map();
 function atlasImage(){
- if(!atlas)atlas=new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>reject(Error('Material atlas unavailable'));image.src=MATERIAL_ATLAS;});
+ if(!atlas)atlas=trackSceneAsset(new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>reject(Error('Material atlas unavailable'));image.src=MATERIAL_ATLAS;}));
  return atlas;
 }
 export function photographicSurfaceData(kind){
