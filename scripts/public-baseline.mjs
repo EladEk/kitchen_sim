@@ -12,6 +12,7 @@ import {COMMON_SPACES} from '../src/common-spaces.mjs';
 import {duplexForUnit} from '../src/building-duplexes.mjs';
 import {normalizeHomeSettings} from '../src/home-model.mjs';
 import {publicSiteData} from './public-site.mjs';
+import {unitDisplayPolygons,displayTriangles} from './public-display-polygons.mjs';
 
 export async function createPublicBaseline(directory){
  const resources=[],picks=[],root=new THREE.Group(),settings={...normalizeHomeSettings(),openDoors:[],openParts:[],closedBuildingDoors:[],cutaway:false,furniture:true,showLighting:true,buildingLevel:9,tourDestination:'unit:1:0'};
@@ -57,11 +58,12 @@ export async function createPublicBaseline(directory){
      if(!textureCache.has(fingerprint)){const compact=tex.clone();compact.image={data:bytes,width:size,height:size};compact.userData={};compact.name='';textureCache.set(fingerprint,compact);}
      mat[key]=textureCache.get(fingerprint);
     }}}});
- const floors=BUILDING_FLOORS.map(f=>({level:f.level,elevation:f.elevation,label:f.he,units:f.units.map(u=>({number:u.number,polygon:u.polygon})),core:f.core}));
+ const display=new Map(BUILDING_FLOORS.map(f=>[f.level,unitDisplayPolygons(f)]));
+ const floors=BUILDING_FLOORS.map(f=>({level:f.level,elevation:f.elevation,label:f.he,units:f.units.map(u=>({number:u.number,polygon:u.polygon,displayPolygons:display.get(f.level).get(u.number),displayTriangles:displayTriangles(display.get(f.level).get(u.number))})),core:f.core}));
  const destinations=[];
  for(const f of BUILDING_FLOORS)for(const u of f.units){const duplex=duplexForUnit(u.number,f.level);if(duplex&&f.level!==duplex.entryFloor)continue;const source=BUILDING_INTERIORS.floors[f.level],entry=source.entries.find(e=>e.unit===u.number),door=source.doors.find(d=>d.id===entry?.doorId);let position,yaw=0;if(u.number===4){position=[6.1,2.8];yaw=Math.PI;}else if(door){const normal=door.opened.map((n,i)=>(n-door.hinge[i])/(Math.hypot(...door.opened.map((x,k)=>x-door.hinge[k]))||1));position=door.hinge.map((n,i)=>(n+door.closed[i])/2+normal[i]*.85);yaw=Math.atan2(-normal[0],-normal[1]);}else{position=[...u.polygon[0]];}destinations.push({id:`unit:${u.number}:${f.level}`,label:`דירה ${u.number}`,floor:f.level,unit:u.number,position,yaw,polygon:u.polygon});}
  for(const c of COMMON_SPACES)destinations.push({id:c.id,label:c.he||c.nameHe||c.id,floor:0,position:c.walk,yaw:c.yaw||0,polygon:c.polygon});
- await mkdir(directory,{recursive:true});await writeFile(directory+'/building.json',JSON.stringify(root.toJSON()));await writeFile(directory+'/site.json',JSON.stringify(publicSiteData()));await writeFile(directory+'/navigation.json',JSON.stringify({revision:90,center:BUILDING_CENTER,storey:BUILDING.storey,floors,destinations}));
+ await mkdir(directory,{recursive:true});await writeFile(directory+'/building.json',JSON.stringify(root.toJSON()));await writeFile(directory+'/site.json',JSON.stringify(publicSiteData()));await writeFile(directory+'/navigation.json',JSON.stringify({revision:94,center:BUILDING_CENTER,storey:BUILDING.storey,floors,destinations}));
  console.log('Public baseline: 43 apartments; original unit-4 kitchen and standard garden; owner geometry excluded.');
  return {root,floors,destinations};
 }
