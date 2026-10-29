@@ -21,6 +21,7 @@ export function createDistrictSite(source){
    `);};m.customProgramCacheKey=()=> 'district-surface-r90-'+kind;
   }return m;
  }
+ const parkingPavers=material('#8b8b83','paving');
  const grass=material('#7f9565','grass'),asphalt=material('#454a4e','asphalt'),paving=material('#c9c6bb','paving'),stone=material('#d2c8b3','stone'),cap=material('#e0d9c9'),metal=material('#303c3c','plain',{roughness:.43,metalness:.52}),paint=material('#eee9d4'),blue=material('#407eae'),trunk=material('#766451'),leaf=material('#4e7148');
  function slab(poly,y,m){
   if(poly.length<3)return;const s=new THREE.Shape();poly.forEach(([x,z],i)=>i?s.lineTo(x,-z):s.moveTo(x,-z));s.closePath();const g=new THREE.ShapeGeometry(s);g.rotateX(-Math.PI/2);g.translate(0,y,0);if(!surfaces.has(m))surfaces.set(m,[]);surfaces.get(m).push(g);
@@ -30,8 +31,8 @@ export function createDistrictSite(source){
  const ext=layout.bounds;
  slab([[ext.west,ext.north],[ext.east,ext.north],[ext.east,ext.south],[ext.west,ext.south]],-.09,grass);
  for(const g of layout.gardens)slab(g.polygon,-.032,grass);
- for(const r of layout.roadSurfaces)slab(rectanglePolygon(r),-.04,asphalt);
- for(const p of layout.parking)slab(p.polygon,-.039,asphalt);
+ for(const r of layout.roadSurfaces)slab(rectanglePolygon(r),-.04,r.kind==='street'?asphalt:parkingPavers);
+ for(const p of layout.parking)slab(p.polygon,-.039,parkingPavers);
  for(const w of layout.sidewalks)slab(w.polygon,-.012,paving);
  for(const r of layout.islands){slab(rectanglePolygon(r),-.01,grass);const p=rectanglePolygon(r);p.forEach((a,i)=>line(a,p[(i+1)%4],.05,.12,.13,cap));}
  // Standard perimeter has a low masonry plinth and black vertical bars,
@@ -56,11 +57,11 @@ export function createDistrictSite(source){
  for(const z of [north,south])for(let x=west+9;x<east-8;x+=6)if(!layout.roads.some(r=>r.kind==='drive'&&contains(r,[x,z])))line([x,z],[x+2.7,z],-.021,.01,.11,paint);
  for(const c of layout.crossings)for(let n=-2.4;n<=2.4;n+=.8)box(c.x+(c.axis==='z'?n:0),-.018,c.z+(c.axis==='x'?n:0),c.axis==='x'?3.5:.45,.012,c.axis==='x'?.45:3.5,paint);
 
- // One small texture atlas supplies real source-plan numbers 1–45 and N1.
+ // One small texture atlas supplies real source-plan plot-1410 numbers 1–204 and N1–N5.
  if(typeof document!=='undefined'){
-  const canvas=document.createElement('canvas');canvas.width=512;canvas.height=384;const ctx=canvas.getContext('2d');
-  if(ctx){ctx.clearRect(0,0,512,384);ctx.fillStyle='#eee9d4';ctx.font='bold 43px Arial';ctx.textAlign='center';ctx.textBaseline='middle';const labels=[...Array.from({length:45},(_,i)=>String(i+1)),'N1'];labels.forEach((s,i)=>ctx.fillText(s,(i%8)*64+32,Math.floor(i/8)*64+32));const tex=new THREE.CanvasTexture(canvas);tex.colorSpace=THREE.SRGBColorSpace;textures.push(tex);const m=new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false});materials.push(m);const parts=[];
-   for(const b of layout.parking.filter(b=>b.traced)){const r=bounds(b.polygon),x=(r.minX+r.maxX)/2,z=(r.minZ+r.maxZ)/2,i=labels.indexOf(b.label),g=new THREE.PlaneGeometry(.8,.6),uv=g.attributes.uv;for(let j=0;j<uv.count;j++){uv.setXY(j,(i%8+uv.getX(j))/8,1-(Math.floor(i/8)+1-uv.getY(j))/6);}g.rotateX(-Math.PI/2);if(r.maxX-r.minX>r.maxZ-r.minZ)g.rotateY(Math.PI/2);g.translate(x,-.012,z);parts.push(g);}
+  const canvas=document.createElement('canvas');canvas.width=1024;canvas.height=896;const ctx=canvas.getContext('2d');
+  if(ctx){ctx.clearRect(0,0,1024,896);ctx.fillStyle='#eee9d4';ctx.font='bold 43px Arial';ctx.textAlign='center';ctx.textBaseline='middle';const labels=[...Array.from({length:204},(_,i)=>String(i+1)),'N1','N2','N3','N4','N5'];labels.forEach((s,i)=>ctx.fillText(s,(i%16)*64+32,Math.floor(i/16)*64+32));const tex=new THREE.CanvasTexture(canvas);tex.colorSpace=THREE.SRGBColorSpace;textures.push(tex);const m=new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false});materials.push(m);const parts=[];
+   for(const b of layout.parking.filter(b=>b.traced)){const r=bounds(b.polygon),x=(r.minX+r.maxX)/2,z=(r.minZ+r.maxZ)/2,i=labels.indexOf(b.label),g=new THREE.PlaneGeometry(.8,.6),uv=g.attributes.uv;for(let j=0;j<uv.count;j++){uv.setXY(j,(i%16+uv.getX(j))/16,1-(Math.floor(i/16)+1-uv.getY(j))/14);}g.rotateX(-Math.PI/2);if(r.maxX-r.minX>r.maxZ-r.minZ)g.rotateY(Math.PI/2);g.translate(x,-.012,z);parts.push(g);}
    const g=mergeGeometries(parts);parts.forEach(g=>g.dispose());geometries.push(g);group.add(new THREE.Mesh(g,m));
   }
  }

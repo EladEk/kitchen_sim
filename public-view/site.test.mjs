@@ -21,13 +21,14 @@ test('shared garden boundaries terminate at the facade and never cross apartment
  assert(source.fences.filter(f=>f.units.length===2).length>=2);
 });
 test('4102 keeps every source bay, number and all 13 tandem pairs without a separating aisle',()=>{
- const actual=layout.parking.filter(b=>b.traced);assert.equal(actual.length,46);assert.equal(actual.filter(b=>b.accessible).length,1);
+ const actual=layout.parking.filter(b=>b.traced);assert.equal(actual.length,209);assert.deepEqual(new Set(actual.map(b=>b.label)),new Set([...Array.from({length:204},(_,i)=>String(i+1)),'N1','N2','N3','N4','N5']));assert.equal(actual.filter(b=>b.accessible).length,5);
  for(const b of SITE_TRACE.parking){const p=actual.find(v=>v.label===b.label);assert(p);assert.deepEqual(p.polygon,b.polygon.map(v=>districtPoint(v,DISTRICT[0])));}
  for(let label=20;label<=44;label+=2){const a=bounds(actual.find(b=>b.label===String(label)).polygon),b=bounds(actual.find(b=>b.label===String(label+1)).polygon);assert(adjacent(a,b));assert(Math.abs(a.minX-b.maxX)<.0001);}
  assert(layout.parking.filter(b=>!b.traced).every(b=>b.label===undefined),'do not invent official numbers for reconstructed courts');
 });
 test('drives and bays avoid every private garden, and bays do not overlap a drive or each other',()=>{
  const gardens=layout.gardens.map(g=>bounds(g.plot));
+ for(const island of layout.islands){assert(!layout.parking.some(b=>intersects(island,bounds(b.polygon))));assert(!layout.roads.some(r=>intersects(island,r)));}
  for(const road of layout.roads)assert(!gardens.some(g=>intersects(road,g)),road.id);
  for(const [i,bay] of layout.parking.entries()){const r=bounds(bay.polygon);assert(!gardens.some(g=>intersects(r,g)),bay.id);assert(!layout.roads.some(l=>intersects(r,l)),bay.id);assert(!layout.parking.slice(i+1).some(b=>intersects(r,bounds(b.polygon))),bay.id);}
 });

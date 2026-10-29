@@ -1,3 +1,13 @@
+## REV 92 — חניות ופיתוח המתחם
+
+נבדקה תוכנית הפיתוח בעמוד 2 של תוכנית הבניין, מגרש1410, מול שתי הדמיות ההעמדה הרשמיות של אפי קפיטל. במודל המתחם כלולים כעת204 תאים ממוספרים ו־N1–N5 מאותו מגרש.46 התאים שברישום4102 נשמרו ללא שינוי; יתר התאים שוחזרו לפי קווי השרטוט והתוויות, בדיוק קצה משוער של כ־7 ס״מ. המספרים הם המספרים בשרטוט, ואינם קובעים הצמדה לדירה.
+
+נתיבי החניה, רחבות התמרון, איי הגינון והמשטחים המשותפים הושלמו. תאי החניה מרוצפים באבנים משתלבות, בנפרד מאספלט הרחוב. רצועות מדרכה אינן מכסות חניות או כניסות לחניון. גישה לכל תא נבדקת, לרבות החניות הטוריות. תאי הדמיה ללא גישה הוסרו.
+
+למגרשים1409/1346/1347 לא נמצאה תוכנית פיתוח מדודה נגישה בבדיקה זו. פריסתם היא שחזור לפי מודול1410 ושתי ההדמיות, ללא מספרי חניה או שיוך לדיירים. גם גובה המדרכות, הגינון ורוחב הכבישים החיצוניים הם המחשה. ההדמיה השנייה מכילה שגיאת כותרת4102 במקום4103; הזיהוי נשמר לפי ההדמיה הראשונה.
+
+תיקוןR91 לממשק מובייל כלול. חבילת המקור מלאה, והתוכניות וההדמיות המקוריות נותרות מוגנות באתר. `qa/development-review-r92.json` מתעד מקורות ומגבלות.
+
 ## REV 82 — Date/location based Sun and Moon sky
 
 Infinite equirectangular HDR sky shared by real-time, immersive WebXR and progressive photo rendering. Sun direction uses the existing NOAA calculation; Moon altitude, azimuth, illuminated fraction and bright-limb angle use SunCalc 2.1.1. Ofakim area coordinates 31.31 N / 34.62 E and the plan's 135° north bearing are approximate existing references, not surveyed GPS. Live mode follows Asia/Jerusalem with daylight saving time, updating each minute. Date/time inputs freeze the simulation to a chosen instant. Private lamp-only mode is preserved. Night skies, above-horizon Moon including in daylight, and its changing phase are supported. Atmospheric colours and stars are illustrative clear-sky artwork, not weather measurements or a star catalogue.

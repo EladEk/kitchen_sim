@@ -1,0 +1,32 @@
+{
+  "revision": 92,
+  "checked": "2026-10-29",
+  "plan": {
+    "file": "public/house/building-plan.pdf",
+    "page": 2,
+    "plot": 1410,
+    "numberedBays": 204,
+    "accessibleBays": [
+      "N1",
+      "N2",
+      "N3",
+      "N4",
+      "N5"
+    ],
+    "source4102BaysUnchanged": 46,
+    "edgeToleranceMetresApprox": 0.07,
+    "method": "Original PDF text labels with raster boundary picks, row pitch completion, and snapped common edges; source4102 vector polygons retained."
+  },
+  "officialWeb": [
+    "https://efficapital.co.il/Effi-Afikim/",
+    "https://efficapital.co.il/Effi-Afikim/wp-content/uploads/2024/06/104187-5_effi_hadmaya_c-1-1.pdf",
+    "https://efficapital.co.il/Effi-Afikim/wp-content/uploads/2024/08/104187-5_effi_hadmaya_c_press_-1.pdf"
+  ],
+  "limitations": [
+    "No accessible measured development plan found for1409/1346/1347; parking there is reconstructed, not numbered and not allocated.",
+    "External street dimensions, planting and kerb heights are illustrative.",
+    "Shared drive aisles and islands use simplified bounded extents trimmed around bays and private plots.",
+    "Do not infer parking ownership from the source-plan numbering.",
+    "Opposite-view August aerial incorrectly repeats4102 for4103; June IDs retained."
+  ]
+}

@@ -1,0 +1,4795 @@
+{
+  "revision": 92,
+  "source": {
+    "file": "public/house/building-plan.pdf",
+    "sha256": "17b91da71d113f1ef3f8bbb2fd9a472354c357c59ff0046422451a3857022f73",
+    "page": 2,
+    "plot": "1410",
+    "method": "Raster row boundaries and original vector text labels, registered to the existing 4102 control. Raster edge tolerance approx 0.07m. Aisle/landscape noses simplified to bounded rectangles."
+  },
+  "parking": [
+    {
+      "id": "plot1410-bay-46",
+      "label": "46",
+      "accessible": false,
+      "polygon": [
+        [
+          49.57451,
+          -21.45958
+        ],
+        [
+          49.57451,
+          -23.87435
+        ],
+        [
+          54.56719,
+          -23.87435
+        ],
+        [
+          54.56719,
+          -21.45958
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-47",
+      "label": "47",
+      "accessible": false,
+      "polygon": [
+        [
+          54.56719,
+          -21.45958
+        ],
+        [
+          54.56719,
+          -23.87435
+        ],
+        [
+          58.80934,
+          -23.87435
+        ],
+        [
+          58.80934,
+          -21.45958
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-48",
+      "label": "48",
+      "accessible": false,
+      "polygon": [
+        [
+          49.57451,
+          -19.04482
+        ],
+        [
+          49.57451,
+          -21.45958
+        ],
+        [
+          54.56719,
+          -21.45958
+        ],
+        [
+          54.56719,
+          -19.04482
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-49",
+      "label": "49",
+      "accessible": false,
+      "polygon": [
+        [
+          54.56719,
+          -19.04482
+        ],
+        [
+          54.56719,
+          -21.45958
+        ],
+        [
+          58.80934,
+          -21.45958
+        ],
+        [
+          58.80934,
+          -19.04482
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-50",
+      "label": "50",
+      "accessible": false,
+      "polygon": [
+        [
+          49.57451,
+          -16.66269
+        ],
+        [
+          49.57451,
+          -19.04482
+        ],
+        [
+          54.56719,
+          -19.04482
+        ],
+        [
+          54.56719,
+          -16.66269
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-51",
+      "label": "51",
+      "accessible": false,
+      "polygon": [
+        [
+          54.56719,
+          -16.66269
+        ],
+        [
+          54.56719,
+          -19.04482
+        ],
+        [
+          58.80934,
+          -19.04482
+        ],
+        [
+          58.80934,
+          -16.66269
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-52",
+      "label": "52",
+      "accessible": false,
+      "polygon": [
+        [
+          49.57451,
+          -14.28056
+        ],
+        [
+          49.57451,
+          -16.66269
+        ],
+        [
+          54.56719,
+          -16.66269
+        ],
+        [
+          54.56719,
+          -14.28056
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-53",
+      "label": "53",
+      "accessible": false,
+      "polygon": [
+        [
+          54.56719,
+          -14.28056
+        ],
+        [
+          54.56719,
+          -16.66269
+        ],
+        [
+          58.80934,
+          -16.66269
+        ],
+        [
+          58.80934,
+          -14.28056
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-54",
+      "label": "54",
+      "accessible": false,
+      "polygon": [
+        [
+          49.57451,
+          -11.86579
+        ],
+        [
+          49.57451,
+          -14.28056
+        ],
+        [
+          54.56719,
+          -14.28056
+        ],
+        [
+          54.56719,
+          -11.86579
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-55",
+      "label": "55",
+      "accessible": false,
+      "polygon": [
+        [
+          54.56719,
+          -11.86579
+        ],
+        [
+          54.56719,
+          -14.28056
+        ],
+        [
+          58.80934,
+          -14.28056
+        ],
+        [
+          58.80934,
+          -11.86579
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-56",
+      "label": "56",
+      "accessible": false,
+      "polygon": [
+        [
+          49.57451,
+          -9.45103
+        ],
+        [
+          49.57451,
+          -11.86579
+        ],
+        [
+          54.56719,
+          -11.86579
+        ],
+        [
+          54.56719,
+          -9.45103
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-57",
+      "label": "57",
+      "accessible": false,
+      "polygon": [
+        [
+          54.56719,
+          -9.45103
+        ],
+        [
+          54.56719,
+          -11.86579
+        ],
+        [
+          58.80934,
+          -11.86579
+        ],
+        [
+          58.80934,
+          -9.45103
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-58",
+      "label": "58",
+      "accessible": false,
+      "polygon": [
+        [
+          49.57451,
+          10.12814
+        ],
+        [
+          49.57451,
+          7.71337
+        ],
+        [
+          54.56719,
+          7.71337
+        ],
+        [
+          54.56719,
+          10.12814
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-59",
+      "label": "59",
+      "accessible": false,
+      "polygon": [
+        [
+          54.56719,
+          10.12814
+        ],
+        [
+          54.56719,
+          7.71337
+        ],
+        [
+          58.80934,
+          7.71337
+        ],
+        [
+          58.80934,
+          10.12814
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-60",
+      "label": "60",
+      "accessible": false,
+      "polygon": [
+        [
+          49.57451,
+          12.51027
+        ],
+        [
+          49.57451,
+          10.12814
+        ],
+        [
+          54.56719,
+          10.12814
+        ],
+        [
+          54.56719,
+          12.51027
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-61",
+      "label": "61",
+      "accessible": false,
+      "polygon": [
+        [
+          54.56719,
+          12.51027
+        ],
+        [
+          54.56719,
+          10.12814
+        ],
+        [
+          58.80934,
+          10.12814
+        ],
+        [
+          58.80934,
+          12.51027
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-62",
+      "label": "62",
+      "accessible": false,
+      "polygon": [
+        [
+          49.57451,
+          14.8924
+        ],
+        [
+          49.57451,
+          12.51027
+        ],
+        [
+          54.56719,
+          12.51027
+        ],
+        [
+          54.56719,
+          14.8924
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-63",
+      "label": "63",
+      "accessible": false,
+      "polygon": [
+        [
+          54.56719,
+          14.8924
+        ],
+        [
+          54.56719,
+          12.51027
+        ],
+        [
+          58.80934,
+          12.51027
+        ],
+        [
+          58.80934,
+          14.8924
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-64",
+      "label": "64",
+      "accessible": false,
+      "polygon": [
+        [
+          49.57451,
+          18.48192
+        ],
+        [
+          49.57451,
+          16.12448
+        ],
+        [
+          54.56719,
+          16.12448
+        ],
+        [
+          54.56719,
+          18.48192
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-65",
+      "label": "65",
+      "accessible": false,
+      "polygon": [
+        [
+          54.56719,
+          18.48192
+        ],
+        [
+          54.56719,
+          16.12448
+        ],
+        [
+          58.80934,
+          16.12448
+        ],
+        [
+          58.80934,
+          18.48192
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-66",
+      "label": "66",
+      "accessible": false,
+      "polygon": [
+        [
+          49.57451,
+          20.89668
+        ],
+        [
+          49.57451,
+          18.48192
+        ],
+        [
+          54.56719,
+          18.48192
+        ],
+        [
+          54.56719,
+          20.89668
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-67",
+      "label": "67",
+      "accessible": false,
+      "polygon": [
+        [
+          54.56719,
+          20.89668
+        ],
+        [
+          54.56719,
+          18.48192
+        ],
+        [
+          58.80934,
+          18.48192
+        ],
+        [
+          58.80934,
+          20.89668
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-68",
+      "label": "68",
+      "accessible": false,
+      "polygon": [
+        [
+          49.57451,
+          23.31144
+        ],
+        [
+          49.57451,
+          20.89668
+        ],
+        [
+          54.56719,
+          20.89668
+        ],
+        [
+          54.56719,
+          23.31144
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-69",
+      "label": "69",
+      "accessible": false,
+      "polygon": [
+        [
+          54.56719,
+          23.31144
+        ],
+        [
+          54.56719,
+          20.89668
+        ],
+        [
+          58.80934,
+          20.89668
+        ],
+        [
+          58.80934,
+          23.31144
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-70",
+      "label": "70",
+      "accessible": false,
+      "polygon": [
+        [
+          49.57451,
+          25.72621
+        ],
+        [
+          49.57451,
+          23.31144
+        ],
+        [
+          54.56719,
+          23.31144
+        ],
+        [
+          54.56719,
+          25.72621
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-71",
+      "label": "71",
+      "accessible": false,
+      "polygon": [
+        [
+          54.56719,
+          25.72621
+        ],
+        [
+          54.56719,
+          23.31144
+        ],
+        [
+          58.80934,
+          23.31144
+        ],
+        [
+          58.80934,
+          25.72621
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-72",
+      "label": "72",
+      "accessible": false,
+      "polygon": [
+        [
+          53.62087,
+          37.80003
+        ],
+        [
+          53.62087,
+          32.80734
+        ],
+        [
+          56.06826,
+          32.80734
+        ],
+        [
+          56.06826,
+          37.80003
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-73",
+      "label": "73",
+      "accessible": false,
+      "polygon": [
+        [
+          53.62087,
+          32.80734
+        ],
+        [
+          53.62087,
+          28.56519
+        ],
+        [
+          56.06826,
+          28.56519
+        ],
+        [
+          56.06826,
+          32.80734
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-74",
+      "label": "74",
+      "accessible": false,
+      "polygon": [
+        [
+          56.06826,
+          37.80003
+        ],
+        [
+          56.06826,
+          32.80734
+        ],
+        [
+          58.48302,
+          32.80734
+        ],
+        [
+          58.48302,
+          37.80003
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-75",
+      "label": "75",
+      "accessible": false,
+      "polygon": [
+        [
+          56.06826,
+          32.80734
+        ],
+        [
+          56.06826,
+          28.56519
+        ],
+        [
+          58.48302,
+          28.56519
+        ],
+        [
+          58.48302,
+          32.80734
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-76",
+      "label": "76",
+      "accessible": false,
+      "polygon": [
+        [
+          58.48302,
+          37.80003
+        ],
+        [
+          58.48302,
+          32.80734
+        ],
+        [
+          60.86516,
+          32.80734
+        ],
+        [
+          60.86516,
+          37.80003
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-77",
+      "label": "77",
+      "accessible": false,
+      "polygon": [
+        [
+          58.48302,
+          32.80734
+        ],
+        [
+          58.48302,
+          28.56519
+        ],
+        [
+          60.86516,
+          28.56519
+        ],
+        [
+          60.86516,
+          32.80734
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-78",
+      "label": "78",
+      "accessible": false,
+      "polygon": [
+        [
+          60.86516,
+          37.80003
+        ],
+        [
+          60.86516,
+          32.80734
+        ],
+        [
+          63.24729,
+          32.80734
+        ],
+        [
+          63.24729,
+          37.80003
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-79",
+      "label": "79",
+      "accessible": false,
+      "polygon": [
+        [
+          60.86516,
+          32.80734
+        ],
+        [
+          60.86516,
+          28.56519
+        ],
+        [
+          63.24729,
+          28.56519
+        ],
+        [
+          63.24729,
+          32.80734
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-80",
+      "label": "80",
+      "accessible": false,
+      "polygon": [
+        [
+          63.24729,
+          37.80003
+        ],
+        [
+          63.24729,
+          32.80734
+        ],
+        [
+          65.66205,
+          32.80734
+        ],
+        [
+          65.66205,
+          37.80003
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-81",
+      "label": "81",
+      "accessible": false,
+      "polygon": [
+        [
+          63.24729,
+          32.80734
+        ],
+        [
+          63.24729,
+          28.56519
+        ],
+        [
+          65.66205,
+          28.56519
+        ],
+        [
+          65.66205,
+          32.80734
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-82",
+      "label": "82",
+      "accessible": false,
+      "polygon": [
+        [
+          65.66205,
+          37.80003
+        ],
+        [
+          65.66205,
+          32.80734
+        ],
+        [
+          68.07682,
+          32.80734
+        ],
+        [
+          68.07682,
+          37.80003
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-83",
+      "label": "83",
+      "accessible": false,
+      "polygon": [
+        [
+          65.66205,
+          32.80734
+        ],
+        [
+          65.66205,
+          28.56519
+        ],
+        [
+          68.07682,
+          28.56519
+        ],
+        [
+          68.07682,
+          32.80734
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-84",
+      "label": "84",
+      "accessible": false,
+      "polygon": [
+        [
+          69.25157,
+          37.80003
+        ],
+        [
+          69.25157,
+          32.80734
+        ],
+        [
+          71.66633,
+          32.80734
+        ],
+        [
+          71.66633,
+          37.80003
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-85",
+      "label": "85",
+      "accessible": false,
+      "polygon": [
+        [
+          69.25157,
+          32.80734
+        ],
+        [
+          69.25157,
+          28.40203
+        ],
+        [
+          71.66633,
+          28.40203
+        ],
+        [
+          71.66633,
+          32.80734
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-86",
+      "label": "86",
+      "accessible": false,
+      "polygon": [
+        [
+          71.66633,
+          37.80003
+        ],
+        [
+          71.66633,
+          32.80734
+        ],
+        [
+          74.08109,
+          32.80734
+        ],
+        [
+          74.08109,
+          37.80003
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-87",
+      "label": "87",
+      "accessible": false,
+      "polygon": [
+        [
+          71.66633,
+          32.80734
+        ],
+        [
+          71.66633,
+          28.56519
+        ],
+        [
+          74.08109,
+          28.56519
+        ],
+        [
+          74.08109,
+          32.80734
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-88",
+      "label": "88",
+      "accessible": false,
+      "polygon": [
+        [
+          74.08109,
+          37.80003
+        ],
+        [
+          74.08109,
+          32.80734
+        ],
+        [
+          76.46322,
+          32.80734
+        ],
+        [
+          76.46322,
+          37.80003
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-89",
+      "label": "89",
+      "accessible": false,
+      "polygon": [
+        [
+          74.08109,
+          32.80734
+        ],
+        [
+          74.08109,
+          28.56519
+        ],
+        [
+          76.46322,
+          28.56519
+        ],
+        [
+          76.46322,
+          32.80734
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-90",
+      "label": "90",
+      "accessible": false,
+      "polygon": [
+        [
+          76.46322,
+          37.80003
+        ],
+        [
+          76.46322,
+          32.80734
+        ],
+        [
+          78.84536,
+          32.80734
+        ],
+        [
+          78.84536,
+          37.80003
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-91",
+      "label": "91",
+      "accessible": false,
+      "polygon": [
+        [
+          76.46322,
+          32.80734
+        ],
+        [
+          76.46322,
+          28.56519
+        ],
+        [
+          78.84536,
+          28.56519
+        ],
+        [
+          78.84536,
+          32.80734
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-92",
+      "label": "92",
+      "accessible": false,
+      "polygon": [
+        [
+          78.84536,
+          37.80003
+        ],
+        [
+          78.84536,
+          32.80734
+        ],
+        [
+          81.26012,
+          32.80734
+        ],
+        [
+          81.26012,
+          37.80003
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-93",
+      "label": "93",
+      "accessible": false,
+      "polygon": [
+        [
+          78.84536,
+          32.80734
+        ],
+        [
+          78.84536,
+          28.56519
+        ],
+        [
+          81.26012,
+          28.56519
+        ],
+        [
+          81.26012,
+          32.80734
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-94",
+      "label": "94",
+      "accessible": false,
+      "polygon": [
+        [
+          81.26012,
+          37.80003
+        ],
+        [
+          81.26012,
+          32.80734
+        ],
+        [
+          83.67489,
+          32.80734
+        ],
+        [
+          83.67489,
+          37.80003
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-95",
+      "label": "95",
+      "accessible": false,
+      "polygon": [
+        [
+          81.26012,
+          32.80734
+        ],
+        [
+          81.26012,
+          28.56519
+        ],
+        [
+          83.67489,
+          28.56519
+        ],
+        [
+          83.67489,
+          32.80734
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-96",
+      "label": "96",
+      "accessible": false,
+      "polygon": [
+        [
+          83.67489,
+          37.80003
+        ],
+        [
+          83.67489,
+          32.80734
+        ],
+        [
+          86.08965,
+          32.80734
+        ],
+        [
+          86.08965,
+          37.80003
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-97",
+      "label": "97",
+      "accessible": false,
+      "polygon": [
+        [
+          83.67489,
+          32.80734
+        ],
+        [
+          83.67489,
+          28.56519
+        ],
+        [
+          86.08965,
+          28.56519
+        ],
+        [
+          86.08965,
+          32.80734
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-98",
+      "label": "98",
+      "accessible": false,
+      "polygon": [
+        [
+          84.58109,
+          48.24225
+        ],
+        [
+          84.58109,
+          44.0001
+        ],
+        [
+          86.96321,
+          44.0001
+        ],
+        [
+          86.96321,
+          48.24225
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-99",
+      "label": "99",
+      "accessible": false,
+      "polygon": [
+        [
+          82.17382,
+          48.24225
+        ],
+        [
+          82.17382,
+          44.0001
+        ],
+        [
+          84.58109,
+          44.0001
+        ],
+        [
+          84.58109,
+          48.24225
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-100",
+      "label": "100",
+      "accessible": false,
+      "polygon": [
+        [
+          79.75905,
+          48.24225
+        ],
+        [
+          79.75905,
+          44.0001
+        ],
+        [
+          82.17382,
+          44.0001
+        ],
+        [
+          82.17382,
+          48.24225
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-101",
+      "label": "101",
+      "accessible": false,
+      "polygon": [
+        [
+          77.35179,
+          48.24225
+        ],
+        [
+          77.35179,
+          44.0001
+        ],
+        [
+          79.75905,
+          44.0001
+        ],
+        [
+          79.75905,
+          48.24225
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-102",
+      "label": "102",
+      "accessible": false,
+      "polygon": [
+        [
+          74.97304,
+          48.24225
+        ],
+        [
+          74.97304,
+          44.0001
+        ],
+        [
+          77.35179,
+          44.0001
+        ],
+        [
+          77.35179,
+          48.24225
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-103",
+      "label": "103",
+      "accessible": false,
+      "polygon": [
+        [
+          71.37264,
+          48.24225
+        ],
+        [
+          71.37264,
+          44.0001
+        ],
+        [
+          73.75477,
+          44.0001
+        ],
+        [
+          73.75477,
+          48.24225
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-104",
+      "label": "104",
+      "accessible": false,
+      "polygon": [
+        [
+          68.99051,
+          48.24225
+        ],
+        [
+          68.99051,
+          44.0001
+        ],
+        [
+          71.37264,
+          44.0001
+        ],
+        [
+          71.37264,
+          48.24225
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-105",
+      "label": "105",
+      "accessible": false,
+      "polygon": [
+        [
+          66.57575,
+          48.24225
+        ],
+        [
+          66.57575,
+          44.0001
+        ],
+        [
+          68.99051,
+          44.0001
+        ],
+        [
+          68.99051,
+          48.24225
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-106",
+      "label": "106",
+      "accessible": false,
+      "polygon": [
+        [
+          64.16098,
+          48.24225
+        ],
+        [
+          64.16098,
+          44.0001
+        ],
+        [
+          66.57575,
+          44.0001
+        ],
+        [
+          66.57575,
+          48.24225
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-107",
+      "label": "107",
+      "accessible": false,
+      "polygon": [
+        [
+          61.74622,
+          48.24225
+        ],
+        [
+          61.74622,
+          44.0001
+        ],
+        [
+          64.16098,
+          44.0001
+        ],
+        [
+          64.16098,
+          48.24225
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-108",
+      "label": "108",
+      "accessible": false,
+      "polygon": [
+        [
+          58.15671,
+          48.24225
+        ],
+        [
+          58.15671,
+          44.0001
+        ],
+        [
+          60.57147,
+          44.0001
+        ],
+        [
+          60.57147,
+          48.24225
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-109",
+      "label": "109",
+      "accessible": false,
+      "polygon": [
+        [
+          55.74194,
+          48.24225
+        ],
+        [
+          55.74194,
+          44.0001
+        ],
+        [
+          58.15671,
+          44.0001
+        ],
+        [
+          58.15671,
+          48.24225
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-110",
+      "label": "110",
+      "accessible": false,
+      "polygon": [
+        [
+          53.35981,
+          48.24225
+        ],
+        [
+          53.35981,
+          44.0001
+        ],
+        [
+          55.74194,
+          44.0001
+        ],
+        [
+          55.74194,
+          48.24225
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-111",
+      "label": "111",
+      "accessible": false,
+      "polygon": [
+        [
+          50.97768,
+          48.24225
+        ],
+        [
+          50.97768,
+          44.0001
+        ],
+        [
+          53.35981,
+          44.0001
+        ],
+        [
+          53.35981,
+          48.24225
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-112",
+      "label": "112",
+      "accessible": false,
+      "polygon": [
+        [
+          50.97768,
+          53.98547
+        ],
+        [
+          50.97768,
+          49.74332
+        ],
+        [
+          53.35981,
+          49.74332
+        ],
+        [
+          53.35981,
+          53.98547
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-113",
+      "label": "113",
+      "accessible": false,
+      "polygon": [
+        [
+          53.35981,
+          53.98547
+        ],
+        [
+          53.35981,
+          49.74332
+        ],
+        [
+          55.74194,
+          49.74332
+        ],
+        [
+          55.74194,
+          53.98547
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-114",
+      "label": "114",
+      "accessible": false,
+      "polygon": [
+        [
+          55.74194,
+          53.98547
+        ],
+        [
+          55.74194,
+          49.74332
+        ],
+        [
+          58.15671,
+          49.74332
+        ],
+        [
+          58.15671,
+          53.98547
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-115",
+      "label": "115",
+      "accessible": false,
+      "polygon": [
+        [
+          58.15671,
+          53.98547
+        ],
+        [
+          58.15671,
+          49.74332
+        ],
+        [
+          60.57147,
+          49.74332
+        ],
+        [
+          60.57147,
+          53.98547
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-116",
+      "label": "116",
+      "accessible": false,
+      "polygon": [
+        [
+          61.74622,
+          53.98547
+        ],
+        [
+          61.74622,
+          49.74332
+        ],
+        [
+          64.16098,
+          49.74332
+        ],
+        [
+          64.16098,
+          53.98547
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-117",
+      "label": "117",
+      "accessible": false,
+      "polygon": [
+        [
+          64.16098,
+          53.98547
+        ],
+        [
+          64.16098,
+          49.74332
+        ],
+        [
+          66.57575,
+          49.74332
+        ],
+        [
+          66.57575,
+          53.98547
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-118",
+      "label": "118",
+      "accessible": false,
+      "polygon": [
+        [
+          66.57575,
+          53.98547
+        ],
+        [
+          66.57575,
+          49.74332
+        ],
+        [
+          68.99051,
+          49.74332
+        ],
+        [
+          68.99051,
+          53.98547
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-119",
+      "label": "119",
+      "accessible": false,
+      "polygon": [
+        [
+          68.99051,
+          53.98547
+        ],
+        [
+          68.99051,
+          49.74332
+        ],
+        [
+          71.37264,
+          49.74332
+        ],
+        [
+          71.37264,
+          53.98547
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-120",
+      "label": "120",
+      "accessible": false,
+      "polygon": [
+        [
+          71.37264,
+          53.98547
+        ],
+        [
+          71.37264,
+          49.74332
+        ],
+        [
+          73.75477,
+          49.74332
+        ],
+        [
+          73.75477,
+          53.98547
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-121",
+      "label": "121",
+      "accessible": false,
+      "polygon": [
+        [
+          74.97304,
+          53.98547
+        ],
+        [
+          74.97304,
+          49.74332
+        ],
+        [
+          77.35179,
+          49.74332
+        ],
+        [
+          77.35179,
+          53.98547
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-122",
+      "label": "122",
+      "accessible": false,
+      "polygon": [
+        [
+          77.35179,
+          53.98547
+        ],
+        [
+          77.35179,
+          49.74332
+        ],
+        [
+          79.75905,
+          49.74332
+        ],
+        [
+          79.75905,
+          53.98547
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-123",
+      "label": "123",
+      "accessible": false,
+      "polygon": [
+        [
+          79.75905,
+          53.98547
+        ],
+        [
+          79.75905,
+          49.74332
+        ],
+        [
+          82.17382,
+          49.74332
+        ],
+        [
+          82.17382,
+          53.98547
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-124",
+      "label": "124",
+      "accessible": false,
+      "polygon": [
+        [
+          82.17382,
+          53.98547
+        ],
+        [
+          82.17382,
+          49.74332
+        ],
+        [
+          84.58109,
+          49.74332
+        ],
+        [
+          84.58109,
+          53.98547
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-125",
+      "label": "125",
+      "accessible": false,
+      "polygon": [
+        [
+          84.58109,
+          53.98547
+        ],
+        [
+          84.58109,
+          49.74332
+        ],
+        [
+          86.96321,
+          49.74332
+        ],
+        [
+          86.96321,
+          53.98547
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-126",
+      "label": "126",
+      "accessible": false,
+      "polygon": [
+        [
+          84.58109,
+          65.21086
+        ],
+        [
+          84.58109,
+          60.21818
+        ],
+        [
+          86.96321,
+          60.21818
+        ],
+        [
+          86.96321,
+          65.21086
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-127",
+      "label": "127",
+      "accessible": false,
+      "polygon": [
+        [
+          84.58109,
+          70.23618
+        ],
+        [
+          84.58109,
+          65.21086
+        ],
+        [
+          86.96321,
+          65.21086
+        ],
+        [
+          86.96321,
+          70.23618
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-128",
+      "label": "128",
+      "accessible": false,
+      "polygon": [
+        [
+          82.17382,
+          65.21086
+        ],
+        [
+          82.17382,
+          60.21818
+        ],
+        [
+          84.58109,
+          60.21818
+        ],
+        [
+          84.58109,
+          65.21086
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-129",
+      "label": "129",
+      "accessible": false,
+      "polygon": [
+        [
+          82.17382,
+          70.23618
+        ],
+        [
+          82.17382,
+          65.21086
+        ],
+        [
+          84.58109,
+          65.21086
+        ],
+        [
+          84.58109,
+          70.23618
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-130",
+      "label": "130",
+      "accessible": false,
+      "polygon": [
+        [
+          79.75905,
+          65.21086
+        ],
+        [
+          79.75905,
+          60.21818
+        ],
+        [
+          82.17382,
+          60.21818
+        ],
+        [
+          82.17382,
+          65.21086
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-131",
+      "label": "131",
+      "accessible": false,
+      "polygon": [
+        [
+          79.75905,
+          69.45301
+        ],
+        [
+          79.75905,
+          65.21086
+        ],
+        [
+          82.17382,
+          65.21086
+        ],
+        [
+          82.17382,
+          69.45301
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-132",
+      "label": "132",
+      "accessible": false,
+      "polygon": [
+        [
+          77.35179,
+          65.21086
+        ],
+        [
+          77.35179,
+          60.21818
+        ],
+        [
+          79.75905,
+          60.21818
+        ],
+        [
+          79.75905,
+          65.21086
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-133",
+      "label": "133",
+      "accessible": false,
+      "polygon": [
+        [
+          77.35179,
+          69.45301
+        ],
+        [
+          77.35179,
+          65.21086
+        ],
+        [
+          79.75905,
+          65.21086
+        ],
+        [
+          79.75905,
+          69.45301
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-134",
+      "label": "134",
+      "accessible": false,
+      "polygon": [
+        [
+          74.97304,
+          65.21086
+        ],
+        [
+          74.97304,
+          60.21818
+        ],
+        [
+          77.35179,
+          60.21818
+        ],
+        [
+          77.35179,
+          65.21086
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-135",
+      "label": "135",
+      "accessible": false,
+      "polygon": [
+        [
+          74.97304,
+          69.45301
+        ],
+        [
+          74.97304,
+          65.21086
+        ],
+        [
+          77.35179,
+          65.21086
+        ],
+        [
+          77.35179,
+          69.45301
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-136",
+      "label": "136",
+      "accessible": false,
+      "polygon": [
+        [
+          72.57252,
+          65.21086
+        ],
+        [
+          72.57252,
+          60.21818
+        ],
+        [
+          74.97304,
+          60.21818
+        ],
+        [
+          74.97304,
+          65.21086
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-137",
+      "label": "137",
+      "accessible": false,
+      "polygon": [
+        [
+          72.57252,
+          69.45301
+        ],
+        [
+          72.57252,
+          65.21086
+        ],
+        [
+          74.97304,
+          65.21086
+        ],
+        [
+          74.97304,
+          69.45301
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-138",
+      "label": "138",
+      "accessible": false,
+      "polygon": [
+        [
+          70.16526,
+          65.21086
+        ],
+        [
+          70.16526,
+          60.21818
+        ],
+        [
+          72.57252,
+          60.21818
+        ],
+        [
+          72.57252,
+          65.21086
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-139",
+      "label": "139",
+      "accessible": false,
+      "polygon": [
+        [
+          70.16526,
+          69.45301
+        ],
+        [
+          70.16526,
+          65.21086
+        ],
+        [
+          72.57252,
+          65.21086
+        ],
+        [
+          72.57252,
+          69.45301
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-140",
+      "label": "140",
+      "accessible": false,
+      "polygon": [
+        [
+          67.7505,
+          65.21086
+        ],
+        [
+          67.7505,
+          60.21818
+        ],
+        [
+          70.16526,
+          60.21818
+        ],
+        [
+          70.16526,
+          65.21086
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-141",
+      "label": "141",
+      "accessible": false,
+      "polygon": [
+        [
+          67.7505,
+          69.45301
+        ],
+        [
+          67.7505,
+          65.21086
+        ],
+        [
+          70.16526,
+          65.21086
+        ],
+        [
+          70.16526,
+          69.45301
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-142",
+      "label": "142",
+      "accessible": false,
+      "polygon": [
+        [
+          64.16098,
+          65.21086
+        ],
+        [
+          64.16098,
+          60.21818
+        ],
+        [
+          66.57575,
+          60.21818
+        ],
+        [
+          66.57575,
+          65.21086
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-143",
+      "label": "143",
+      "accessible": false,
+      "polygon": [
+        [
+          64.16098,
+          69.45301
+        ],
+        [
+          64.16098,
+          65.21086
+        ],
+        [
+          66.57575,
+          65.21086
+        ],
+        [
+          66.57575,
+          69.45301
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-144",
+      "label": "144",
+      "accessible": false,
+      "polygon": [
+        [
+          61.74622,
+          65.21086
+        ],
+        [
+          61.74622,
+          60.21818
+        ],
+        [
+          64.16098,
+          60.21818
+        ],
+        [
+          64.16098,
+          65.21086
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-145",
+      "label": "145",
+      "accessible": false,
+      "polygon": [
+        [
+          61.74622,
+          69.45301
+        ],
+        [
+          61.74622,
+          65.21086
+        ],
+        [
+          64.16098,
+          65.21086
+        ],
+        [
+          64.16098,
+          69.45301
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-146",
+      "label": "146",
+      "accessible": false,
+      "polygon": [
+        [
+          59.36409,
+          65.21086
+        ],
+        [
+          59.36409,
+          60.21818
+        ],
+        [
+          61.74622,
+          60.21818
+        ],
+        [
+          61.74622,
+          65.21086
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-147",
+      "label": "147",
+      "accessible": false,
+      "polygon": [
+        [
+          59.36409,
+          69.45301
+        ],
+        [
+          59.36409,
+          65.21086
+        ],
+        [
+          61.74622,
+          65.21086
+        ],
+        [
+          61.74622,
+          69.45301
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-148",
+      "label": "148",
+      "accessible": false,
+      "polygon": [
+        [
+          56.98196,
+          65.21086
+        ],
+        [
+          56.98196,
+          60.21818
+        ],
+        [
+          59.36409,
+          60.21818
+        ],
+        [
+          59.36409,
+          65.21086
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-149",
+      "label": "149",
+      "accessible": false,
+      "polygon": [
+        [
+          56.98196,
+          69.45301
+        ],
+        [
+          56.98196,
+          65.21086
+        ],
+        [
+          59.36409,
+          65.21086
+        ],
+        [
+          59.36409,
+          69.45301
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-150",
+      "label": "150",
+      "accessible": false,
+      "polygon": [
+        [
+          54.56719,
+          65.21086
+        ],
+        [
+          54.56719,
+          60.21818
+        ],
+        [
+          56.98196,
+          60.21818
+        ],
+        [
+          56.98196,
+          65.21086
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-151",
+      "label": "151",
+      "accessible": false,
+      "polygon": [
+        [
+          54.56719,
+          69.45301
+        ],
+        [
+          54.56719,
+          65.21086
+        ],
+        [
+          56.98196,
+          65.21086
+        ],
+        [
+          56.98196,
+          69.45301
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-152",
+      "label": "152",
+      "accessible": false,
+      "polygon": [
+        [
+          50.97768,
+          65.21086
+        ],
+        [
+          50.97768,
+          60.21818
+        ],
+        [
+          53.35981,
+          60.21818
+        ],
+        [
+          53.35981,
+          65.21086
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-153",
+      "label": "153",
+      "accessible": false,
+      "polygon": [
+        [
+          50.97768,
+          69.45301
+        ],
+        [
+          50.97768,
+          65.21086
+        ],
+        [
+          53.35981,
+          65.21086
+        ],
+        [
+          53.35981,
+          69.45301
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-154",
+      "label": "154",
+      "accessible": false,
+      "polygon": [
+        [
+          48.56291,
+          65.21086
+        ],
+        [
+          48.56291,
+          60.21818
+        ],
+        [
+          50.97768,
+          60.21818
+        ],
+        [
+          50.97768,
+          65.21086
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-155",
+      "label": "155",
+      "accessible": false,
+      "polygon": [
+        [
+          48.56291,
+          69.45301
+        ],
+        [
+          48.56291,
+          65.21086
+        ],
+        [
+          50.97768,
+          65.21086
+        ],
+        [
+          50.97768,
+          69.45301
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-156",
+      "label": "156",
+      "accessible": false,
+      "polygon": [
+        [
+          46.14815,
+          65.21086
+        ],
+        [
+          46.14815,
+          60.21818
+        ],
+        [
+          48.56291,
+          60.21818
+        ],
+        [
+          48.56291,
+          65.21086
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-157",
+      "label": "157",
+      "accessible": false,
+      "polygon": [
+        [
+          46.14815,
+          69.45301
+        ],
+        [
+          46.14815,
+          65.21086
+        ],
+        [
+          48.56291,
+          65.21086
+        ],
+        [
+          48.56291,
+          69.45301
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-158",
+      "label": "158",
+      "accessible": false,
+      "polygon": [
+        [
+          43.76602,
+          65.21086
+        ],
+        [
+          43.76602,
+          60.21818
+        ],
+        [
+          46.14815,
+          60.21818
+        ],
+        [
+          46.14815,
+          65.21086
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-159",
+      "label": "159",
+      "accessible": false,
+      "polygon": [
+        [
+          43.76602,
+          69.45301
+        ],
+        [
+          43.76602,
+          65.21086
+        ],
+        [
+          46.14815,
+          65.21086
+        ],
+        [
+          46.14815,
+          69.45301
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-160",
+      "label": "160",
+      "accessible": false,
+      "polygon": [
+        [
+          41.38389,
+          65.21086
+        ],
+        [
+          41.38389,
+          60.21818
+        ],
+        [
+          43.76602,
+          60.21818
+        ],
+        [
+          43.76602,
+          65.21086
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-161",
+      "label": "161",
+      "accessible": false,
+      "polygon": [
+        [
+          41.38389,
+          69.45301
+        ],
+        [
+          41.38389,
+          65.21086
+        ],
+        [
+          43.76602,
+          65.21086
+        ],
+        [
+          43.76602,
+          69.45301
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-162",
+      "label": "162",
+      "accessible": false,
+      "polygon": [
+        [
+          37.79437,
+          65.21086
+        ],
+        [
+          37.79437,
+          60.21818
+        ],
+        [
+          40.14387,
+          60.21818
+        ],
+        [
+          40.14387,
+          65.21086
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-163",
+      "label": "163",
+      "accessible": false,
+      "polygon": [
+        [
+          37.79437,
+          69.45301
+        ],
+        [
+          37.79437,
+          65.21086
+        ],
+        [
+          40.14387,
+          65.21086
+        ],
+        [
+          40.14387,
+          69.45301
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-164",
+      "label": "164",
+      "accessible": false,
+      "polygon": [
+        [
+          35.37961,
+          65.21086
+        ],
+        [
+          35.37961,
+          60.21818
+        ],
+        [
+          37.79437,
+          60.21818
+        ],
+        [
+          37.79437,
+          65.21086
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-165",
+      "label": "165",
+      "accessible": false,
+      "polygon": [
+        [
+          35.37961,
+          69.45301
+        ],
+        [
+          35.37961,
+          65.21086
+        ],
+        [
+          37.79437,
+          65.21086
+        ],
+        [
+          37.79437,
+          69.45301
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-166",
+      "label": "166",
+      "accessible": false,
+      "polygon": [
+        [
+          32.96484,
+          65.21086
+        ],
+        [
+          32.96484,
+          60.21818
+        ],
+        [
+          35.37961,
+          60.21818
+        ],
+        [
+          35.37961,
+          65.21086
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-167",
+      "label": "167",
+      "accessible": false,
+      "polygon": [
+        [
+          32.96484,
+          69.45301
+        ],
+        [
+          32.96484,
+          65.21086
+        ],
+        [
+          35.37961,
+          65.21086
+        ],
+        [
+          35.37961,
+          69.45301
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-168",
+      "label": "168",
+      "accessible": false,
+      "polygon": [
+        [
+          30.55757,
+          65.21086
+        ],
+        [
+          30.55757,
+          60.21818
+        ],
+        [
+          32.96484,
+          60.21818
+        ],
+        [
+          32.96484,
+          65.21086
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-169",
+      "label": "169",
+      "accessible": false,
+      "polygon": [
+        [
+          30.55757,
+          69.45301
+        ],
+        [
+          30.55757,
+          65.21086
+        ],
+        [
+          32.96484,
+          65.21086
+        ],
+        [
+          32.96484,
+          69.45301
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-170",
+      "label": "170",
+      "accessible": false,
+      "polygon": [
+        [
+          28.15031,
+          65.21086
+        ],
+        [
+          28.15031,
+          60.21818
+        ],
+        [
+          30.55757,
+          60.21818
+        ],
+        [
+          30.55757,
+          65.21086
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-171",
+      "label": "171",
+      "accessible": false,
+      "polygon": [
+        [
+          28.15031,
+          69.45301
+        ],
+        [
+          28.15031,
+          65.21086
+        ],
+        [
+          30.55757,
+          65.21086
+        ],
+        [
+          30.55757,
+          69.45301
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-172",
+      "label": "172",
+      "accessible": false,
+      "polygon": [
+        [
+          35.90172,
+          53.98547
+        ],
+        [
+          35.90172,
+          49.74332
+        ],
+        [
+          38.40115,
+          49.74332
+        ],
+        [
+          38.40115,
+          53.98547
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-173",
+      "label": "173",
+      "accessible": false,
+      "polygon": [
+        [
+          33.48696,
+          53.98547
+        ],
+        [
+          33.48696,
+          49.74332
+        ],
+        [
+          35.90172,
+          49.74332
+        ],
+        [
+          35.90172,
+          53.98547
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-174",
+      "label": "174",
+      "accessible": false,
+      "polygon": [
+        [
+          31.13746,
+          53.98547
+        ],
+        [
+          31.13746,
+          49.74332
+        ],
+        [
+          33.48696,
+          49.74332
+        ],
+        [
+          33.48696,
+          53.98547
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-175",
+      "label": "175",
+      "accessible": false,
+      "polygon": [
+        [
+          28.72269,
+          53.98547
+        ],
+        [
+          28.72269,
+          49.74332
+        ],
+        [
+          31.13746,
+          49.74332
+        ],
+        [
+          31.13746,
+          53.98547
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-176",
+      "label": "176",
+      "accessible": false,
+      "polygon": [
+        [
+          38.40115,
+          49.02542
+        ],
+        [
+          38.40115,
+          44.0001
+        ],
+        [
+          40.73125,
+          44.0001
+        ],
+        [
+          40.73125,
+          49.02542
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-177",
+      "label": "177",
+      "accessible": false,
+      "polygon": [
+        [
+          35.90172,
+          48.24225
+        ],
+        [
+          35.90172,
+          44.0001
+        ],
+        [
+          38.40115,
+          44.0001
+        ],
+        [
+          38.40115,
+          48.24225
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-178",
+      "label": "178",
+      "accessible": false,
+      "polygon": [
+        [
+          33.48696,
+          48.24225
+        ],
+        [
+          33.48696,
+          44.0001
+        ],
+        [
+          35.90172,
+          44.0001
+        ],
+        [
+          35.90172,
+          48.24225
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-179",
+      "label": "179",
+      "accessible": false,
+      "polygon": [
+        [
+          31.13746,
+          48.24225
+        ],
+        [
+          31.13746,
+          44.0001
+        ],
+        [
+          33.48696,
+          44.0001
+        ],
+        [
+          33.48696,
+          48.24225
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-180",
+      "label": "180",
+      "accessible": false,
+      "polygon": [
+        [
+          28.72269,
+          48.24225
+        ],
+        [
+          28.72269,
+          44.0001
+        ],
+        [
+          31.13746,
+          44.0001
+        ],
+        [
+          31.13746,
+          48.24225
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-181",
+      "label": "181",
+      "accessible": false,
+      "polygon": [
+        [
+          28.85322,
+          37.80003
+        ],
+        [
+          28.85322,
+          33.55787
+        ],
+        [
+          31.26798,
+          33.55787
+        ],
+        [
+          31.26798,
+          37.80003
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-182",
+      "label": "182",
+      "accessible": false,
+      "polygon": [
+        [
+          31.26798,
+          37.80003
+        ],
+        [
+          31.26798,
+          33.55787
+        ],
+        [
+          33.68275,
+          33.55787
+        ],
+        [
+          33.68275,
+          37.80003
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-183",
+      "label": "183",
+      "accessible": false,
+      "polygon": [
+        [
+          33.68275,
+          37.80003
+        ],
+        [
+          33.68275,
+          33.55787
+        ],
+        [
+          36.09751,
+          33.55787
+        ],
+        [
+          36.09751,
+          37.80003
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-184",
+      "label": "184",
+      "accessible": false,
+      "polygon": [
+        [
+          36.09751,
+          37.80003
+        ],
+        [
+          36.09751,
+          33.55787
+        ],
+        [
+          38.40115,
+          33.55787
+        ],
+        [
+          38.40115,
+          37.80003
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-185",
+      "label": "185",
+      "accessible": false,
+      "polygon": [
+        [
+          38.40115,
+          37.80003
+        ],
+        [
+          38.40115,
+          32.80734
+        ],
+        [
+          40.86177,
+          32.80734
+        ],
+        [
+          40.86177,
+          37.80003
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-186",
+      "label": "186",
+      "accessible": false,
+      "polygon": [
+        [
+          36.09751,
+          32.05681
+        ],
+        [
+          36.09751,
+          27.81465
+        ],
+        [
+          38.40115,
+          27.81465
+        ],
+        [
+          38.40115,
+          32.05681
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-187",
+      "label": "187",
+      "accessible": false,
+      "polygon": [
+        [
+          33.68275,
+          32.05681
+        ],
+        [
+          33.68275,
+          27.81465
+        ],
+        [
+          36.09751,
+          27.81465
+        ],
+        [
+          36.09751,
+          32.05681
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-188",
+      "label": "188",
+      "accessible": false,
+      "polygon": [
+        [
+          31.26798,
+          32.05681
+        ],
+        [
+          31.26798,
+          27.81465
+        ],
+        [
+          33.68275,
+          27.81465
+        ],
+        [
+          33.68275,
+          32.05681
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-189",
+      "label": "189",
+      "accessible": false,
+      "polygon": [
+        [
+          28.85322,
+          32.05681
+        ],
+        [
+          28.85322,
+          27.81465
+        ],
+        [
+          31.26798,
+          27.81465
+        ],
+        [
+          31.26798,
+          32.05681
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": true
+    },
+    {
+      "id": "plot1410-bay-190",
+      "label": "190",
+      "accessible": false,
+      "polygon": [
+        [
+          25.32897,
+          30.88206
+        ],
+        [
+          25.32897,
+          26.6399
+        ],
+        [
+          27.74373,
+          26.6399
+        ],
+        [
+          27.74373,
+          30.88206
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": false
+    },
+    {
+      "id": "plot1410-bay-191",
+      "label": "191",
+      "accessible": false,
+      "polygon": [
+        [
+          22.91421,
+          30.88206
+        ],
+        [
+          22.91421,
+          26.6399
+        ],
+        [
+          25.32897,
+          26.6399
+        ],
+        [
+          25.32897,
+          30.88206
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": false
+    },
+    {
+      "id": "plot1410-bay-192",
+      "label": "192",
+      "accessible": false,
+      "polygon": [
+        [
+          20.49944,
+          30.88206
+        ],
+        [
+          20.49944,
+          26.6399
+        ],
+        [
+          22.91421,
+          26.6399
+        ],
+        [
+          22.91421,
+          30.88206
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": false
+    },
+    {
+      "id": "plot1410-bay-193",
+      "label": "193",
+      "accessible": false,
+      "polygon": [
+        [
+          18.11731,
+          30.88206
+        ],
+        [
+          18.11731,
+          26.6399
+        ],
+        [
+          20.49944,
+          26.6399
+        ],
+        [
+          20.49944,
+          30.88206
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": false
+    },
+    {
+      "id": "plot1410-bay-194",
+      "label": "194",
+      "accessible": false,
+      "polygon": [
+        [
+          15.73518,
+          30.88206
+        ],
+        [
+          15.73518,
+          26.6399
+        ],
+        [
+          18.11731,
+          26.6399
+        ],
+        [
+          18.11731,
+          30.88206
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": false
+    },
+    {
+      "id": "plot1410-bay-195",
+      "label": "195",
+      "accessible": false,
+      "polygon": [
+        [
+          12.14566,
+          30.88206
+        ],
+        [
+          12.14566,
+          26.6399
+        ],
+        [
+          14.49516,
+          26.6399
+        ],
+        [
+          14.49516,
+          30.88206
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": false
+    },
+    {
+      "id": "plot1410-bay-196",
+      "label": "196",
+      "accessible": false,
+      "polygon": [
+        [
+          9.76309,
+          30.88206
+        ],
+        [
+          9.76309,
+          26.6399
+        ],
+        [
+          12.14566,
+          26.6399
+        ],
+        [
+          12.14566,
+          30.88206
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": false
+    },
+    {
+      "id": "plot1410-bay-197",
+      "label": "197",
+      "accessible": false,
+      "polygon": [
+        [
+          0.98554,
+          30.88206
+        ],
+        [
+          0.98554,
+          26.6399
+        ],
+        [
+          3.4003,
+          26.6399
+        ],
+        [
+          3.4003,
+          30.88206
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": false
+    },
+    {
+      "id": "plot1410-bay-198",
+      "label": "198",
+      "accessible": false,
+      "polygon": [
+        [
+          -1.36396,
+          30.88206
+        ],
+        [
+          -1.36396,
+          26.6399
+        ],
+        [
+          0.98554,
+          26.6399
+        ],
+        [
+          0.98554,
+          30.88206
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": false
+    },
+    {
+      "id": "plot1410-bay-199",
+      "label": "199",
+      "accessible": false,
+      "polygon": [
+        [
+          -3.77873,
+          30.88206
+        ],
+        [
+          -3.77873,
+          26.6399
+        ],
+        [
+          -1.36396,
+          26.6399
+        ],
+        [
+          -1.36396,
+          30.88206
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": false
+    },
+    {
+      "id": "plot1410-bay-200",
+      "label": "200",
+      "accessible": false,
+      "polygon": [
+        [
+          -6.19349,
+          30.88206
+        ],
+        [
+          -6.19349,
+          26.6399
+        ],
+        [
+          -3.77873,
+          26.6399
+        ],
+        [
+          -3.77873,
+          30.88206
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": false
+    },
+    {
+      "id": "plot1410-bay-201",
+      "label": "201",
+      "accessible": false,
+      "polygon": [
+        [
+          -9.783,
+          30.88206
+        ],
+        [
+          -9.783,
+          26.6399
+        ],
+        [
+          -7.36824,
+          26.6399
+        ],
+        [
+          -7.36824,
+          30.88206
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": false
+    },
+    {
+      "id": "plot1410-bay-202",
+      "label": "202",
+      "accessible": false,
+      "polygon": [
+        [
+          -12.19777,
+          30.88206
+        ],
+        [
+          -12.19777,
+          26.6399
+        ],
+        [
+          -9.783,
+          26.6399
+        ],
+        [
+          -9.783,
+          30.88206
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": false
+    },
+    {
+      "id": "plot1410-bay-203",
+      "label": "203",
+      "accessible": false,
+      "polygon": [
+        [
+          -14.61253,
+          30.88206
+        ],
+        [
+          -14.61253,
+          26.6399
+        ],
+        [
+          -12.19777,
+          26.6399
+        ],
+        [
+          -12.19777,
+          30.88206
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": false
+    },
+    {
+      "id": "plot1410-bay-204",
+      "label": "204",
+      "accessible": false,
+      "polygon": [
+        [
+          -16.96203,
+          30.88206
+        ],
+        [
+          -16.96203,
+          26.6399
+        ],
+        [
+          -14.61253,
+          26.6399
+        ],
+        [
+          -14.61253,
+          30.88206
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": false
+    },
+    {
+      "id": "plot1410-bay-N2",
+      "label": "N2",
+      "accessible": true,
+      "polygon": [
+        [
+          53.62087,
+          2.81858
+        ],
+        [
+          53.62087,
+          0.33856
+        ],
+        [
+          59.52725,
+          0.33856
+        ],
+        [
+          59.52725,
+          2.81858
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": false
+    },
+    {
+      "id": "plot1410-bay-N3",
+      "label": "N3",
+      "accessible": true,
+      "polygon": [
+        [
+          53.62087,
+          7.71337
+        ],
+        [
+          53.62087,
+          5.23335
+        ],
+        [
+          59.52725,
+          5.23335
+        ],
+        [
+          59.52725,
+          7.71337
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": false
+    },
+    {
+      "id": "plot1410-bay-N4",
+      "label": "N4",
+      "accessible": true,
+      "polygon": [
+        [
+          7.29497,
+          31.12371
+        ],
+        [
+          7.29497,
+          26.12308
+        ],
+        [
+          9.76309,
+          26.12308
+        ],
+        [
+          9.76309,
+          31.12371
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": false
+    },
+    {
+      "id": "plot1410-bay-N5",
+      "label": "N5",
+      "accessible": true,
+      "polygon": [
+        [
+          3.52907,
+          31.12371
+        ],
+        [
+          3.52907,
+          26.12308
+        ],
+        [
+          6.02938,
+          26.12308
+        ],
+        [
+          6.02938,
+          31.12371
+        ]
+      ],
+      "traced": true,
+      "plot": "1410",
+      "evidence": "development-plan-page2",
+      "tandem": false
+    }
+  ],
+  "roads": [
+    {
+      "id": "1410-main-cross-aisle",
+      "polygon": [
+        [
+          43.40178,
+          70.20267
+        ],
+        [
+          43.40178,
+          -24.16539
+        ],
+        [
+          49.60184,
+          -24.16539
+        ],
+        [
+          49.60184,
+          70.20267
+        ]
+      ],
+      "traced": true,
+      "kind": "drive",
+      "surface": "pavers",
+      "plot": "1410"
+    },
+    {
+      "id": "1410-entry-spine",
+      "polygon": [
+        [
+          -17.9992,
+          26.57287
+        ],
+        [
+          -17.9992,
+          20.37369
+        ],
+        [
+          86.95219,
+          20.37369
+        ],
+        [
+          86.95219,
+          26.57287
+        ]
+      ],
+      "traced": true,
+      "kind": "drive",
+      "surface": "pavers",
+      "plot": "1410"
+    },
+    {
+      "id": "1410-west-aisle",
+      "polygon": [
+        [
+          28.30289,
+          60.18378
+        ],
+        [
+          28.30289,
+          53.98547
+        ],
+        [
+          86.95219,
+          53.98547
+        ],
+        [
+          86.95219,
+          60.18378
+        ]
+      ],
+      "traced": true,
+      "kind": "drive",
+      "surface": "pavers",
+      "plot": "1410"
+    },
+    {
+      "id": "1410-middle-aisle",
+      "polygon": [
+        [
+          28.30289,
+          44.0001
+        ],
+        [
+          28.30289,
+          37.80003
+        ],
+        [
+          86.95219,
+          37.80003
+        ],
+        [
+          86.95219,
+          44.0001
+        ]
+      ],
+      "traced": true,
+      "kind": "drive",
+      "surface": "pavers",
+      "plot": "1410"
+    },
+    {
+      "id": "1410-top-aisle-link",
+      "polygon": [
+        [
+          26.539,
+          60.18378
+        ],
+        [
+          26.539,
+          20.37369
+        ],
+        [
+          29.11427,
+          20.37369
+        ],
+        [
+          29.11427,
+          60.18378
+        ]
+      ],
+      "traced": true,
+      "kind": "drive",
+      "surface": "pavers",
+      "plot": "1410"
+    },
+    {
+      "id": "1410-turning-apron",
+      "polygon": [
+        [
+          86.95219,
+          70.20267
+        ],
+        [
+          86.95219,
+          20.37281
+        ],
+        [
+          88.4515,
+          20.37281
+        ],
+        [
+          88.4515,
+          70.20267
+        ]
+      ],
+      "traced": true,
+      "kind": "drive",
+      "surface": "pavers",
+      "plot": "1410"
+    }
+  ],
+  "islands": [
+    [
+      [
+        29.27302,
+        49.60044
+      ],
+      [
+        29.27302,
+        48.29517
+      ],
+      [
+        38.00427,
+        48.29517
+      ],
+      [
+        38.00427,
+        49.60044
+      ]
+    ],
+    [
+      [
+        51.14525,
+        49.60044
+      ],
+      [
+        51.14525,
+        48.29517
+      ],
+      [
+        60.22927,
+        48.29517
+      ],
+      [
+        60.22927,
+        49.60044
+      ]
+    ],
+    [
+      [
+        62.25775,
+        49.60044
+      ],
+      [
+        62.25775,
+        48.29517
+      ],
+      [
+        75.22233,
+        48.29517
+      ],
+      [
+        75.22233,
+        49.60044
+      ]
+    ],
+    [
+      [
+        76.54525,
+        49.60044
+      ],
+      [
+        76.54525,
+        48.29517
+      ],
+      [
+        85.80566,
+        48.29517
+      ],
+      [
+        85.80566,
+        49.60044
+      ]
+    ],
+    [
+      [
+        29.27302,
+        33.46086
+      ],
+      [
+        29.27302,
+        32.27906
+      ],
+      [
+        38.00427,
+        32.27906
+      ],
+      [
+        38.00427,
+        33.46086
+      ]
+    ],
+    [
+      [
+        51.14525,
+        33.46086
+      ],
+      [
+        51.14525,
+        32.27906
+      ],
+      [
+        67.90219,
+        32.27906
+      ],
+      [
+        67.90219,
+        33.46086
+      ]
+    ],
+    [
+      [
+        69.66608,
+        33.46086
+      ],
+      [
+        69.66608,
+        32.27906
+      ],
+      [
+        85.80566,
+        32.27906
+      ],
+      [
+        85.80566,
+        33.46086
+      ]
+    ],
+    [
+      [
+        90.03899722218476,
+        69.76169444441253
+      ],
+      [
+        90.03899722218476,
+        59.88391666663972
+      ],
+      [
+        98.85844166662476,
+        59.88391666663972
+      ],
+      [
+        98.85844166662476,
+        69.76169444441253
+      ]
+    ],
+    [
+      [
+        90.03899722218476,
+        57.855444444418524
+      ],
+      [
+        90.03899722218476,
+        44.185305555536516
+      ],
+      [
+        98.85844166662476,
+        44.185305555536516
+      ],
+      [
+        98.85844166662476,
+        57.855444444418524
+      ]
+    ],
+    [
+      [
+        90.03899722218476,
+        41.89224999998213
+      ],
+      [
+        90.03899722218476,
+        25.75266666665692
+      ],
+      [
+        98.85844166662476,
+        25.75266666665692
+      ],
+      [
+        98.85844166662476,
+        41.89224999998213
+      ]
+    ]
+  ],
+  "walkable": [
+    {
+      "id": "1410-common-south-forecourt",
+      "polygon": [
+        [
+          88.4515,
+          74.61239
+        ],
+        [
+          88.4515,
+          20.461
+        ],
+        [
+          101.68066,
+          20.461
+        ],
+        [
+          101.68066,
+          74.61239
+        ]
+      ],
+      "traced": true,
+      "plot": "1410"
+    },
+    {
+      "id": "1410-west-edge-walk",
+      "polygon": [
+        [
+          26.539,
+          74.61239
+        ],
+        [
+          26.539,
+          70.20267
+        ],
+        [
+          88.4515,
+          70.20267
+        ],
+        [
+          88.4515,
+          74.61239
+        ]
+      ],
+      "traced": true,
+      "plot": "1410"
+    }
+  ]
+}

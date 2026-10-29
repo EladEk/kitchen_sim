@@ -4,7 +4,7 @@
   "plot": 1410,
   "checked": "2026-10-22",
   "galleryPage": "https://efficapital.co.il/Effi-Afikim/",
-  "projectPage": "https://www.efficapital.co.il/פרויקטים/אפי-באפיקי-נחל-אופקים-שלב-א/",
+  "projectPage": "https://www.efficapital.co.il/\u05e4\u05e8\u05d5\u05d9\u05e7\u05d8\u05d9\u05dd/\u05d0\u05e4\u05d9-\u05d1\u05d0\u05e4\u05d9\u05e7\u05d9-\u05e0\u05d7\u05dc-\u05d0\u05d5\u05e4\u05e7\u05d9\u05dd-\u05e9\u05dc\u05d1-\u05d0/",
   "references": [
     {
       "file": "001.jpg",
@@ -159,6 +159,13 @@
       "sha256": "f57970facf823ce59fcb5e7fd98fc7b11f62f2ec1eb5367cc32ce075c9ad2ed5",
       "type": "official-interior-marketing-render",
       "basis": "Use lighting/material realism reference only; does not verify owner choices, common lobby or precise apartment"
+    },
+    {
+      "file": "site-opposite-view.pdf",
+      "url": "https://efficapital.co.il/Effi-Afikim/wp-content/uploads/2024/08/104187-5_effi_hadmaya_c_press_-1.pdf",
+      "sha256": "35546b8ad233b41cf0fdf0a32ff0fc6532361791ab705cda0c89730f13536bf8",
+      "type": "official-labelled-marketing-aerial",
+      "basis": "Opposite viewpoint for shared parking courts. The central rear building is mislabelled4102 in this source: use June aerial4103 ID."
     }
   ]
 }
