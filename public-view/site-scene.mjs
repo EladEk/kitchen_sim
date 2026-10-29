@@ -23,18 +23,20 @@ export function createDistrictSite(source){
  }
  const parkingPavers=material('#8b8b83','paving');
  const grass=material('#7f9565','grass'),asphalt=material('#454a4e','asphalt'),paving=material('#c9c6bb','paving'),stone=material('#d2c8b3','stone'),cap=material('#e0d9c9'),metal=material('#303c3c','plain',{roughness:.43,metalness:.52}),paint=material('#eee9d4'),blue=material('#407eae'),trunk=material('#766451'),leaf=material('#4e7148');
- function slab(poly,y,m){
-  if(poly.length<3)return;const s=new THREE.Shape();poly.forEach(([x,z],i)=>i?s.lineTo(x,-z):s.moveTo(x,-z));s.closePath();const g=new THREE.ShapeGeometry(s);g.rotateX(-Math.PI/2);g.translate(0,y,0);if(!surfaces.has(m))surfaces.set(m,[]);surfaces.get(m).push(g);
+ function slab(poly,y,m,holes=[]){
+  if(poly.length<3)return;const s=new THREE.Shape();poly.forEach(([x,z],i)=>i?s.lineTo(x,-z):s.moveTo(x,-z));s.closePath();
+  for(const ring of holes){const path=new THREE.Path();ring.forEach(([x,z],i)=>i?path.lineTo(x,-z):path.moveTo(x,-z));path.closePath();s.holes.push(path);}
+  const g=new THREE.ShapeGeometry(s);g.rotateX(-Math.PI/2);g.translate(0,y,0);if(!surfaces.has(m))surfaces.set(m,[]);surfaces.get(m).push(g);
  }
  function box(x,y,z,w,h,d,m,angle=0){if(!boxes.has(m))boxes.set(m,[]);boxes.get(m).push([x,y,z,w,h,d,angle]);}
  function line(a,b,y,h,w,m){const dx=b[0]-a[0],dz=b[1]-a[1],len=Math.hypot(dx,dz);if(len>.015)box((a[0]+b[0])/2,y,(a[1]+b[1])/2,len,h,w,m,-Math.atan2(dz,dx));}
- const ext=layout.bounds;
- slab([[ext.west,ext.north],[ext.east,ext.north],[ext.east,ext.south],[ext.west,ext.south]],-.09,grass);
- for(const g of layout.gardens)slab(g.polygon,-.032,grass);
+ const cover=source.groundCover;
+ if(cover?.revision!==95)throw Error('נתוני הקרקע אינם תואמים לגרסה R95. יש לרענן לאחר העלאת הגרסה.');
+ for(const layer of cover.grass)for(const [outer,...holes] of layer.polygons)slab(outer,layer.y,grass,holes);
  for(const r of layout.roadSurfaces)slab(rectanglePolygon(r),-.04,r.kind==='street'?asphalt:parkingPavers);
  for(const p of layout.parking)slab(p.polygon,-.039,parkingPavers);
  for(const w of layout.sidewalks)slab(w.polygon,-.012,paving);
- for(const r of layout.islands){slab(rectanglePolygon(r),-.01,grass);const p=rectanglePolygon(r);p.forEach((a,i)=>line(a,p[(i+1)%4],.05,.12,.13,cap));}
+ for(const r of layout.islands){const p=rectanglePolygon(r);p.forEach((a,i)=>line(a,p[(i+1)%4],.05,.12,.13,cap));}
  // Standard perimeter has a low masonry plinth and black vertical bars,
  // matching the supplied exterior photographs. Internal garden dividers are
  // plain masonry; no owner-specific privacy panels are copied to neighbours.
@@ -47,6 +49,9 @@ export function createDistrictSite(source){
   const posts=Math.ceil(len/2.2);for(let i=0;i<=posts;i++)box(f.a[0]+dx*i/posts,.82,f.a[1]+dz*i/posts,.06,1.08,.06,metal);
  }
  for(const c of layout.curbs)line(c.a,c.b,.045,.11,.13,cap);
+ // Paint and number decals retain a depth bias when their actual centimetre
+ // height becomes subpixel in a distant overview.
+ for(const m of [paint,blue])Object.assign(m,{polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-2});
  // Every bay is individually outlined, with deduplicated shared paint edges.
  const painted=new Set();for(const b of layout.parking)b.polygon.forEach((a,i)=>{const end=b.polygon[(i+1)%b.polygon.length],key=[a,end].map(p=>p.map(v=>v.toFixed(2)).join(',')).sort().join('|');if(painted.has(key))return;painted.add(key);line(a,end,-.025,.012,.055,b.accessible?blue:paint);});
  for(const b of layout.parking.filter(b=>b.accessible)){const r=bounds(b.polygon);for(let x=r.minX+.2;x<r.maxX-.2;x+=.45)line([x,r.minZ+.15],[Math.min(x+.7,r.maxX-.15),r.maxZ-.15],-.021,.01,.06,blue);}
@@ -65,7 +70,7 @@ export function createDistrictSite(source){
    const g=mergeGeometries(parts);parts.forEach(g=>g.dispose());geometries.push(g);group.add(new THREE.Mesh(g,m));
   }
  }
- for(const [m,parts] of surfaces){const g=mergeGeometries(parts);parts.forEach(p=>p.dispose());geometries.push(g);const mesh=new THREE.Mesh(g,m);mesh.receiveShadow=true;group.add(mesh);}
+ for(const [m,parts] of surfaces){const g=mergeGeometries(parts);parts.forEach(p=>p.dispose());geometries.push(g);const mesh=new THREE.Mesh(g,m);mesh.userData.groundSurface=m===grass?'grass':m===parkingPavers?'parking':m===asphalt?'street':'sidewalk';mesh.receiveShadow=true;group.add(mesh);}
  const cube=new THREE.BoxGeometry(1,1,1);geometries.push(cube);const matrix=new THREE.Matrix4(),q=new THREE.Quaternion();
  for(const [m,items] of boxes){const mesh=new THREE.InstancedMesh(cube,m,items.length);items.forEach(([x,y,z,w,h,d,a],i)=>{q.setFromAxisAngle(THREE.Object3D.DEFAULT_UP,a);matrix.compose(new THREE.Vector3(x,y,z),q,new THREE.Vector3(w,h,d));mesh.setMatrixAt(i,matrix);});mesh.castShadow=mesh.receiveShadow=true;mesh.computeBoundingSphere();group.add(mesh);}
  // Representative vehicles fit completely within their own marked bay.

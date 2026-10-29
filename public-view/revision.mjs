@@ -1,1 +1,1 @@
-export const APP_REVISION='R94';
+export const APP_REVISION='R95';

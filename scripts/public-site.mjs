@@ -2,6 +2,8 @@
 // No owner layout, custom fence, shed, car assignment or source documents.
 import {BUILDING_FLOORS} from '../src/building-layout.mjs';
 import {SITE_TRACE} from '../src/building-site-trace.mjs';
+import {createSiteLayout} from '../public-view/site-layout.mjs';
+import {publicGroundCover} from './public-ground-cover.mjs';
 
 const distance=(p,a,b)=>{const dx=b[0]-a[0],dz=b[1]-a[1],t=Math.max(0,Math.min(1,((p[0]-a[0])*dx+(p[1]-a[1])*dz)/(dx*dx+dz*dz||1)));return Math.hypot(p[0]-a[0]-dx*t,p[1]-a[1]-dz*t);};
 const boundaryDistance=(p,poly)=>Math.min(...poly.map((a,i)=>distance(p,a,poly[(i+1)%poly.length])));
@@ -24,5 +26,7 @@ export function publicSiteData(){
    fences.set(key,{a:start,b:end,units:[garden.unit]});
   }
  }
- return {revision:92,gardens:floor.gardens.map(g=>({unit:g.unit,polygon:g.polygon,plot:g.plot})),fences:[...fences.values()],parking:SITE_TRACE.parking.map(b=>({id:b.id,label:b.label,accessible:b.accessible,polygon:b.polygon})),roads:SITE_TRACE.roads.map(r=>({id:r.id,polygon:r.polygon})),walkable:SITE_TRACE.walkable.map(w=>({id:w.id,polygon:w.polygon})),curbs:SITE_TRACE.curbs.map(c=>({id:c.id,points:c.points})),accuracy:{building4102:'Gardens and adjacent numbered bays retain the source trace. Public district geometry adds the entire plot1410 parking plan (204 numbered bays and N1–N5), registered to the same control.',otherBuildings:'Standard garden template rotated/reflected with each building. Plot1409 parking uses the plot1410 module checked against both official aerials; 1346/1347 courts and external street connections remain aerial reconstructions, not surveyed counts or parking allocations.',heights:'Fence, kerb and landscape heights are illustrative.'}};
+ const data={revision:95,gardens:floor.gardens.map(g=>({unit:g.unit,polygon:g.polygon,plot:g.plot})),fences:[...fences.values()],parking:SITE_TRACE.parking.map(b=>({id:b.id,label:b.label,accessible:b.accessible,polygon:b.polygon})),roads:SITE_TRACE.roads.map(r=>({id:r.id,polygon:r.polygon})),walkable:SITE_TRACE.walkable.map(w=>({id:w.id,polygon:w.polygon})),curbs:SITE_TRACE.curbs.map(c=>({id:c.id,points:c.points})),accuracy:{building4102:'Gardens and adjacent numbered bays retain the source trace. Public district geometry adds the entire plot1410 parking plan (204 numbered bays and N1–N5), registered to the same control.',otherBuildings:'Standard garden template rotated/reflected with each building. Plot1409 parking uses the plot1410 module checked against both official aerials; 1346/1347 courts and external street connections remain aerial reconstructions, not surveyed counts or parking allocations.',heights:'Fence, kerb and landscape heights are illustrative.'}};
+ data.groundCover=publicGroundCover(createSiteLayout(data));
+ return data;
 }
