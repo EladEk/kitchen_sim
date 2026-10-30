@@ -1,16 +1,17 @@
 import * as THREE from 'three';
 import clipping from 'polygon-clipping';
 import {createHomeScene} from './home-scene.js';
-import {normalizeHomeSettings,DOORS,PLOT,CONSTRUCTION_WALLS,SERVICE_YARD} from './home-model.mjs';
+import {normalizeHomeSettings,DOORS,PLOT,HOUSE_OUTLINE,CONSTRUCTION_WALLS,SERVICE_YARD,furnitureForSettings} from './home-model.mjs';
 import {clearHomeSurfaceCache} from './surface-materials.mjs';
 import {batchPersonalTour} from './personal-tour-batching.mjs';
 import {HOME_STORAGE} from './studio-state.mjs';
 import {DISTRICT,buildingTransform} from '../public-view/district.mjs';
+import {extractFloorMap} from '../public-view/floor-map-geometry.mjs';
 
 export function createPersonalDistrictVariant({model,siteData,settings,kitchenSettings,mobile=false,signal,onCollisionChange=()=>{},storage=globalThis.localStorage}){
  if(signal?.aborted)throw new DOMException('Canceled','AbortError');
  const root=model.clone(true),slots=[];root.traverse(o=>{if(o.userData.variantSlot===4)slots.push(o);});
- if(!slots.length)throw Error('נדרש רענון של נתוני R101 לתכנון האישי.');
+ if(!slots.length)throw Error('נדרש רענון של נתוני R102 לתכנון האישי.');
  for(const slot of slots){slot.traverse(o=>{if(o.isInstancedMesh)o.dispose();});slot.removeFromParent();}slots.length=0;
  let current=normalizeHomeSettings({...settings,cutaway:false,showElectrical:false,showWater:false});
  const home=createHomeScene(current,{mode:'walk',kitchenSettings,context:false,daylight:false});
@@ -26,6 +27,12 @@ export function createPersonalDistrictVariant({model,siteData,settings,kitchenSe
  });
  localLights.sort((a,b)=>b.intensity-a.intensity);localLights.slice(mobile?4:8).forEach(light=>{light.visible=false;});localLights.length=0;
  for(const motion of home.motions)motion.object.userData={...motion.object.userData,tourMotionId:motion.id,level:0};
+ // Capture the supplied apartment before static batching removes part tags.
+ // Its map is local to this authorized entry and follows the saved furniture.
+ const mapMotions=home.motions.filter(m=>m.id.startsWith('door:')).map(m=>{const d=DOORS.find(d=>'door:'+d.id===m.id);return {...m,closed:d.type==='slider'?-d.width/4:0,open:d.type==='slider'?d.width/4:(d.swing||-1)*Math.PI*.48,kind:d.id==='entry'?'entry':d.type==='slider'?'glazed':'interior',defaultOpen:current.openDoors.includes(d.id)};});
+ const mapLayer=extractFloorMap(home.group,{motions:mapMotions,furniture:()=>null});
+ if(current.furniture)for(const f of furnitureForSettings(current)){if(!['sofa','coffee','console','bed','desk','dining','wardrobe','office-cabinet'].includes(f.kind))continue;const c=Math.cos(f.rotation),s=Math.sin(f.rotation),polygon=[[-f.w/2,-f.d/2],[f.w/2,-f.d/2],[f.w/2,f.d/2],[-f.w/2,f.d/2]].map(([x,z])=>[f.position[0]+x*c+z*s,f.position[1]-x*s+z*c]);mapLayer.furniture.push({kind:f.kind==='console'?'media':f.kind,polygon});}
+ const mapOverrides=new Map([['4102:0:4',{polygons:[HOUSE_OUTLINE],layer:mapLayer}]]);
  const stats=batchPersonalTour(home);home.group.userData.variantSlot=4;root.add(home.group);root.updateMatrixWorld(true);const models=new Map([['4102',root]]);
  const plot=PLOT.map(([x,z])=>{const p=new THREE.Vector3(x,0,z).applyMatrix4(buildingTransform(DISTRICT[0]));return [p.x,p.z];});
  const site={...siteData,groundCover:{...siteData.groundCover,grass:siteData.groundCover.grass.map(layer=>({...layer,polygons:layer.polygons.length?clipping.difference(layer.polygons,[plot]):[]}))}};
@@ -46,6 +53,6 @@ export function createPersonalDistrictVariant({model,siteData,settings,kitchenSe
   try{const stored=JSON.parse(storage?.getItem(HOME_STORAGE)||'{}');storage?.setItem(HOME_STORAGE,JSON.stringify({...stored,[key]:current[key]}));}catch{}
   return true;
  }
- return {models,siteData:site,stats,onSelect,siteOptions:{includeFence:f=>!(f.building==='4102'&&f.units.includes(4)),includeCar:b=>!(b.building==='4102'&&['24','25'].includes(b.label))},
-  dispose(){if(disposed)return;disposed=true;root.traverse(o=>{if(o.isInstancedMesh)o.dispose();});home.dispose();root.removeFromParent();root.clear();models.clear();dynamicState.clear();slots.length=0;clearHomeSurfaceCache();}};
+ return {models,siteData:site,stats,onSelect,mapOverrides,mapDoorOpen:(building,id)=>building==='4102'&&id.startsWith('door:')?current.openDoors.includes(id.slice(5)):null,siteOptions:{includeFence:f=>!(f.building==='4102'&&f.units.includes(4)),includeCar:b=>!(b.building==='4102'&&['24','25'].includes(b.label))},
+  dispose(){if(disposed)return;disposed=true;root.traverse(o=>{if(o.isInstancedMesh)o.dispose();});home.dispose();root.removeFromParent();root.clear();models.clear();mapOverrides.clear();dynamicState.clear();slots.length=0;clearHomeSurfaceCache();}};
 }

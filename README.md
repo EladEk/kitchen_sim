@@ -1,4 +1,19 @@
-# R101 — entrances, shared corridors and doors in every apartment
+# R102 — corrected living areas and a live apartment map
+
+Living seating in 16 upper apartments and the standard ground template is
+registered to the original plan's living area, with door/glazing approaches
+kept clear. Saved personal furnishings continue to drive the personal scene.
+
+Entering an apartment during a tour opens its interior plan automatically.
+The blue marker and arrow show the actual position and look direction in the
+current building and floor, including rotations, reflections and balconies.
+Walls, furniture and door poses come from the scene; private plan overrides
+stay in the authorized entry. Static SVG structure is cached while the marker
+updates at 5 Hz. There is no second renderer, model or collision index.
+
+See [UPDATE-R102.md](UPDATE-R102.md) for installation and verification details.
+
+## R101 — entrances, shared corridors and doors in every apartment
 
 Apartment entrance doors use dark green-grey #536c66; interior doors keep the
 light satin finish. Shared corridor faces use sage plaster #cddbd2. The finish

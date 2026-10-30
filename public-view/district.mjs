@@ -4,6 +4,7 @@ import {motionAncestor,motionRoots,createMotionCopy} from './model-motions.mjs';
 import {createDoorContext} from './door-context.mjs';
 import {compactRenderAttributes} from './compact-attributes.mjs';
 import {DISTRICT,PLAN_CENTER,PLAN_ROTATION} from './district-layout.mjs';
+import {inside} from './navigation.mjs';
 import {createDistrictSite} from './site-scene.mjs';
 export {DISTRICT} from './district-layout.mjs';
 export {PLAN_ROTATION} from './district-layout.mjs';
@@ -11,7 +12,7 @@ export const districtSolar=solar=>({...solar,northBearing:((solar.northBearing??
 const center=PLAN_CENTER;
 export function buildingTransform(b){return new THREE.Matrix4().makeTranslation(center[0]+b.x,0,center[1]+b.z).multiply(new THREE.Matrix4().makeRotationY(b.angle+PLAN_ROTATION)).multiply(new THREE.Matrix4().makeScale(b.mirror?-1:1,1,1)).multiply(new THREE.Matrix4().makeTranslation(-center[0],0,-center[1]));}
 export function districtLocation(position,data){
- for(const b of DISTRICT){const p=position.clone().applyMatrix4(buildingTransform(b).invert());if(p.x>=-4.1&&p.x<=27.5&&p.z>=-23.7&&p.z<=15.7){const floor=Math.max(0,Math.min(8,Math.floor((p.y-1.62+.35)/data.storey)));return {building:b.id,floor,position:p};}}
+ for(const b of DISTRICT){const p=position.clone().applyMatrix4(buildingTransform(b).invert()),floor=Math.max(0,Math.min(8,Math.floor((p.y-1.62+.35)/data.storey))),onBody=p.x>=-4.1&&p.x<=27.5&&p.z>=-23.7&&p.z<=15.7;if(onBody||data.floors?.[floor]?.units.some(u=>u.displayPolygons?.some(poly=>inside([p.x,p.z],poly))))return {building:b.id,floor,position:p};}
  return {building:null,floor:0,position};
 }
 // The public entry supplies only its sanitized snapshot. Authorized entries

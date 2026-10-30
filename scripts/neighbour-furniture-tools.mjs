@@ -36,13 +36,15 @@ export function placeBed(room,seed,master,built=[]){
  return null;
 }
 
-export function placeLiving(room,built=[]){
+export function placeLiving(room,built=[],guide=null){
+ const inZone=box=>!guide?.polygon||[[box.minX,box.minZ],[box.maxX,box.minZ],[box.maxX,box.maxZ],[box.minX,box.maxZ]].every(p=>polygonContains(p,guide.polygon));
+ const cells=guide?.polygon?room.cells.filter(i=>polygonContains(room.xy(i),guide.polygon)):room.cells,anchor=guide?.anchor||room.centre;
  for(const [sofaW,mediaW]of [[2.2,1.5],[2,1.3],[1.8,1.1]]){const candidates=[];
-  for(const angle of [0,Math.PI/2,Math.PI,-Math.PI/2])for(const i of room.cells){const [x,z]=room.xy(i),box=footprint(x,z,mediaW,.34,angle);if(!room.valid(box,built))continue;const gap=backing(box,angle,mediaW,room.walls);if(!Number.isFinite(gap))continue;const n=[Math.sin(angle),Math.cos(angle)];
-   for(const distance of [2.6,2.8,3,2.4,3.3,3.6]){const sofa={kind:'sofa',x:x+n[0]*distance,z:z+n[1]*distance,w:sofaW,d:.92,angle:angle+Math.PI};sofa.box=footprint(sofa.x,sofa.z,sofa.w,sofa.d,sofa.angle);if(!room.valid(sofa.box,[...built,box]))continue;
-    const coffee={kind:'coffee',x:sofa.x-n[0]*1.16,z:sofa.z-n[1]*1.16,w:.95,d:.55,angle};coffee.box=footprint(coffee.x,coffee.z,coffee.w,coffee.d,angle);if(!room.valid(coffee.box,[...built,box,sofa.box]))continue;
+  for(const angle of guide?.angles||[0,Math.PI/2,Math.PI,-Math.PI/2])for(const i of cells){const [x,z]=room.xy(i),box=footprint(x,z,mediaW,.34,angle);if(!inZone(box)||!room.valid(box,built))continue;let gap=backing(box,angle,mediaW,room.walls);if(!Number.isFinite(gap)){if(!guide?.allowFloating)continue;gap=.35;}const n=[Math.sin(angle),Math.cos(angle)];
+   for(const distance of [2.6,2.8,3,2.4,3.3,3.6,...(guide?[2.2,2]:[])]){const sofa={kind:'sofa',x:x+n[0]*distance,z:z+n[1]*distance,w:sofaW,d:.92,angle:angle+Math.PI};sofa.box=footprint(sofa.x,sofa.z,sofa.w,sofa.d,sofa.angle);if(!inZone(sofa.box)||!room.valid(sofa.box,[...built,box]))continue;
+    const offset=guide?Math.min(1.16,distance*.46):1.16,coffee={kind:'coffee',x:sofa.x-n[0]*offset,z:sofa.z-n[1]*offset,w:.95,d:.55,angle};coffee.box=footprint(coffee.x,coffee.z,coffee.w,coffee.d,angle);if(!inZone(coffee.box)||!room.valid(coffee.box,[...built,box,sofa.box]))continue;
     const side=[Math.cos(angle),-Math.sin(angle)];if(![-1,1].some(sign=>room.pointClear([sofa.x+side[0]*sign*(sofa.w/2+.38),sofa.z+side[1]*sign*(sofa.w/2+.38)],[...built,box,coffee.box])))continue;
-    const media={kind:'media',x,z,w:mediaW,d:.34,angle,box},score=Math.hypot(sofa.x-room.centre[0],sofa.z-room.centre[1])*.25+Math.abs(distance-2.8)*.2+gap;
+    const media={kind:'media',x,z,w:mediaW,d:.34,angle,box,wallBacked:Number.isFinite(backing(box,angle,mediaW,room.walls))},score=(guide?Math.hypot((sofa.x+x)/2-anchor[0],(sofa.z+z)/2-anchor[1])*.35:Math.hypot(sofa.x-anchor[0],sofa.z-anchor[1])*.25)+Math.abs(distance-2.8)*.2+gap;
     candidates.push({sofa,coffee,media,score});
    }
   }
