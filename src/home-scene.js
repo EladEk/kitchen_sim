@@ -31,7 +31,7 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
  const group=new THREE.Group(),picks=[],resources=[],motions=[],roomGroups=new Map(),furnitureGroups=new Map(),doorGroups=new Map(),shutterGroups=new Map();
  const mat=(color,opts={})=>{const m=new THREE.MeshStandardMaterial({color,roughness:.78,...opts});resources.push(m);return m;};
  const surface=createSurfacePalette(resources);
- const doorFinish=surface('door','#d8d0c3'),doorFrame=surface('paint','#e2dcd1'),ceilingFinish=surface('plaster','#f7f5ef',{side:THREE.FrontSide,shadowSide:THREE.DoubleSide}),offwhite=surface('paint','#efebe2'),oak=surface('wood','#ae8b61'),ink=mat('#35463d'),windowInk=mat('#343d3d',{metalness:.3,roughness:.5}),steel=mat('#a7b1ac',{metalness:.55,roughness:.35}),white=mat('#f0f0e8'),dark=mat('#29352f'),glass=mat('#b0c8be',{transparent:true,opacity:.28,roughness:.16,depthWrite:false}),linen=surface('fabric','#c5c5af'),clay=mat('#b58e75'),cap=mat('#c7c9bc');
+ const entryDoorFinish=surface('door','#536c66'),doorFinish=surface('door','#d8d0c3'),doorFrame=surface('paint','#e2dcd1'),ceilingFinish=surface('plaster','#f7f5ef',{side:THREE.FrontSide,shadowSide:THREE.DoubleSide}),offwhite=surface('paint','#efebe2'),oak=surface('wood','#ae8b61'),ink=mat('#35463d'),windowInk=mat('#343d3d',{metalness:.3,roughness:.5}),steel=mat('#a7b1ac',{metalness:.55,roughness:.35}),white=mat('#f0f0e8'),dark=mat('#29352f'),glass=mat('#b0c8be',{transparent:true,opacity:.28,roughness:.16,depthWrite:false}),linen=surface('fabric','#c5c5af'),clay=mat('#b58e75'),cap=mat('#c7c9bc');
  // Selecting a destination removes upper floors, but must not enable wall cuts.
  const wallCutaway=settings.cutaway===true&&mode!=='walk'&&(mode==='building'?settings.buildingLevel===0:mode==='unit'?parseDestination(settings.tourDestination).floor===0:true);
  const wallHeight=wallCutaway?.86:HOUSE.height;
@@ -120,7 +120,7 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
    }
   }else{
    const sign=d.hinge==='end'?-1:1,pivot=new THREE.Group(),openTarget=(d.swing||-1)*Math.PI*.48;pivot.position.x=-sign*d.width/2;pivot.rotation.y=isOpen?openTarget:0;p.add(pivot);motions.push({id:`door:${d.id}`,object:pivot,property:'y',axis:'rotation',target:pivot.rotation.y,openTarget});
-   box(sign*d.width/2,h/2,0,d.width-.045,h-.025,d.id==='safe'?.065:.035,d.material==='steel'?surface('door',d.id==='service-exit'?'#3e4946':'#b4bbb2',{metalness:.25}):doorFinish,pivot,data,.009);for(const side of [-1,1]){box(sign*(d.width-.12),h*.48,side*.025,.028,.16,.012,steel,pivot,data);box(sign*(d.width-.15),h*.48+.012,side*.047,.105,.018,.022,steel,pivot,data);}
+   box(sign*d.width/2,h/2,0,d.width-.045,h-.025,d.id==='safe'?.065:.035,d.id==='entry'?entryDoorFinish:d.material==='steel'?surface('door',d.id==='service-exit'?'#3e4946':'#b4bbb2',{metalness:.25}):doorFinish,pivot,data,.009);for(const side of [-1,1]){box(sign*(d.width-.12),h*.48,side*.025,.028,.16,.012,steel,pivot,data);box(sign*(d.width-.15),h*.48+.012,side*.047,.105,.018,.022,steel,pivot,data);}
   }
  }
  // Curtain outside the glass; the photographed dark access cover faces inside.

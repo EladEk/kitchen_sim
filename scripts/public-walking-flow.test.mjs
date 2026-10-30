@@ -26,10 +26,10 @@ test('actual district repeatedly enters 4103 with one collision model, bounded b
  }
  // An old apartment crop must not retain generated buffers during a long tour.
  const cropped=controller.update({building:'4103',level:1,target:'unit:5:1'}).content;let released=0;
- for(const o of cropped.children)o.geometry.addEventListener('dispose',()=>released++);
+ const cropGeometries=new Set();cropped.traverse(o=>{if(o.geometry&&!geometries.has(o.geometry))cropGeometries.add(o.geometry);});assert(cropGeometries.size>0);for(const geometry of cropGeometries)geometry.addEventListener('dispose',()=>released++);
  const same=controller.update({building:'3461',level:1,target:'unit:5:1'}).content;assert.equal(same,cropped,'equal canonical apartment cuts are reused across building transforms');
  controller.update(state,{walking:true,position:new THREE.Vector3(lobby.position[0],1.62,lobby.position[1]).applyMatrix4(buildingTransform(DISTRICT[4]))});
- assert(released>0);assert.equal(root.children.length,1);assert(!cropped.parent);
+ assert.equal(released,cropGeometries.size);assert.equal(root.children.length,1);assert(!cropped.parent);
  // Upper exterior meshes survive walking floor culling even under interior groups.
  model.traverse(o=>{if(o.isMesh&&o.userData.exterior&&o.userData.level>2){let parent=o;while(parent){assert(parent.visible,'upper facade must remain visible');parent=parent.parent;}}});
  controller.update(state);model.traverse(o=>{if(o.isMesh&&o.userData.exterior===false)assert(o.visible,'overview restores interiors');});

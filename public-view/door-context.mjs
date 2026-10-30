@@ -1,0 +1,21 @@
+import * as THREE from 'three';
+import {motionRoots} from './model-motions.mjs';
+
+// A handful of instanced batches renders every distant door. Only matrices
+// change when a door opens; geometry and materials remain shared.
+export function createDoorContext(plans,{getOpen,transform,mirrorGeometry}){
+ const group=new THREE.Group(),buckets=new Map(),mirrors=new Map(),byDoor=new Map(),records=[],batches=[];const reflection=new THREE.Matrix4().makeScale(-1,1,1),matrix=new THREE.Matrix4(),instance=new THREE.Matrix4(),pose=new THREE.Object3D();let active='4102',nearby=null,view={},disposed=false;
+ function bucket(geometry,material,cast,receive,reflected){let g=geometry;if(reflected){if(!mirrors.has(g))mirrors.set(g,mirrorGeometry(g));g=mirrors.get(g);}let mats=buckets.get(g);if(!mats)buckets.set(g,mats=new Map());let flags=mats.get(material);if(!flags)mats.set(material,flags=new Map());const key=JSON.stringify([cast,receive]);if(!flags.has(key))flags.set(key,{geometry:g,material,cast,receive,records:[]});return flags.get(key);}
+ for(const {source,members,include} of plans){source.updateWorldMatrix(true,true);const inverse=source.matrixWorld.clone().invert();for(const root of motionRoots(source)){
+  const d=root.userData.tourDoor;if(!d||!include(root))continue;
+  const parent=inverse.clone().multiply(root.parent.matrixWorld),rootInverse=root.matrixWorld.clone().invert();pose.position.copy(root.position);pose.quaternion.copy(root.quaternion);pose.scale.copy(root.scale);pose[d.axis][d.property]=d.closed;pose.updateMatrix();const closedRoot=parent.clone().multiply(pose.matrix);pose[d.axis][d.property]=d.open;pose.updateMatrix();const openRoot=parent.clone().multiply(pose.matrix);
+  root.traverse(o=>{if(!o.isMesh)return;const local=rootInverse.clone().multiply(o.matrixWorld);for(let i=0;i<(o.isInstancedMesh?o.count:1);i++){const child=local.clone();if(o.isInstancedMesh){o.getMatrixAt(i,instance);child.multiply(instance);}const closed=closedRoot.clone().multiply(child),open=openRoot.clone().multiply(child);for(const b of members){const base=transform(b),reflected=matrix.copy(base).multiply(closed).determinant()<0,material=o.material;if(Array.isArray(material))throw Error('Door context requires a single material per leaf');const target=bucket(o.geometry,material,o.castShadow,o.receiveShadow,reflected),record={building:b.id,id:d.id,level:root.userData.level??0,defaultOpen:d.defaultOpen,base,closed,open,reflected,target,index:target.records.length};target.records.push(record);records.push(record);const key=b.id+'|'+d.id;if(!byDoor.has(key))byDoor.set(key,[]);byDoor.get(key).push(record);}}});
+ }}
+ for(const mats of buckets.values())for(const flags of mats.values())for(const b of flags.values()){const mesh=new THREE.InstancedMesh(b.geometry,b.material,b.records.length);mesh.castShadow=b.cast;mesh.receiveShadow=b.receive;mesh.userData={district:true,detail:'doors'};b.mesh=mesh;batches.push(b);group.add(mesh);}
+ function visible(r){return r.building===active?!!view.includeActive&&(!view.walking||Math.abs(r.level-view.floor)<=1):!nearby||nearby.has(r.building);}
+ function draw(r){matrix.copy(r.base).multiply((getOpen?.(r.building,r.id)??r.defaultOpen)?r.open:r.closed);if(r.reflected)matrix.multiply(reflection);r.target.mesh.setMatrixAt(r.index,matrix);}
+ function finish(changed){for(const b of changed){b.mesh.instanceMatrix.needsUpdate=true;if(b.mesh.count)b.mesh.computeBoundingSphere();}}
+ function refresh(){for(const b of batches){let count=0;for(const r of b.records){r.index=visible(r)?count++:-1;if(r.index>=0)draw(r);}b.mesh.count=count;}finish(batches);}
+ refresh();buckets.clear();
+ return {group,setVisibility(id,members,options={}){active=id;nearby=members;view=options;refresh();},sync(building,id){const changed=new Set();for(const r of byDoor.get(building+'|'+id)||[]){if(r.index<0)continue;draw(r);changed.add(r.target);}finish(changed);},get stats(){return {batches:batches.length,instances:records.length,poseBytes:records.length*64};},dispose(){if(disposed)return;disposed=true;for(const b of batches){b.mesh.dispose();b.records.length=0;}for(const g of mirrors.values())g.dispose();mirrors.clear();byDoor.clear();records.length=batches.length=0;group.removeFromParent();group.clear();}};
+}

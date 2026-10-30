@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import {MeshBVH, CENTER} from 'three-mesh-bvh';
 import {inVariantSlot,hasVariantSlot} from './model-variants.mjs';
+import {publicDoorAncestor} from './district-doors.mjs';
 import {DISTRICT, buildingTransform} from './district.mjs';
 
 const CELL = 3, EPS = .0001;
@@ -125,19 +126,22 @@ export function createSpatialCollisionIndex(root, {trees = new Map(), include = 
 // index. The eight buildings do not own eight collision models or BVHs.
 export function createWalkingWorld({model, site, buildings = DISTRICT, variants = new Map()}) {
  const partitioned=variants.size>0&&hasVariantSlot(model)&&[...variants.values()].every(hasVariantSlot);
- const trees = new Map(), building = createSpatialCollisionIndex(model, {trees,include:partitioned?o=>!inVariantSlot(o):()=>true});
- const standardSlot=partitioned?createSpatialCollisionIndex(model,{trees,include:inVariantSlot}):null;
+ const staticObject=o=>!publicDoorAncestor(o);
+ const trees = new Map(), building = createSpatialCollisionIndex(model, {trees,include:o=>staticObject(o)&&(!partitioned||!inVariantSlot(o))});
+ const standardSlot=partitioned?createSpatialCollisionIndex(model,{trees,include:o=>staticObject(o)&&inVariantSlot(o)}):null;
+ const doorInclude=o=>!!publicDoorAncestor(o),defaultDoors=createSpatialCollisionIndex(model,{trees,include:doorInclude,visibleOnly:false}),doorIndexes=new Map();
  const outside = createSpatialCollisionIndex(site, {trees, include: object => {
   const p = object.userData;
   if (p.propType) return p.detailTier === 2 && ['body', 'branches'].includes(p.propPart);
   return ![object.material].flat().some(m => m?.polygonOffset || m?.transparent && m.opacity < .5);
  }});
  const variantIndexes=new Map();
- const include=o=>(!partitioned||inVariantSlot(o))&&!o.userData.tourNonPhysical&&!o.userData.securityOverlay&&!o.userData.sceneUi&&!o.userData.vrHelper;
+ const include=o=>staticObject(o)&&(!partitioned||inVariantSlot(o))&&!o.userData.tourNonPhysical&&!o.userData.securityOverlay&&!o.userData.sceneUi&&!o.userData.vrHelper;
  for(const [id,source] of variants)variantIndexes.set(id,createSpatialCollisionIndex(source,{trees,include,visibleOnly:false}));
+ for(const [id,source] of variants)doorIndexes.set(id,createSpatialCollisionIndex(source,{trees,include:doorInclude,visibleOnly:false}));
  const copies = buildings.map(b => {
-  const matrix = buildingTransform(b), index=variantIndexes.get(b.id)||(partitioned?standardSlot:building), box = (partitioned?building.bounds.clone().union(index.bounds):index.bounds.clone()).applyMatrix4(matrix);
-  return {id:b.id,index,matrix, inverse: matrix.clone().invert(), bounds: [...box.min.toArray(), ...box.max.toArray()]};
+  const matrix = buildingTransform(b), index=variantIndexes.get(b.id)||(partitioned?standardSlot:building),doors=doorIndexes.get(b.id)||defaultDoors,box=(partitioned?building.bounds.clone().union(index.bounds):index.bounds.clone()).union(doors.bounds).applyMatrix4(matrix);
+  return {id:b.id,index,doors,matrix, inverse: matrix.clone().invert(), bounds: [...box.min.toArray(), ...box.max.toArray()]};
  });
  const local = new THREE.Raycaster(); local.firstHitOnly = true;
  let disposed = false;
@@ -156,13 +160,15 @@ export function createWalkingWorld({model, site, buildings = DISTRICT, variants 
     local.ray.copy(raycaster.ray).applyMatrix4(copy.inverse); local.far = closest?.distance ?? raycaster.far;
     let hit=partitioned?building.firstHit(local,options):null;if(partitioned)stats.narrowTests+=building.stats.narrowTests;
     if(!(options.any&&hit)){local.far=hit?.distance??local.far;const variantHit=copy.index.firstHit(local,options);stats.narrowTests+=copy.index.stats.narrowTests;if(variantHit&&(!hit||variantHit.distance<hit.distance))hit=variantHit;}
-    if (hit && (!closest || hit.distance < closest.distance)) { hit.point.applyMatrix4(copy.matrix); closest = hit; }
+    if(!(options.any&&hit)){local.far=hit?.distance??local.far;const doorHit=copy.doors.firstHit(local,options);stats.narrowTests+=copy.doors.stats.narrowTests;if(doorHit&&(!hit||doorHit.distance<hit.distance))hit=doorHit;}
+    if (hit && (!closest || hit.distance < closest.distance)) { hit.point.applyMatrix4(copy.matrix);hit.buildingId=copy.id;closest = hit; }
     if (options.any && closest) break;
    }
    return closest;
   },
-  refreshVariant(id){if(disposed||!variants.has(id))return false;const previous=variantIndexes.get(id);previous?.dispose();const index=createSpatialCollisionIndex(variants.get(id),{trees,include,visibleOnly:false});variantIndexes.set(id,index);const copy=copies.find(c=>c.id===id);if(copy){copy.index=index;const box=(partitioned?building.bounds.clone().union(index.bounds):index.bounds.clone()).applyMatrix4(copy.matrix);copy.bounds=[...box.min.toArray(),...box.max.toArray()];}return true;},
-  get memory() { return {indexBytes: building.stats.bufferBytes + outside.stats.bufferBytes + (standardSlot?.stats.bufferBytes||0) + [...variantIndexes.values()].reduce((n,index)=>n+index.stats.bufferBytes,0), sharedBVHs: trees.size}; },
-  dispose() { if (disposed) return; disposed = true; building.dispose(); outside.dispose();standardSlot?.dispose(); for(const index of variantIndexes.values())index.dispose();variantIndexes.clear();copies.length = 0; trees.clear(); }
+  refreshVariant(id){if(disposed||!variants.has(id))return false;const previous=variantIndexes.get(id);previous?.dispose();const index=createSpatialCollisionIndex(variants.get(id),{trees,include,visibleOnly:false});variantIndexes.set(id,index);const copy=copies.find(c=>c.id===id);if(copy){copy.index=index;const box=(partitioned?building.bounds.clone().union(index.bounds):index.bounds.clone()).union(copy.doors.bounds).applyMatrix4(copy.matrix);copy.bounds=[...box.min.toArray(),...box.max.toArray()];}return true;},
+  refreshDoors(id,source=variants.get(id)||model){if(disposed)return false;const copy=copies.find(c=>c.id===id);if(!copy)return false;const next=createSpatialCollisionIndex(source,{trees,include:doorInclude,visibleOnly:false});doorIndexes.get(id)?.dispose();doorIndexes.set(id,next);copy.doors=next;const box=(partitioned?building.bounds.clone().union(copy.index.bounds):copy.index.bounds.clone()).union(next.bounds).applyMatrix4(copy.matrix);copy.bounds=[...box.min.toArray(),...box.max.toArray()];return true;},
+  get memory() { return {indexBytes: building.stats.bufferBytes + outside.stats.bufferBytes + defaultDoors.stats.bufferBytes + (standardSlot?.stats.bufferBytes||0) + [...variantIndexes.values(),...doorIndexes.values()].reduce((n,index)=>n+index.stats.bufferBytes,0), sharedBVHs: trees.size,doorIndexes:1+doorIndexes.size}; },
+  dispose() { if (disposed) return; disposed = true; building.dispose(); outside.dispose();standardSlot?.dispose();defaultDoors.dispose();for(const index of doorIndexes.values())index.dispose();doorIndexes.clear();for(const index of variantIndexes.values())index.dispose();variantIndexes.clear();copies.length = 0; trees.clear(); }
  };
 }

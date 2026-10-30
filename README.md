@@ -1,4 +1,30 @@
-# R100 — usable doors and restrained interior finishes
+# R101 — entrances, shared corridors and doors in every apartment
+
+Apartment entrance doors use dark green-grey #536c66; interior doors keep the
+light satin finish. Shared corridor faces use sage plaster #cddbd2. The finish
+is placed only on the common side of existing walls, with doorway gaps kept open.
+The same entrance colour is applied to the saved personal apartment.
+
+All 400 standard door motions are available throughout the eight-building
+public/personal district: 43 apartment entrances, interior leaves and glazed
+terrace doors. Tap a visible door in an apartment cutaway or walking tour, or
+select it with a WebXR controller. Door state is independent per building and
+saved locally; personal apartment changes keep their existing saved settings.
+
+Static building geometry and BVHs remain shared. One live hinge set serves the
+selected building. Whole-building doors use 16 instanced batches and compacted visible poses,
+including corrected winding for reflected garden/building copies. Apartment
+cutaways keep directly clickable hinges and shared geometry.
+Opening a door updates its context matrices and a small per-building collision
+partition. Upper floors remain indexed while visually culled. Render geometry
+is not recreated per click, and collision/context resources are disposed.
+
+Build verification checks all 43 entry doors, individual door poses, independent
+building state, mirrored copies, selection, movement, storage, memory and the
+public/private asset boundary. Device appearance/frame rate still needs a
+compatible phone or VR headset; CPU checks do not establish GPU performance.
+
+## R100 — usable doors and restrained interior finishes
 
 Personal doors respond to a tap in both the apartment cutaway and the complete
 building tour. Moving branches retain their actions, hinges and shared buffers

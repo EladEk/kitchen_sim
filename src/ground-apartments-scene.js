@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import {groundBaseProfile,groundTransform,groundBaseServices,baseOpeningPosition,GROUND_KITCHEN} from './ground-apartments.mjs';
-import {point} from './home-model.mjs';
+import {point,DOORS} from './home-model.mjs';
+import {markPublicDoor} from './public-door-motion.mjs';
 import {createSurfacePalette,metricSurfaceUVs} from './surface-materials.mjs';
 import {installBuildingSurfaceUVs} from './building-surface-uvs.mjs';
 import {buildObservedArchitecture} from './home-observed-scene.js';
@@ -10,9 +11,10 @@ import {lightOutput} from './lighting-controls.mjs';
 
 // One shared base geometry, three rigid placements. Gardens, ordered products,
 // movable owner furniture and the owner's kitchen never enter this builder.
-export function buildGroundApartments({root,resources,picks,settings,cut=false,mode='building',floorMaterial=null}){
+export function buildGroundApartments({root,resources,picks,settings,cut=false,mode='building',floorMaterial=null,interactiveDoors=false}){
  const profile=groundBaseProfile(),template=new THREE.Group(),h=cut?.85:profile.height,mat=(color,extra={})=>{const m=new THREE.MeshStandardMaterial({color,roughness:.72,...extra});resources.push(m);return m;},surface=createSurfacePalette(resources);
  const paint=surface('plaster','#eeece5'),stone=surface('limestone','#d9d2c5'),neutralFloor=floorMaterial||surface('porcelain','#d0cdc5'),wetFloor=surface('cement','#c4c3bd'),white=mat('#f0f0e9'),metal=mat('#343e3d',{metalness:.35,roughness:.4}),glass=mat('#acc2ca',{transparent:true,opacity:.28,depthWrite:false,roughness:.18}),wood=surface('paint','#dedbd1');
+ const innerDoor=surface('door','#d8d0c3'),entryDoor=surface('door','#536c66');for(const material of [innerDoor,entryDoor])installBuildingSurfaceUVs(material);
  for(const material of [paint,stone,neutralFloor,wetFloor,wood])installBuildingSurfaceUVs(material);
  const cube=new THREE.BoxGeometry(1,1,1);resources.push(cube);let interactive=false;
  const box=(x,y,z,w,hh,d,m,parent=template,data=null)=>{const mesh=new THREE.Mesh(cube,m);mesh.position.set(x,y,z);mesh.scale.set(w,hh,d);mesh.castShadow=mesh.receiveShadow=true;mesh.userData={...(data||{}),baseline:true};parent.add(mesh);if(interactive&&data?.action)picks.push(mesh);return mesh;};
@@ -25,8 +27,22 @@ export function buildGroundApartments({root,resources,picks,settings,cut=false,m
   let cursor=lo;for(const o of holes){segment(cursor,o.start,0,h);if(o.sill)segment(o.start,o.end,0,Math.min(h,o.sill));if(h>o.sill+o.height)segment(o.start,o.end,o.sill+o.height,h-o.sill-o.height);cursor=o.end;}segment(cursor,hi,0,h);
   if(!cut&&wall.external)segment(lo,hi,profile.height,3.1-profile.height);
  }
- for(const o of [...profile.windows,...profile.doors]){
+ for(const o of [...profile.windows,...profile.doors,...(interactiveDoors?DOORS.filter(d=>d.hostDoorId):[])]){
   const y=o.sill||0,hh=Math.min(o.height,h-y);if(hh<=0)continue;const [x,z]=baseOpeningPosition(o),p=new THREE.Group();p.position.set(x,y,z);p.rotation.y=o.vertical?Math.PI/2:0;template.add(p);p.userData={part:'ground-base-opening',baseOpeningId:o.id};
+  if(interactiveDoors&&o.type!=='window'){
+   p.rotation.y=o.vertical?-Math.PI/2:0;p.position.x+=o.vertical?(o.faceOffset||0):0;p.position.z+=o.vertical?0:(o.faceOffset||0);
+   const id='base:'+o.id,kind=o.id==='entry'?'entry':o.type==='slider'?'glazed':'interior',data={action:'district-door',doorId:id};
+   if(!o.hostDoorId){for(const xx of [-o.width/2,o.width/2])box(xx,hh/2,0,.052,hh,.105,wood,p);if(!cut)box(0,hh,0,o.width,.052,.105,wood,p);}
+   if(o.type==='slider'){
+    for(let i=0;i<2;i++){const leaf=new THREE.Group();leaf.position.x=o.width/4;p.add(leaf);const pane=box(0,hh/2,(i?1:-1)*.012,o.width/2-.035,hh-.035,.008,glass,leaf,data);pane.castShadow=false;for(const xx of [-o.width/4,o.width/4])box(xx,hh/2,0,.027,hh,.045,metal,leaf,data);for(const yy of [.015,hh-.015])box(0,yy,0,o.width/2,.027,.045,metal,leaf,data);box(-o.width/4+.06,hh*.48,.035,.02,.18,.025,metal,leaf,data);if(!i)markPublicDoor(leaf,{id,axis:'position',property:'x',closed:-o.width/4,open:o.width/4,kind});}
+   }else{
+    const sign=o.hinge==='end'?-1:1,pivot=new THREE.Group(),angle=(o.swing||-1)*Math.PI*.48;pivot.position.x=-sign*o.width/2;pivot.rotation.y=angle;p.add(pivot);
+    box(sign*o.width/2,hh/2,0,o.width-.045,hh-.025,.04,o.id==='entry'?entryDoor:innerDoor,pivot,data);
+    for(const side of [-1,1])box(sign*(o.width-.13),hh*.48,side*.041,.10,.022,.025,metal,pivot,data);
+    markPublicDoor(pivot,{id,open:angle,kind});
+   }
+   continue;
+  }
   for(const xx of [-o.width/2,o.width/2])box(xx,hh/2,0,.035,hh,.09,metal,p);if(!cut)box(0,hh,0,o.width,.035,.09,metal,p);
   if(o.type==='window'||o.type==='slider'){
    if(o.type==='window'){box(0,hh/2,0,o.width-.05,hh-.05,.012,glass,p);box(0,hh/2,0,.03,hh,.07,metal,p);box(0,-.035,0,o.width+.08,.055,.25,stone,p);}
@@ -59,7 +75,7 @@ export function buildGroundApartments({root,resources,picks,settings,cut=false,m
  for(const unit of [1,2,3]){
   const node=template.clone(true),t=groundTransform(unit),[a,b,c,d]=t.matrix;
   node.matrixAutoUpdate=false;node.matrix.set(a,0,b,t.offset[0],0,1,0,0,c,0,d,t.offset[1],0,0,0,1);node.name=`garden-apartment-${unit}-base`;node.userData={part:'ground-base-apartment',unit,derived:true,reflected:t.reflected,source:'building-plan',page:3};root.add(node);groups.set(unit,node);
-  node.traverse(o=>{o.userData={...o.userData,unit,derived:true,buildingFloor:0};delete o.userData.action;delete o.userData.buildingId;delete o.userData.pickMeshes;if(o.userData.blockPick)picks.push(o);});
+  node.traverse(o=>{o.userData={...o.userData,unit,derived:true,buildingFloor:0};if(o.userData.action==='district-door'){o.userData.doorId=o.userData.doorId.replace('base:',`ground:${unit}:`);if(o.userData.tourDoor){o.userData.tourDoor.id=o.userData.doorId;o.userData.tourMotionId='public:'+o.userData.doorId;}}else delete o.userData.action;delete o.userData.buildingId;delete o.userData.pickMeshes;if(o.userData.blockPick)picks.push(o);});
   const services=groundBaseServices(unit),worldGroup=new THREE.Group();worldGroup.name=`garden-apartment-${unit}-services`;root.add(worldGroup);interactive=true;
   const flags={...settings,selectedElectricalId:null,electricalPresentation:'fixtures'};
   const electric=services.filter(p=>p.serviceKind==='electrical'),water=services.filter(p=>p.serviceKind==='water');

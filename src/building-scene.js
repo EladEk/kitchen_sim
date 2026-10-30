@@ -18,11 +18,12 @@ import {buildElevators} from './building-elevators.js';
 import {buildingNumberPlate} from './building-signage.js';
 import {buildGroundApartments} from './ground-apartments-scene.js';
 import {buildSiteContext} from './building-site-scene.js';
+import {wrapPublicDoor} from './public-door-motion.mjs';
 
 // Shared instanced cubes keep nine storeys affordable on phones. Physical
 // shadow geometry remains present while the apartment is viewed as a cutaway;
 // its invisible materials do not write depth or cover apartment controls.
-export function buildBuildingContext({group,resources,settings,mode='overview',picks=[],kitchenAnchor=null,apartmentOutline=null}){
+export function buildBuildingContext({group,resources,settings,mode='overview',picks=[],kitchenAnchor=null,apartmentOutline=null,interactiveDoors=false}){
  const walking=mode==='walk',unitView=mode==='unit',shown=mode==='building'||walking||unitView,selected=parseDestination(settings.tourDestination),limit=walking?9:unitView?selected.floor:shown?normalizeBuildingLevel(settings.buildingLevel):9;
  if(!shown&&settings.buildingShadows===false)return {group:null,floors:new Map(),shadowOnly:true};
  const root=new THREE.Group();root.name='building-4102';root.userData={part:'whole-building',building:4102,source:'building-plan',shadowOnly:!shown};group.add(root);
@@ -41,6 +42,7 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
 
  }
  const matrix=new THREE.Matrix4(),rotation=new THREE.Quaternion(),position=new THREE.Vector3(),scale=new THREE.Vector3();
+ const entranceFinish=finish('door','#536c66',{roughness:.5}),corridorFinish=finish('plaster','#cddbd2',{roughness:.94});if(shown)for(const mat of [entranceFinish,corridorFinish])installBuildingSurfaceUVs(mat);
  function batch(parent,mat,items,part,level,cast=true){
   if(!items.length)return;const mesh=new THREE.InstancedMesh(cube,mat,items.length);mesh.name=part;mesh.userData={part,buildingFloor:level,source:'building-plan',heightInferred:true,...(shown&&level!==null?{action:'building-floor'}:{})};
   items.forEach(([x,y,z,w,h,d,angle=0],i)=>{rotation.setFromAxisAngle(THREE.Object3D.DEFAULT_UP,angle);position.set(x,y,z);scale.set(Math.max(.001,w),Math.max(.001,h),Math.max(.001,d));matrix.compose(position,rotation,scale);mesh.setMatrixAt(i,matrix);});
@@ -61,8 +63,9 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
  for(const def of BUILDING_FLOORS){
   if(def.level>limit)continue;
   const node=new THREE.Group();node.name=def.id;node.userData={part:'building-storey',level:def.level,page:def.page,source:'building-plan'};root.add(node);floors.set(def.level,node);
-  const cut=settings.cutaway===true&&shown&&!walking&&limit<9&&def.level===limit,base=def.elevation,h=cut?.85:BUILDING.storey,walls=[],frames=[],panes=[],dark=[],rails=[],decks=[],interiorWalls=[],trims=[],handles=[],fascias=[],source=BUILDING_INTERIORS.floors[def.level];
+  const cut=settings.cutaway===true&&shown&&!walking&&limit<9&&def.level===limit,base=def.elevation,h=cut?.85:BUILDING.storey,walls=[],frames=[],panes=[],dark=[],rails=[],decks=[],interiorWalls=[],trims=[],handles=[],corridorFaces=[],fascias=[],source=BUILDING_INTERIORS.floors[def.level];
   const [sa,sb]=source.stairs.rect,rect=(a,b)=>[[a[0],a[1]],[b[0],a[1]],[b[0],b[1]],[a[0],b[1]]],holes=[rect(sa,sb),...source.lifts.map(l=>rect([l.minX-.12,l.minZ-.05],[l.doorCenter[0]-.04,l.maxZ+.05]))];
+  const addCorridorFace=(a,b,y,height,width)=>{const dx=b[0]-a[0],dz=b[1]-a[1],length=Math.hypot(dx,dz);if(length<.008||height<.008)return;const nx=-dz/length,nz=dx/length,middle=[(a[0]+b[0])/2,(a[1]+b[1])/2];for(const sign of [-1,1]){const sample=[middle[0]+nx*sign*(width/2+.06),middle[1]+nz*sign*(width/2+.06)];if(pointInPolygon(sample,def.core)&&!def.units.some(u=>pointInPolygon(sample,u.polygon)))segment([a[0]+nx*sign*(width/2+.004),a[1]+nz*sign*(width/2+.004)],[b[0]+nx*sign*(width/2+.004),b[1]+nz*sign*(width/2+.004)],y,height,.006,corridorFaces);}};
   const ceilingHoles=[...holes],duplex=duplexOnFloor(def.level),privateStair=duplexStair(duplex);
   if(privateStair)(def.level===duplex.entryFloor?ceilingHoles:holes).push(duplexStairOpening(privateStair));
   if(def.level===0)holes.push(...serviceSlabHoles());
@@ -87,7 +90,7 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
   for(const w of connectedWallRuns(source,def,def.level===0?COMMON_ENTRY_DOORS:[])){
    const ownership=w.sourceWallIndex==null?w:source.walls[w.sourceWallIndex],mid=ownership.a.map((n,i)=>(n+ownership.b[i])/2);if(def.level===0&&(onDetailedGround(mid)||shown&&onGroundReplica(mid)))continue;
    const exterior=def.envelope.some(path=>path.polygon.some((a,i)=>segmentDistance(mid,a,path.polygon[(i+1)%path.polygon.length])<.25));
-   segment(w.a,w.b,base,h,w.width,exterior?walls:interiorWalls);
+   segment(w.a,w.b,base,h,w.width,exterior?walls:interiorWalls);if(!exterior)addCorridorFace(w.a,w.b,base,h,w.width);
    if(shown&&!exterior){const dx=w.b[0]-w.a[0],dz=w.b[1]-w.a[1],len=Math.hypot(dx,dz),nx=-dz/len,nz=dx/len;for(const sign of [-1,1])segment([w.a[0]+nx*sign*(w.width/2+.007),w.a[1]+nz*sign*(w.width/2+.007)],[w.b[0]+nx*sign*(w.width/2+.007),w.b[1]+nz*sign*(w.width/2+.007)],base+.01,.075,.014,trims);}
   }
   if(shown){
@@ -95,18 +98,18 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
    for(const unit of def.units){if(def.level===0)continue;slab(unit.polygon,base+.005,.025,interiorFloor,node,'building-unit-finish',def.level,holes.filter(h=>pointInPolygon(h[0],unit.polygon)));}
    for(const door of source.doors){
     if(def.level===0&&['bd-0-4','bd-0-5'].includes(door.id)){const opening=doorWallOpening(source,door);if(h>1.15)segment(opening.a,opening.b,base+1.15,h-1.15,opening.width,interiorWalls);continue;}
-    if(def.level===0&&onDetailedGround(door.hinge))continue;
-    const open=!settings.closedBuildingDoors?.includes(door.id),end=open?door.opened:door.closed,items=[],dh=cut?.82:2.18,construction=doorWallOpening(source,door);
+    if(def.level===0&&(onDetailedGround(door.hinge)||interactiveDoors&&onGroundReplica(door.hinge)))continue;
+    const open=!settings.closedBuildingDoors?.includes(door.id),end=open?door.opened:door.closed,items=[],doorLeaves=[],doorHandles=[],dh=cut?.82:2.18,construction=doorWallOpening(source,door),entry=source.entries.some(e=>e.doorId===door.id);
     if(door.balconyDoor){
      const length=Math.hypot(end[0]-door.hinge[0],end[1]-door.hinge[1]),u=end.map((v,i)=>(v-door.hinge[i])/length),angle=-Math.atan2(u[1],u[0]);
      for(const t of [.025,length-.025])items.push([door.hinge[0]+u[0]*t,base+dh/2,door.hinge[1]+u[1]*t,.045,dh,.075,angle]);
      segment(door.hinge,end,base,.045,.075,items);segment(door.hinge,end,base+dh-.045,.045,.075,items);
      const panes=[];segment(door.hinge.map((v,i)=>v+u[i]*.05),end.map((v,i)=>v-u[i]*.05),base+.055,dh-.11,.016,panes);
-     const glassLeaf=batch(node,glass,panes,'building-balcony-door-glazing',def.level,false);if(glassLeaf){glassLeaf.userData={part:'building-balcony-door-glazing',source:'building-plan',action:'building-door',doorId:door.id,balconyDoor:true,buildingFloor:def.level};picks.push(glassLeaf);}
+     const glassLeaf=batch(node,glass,panes,'building-balcony-door-glazing',def.level,false);if(glassLeaf){doorLeaves.push(glassLeaf);glassLeaf.userData={part:'building-balcony-door-glazing',source:'building-plan',action:'building-door',doorId:door.id,balconyDoor:true,buildingFloor:def.level};picks.push(glassLeaf);}
     }else segment(door.hinge,end,base,dh,.045,items);
-    const dx=door.closed[0]-door.hinge[0],dz=door.closed[1]-door.hinge[1],width=Math.hypot(dx,dz),angle=-Math.atan2(dz,dx);for(const at of [door.hinge,door.closed])trims.push([at[0],base+dh/2,at[1],.052,dh,.14,angle]);if(!cut){segment(door.hinge,door.closed,base+2.18,.055,.14,trims);const lx=end[0]-door.hinge[0],lz=end[1]-door.hinge[1],ll=Math.hypot(lx,lz),normal=[-lz/ll,lx/ll],handle=door.hinge.map((n,i)=>n+(end[i]-n)*Math.max(.1,(ll-.12)/ll));for(const sign of [-1,1]){handles.push([handle[0]+normal[0]*sign*.034,base+1.02,handle[1]+normal[1]*sign*.034,.035,.085,.018,-Math.atan2(lz,lx)]);segment([handle[0]+normal[0]*sign*.055,handle[1]+normal[1]*sign*.055],[handle[0]-lx/ll*.10+normal[0]*sign*.055,handle[1]-lz/ll*.10+normal[1]*sign*.055],base+1.03,.018,.019,handles);}}
-    const mesh=batch(node,door.balconyDoor?metal:doorMat,items,'building-apartment-door',null);mesh.userData={part:'building-apartment-door',source:'building-plan',action:'building-door',doorId:door.id,unit:door.unit,balconyDoor:!!door.balconyDoor,buildingFloor:def.level};picks.push(mesh);
-    if(h>2.2&&!(def.level===0&&onGroundReplica(door.hinge)))segment(construction.a,construction.b,base+2.18,h-2.18,construction.width,door.balconyDoor?walls:interiorWalls);
+    const dx=door.closed[0]-door.hinge[0],dz=door.closed[1]-door.hinge[1],width=Math.hypot(dx,dz),angle=-Math.atan2(dz,dx);for(const at of [door.hinge,door.closed])trims.push([at[0],base+dh/2,at[1],.052,dh,.14,angle]);if(!cut){segment(door.hinge,door.closed,base+2.18,.055,.14,trims);const lx=end[0]-door.hinge[0],lz=end[1]-door.hinge[1],ll=Math.hypot(lx,lz),normal=[-lz/ll,lx/ll],handle=door.hinge.map((n,i)=>n+(end[i]-n)*Math.max(.1,(ll-.12)/ll));for(const sign of [-1,1]){doorHandles.push([handle[0]+normal[0]*sign*.034,base+1.02,handle[1]+normal[1]*sign*.034,.035,.085,.018,-Math.atan2(lz,lx)]);segment([handle[0]+normal[0]*sign*.055,handle[1]+normal[1]*sign*.055],[handle[0]-lx/ll*.10+normal[0]*sign*.055,handle[1]-lz/ll*.10+normal[1]*sign*.055],base+1.03,.018,.019,doorHandles);}}
+    const mesh=batch(node,door.balconyDoor?metal:entry?entranceFinish:doorMat,items,'building-apartment-door',null);mesh.userData={part:'building-apartment-door',source:'building-plan',action:'building-door',doorId:door.id,unit:door.unit,balconyDoor:!!door.balconyDoor,buildingFloor:def.level};picks.push(mesh);doorLeaves.push(mesh);if(interactiveDoors){doorLeaves.push(batch(node,handleMat,doorHandles,'building-door-hardware',def.level));wrapPublicDoor(node,doorLeaves,{door,level:def.level,base,opened:open,kind:entry?'entry':door.balconyDoor?'glazed':'interior'});}else handles.push(...doorHandles);
+    if(h>2.2&&!(def.level===0&&onGroundReplica(door.hinge))){segment(construction.a,construction.b,base+2.18,h-2.18,construction.width,door.balconyDoor?walls:interiorWalls);if(!door.balconyDoor)addCorridorFace(construction.a,construction.b,base+2.18,h-2.18,construction.width);}
    }
   }
   // The low rail courses in the photographs have glass infill, dark top rails
@@ -156,11 +159,11 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
   }
   const screenMesh=batch(node,metal,louvres,'building-laundry-screen',def.level);if(screenMesh)screenMesh.userData.screens=laundryScreens(def.level);
   batch(node,trimMat,trims,'building-interior-trim',def.level);batch(node,handleMat,handles,'building-door-hardware',def.level);batch(node,fascia,fascias,'building-balcony-fascia',def.level);
-  batch(node,limestone,walls,'building-facade-wall',def.level);batch(node,insideWall,interiorWalls,'building-interior-wall',def.level);batch(node,metal,frames,'building-window-frame',def.level);batch(node,glass,panes,'building-glazing',def.level,false);batch(node,voidMat,dark,'building-fascia-and-service-screen',def.level);batch(node,metal,rails,'building-rail-and-louvres',def.level);batch(node,limestone,decks,'building-stone-sill',def.level);
+  batch(node,corridorFinish,corridorFaces,'building-corridor-finish',def.level);batch(node,limestone,walls,'building-facade-wall',def.level);batch(node,insideWall,interiorWalls,'building-interior-wall',def.level);batch(node,metal,frames,'building-window-frame',def.level);batch(node,glass,panes,'building-glazing',def.level,false);batch(node,voidMat,dark,'building-fascia-and-service-screen',def.level);batch(node,metal,rails,'building-rail-and-louvres',def.level);batch(node,limestone,decks,'building-stone-sill',def.level);
   if(shown)buildApartmentFurniture({parent:node,resources,level:def.level,base,settings,surfaces:surface});
   if(def.level===0&&shown)buildCommonSpaces({parent:node,resources,settings,cut});
   if(def.level===0&&shown)buildResidentsClub({parent:node,resources,settings,cut,ceilingVisible:walking||limit>0});
-  if(def.level===0&&shown)buildGroundApartments({root:node,resources,picks,settings,cut,mode,floorMaterial:interiorFloor});
+  if(def.level===0&&shown)buildGroundApartments({root:node,resources,picks,settings,cut,mode,floorMaterial:interiorFloor,interactiveDoors});
   if(shown&&!cut&&(walking||def.level<limit||limit===9)){
    // A visible closing slab must meet the full storey-height walls. Placing
    // its upper face at the interior clear height hid the rooms while leaving
