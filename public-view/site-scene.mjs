@@ -1,28 +1,32 @@
 import * as THREE from 'three';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
-import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
-import {createSiteLayout,bounds,inside,contains,rectanglePolygon} from './site-layout.mjs';
+import {createRealisticProps} from './realistic-props.mjs';
+import {createSurfaceDetails} from './surface-detail.mjs';
+import {FINISH_GRID_GLSL} from '../src/building-finish-shaders.mjs';
+import {createSiteLayout,bounds,inside,contains,rectanglePolygon,intersects} from './site-layout.mjs';
 import {DISTRICT_GROUND,DISTRICT,districtFootprint} from './district-layout.mjs';
 
-export function createDistrictSite(source){
- const layout=createSiteLayout(source),group=new THREE.Group(),geometries=[],materials=[],textures=[],surfaces=new Map(),boxes=new Map();group.name='public-district-development';
+export function createDistrictSite(source,{mobile=false}={}){
+ const layout=createSiteLayout(source),group=new THREE.Group(),geometries=[],materials=[],textures=[],surfaces=new Map(),boxes=new Map();group.name='public-district-development';const details=createSurfaceDetails({mobile});
  function material(color,kind='plain',extra={}){
   const m=new THREE.MeshStandardMaterial({color,roughness:.88,...extra});materials.push(m);
+  if(['grass','asphalt','paving','stone'].includes(kind))details.apply(m,kind==='stone'?'limestone':kind);
   if(kind!=='plain'){
    m.onBeforeCompile=s=>{s.vertexShader='varying vec2 vSiteXZ;\n'+s.vertexShader;s.vertexShader=s.vertexShader.replace('#include <begin_vertex>',`#include <begin_vertex>
     vec4 siteVertex=vec4(transformed,1.0);
     #ifdef USE_INSTANCING
     siteVertex=instanceMatrix*siteVertex;
     #endif
-    vSiteXZ=(modelMatrix*siteVertex).xz;`);s.fragmentShader='varying vec2 vSiteXZ;\n'+s.fragmentShader;s.fragmentShader=s.fragmentShader.replace('#include <color_fragment>',`#include <color_fragment>
+    vSiteXZ=(modelMatrix*siteVertex).xz;`);s.fragmentShader='varying vec2 vSiteXZ;\n'+FINISH_GRID_GLSL+s.fragmentShader;s.fragmentShader=s.fragmentShader.replace('#include <color_fragment>',`#include <color_fragment>
     float grain=fract(sin(dot(floor(vSiteXZ*125.0),vec2(127.1,311.7)))*43758.5453);
-    diffuseColor.rgb*=.965+grain*.07;
-    ${kind==='paving'?`vec2 tile=vSiteXZ*vec2(2.0,4.0);tile.x+=mod(floor(tile.y),2.0)*.5;vec2 edge=min(fract(tile),1.0-fract(tile));float grout=1.0-smoothstep(.008,.023+max(fwidth(tile.x),fwidth(tile.y)),min(edge.x,edge.y));diffuseColor.rgb*=mix(1.0,.73,grout);`:''}
-   `);};m.customProgramCacheKey=()=> 'district-surface-r90-'+kind;
+    float footprint=max(fwidth(vSiteXZ.x),fwidth(vSiteXZ.y));
+    diffuseColor.rgb*=1.0+(grain-.5)*.07*(1.0-smoothstep(.004,.03,footprint));
+    ${kind==='paving'?`vec2 tile=vSiteXZ*vec2(2.0,4.0);tile.x+=mod(floor(tile.y),2.0)*.5;vec2 edge=min(fract(tile),1.0-fract(tile))*vec2(.5,.25);float gx=finishGridCoverage(edge.x,fwidth(vSiteXZ.x),.003,.5),gz=finishGridCoverage(edge.y,fwidth(vSiteXZ.y),.003,.25);float grout=1.0-(1.0-gx)*(1.0-gz);diffuseColor.rgb*=mix(1.0,.75,grout);`:''}
+   `);};m.customProgramCacheKey=()=> 'district-surface-r96-'+kind;
   }return m;
  }
  const parkingPavers=material('#8b8b83','paving');
- const grass=material('#7f9565','grass'),asphalt=material('#454a4e','asphalt'),paving=material('#c9c6bb','paving'),stone=material('#d2c8b3','stone'),cap=material('#e0d9c9'),metal=material('#303c3c','plain',{roughness:.43,metalness:.52}),paint=material('#eee9d4'),blue=material('#407eae'),trunk=material('#766451'),leaf=material('#4e7148');
+ const grass=material('#7f9565','grass'),asphalt=material('#454a4e','asphalt'),paving=material('#c9c6bb','paving'),stone=material('#d2c8b3','stone'),cap=material('#e0d9c9'),metal=material('#303c3c','plain',{roughness:.43,metalness:.52}),paint=material('#eee9d4'),blue=material('#407eae');
  function slab(poly,y,m,holes=[]){
   if(poly.length<3)return;const s=new THREE.Shape();poly.forEach(([x,z],i)=>i?s.lineTo(x,-z):s.moveTo(x,-z));s.closePath();
   for(const ring of holes){const path=new THREE.Path();ring.forEach(([x,z],i)=>i?path.lineTo(x,-z):path.moveTo(x,-z));path.closePath();s.holes.push(path);}
@@ -31,7 +35,7 @@ export function createDistrictSite(source){
  function box(x,y,z,w,h,d,m,angle=0){if(!boxes.has(m))boxes.set(m,[]);boxes.get(m).push([x,y,z,w,h,d,angle]);}
  function line(a,b,y,h,w,m){const dx=b[0]-a[0],dz=b[1]-a[1],len=Math.hypot(dx,dz);if(len>.015)box((a[0]+b[0])/2,y,(a[1]+b[1])/2,len,h,w,m,-Math.atan2(dz,dx));}
  const cover=source.groundCover;
- if(cover?.revision!==95)throw Error('נתוני הקרקע אינם תואמים לגרסה R95. יש לרענן לאחר העלאת הגרסה.');
+ if(cover?.revision!==97)throw Error('נתוני הקרקע אינם תואמים לגרסה R97. יש לרענן לאחר העלאת הגרסה.');
  for(const layer of cover.grass)for(const [outer,...holes] of layer.polygons)slab(outer,layer.y,grass,holes);
  for(const r of layout.roadSurfaces)slab(rectanglePolygon(r),-.04,r.kind==='street'?asphalt:parkingPavers);
  for(const p of layout.parking)slab(p.polygon,-.039,parkingPavers);
@@ -49,6 +53,21 @@ export function createDistrictSite(source){
   const posts=Math.ceil(len/2.2);for(let i=0;i<=posts;i++)box(f.a[0]+dx*i/posts,.82,f.a[1]+dz*i/posts,.06,1.08,.06,metal);
  }
  for(const c of layout.curbs)line(c.a,c.b,.045,.11,.13,cap);
+ // Illustrative drainage grates sit on an existing drive, never in a bay or
+ // garden. Thin kerb joints supply readable scale without changing the layout.
+ const recess=material('#343937','plain',{roughness:.92}),grate=material('#737a78','plain',{roughness:.66,metalness:.55});let drains=0;
+ for(const c of layout.curbs){
+  const dx=c.b[0]-c.a[0],dz=c.b[1]-c.a[1],length=Math.hypot(dx,dz),angle=-Math.atan2(dz,dx);
+  for(let t=.85;t<length-.2;t+=1.1){const x=c.a[0]+dx*t/length,z=c.a[1]+dz*t/length;box(x,.103,z,.008,.004,.135,recess,angle);}
+  if(length<7||drains>=64)continue;
+  for(let t=3.5;t<length-1&&drains<64;t+=22){
+   let spot;for(const side of [-1,1]){const x=c.a[0]+dx*t/length-dz/length*.38*side,z=c.a[1]+dz*t/length+dx/length*.38*side;
+    if(layout.roads.some(r=>contains(r,[x,z]))&&!layout.parking.some(b=>inside([x,z],b.polygon))){spot=[x,z];break;}}
+   if(!spot)continue;const [x,z]=spot;box(x,-.026,z,.48,.015,.30,recess,angle);
+   for(const side of [-1,1])box(x-dz/length*.14*side,-.015,z+dx/length*.14*side,.48,.012,.018,grate,angle);
+   for(let n=-.2;n<=.201;n+=.05)box(x+dx/length*n,-.012,z+dz/length*n,.014,.016,.28,grate,angle);drains++;
+  }
+ }
  // Paint and number decals retain a depth bias when their actual centimetre
  // height becomes subpixel in a distant overview.
  for(const m of [paint,blue])Object.assign(m,{polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-2});
@@ -75,13 +94,10 @@ export function createDistrictSite(source){
  for(const [m,items] of boxes){const mesh=new THREE.InstancedMesh(cube,m,items.length);items.forEach(([x,y,z,w,h,d,a],i)=>{q.setFromAxisAngle(THREE.Object3D.DEFAULT_UP,a);matrix.compose(new THREE.Vector3(x,y,z),q,new THREE.Vector3(w,h,d));mesh.setMatrixAt(i,matrix);});mesh.castShadow=mesh.receiveShadow=true;mesh.computeBoundingSphere();group.add(mesh);}
  // Representative vehicles fit completely within their own marked bay.
  const cars=layout.parking.filter((b,i)=>!b.accessible&&i%7===0).map(b=>{const r=bounds(b.polygon),alongX=r.maxX-r.minX>r.maxZ-r.minZ;return {x:(r.minX+r.maxX)/2,z:(r.minZ+r.maxZ)/2,angle:alongX?Math.PI/2:0,length:Math.min(4.1,Math.max(r.maxX-r.minX,r.maxZ-r.minZ)-.22)};});
- const bodyGeo=new RoundedBoxGeometry(1,1,1,2,.07),glassGeo=new RoundedBoxGeometry(1,1,1,2,.1),wheelGeo=new THREE.CylinderGeometry(.27,.27,.17,12);geometries.push(bodyGeo,glassGeo,wheelGeo);
- const bodyMat=material('#ffffff','plain',{metalness:.45,roughness:.3}),glassMat=material('#29434b','plain',{metalness:.25,roughness:.17}),tyres=material('#252b2c'),bodies=new THREE.InstancedMesh(bodyGeo,bodyMat,cars.length),cabins=new THREE.InstancedMesh(glassGeo,glassMat,cars.length),wheels=new THREE.InstancedMesh(wheelGeo,tyres,cars.length*4),colours=['#b9c5ca','#3f5260','#ebe8df','#8d958a','#687a86'];
- cars.forEach((c,i)=>{q.setFromAxisAngle(THREE.Object3D.DEFAULT_UP,c.angle);matrix.compose(new THREE.Vector3(c.x,.54,c.z),q,new THREE.Vector3(1.76,.58,c.length));bodies.setMatrixAt(i,matrix);bodies.setColorAt(i,new THREE.Color(colours[i%colours.length]));matrix.compose(new THREE.Vector3(c.x,1.06,c.z),q,new THREE.Vector3(1.52,.58,c.length*.52));cabins.setMatrixAt(i,matrix);let n=0;for(const side of [-1,1])for(const end of [-1,1]){const offset=new THREE.Vector3(side*.88,.27,end*c.length*.31).applyQuaternion(q),wheelQ=q.clone().multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1),Math.PI/2));matrix.compose(new THREE.Vector3(c.x+offset.x,offset.y,c.z+offset.z),wheelQ,new THREE.Vector3(1,1,1));wheels.setMatrixAt(i*4+n++,matrix);}});
- for(const mesh of [bodies,cabins,wheels]){mesh.castShadow=mesh.receiveShadow=true;mesh.computeBoundingSphere();group.add(mesh);}
  const bodies2D=DISTRICT.map(b=>districtFootprint(b,2)),points=[],forbidden=layout.gardens.map(g=>g.plot).concat(layout.parking.map(b=>b.polygon),layout.sidewalks.map(w=>w.polygon));
- for(let x=west+12;x<east-8;x+=11)for(let z=north-45;z<south-6;z+=12){if(bodies2D.some(r=>contains(r,[x,z]))||layout.roads.some(r=>contains({...r,minX:r.minX-2,maxX:r.maxX+2,minZ:r.minZ-2,maxZ:r.maxZ+2},[x,z]))||forbidden.some(p=>inside([x,z],p)||inside([x-2,z-2],p)||inside([x+2,z+2],p)))continue;points.push([x,z]);}
- const crown=new THREE.IcosahedronGeometry(1.6,1),stem=new THREE.CylinderGeometry(.13,.20,2.6,7);geometries.push(crown,stem);for(const [geo,m,y] of [[crown,leaf,3.6],[stem,trunk,1.25]]){const mesh=new THREE.InstancedMesh(geo,m,points.length);points.forEach(([x,z],i)=>mesh.setMatrixAt(i,new THREE.Matrix4().makeTranslation(x,y,z)));mesh.castShadow=mesh.receiveShadow=true;mesh.computeBoundingSphere();group.add(mesh);}
+ for(let x=west+12;x<east-8;x+=11)for(let z=north-45;z<south-6;z+=12){if(bodies2D.some(r=>contains(r,[x,z]))||layout.roads.some(r=>contains({...r,minX:r.minX-2,maxX:r.maxX+2,minZ:r.minZ-2,maxZ:r.maxZ+2},[x,z]))||forbidden.some(p=>intersects({minX:x-2.4,maxX:x+2.4,minZ:z-2.4,maxZ:z+2.4},bounds(p))))continue;points.push([x,z]);}
+ const props=createRealisticProps({trees:points,cars,mobile});group.add(props.group);
  group.updateMatrixWorld(true);
- return {group,layout,dispose(){geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());}};
+ let disposed=false;
+ return {group,layout,update:(position,now)=>props.update(position,now),props,details:{drains},dispose(){if(disposed)return;disposed=true;props.dispose();for(const o of group.children)if(o.isInstancedMesh)o.dispose();details.dispose();geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());group.removeFromParent();group.clear();}};
 }

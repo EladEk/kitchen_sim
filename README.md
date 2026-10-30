@@ -1,3 +1,35 @@
+# R97 — walking and memory
+
+Walking uses a spatial collision index and shared BVHs of one canonical public
+building. Queries are transformed to the nearby building; district render meshes,
+all distant apartments and foliage are no longer raycast for every movement step.
+Instance bounds and transforms use fixed typed buffers. No collision geometry is
+copied per building. Both joystick/keyboard movement and WebXR use this path.
+
+Public geometry is compacted at build time with UV/normal seams retained. Equal
+public materials share batches; reflected geometry preserves its index. Temporary
+merge records are released after construction. Apartment crops are reused when
+switching buildings and disposed when returning to the full view or walking.
+The detailed building follows the walker without teleporting the camera; remote
+interiors and interior floors outside the current floor's neighbourhood are hidden
+while exterior facades and balconies remain present.
+
+A CPU benchmark of the actual public scene reduced geometry attribute/index
+buffers from 146,995,290 to 77,210,746 bytes (about 47%). The new fixed collision
+index adds 7,306,824 bytes. The median pair of small entrance movement checks at
+4103 dropped from about 374 ms to 0.24 ms in this environment. These are CPU
+measurements, not phone/VR frame-rate or whole-browser memory guarantees.
+
+## REV 96 — חומרים, צמחייה, רכבים וגימורי חזית
+
+הגרסה הציבורית מקבלת חומרים מפורטים יותר בקנה מידה של מטרים, עם מפות צבע, חספוס ותבליט נפרדות. חיפוי האבן משתמש בטקסטורה חדשה שנוצרה בכלי התמונות המובנה; הקובץ והפרומפט מתועדים ב־`public-view/assets/README.md`. זהו חומר המחשה, לא סריקת יצרן. טעינת החומר נשארת בתוך שלב הטעינה הראשוני, עם חומר פרוצדורלי כגיבוי.
+
+העצים כוללים ענפים, עלים בעלי שקיפות חתוכה ושיחים; הרכבים כוללים גוף מעוצב, חלונות, קשתות גלגלים, חישוקים, פנסים, מראות וגימורים. הגאומטריה והצללות המגע משותפות ומאוחדות למופעים, עם שלוש רמות פירוט, ספי מעבר עם היסטרזיס ועדכון קצוב. גוונים, מיקום ומידות נשמרים בכל רמת פירוט. מרחוק מוסתרים פרטי פנים בבנייני ההקשר בלבד; מעטפת, פתחים, מרפסות, גוונים ווילונות נשארים. בחירת דירה/קומה והבניין המפורט נשארים מלאים.
+
+נוספו וילונות כלליים בחלק מהחלונות הרגילים, ספי אבן מעוגלים בתוך המידות המקוריות, חיבורי אבני שפה ורשתות ניקוז להמחשה בתוך הדרכים הקיימות. אלה אינם נתוני דיירים או מדידת תשתית. גבולות החניות, הגינות, הקומות והדירות נשמרים. סימוני הפוגות מסוננים לפי כיסוי פיקסל כדי לשמור על גוון יציב בזום רחוק.
+
+מפת הצללים מתרחבת עם המבט על המתחם ומתייצבת על רשת הטקסלים; כיוון השמש והירח ממשיך להגיע מהחישוב האסטרונומי. הצללת המגע שופרה, ועלים שקופים מוחרגים ממעבר הנורמלים של GTAO. מצב VR ממשיך להשתמש ברינדור המקורי, עם צללי מגע גאומטריים. ביצועי המכשיר והתוצאה החזותית בדפדפן דורשים בדיקה במכשיר עם WebGL.
+
 ## REV 95 — יציבות צבעי הבניינים ומשטחי החניה בזום
 
 בוטל ערפל המרחק בתצוגה הציבורית, שגרם לבניינים ולפיתוח להלבין כאשר מתרחקים. מישור החיתוך הקרוב של המצלמה מותאם למרחק במבט חיצוני כדי לשפר את דיוק העומק; הליכה שומרת על המישור הקרוב המקורי ו־WebXR ממשיך לשלוט במטריצות שלו.

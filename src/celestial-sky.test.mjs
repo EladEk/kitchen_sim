@@ -88,3 +88,10 @@ test('manual noon sky does not regenerate each minute and toggling live time res
  sky.update({now:new Date('2026-10-28T20:00:00Z')});sky.update({now:new Date('2026-10-28T20:01:00Z')});assert.equal(builds,1);assert.equal(sky.state.solar.minutes,720);
  settings={solar:{live:true}};sky.update({now:new Date('2026-10-28T20:02:00Z')});assert.equal(sky.state.solar.minutes,22*60+2);sky.dispose();
 });
+
+test('wide district shadow coverage keeps astronomical directions and snaps sub-texel camera motion',()=>{
+ const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(),sky=installCelestialSky({renderer:{},scene,camera,getSettings:()=>manual('2026-10-30',720),ownSun:true,mobile:true,environmentFactory:()=>({texture:new THREE.Texture(),dispose(){}})});
+ const focus=new THREE.Vector3();sky.update({focus,shadowRadius:240});let sun;scene.traverse(o=>{if(o.isDirectionalLight&&o.castShadow)sun=o;});assert(sun);
+ const before=sun.target.position.clone(),axis=new THREE.Vector3(...sky.state.sun.direction),right=new THREE.Vector3(0,1,0).cross(axis).normalize(),up=axis.clone().cross(right).normalize();sky.update({focus:new THREE.Vector3(.000001,.000001,.000001),shadowRadius:240});const movement=sun.target.position.clone().sub(before);assert(Math.abs(movement.dot(right))<1e-8);assert(Math.abs(movement.dot(up))<1e-8);
+ const direction=sun.position.clone().sub(sun.target.position).normalize();assert(direction.distanceTo(new THREE.Vector3(...sky.state.sun.direction))<1e-10);assert.equal(sun.shadow.camera.right,240);assert(sun.shadow.camera.far>1000);sky.dispose();
+});

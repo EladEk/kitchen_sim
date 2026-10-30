@@ -27,9 +27,17 @@ export function installCelestialSky({renderer,scene,camera,getSettings=()=>({}),
   onDaylight?.(lastSettings);disks.update(state);
   scene.background=source;scene.environment=state.dark?null:filtered.texture;scene.environmentIntensity=state.environmentIntensity;scene.userData.photoEnvironment=source;
   if(scene.fog)scene.fog.color.set(state.dark||state.sun.elevation<-6?'#050914':state.sun.elevation<3?'#665b67':'#d2dfea');
-  target.position.copy(focus);moon.position.copy(focus).addScaledVector(new THREE.Vector3(...state.moon.direction),100);moon.intensity=state.moonIntensity;moon.visible=moon.intensity>0;
+  const anchor=focus.clone(),sunDirection=new THREE.Vector3(...state.sun.direction);
+  if(sun){
+   // Snap the shadow coverage in light space to avoid crawling shadow texels
+   // while orbiting. Both light and target move together: astronomy is unchanged.
+   const right=new THREE.Vector3(0,1,0).cross(sunDirection);if(right.lengthSq()<1e-8)right.set(1,0,0);right.normalize();
+   const up=sunDirection.clone().cross(right).normalize(),texel=shadowRadius*2/sun.shadow.mapSize.x;
+   for(const axis of [right,up]){const at=anchor.dot(axis);anchor.addScaledVector(axis,Math.round(at/texel)*texel-at);}
+  }
+  target.position.copy(anchor);moon.position.copy(anchor).addScaledVector(new THREE.Vector3(...state.moon.direction),100);moon.intensity=state.moonIntensity;moon.visible=moon.intensity>0;
   fill.intensity=state.dark?0:ownSun?state.daylight*1.15+state.twilight*.12+.015:state.daylight>0?0:.015;fill.visible=fill.intensity>0;
-  if(sun){sun.intensity=state.sunIntensity;sun.visible=sun.intensity>0;sun.color.set(state.sun.elevation<15?'#ffcf95':'#fff4e1');sun.position.copy(focus).addScaledVector(new THREE.Vector3(...state.sun.direction),100);Object.assign(sun.shadow.camera,{left:-shadowRadius,right:shadowRadius,top:shadowRadius,bottom:-shadowRadius,near:.1,far:220});sun.shadow.camera.updateProjectionMatrix();}
+  if(sun){const distance=Math.max(100,shadowRadius*2+60);sun.intensity=state.sunIntensity;sun.visible=sun.intensity>0;sun.color.set(state.sun.elevation<15?'#ffcf95':'#fff4e1');sun.position.copy(anchor).addScaledVector(sunDirection,distance);Object.assign(sun.shadow.camera,{left:-shadowRadius,right:shadowRadius,top:shadowRadius,bottom:-shadowRadius,near:.1,far:Math.max(220,distance+shadowRadius*2+80)});sun.shadow.camera.updateProjectionMatrix();}
   return state;
  }
  return {update,get state(){return state;},dispose(){disposed=true;scene.remove(disks.mesh);disks.dispose();source?.dispose();filtered?.dispose();sun?.shadow.map?.dispose();scene.remove(lightRig);scene.background=original.background;scene.environment=original.environment;scene.userData.photoEnvironment=original.photo;}};

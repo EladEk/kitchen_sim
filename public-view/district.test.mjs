@@ -7,7 +7,7 @@ test('only 3461/3471 are mirrored; end buildings align while middle buildings ar
 });
 test('baked mirror keeps outward normals and matches full reflected navigation transform',async()=>{
  const {mirroredGeometry}=await import('./district.mjs');const source=new THREE.BoxGeometry(2,3,4),geo=mirroredGeometry(source),p=geo.attributes.position,n=geo.attributes.normal;
- for(let i=0;i<p.count;i+=3){const a=new THREE.Vector3().fromBufferAttribute(p,i),b=new THREE.Vector3().fromBufferAttribute(p,i+1),c=new THREE.Vector3().fromBufferAttribute(p,i+2),cross=b.sub(a).cross(c.sub(a)).normalize();assert(cross.dot(new THREE.Vector3().fromBufferAttribute(n,i))>.99);}
+ assert(geo.index,'reflected geometry retains compact shared vertices');const idx=geo.index;for(let i=0;i<idx.count;i+=3){const ia=idx.getX(i),ib=idx.getX(i+1),ic=idx.getX(i+2),a=new THREE.Vector3().fromBufferAttribute(p,ia),b=new THREE.Vector3().fromBufferAttribute(p,ib),c=new THREE.Vector3().fromBufferAttribute(p,ic),cross=b.sub(a).cross(c.sub(a)).normalize();assert(cross.dot(new THREE.Vector3().fromBufferAttribute(n,ia))>.99);}
  source.dispose();geo.dispose();
 });
 

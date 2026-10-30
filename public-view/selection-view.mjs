@@ -1,16 +1,27 @@
 import * as THREE from 'three';
-import {DISTRICT,buildingTransform} from './district.mjs';
+import {DISTRICT,buildingTransform,districtLocation} from './district.mjs';
+import {PLAN_CENTER} from './district-layout.mjs';
 import {createSelection} from './selection.mjs';
 
 export function createSelectionController({root,model,district,nav}){
- let section,key,current;
+ let section,key,current,walkBuilding,visibilityKey;
+ const interiors=[];model.traverse(o=>{if(o.isMesh&&o.userData.exterior===false)interiors.push({object:o,visible:o.visible});});
  if(model.parent!==root)root.add(model);
  return {
-  update(state,{walking=false}={}){
-   const b=DISTRICT.find(b=>b.id===state.building)||DISTRICT[0],focused=!walking&&(Number(state.level)!==9||!!state.target);
+  update(state,{walking=false,position=null}={}){
+   let b=DISTRICT.find(b=>b.id===state.building)||DISTRICT[0];
+   if(walking&&position){
+    const distance=v=>Math.hypot(position.x-PLAN_CENTER[0]-v.x,position.z-PLAN_CENTER[1]-v.z),inside=districtLocation(position,nav).building;
+    const nearest=inside?DISTRICT.find(v=>v.id===inside):DISTRICT.reduce((a,v)=>distance(a)<distance(v)?a:v);
+    if(!walkBuilding||inside||distance(nearest)<distance(walkBuilding)*.8)walkBuilding=nearest;
+    b=walkBuilding;
+   }else if(!walking)walkBuilding=null;
+   const floor=position?Math.max(0,Math.floor((position.y-1.62+.35)/nav.storey)):0,nextVisibility=walking&&position?'walk:'+floor:'all';
+   if(visibilityKey!==nextVisibility){for(const {object,visible} of interiors)object.visible=visible&&(!walking||!position||Math.abs((object.userData.level??0)-floor)<=1);visibilityKey=nextVisibility;}
+   const focused=!walking&&(Number(state.level)!==9||!!state.target);
    root.visible=true;root.matrixAutoUpdate=false;root.matrix.copy(buildingTransform(b));root.matrixWorldNeedsUpdate=true;root.updateMatrixWorld(true);
    district.setActiveBuilding(b.id);district.group.visible=!focused;model.visible=!focused;
-   if(focused){const next=b.id+'|'+state.level+'|'+state.target;if(next!==key){if(section){root.remove(section.group);section.dispose();}section=createSelection(model,nav,{...state,level:Number(state.level)});if(!section.group.children.length)throw Error('Empty selected building section');root.add(section.group);key=next;}section.group.visible=true;}else if(section)section.group.visible=false;
+   if(focused){const next=state.level+'|'+state.target;if(next!==key){if(section){root.remove(section.group);section.dispose();}section=createSelection(model,nav,{...state,level:Number(state.level)});if(!section.group.children.length)throw Error('Empty selected building section');root.add(section.group);key=next;}section.group.visible=true;}else if(section){root.remove(section.group);section.dispose();section=null;key=null;}
    root.updateMatrixWorld(true);current={content:focused?section.group:model,building:b,focused};return current;
   },
   get current(){return current;},
