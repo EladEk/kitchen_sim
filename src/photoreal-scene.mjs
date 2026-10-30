@@ -22,7 +22,24 @@ function stoneMaps(){
  const make=(data,srgb=false)=>{const t=new THREE.DataTexture(data,w,h,THREE.RGBAFormat);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(1/1.88,1/.96);t.magFilter=THREE.LinearFilter;t.minFilter=THREE.LinearMipmapLinearFilter;t.generateMipmaps=true;t.colorSpace=srgb?THREE.SRGBColorSpace:THREE.NoColorSpace;t.needsUpdate=true;return t;};
  return {map:make(color,true),bumpMap:make(bump),roughnessMap:make(rough)};
 }
-export function createPhotoScene(source,{maxTriangles=2500000,maxMeshes=60000}={}){
+const excluded=o=>o.userData.celestialBackground||o.userData.securityOverlay||o.userData.electricalId||o.userData.waterId||o.userData.sceneUi||o.userData.part==='sun-position-marker';
+export function estimatePhotoScene(source,{maxTriangles=2500000,maxMeshes=60000,maxBytes=Infinity,textureSize=1024}={}){
+ let triangles=0,meshes=0,cloneBytes=0;const shared=new Set(),textures=new Set();
+ source.updateMatrixWorld(true);source.traverseVisible(o=>{
+  if(excluded(o)||!o.isMesh||o.isSkinnedMesh||!o.geometry?.attributes.position)return;
+  const mats=Array.isArray(o.material)?o.material:[o.material];
+  if(!mats.some(m=>m&&m.visible!==false&&m.colorWrite!==false&&m.opacity!==0))return;
+  const count=o.isInstancedMesh?o.count:1,geometry=o.geometry,metric=mats.some(m=>m?.userData.metricInstancedUVs||m?.userData.publicFinish==='stone');
+  meshes+=count;triangles+=(geometry.index?.count||geometry.attributes.position.count)/3*count;
+  if(metric||!shared.has(geometry)){shared.add(geometry);cloneBytes+=Object.values(geometry.attributes).reduce((n,a)=>n+a.array.byteLength,geometry.index?.array.byteLength||0)*(metric?count:1);}
+  for(const m of mats)if(m)for(const value of Object.values(m))if(value?.isTexture)textures.add(value);
+  const bytes=cloneBytes+triangles*160+meshes*256+textures.size*textureSize*textureSize*4;
+  if(triangles>maxTriangles||meshes>maxMeshes||bytes>maxBytes)throw new PhotoSceneLimit('Scene exceeds photo memory budget');
+ });
+ return {triangles,meshes,bytes:cloneBytes+triangles*160+meshes*256+textures.size*textureSize*textureSize*4};
+}
+export function createPhotoScene(source,{maxTriangles=2500000,maxMeshes=60000,maxBytes=Infinity,textureSize=1024}={}){
+ estimatePhotoScene(source,{maxTriangles,maxMeshes,maxBytes,textureSize});
  source.updateMatrixWorld(true);const scene=new THREE.Scene(),geometries=new Map(),materials=new Map(),ownedGeometry=new Set(),ownedMaterial=new Set(),ownedTexture=new Set();let triangles=0,meshes=0,stone;
  scene.background=source.background?.isColor?source.background.clone():source.background;
  // PMREM is a cube-UV texture; a path tracer requires the original equirectangular HDR.
@@ -50,7 +67,7 @@ export function createPhotoScene(source,{maxTriangles=2500000,maxMeshes=60000}={
   if(color){mesh.material=[mesh.material].flat().map(m=>{const c=m.clone();c.color.multiply(color);ownedMaterial.add(c);return c;});if(!Array.isArray(o.material))mesh.material=mesh.material[0];}
   scene.add(mesh);
  };
- const dispose=()=>{ownedGeometry.forEach(g=>g.dispose());ownedMaterial.forEach(m=>m.dispose());ownedTexture.forEach(t=>t.dispose());scene.clear();};
+ let disposed=false;const dispose=()=>{if(disposed)return;disposed=true;ownedGeometry.forEach(g=>g.dispose());ownedMaterial.forEach(m=>m.dispose());ownedTexture.forEach(t=>{t.dispose();t.source.data=null;});ownedGeometry.clear();ownedMaterial.clear();ownedTexture.clear();geometries.clear();materials.clear();stone=null;scene.clear();scene.background=scene.environment=null;};
  try{source.traverseVisible(o=>{
   if(o.userData.celestialBackground||o.userData.securityOverlay||o.userData.electricalId||o.userData.waterId||o.userData.sceneUi||o.userData.part==='sun-position-marker')return;
   if(o.isMesh&&o.geometry?.attributes.position){

@@ -13,7 +13,7 @@ export function publicGroundCover(layout){
  const gardens=layout.gardens.map(g=>[g.polygon]),islands=layout.islands.map(r=>[rectanglePolygon(r)]);
  const {west,east,north,south}=layout.bounds;
  const base=rectanglePolygon({minX:west,maxX:east,minZ:north,maxZ:south});
- return {revision:97,grass:[
+ return {revision:98,grass:[
   {y:-.09,polygons:clipping.difference([base],hardscape,...gardens,...islands)},
   {y:-.032,polygons:clipping.difference(gardens,hardscape)},
   {y:-.01,polygons:islands.length?clipping.difference(islands,hardscape):[]}

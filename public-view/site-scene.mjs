@@ -35,7 +35,7 @@ export function createDistrictSite(source,{mobile=false}={}){
  function box(x,y,z,w,h,d,m,angle=0){if(!boxes.has(m))boxes.set(m,[]);boxes.get(m).push([x,y,z,w,h,d,angle]);}
  function line(a,b,y,h,w,m){const dx=b[0]-a[0],dz=b[1]-a[1],len=Math.hypot(dx,dz);if(len>.015)box((a[0]+b[0])/2,y,(a[1]+b[1])/2,len,h,w,m,-Math.atan2(dz,dx));}
  const cover=source.groundCover;
- if(cover?.revision!==97)throw Error('נתוני הקרקע אינם תואמים לגרסה R97. יש לרענן לאחר העלאת הגרסה.');
+ if(cover?.revision!==98)throw Error('נתוני הקרקע אינם תואמים לגרסה R98. יש לרענן לאחר העלאת הגרסה.');
  for(const layer of cover.grass)for(const [outer,...holes] of layer.polygons)slab(outer,layer.y,grass,holes);
  for(const r of layout.roadSurfaces)slab(rectanglePolygon(r),-.04,r.kind==='street'?asphalt:parkingPavers);
  for(const p of layout.parking)slab(p.polygon,-.039,parkingPavers);
@@ -98,6 +98,7 @@ export function createDistrictSite(source,{mobile=false}={}){
  for(let x=west+12;x<east-8;x+=11)for(let z=north-45;z<south-6;z+=12){if(bodies2D.some(r=>contains(r,[x,z]))||layout.roads.some(r=>contains({...r,minX:r.minX-2,maxX:r.maxX+2,minZ:r.minZ-2,maxZ:r.maxZ+2},[x,z]))||forbidden.some(p=>intersects({minX:x-2.4,maxX:x+2.4,minZ:z-2.4,maxZ:z+2.4},bounds(p))))continue;points.push([x,z]);}
  const props=createRealisticProps({trees:points,cars,mobile});group.add(props.group);
  group.updateMatrixWorld(true);
+ surfaces.clear();boxes.clear();
  let disposed=false;
- return {group,layout,update:(position,now)=>props.update(position,now),props,details:{drains},dispose(){if(disposed)return;disposed=true;props.dispose();for(const o of group.children)if(o.isInstancedMesh)o.dispose();details.dispose();geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());group.removeFromParent();group.clear();}};
+ return {group,layout,update:(position,now)=>props.update(position,now),props,details:{drains},dispose(){if(disposed)return;disposed=true;props.dispose();for(const o of group.children)if(o.isInstancedMesh)o.dispose();details.dispose();geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());group.removeFromParent();group.clear();geometries.length=materials.length=textures.length=0;surfaces.clear();boxes.clear();}};
 }

@@ -17,11 +17,11 @@ export function installCelestialSky({renderer,scene,camera,getSettings=()=>({}),
   if(disposed)return null;
   const settings=getSettings()||{},minute=Math.floor(now.getTime()/60000),nextKey=JSON.stringify([settings.solar,settings.light,settings.solar?.live===true?minute:null]);
   if(nextKey!==key){
-   const nextState=celestialState(settings,now,{kitchen}),pixels=skyPixels(nextState,{width:mobile?1024:2048,height:mobile?512:1024});
-   const texture=new THREE.DataTexture(pixels.data,pixels.width,pixels.height,THREE.RGBAFormat,THREE.FloatType);texture.mapping=THREE.EquirectangularReflectionMapping;texture.magFilter=THREE.LinearFilter;texture.minFilter=THREE.LinearFilter;texture.needsUpdate=true;
+   const nextState=celestialState(settings,now,{kitchen}),pixels=skyPixels(nextState,{width:mobile?512:1024,height:mobile?256:512});
+   const texture=new THREE.DataTexture(Uint16Array.from(pixels.data,THREE.DataUtils.toHalfFloat),pixels.width,pixels.height,THREE.RGBAFormat,THREE.HalfFloatType);texture.mapping=THREE.EquirectangularReflectionMapping;texture.magFilter=THREE.LinearFilter;texture.minFilter=THREE.LinearFilter;texture.needsUpdate=true;
    let nextFiltered;
    try{if(environmentFactory)nextFiltered=environmentFactory(texture);else{const generator=new THREE.PMREMGenerator(renderer);try{nextFiltered=generator.fromEquirectangular(texture);}finally{generator.dispose();}}}catch(error){texture.dispose();throw error;}
-   source?.dispose();filtered?.dispose();source=texture;filtered=nextFiltered;state=nextState;key=nextKey;lastSettings=state.settings;
+   source?.dispose();if(source?.source)source.source.data=null;filtered?.dispose();source=texture;filtered=nextFiltered;state=nextState;key=nextKey;lastSettings=state.settings;
   }
   if(!state)return null;
   onDaylight?.(lastSettings);disks.update(state);
@@ -40,5 +40,5 @@ export function installCelestialSky({renderer,scene,camera,getSettings=()=>({}),
   if(sun){const distance=Math.max(100,shadowRadius*2+60);sun.intensity=state.sunIntensity;sun.visible=sun.intensity>0;sun.color.set(state.sun.elevation<15?'#ffcf95':'#fff4e1');sun.position.copy(anchor).addScaledVector(sunDirection,distance);Object.assign(sun.shadow.camera,{left:-shadowRadius,right:shadowRadius,top:shadowRadius,bottom:-shadowRadius,near:.1,far:Math.max(220,distance+shadowRadius*2+80)});sun.shadow.camera.updateProjectionMatrix();}
   return state;
  }
- return {update,get state(){return state;},dispose(){disposed=true;scene.remove(disks.mesh);disks.dispose();source?.dispose();filtered?.dispose();sun?.shadow.map?.dispose();scene.remove(lightRig);scene.background=original.background;scene.environment=original.environment;scene.userData.photoEnvironment=original.photo;}};
+ return {update,trim(){if(sun){sun.shadow.map?.dispose();sun.shadow.map=null;sun.shadow.mapSize.set(mobile?1024:2048,mobile?1024:2048);}},get state(){return state;},dispose(){if(disposed)return;disposed=true;scene.remove(disks.mesh);disks.dispose();source?.dispose();if(source?.source)source.source.data=null;filtered?.dispose();source=filtered=null;sun?.shadow.map?.dispose();scene.remove(lightRig);scene.background=original.background;scene.environment=original.environment;scene.userData.photoEnvironment=original.photo;}};
 }

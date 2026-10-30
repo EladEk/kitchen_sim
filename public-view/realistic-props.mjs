@@ -198,8 +198,8 @@ export function createRealisticProps({trees=[],cars=[],mobile=false}={}){
  families.forEach(f=>f.initialized=false);
  return {group,update,thresholds:thresholds.slice(),
   getState(){return families.flatMap(f=>f.placements.map((p,i)=>({type:f.type,id:p.id,tier:f.levels[i],position:[p.x,p.y,p.z],angle:p.angle,scale:p.scale.slice(),color:p.color.toArray(),...(p.length?{length:p.length}:{})})));},
-  resources:{geometries:[...geometries],materials:[...materials],textures:[...textures]},
+  get resources(){return {geometries:[...geometries],materials:[...materials],textures:[...textures]};},
   get stats(){return {drawCalls:group.children.filter(m=>m.visible&&m.count>0).length,maxDrawCalls:group.children.length,activeInstances:group.children.reduce((n,m)=>n+(m.visible?m.count:0),0),templateTriangles:[...geometries].reduce((n,g)=>n+(g.index?.count??g.attributes.position.count)/3,0)};},
-  dispose(){if(disposed)return;disposed=true;group.removeFromParent();for(const mesh of group.children)mesh.dispose?.();geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());group.clear();}
+  dispose(){if(disposed)return;disposed=true;group.removeFromParent();for(const mesh of group.children)mesh.dispose?.();geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());group.clear();geometries.clear();materials.clear();textures.clear();families.length=0;}
  };
 }

@@ -34,7 +34,7 @@ export function createSpatialCollisionIndex(root, {trees = new Map(), include = 
   const n = object.isInstancedMesh ? object.count : 1;
   if (n) { sources.push(object); counts.push(n); count += n; }
  });
- let matrices = new Float64Array(count * 16), boxes = new Float32Array(count * 6);
+ let matrices = new Float32Array(count * 16), boxes = new Float32Array(count * 6);
  let sourceIds = new Uint32Array(count), visited = new Uint32Array(count), stamp = 0;
  const matrix = new THREE.Matrix4(), instance = new THREE.Matrix4(), box = new THREE.Box3();
  const envelope = new THREE.Box3(), grid = new Map(), global = [];
@@ -114,7 +114,7 @@ export function createSpatialCollisionIndex(root, {trees = new Map(), include = 
   dispose() {
    if (disposed) return; disposed = true;
    sources.length = counts.length = hits.length = global.length = 0; grid.clear();
-   matrices = boxes = sourceIds = visited = overflow = null;
+   matrices = boxes = sourceIds = visited = overflow = null; stats.bufferBytes = 0;
    if (proxy) proxy.geometry = proxy.material = null;
   }
  };

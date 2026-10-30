@@ -35,3 +35,12 @@ test('leaving photo mode during asynchronous initialization disposes the stale r
   const now=performance.now();f.button.click();f.photo.render(now+1500);f.photo.render(now+3000);assert(resolve);f.button.click();resolve(f.make());await flush();assert.equal(f.counts.disposed,2);assert.equal(f.host.children.length,1);assert.equal(f.photo.capture(),null);assert.equal(f.button.attributes['aria-pressed'],'false');
  }finally{f.finish();}
 });
+test('sustained camera movement and background suspension retire photo buffers before rebuilding',async()=>{
+ const f=fixture();try{
+  const now=performance.now();f.button.click();f.photo.render(now+1500);f.photo.render(now+3000);await flush();f.photo.render(now+4500);f.photo.render(now+4600);assert(f.photo.capture());
+  for(let i=0;i<12;i++){f.camera.position.x+=.1;f.photo.render(now+4700+i*50);}
+  assert.equal(f.photo.capture(),null);assert.equal(f.counts.disposed,2);assert.equal(f.button.attributes['aria-pressed'],'true');assert.equal(f.host.children.length,1);
+  f.photo.render(now+9000);await flush();f.photo.render(now+10500);f.photo.render(now+10600);assert(f.photo.capture());
+  f.photo.suspend();assert.equal(f.counts.disposed,4);assert.equal(f.host.children.length,1);assert.equal(f.photo.capture(),null);
+ }finally{f.finish();}
+});

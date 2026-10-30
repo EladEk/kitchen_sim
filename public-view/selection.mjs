@@ -61,5 +61,5 @@ export function createSelection(template,nav,state){
  });
  for(const [material,b] of buckets){const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(b.positions,3));geo.setAttribute('normal',new THREE.Float32BufferAttribute(b.normals,3));geo.setAttribute('uv',new THREE.Float32BufferAttribute(b.uvs,2));geo.computeBoundingSphere();owned.push(geo);const mesh=new THREE.Mesh(geo,material);mesh.castShadow=mesh.receiveShadow=true;group.add(mesh);}
  group.updateMatrixWorld(true);
- return {group,regions,dispose(){owned.forEach(g=>g.dispose());instances.forEach(m=>m.dispose());group.clear();}};
+ return {group,regions,dispose(){owned.forEach(g=>g.dispose());instances.forEach(m=>m.dispose());group.clear();owned.length=instances.length=0;buckets.clear();}};
 }

@@ -1,5 +1,6 @@
 // Build-time only: publish approved baseline geometry, never owner modules/data.
 import * as THREE from 'three';
+import {compactRenderAttributes} from '../public-view/compact-attributes.mjs';
 import {mergeVertices} from 'three/addons/utils/BufferGeometryUtils.js';
 import {createHash} from 'node:crypto';
 import {writeFile,mkdir} from 'node:fs/promises';
@@ -44,6 +45,7 @@ export async function createPublicBaseline(directory){
     // Rounded source primitives often repeat all three corners of every
     // triangle. Compact once at build time, preserving UV and normal seams.
     if(!g.index){const compact=mergeVertices(g,1e-6),bytes=v=>Object.values(v.attributes).reduce((n,a)=>n+a.array.byteLength,v.index?.array.byteLength||0);if(bytes(compact)<bytes(g)){g.dispose();g=compact;}else compact.dispose();}
+    compactRenderAttributes(g);
     const hash=createHash('sha256');
     for(const [name,attribute] of [...Object.entries(g.attributes),['index',g.index]]){if(!attribute)continue;hash.update(JSON.stringify([name,attribute.itemSize,attribute.normalized,attribute.array.constructor.name]));hash.update(Buffer.from(attribute.array.buffer,attribute.array.byteOffset,attribute.array.byteLength));}
     hash.update(JSON.stringify([g.groups,g.drawRange]));const key=hash.digest('hex');
@@ -74,7 +76,7 @@ export async function createPublicBaseline(directory){
  const destinations=[];
  for(const f of BUILDING_FLOORS)for(const u of f.units){const duplex=duplexForUnit(u.number,f.level);if(duplex&&f.level!==duplex.entryFloor)continue;const source=BUILDING_INTERIORS.floors[f.level],entry=source.entries.find(e=>e.unit===u.number),door=source.doors.find(d=>d.id===entry?.doorId);let position,yaw=0;if(u.number===4){position=[6.1,2.8];yaw=Math.PI;}else if(door){const normal=door.opened.map((n,i)=>(n-door.hinge[i])/(Math.hypot(...door.opened.map((x,k)=>x-door.hinge[k]))||1));position=door.hinge.map((n,i)=>(n+door.closed[i])/2+normal[i]*.85);yaw=Math.atan2(-normal[0],-normal[1]);}else{position=[...u.polygon[0]];}destinations.push({id:`unit:${u.number}:${f.level}`,label:`דירה ${u.number}`,floor:f.level,unit:u.number,position,yaw,polygon:u.polygon});}
  for(const c of COMMON_SPACES)destinations.push({id:c.id,label:c.he||c.nameHe||c.id,floor:0,position:c.walk,yaw:c.yaw||0,polygon:c.polygon});
- await mkdir(directory,{recursive:true});await writeFile(directory+'/building.json',JSON.stringify(root.toJSON()));await writeFile(directory+'/site.json',JSON.stringify(publicSiteData()));await writeFile(directory+'/navigation.json',JSON.stringify({revision:97,center:BUILDING_CENTER,storey:BUILDING.storey,floors,destinations}));
+ await mkdir(directory,{recursive:true});await writeFile(directory+'/building.json',JSON.stringify(root.toJSON()));await writeFile(directory+'/site.json',JSON.stringify(publicSiteData()));await writeFile(directory+'/navigation.json',JSON.stringify({revision:98,center:BUILDING_CENTER,storey:BUILDING.storey,floors,destinations}));
  console.log('Public baseline: 43 apartments; original unit-4 kitchen and standard garden; owner geometry excluded.');
  return {root,floors,destinations};
 }

@@ -2,7 +2,7 @@ import {installStoneCourses,installFloorCourses} from '../src/building-finish-sh
 import {installBuildingSurfaceUVs} from '../src/building-surface-uvs.mjs';
 import {createSurfaceDetails} from './surface-detail.mjs';
 // Reinstall shader functions lost by Three ObjectLoader JSON serialization.
-export function restorePublicFinishes(root,{mobile=false,stoneUrl=null}={}){
+export function restorePublicFinishes(root,{mobile=false,stoneUrl=null,signal}={}){
  const details=createSurfaceDetails({mobile}),previous=new Set();
  root.traverse(o=>{for(const mat of [o.material].flat().filter(Boolean))for(const value of Object.values(mat))if(value?.isTexture)previous.add(value);});
  const seen=new Set();root.traverse(o=>{for(const mat of [o.material].flat().filter(Boolean)){
@@ -16,5 +16,5 @@ export function restorePublicFinishes(root,{mobile=false,stoneUrl=null}={}){
  }});
  const used=new Set();root.traverse(o=>{for(const mat of [o.material].flat().filter(Boolean))for(const value of Object.values(mat))if(value?.isTexture)used.add(value);});
  for(const t of previous)if(!used.has(t))t.dispose();
- return {ready:details.loadStone(stoneUrl),dispose:()=>details.cancel()};
+ return {ready:details.loadStone(stoneUrl,{signal}),dispose:()=>details.dispose(),get textures(){return details.textures;}};
 }

@@ -1,4 +1,36 @@
-# R97 — walking and memory
+# R98 — memory safeguards and stable tour menus
+
+Opening Options during a walking tour now pauses navigation without running
+OrbitControls against the old building-view target. Position and gaze remain
+unchanged, held input is cleared, and closing the dialog resumes the same tour.
+
+Render normals use normalized Int16 and bounded UVs use normalized Uint16;
+positions and indices remain exact and tiled/world UVs retain Float32 range.
+Collision instance transforms now use Float32. The procedural surface cache has
+an 8 MiB LRU limit; bump and roughness share an RG8 texture with separate channels.
+HDR skies use half-float storage and smaller mobile/desktop maps; astronomical
+positions and the separate screen-resolution Sun and Moon meshes are preserved.
+
+Postprocessing is allocated lazily, bounded by output pixel count, and released
+for XR, backgrounding and sustained slow frames. Photo mode preflights a working
+memory estimate before cloning, avoids overlapping old/new tracers, cancels BVH
+waiters, and releases its renderer context during sustained movement or suspend.
+Model disposal clears resource containers and CPU image references. Baseline and
+surface loads can be canceled; image loading has a deadline and late-result cleanup.
+
+Visibility/BFCache events pause and resume one render loop without changing the
+camera. Graphics-context restoration reuses the loaded scene with a smaller GPU
+budget, caps automatic recovery attempts, and offers reload on persistent failure.
+Automated tests exercise repeated resource cycles, navigation pause, cancellation,
+real district walking and apartment photo BVH generation. Device GPU/VR testing
+still requires compatible hardware; CPU buffer measurements are not total browser
+memory or frame-rate guarantees.
+
+Measured on the same public-scene CPU benchmark, render attribute/index buffers
+are 57,845,552 bytes (R97: 77,210,746; about 25% less), and the collision index is
+4,500,104 bytes (R97: 7,306,824; about 38% less).
+
+## R97 — walking and memory
 
 Walking uses a spatial collision index and shared BVHs of one canonical public
 building. Queries are transformed to the nearby building; district render meshes,
