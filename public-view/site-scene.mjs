@@ -6,7 +6,7 @@ import {FINISH_GRID_GLSL} from '../src/building-finish-shaders.mjs';
 import {createSiteLayout,bounds,inside,contains,rectanglePolygon,intersects} from './site-layout.mjs';
 import {DISTRICT_GROUND,DISTRICT,districtFootprint} from './district-layout.mjs';
 
-export function createDistrictSite(source,{mobile=false}={}){
+export function createDistrictSite(source,{mobile=false,includeFence=()=>true,includeCar=()=>true}={}){
  const layout=createSiteLayout(source),group=new THREE.Group(),geometries=[],materials=[],textures=[],surfaces=new Map(),boxes=new Map();group.name='public-district-development';const details=createSurfaceDetails({mobile});
  function material(color,kind='plain',extra={}){
   const m=new THREE.MeshStandardMaterial({color,roughness:.88,...extra});materials.push(m);
@@ -35,7 +35,7 @@ export function createDistrictSite(source,{mobile=false}={}){
  function box(x,y,z,w,h,d,m,angle=0){if(!boxes.has(m))boxes.set(m,[]);boxes.get(m).push([x,y,z,w,h,d,angle]);}
  function line(a,b,y,h,w,m){const dx=b[0]-a[0],dz=b[1]-a[1],len=Math.hypot(dx,dz);if(len>.015)box((a[0]+b[0])/2,y,(a[1]+b[1])/2,len,h,w,m,-Math.atan2(dz,dx));}
  const cover=source.groundCover;
- if(cover?.revision!==98)throw Error('נתוני הקרקע אינם תואמים לגרסה R98. יש לרענן לאחר העלאת הגרסה.');
+ if(cover?.revision!==100)throw Error('נתוני הקרקע אינם תואמים לגרסה R100. יש לרענן לאחר העלאת הגרסה.');
  for(const layer of cover.grass)for(const [outer,...holes] of layer.polygons)slab(outer,layer.y,grass,holes);
  for(const r of layout.roadSurfaces)slab(rectanglePolygon(r),-.04,r.kind==='street'?asphalt:parkingPavers);
  for(const p of layout.parking)slab(p.polygon,-.039,parkingPavers);
@@ -44,7 +44,7 @@ export function createDistrictSite(source,{mobile=false}={}){
  // Standard perimeter has a low masonry plinth and black vertical bars,
  // matching the supplied exterior photographs. Internal garden dividers are
  // plain masonry; no owner-specific privacy panels are copied to neighbours.
- for(const f of layout.fences){
+ for(const f of layout.fences.filter(includeFence)){
   const dx=f.b[0]-f.a[0],dz=f.b[1]-f.a[1],len=Math.hypot(dx,dz),height=f.divider?1.55:.3;
   line(f.a,f.b,height/2,height,.16,stone);line(f.a,f.b,height+.025,.05,.20,cap);
   if(f.divider)continue;
@@ -93,7 +93,7 @@ export function createDistrictSite(source,{mobile=false}={}){
  const cube=new THREE.BoxGeometry(1,1,1);geometries.push(cube);const matrix=new THREE.Matrix4(),q=new THREE.Quaternion();
  for(const [m,items] of boxes){const mesh=new THREE.InstancedMesh(cube,m,items.length);items.forEach(([x,y,z,w,h,d,a],i)=>{q.setFromAxisAngle(THREE.Object3D.DEFAULT_UP,a);matrix.compose(new THREE.Vector3(x,y,z),q,new THREE.Vector3(w,h,d));mesh.setMatrixAt(i,matrix);});mesh.castShadow=mesh.receiveShadow=true;mesh.computeBoundingSphere();group.add(mesh);}
  // Representative vehicles fit completely within their own marked bay.
- const cars=layout.parking.filter((b,i)=>!b.accessible&&i%7===0).map(b=>{const r=bounds(b.polygon),alongX=r.maxX-r.minX>r.maxZ-r.minZ;return {x:(r.minX+r.maxX)/2,z:(r.minZ+r.maxZ)/2,angle:alongX?Math.PI/2:0,length:Math.min(4.1,Math.max(r.maxX-r.minX,r.maxZ-r.minZ)-.22)};});
+ const cars=layout.parking.filter((b,i)=>!b.accessible&&i%7===0&&includeCar(b)).map(b=>{const r=bounds(b.polygon),alongX=r.maxX-r.minX>r.maxZ-r.minZ;return {x:(r.minX+r.maxX)/2,z:(r.minZ+r.maxZ)/2,angle:alongX?Math.PI/2:0,length:Math.min(4.1,Math.max(r.maxX-r.minX,r.maxZ-r.minZ)-.22)};});
  const bodies2D=DISTRICT.map(b=>districtFootprint(b,2)),points=[],forbidden=layout.gardens.map(g=>g.plot).concat(layout.parking.map(b=>b.polygon),layout.sidewalks.map(w=>w.polygon));
  for(let x=west+12;x<east-8;x+=11)for(let z=north-45;z<south-6;z+=12){if(bodies2D.some(r=>contains(r,[x,z]))||layout.roads.some(r=>contains({...r,minX:r.minX-2,maxX:r.maxX+2,minZ:r.minZ-2,maxZ:r.maxZ+2},[x,z]))||forbidden.some(p=>intersects({minX:x-2.4,maxX:x+2.4,minZ:z-2.4,maxZ:z+2.4},bounds(p))))continue;points.push([x,z]);}
  const props=createRealisticProps({trees:points,cars,mobile});group.add(props.group);

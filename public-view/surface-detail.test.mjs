@@ -6,7 +6,7 @@ import {restorePublicFinishes} from './finishes.mjs';
 
 test('public material channels have finite bounded detail and suitable linear/color spaces',()=>{
  const set=createSurfaceDetails({mobile:true});
- try{for(const kind of ['limestone','porcelain','cement','plaster','paint','wood','fabric','paving','asphalt','grass']){
+ try{for(const kind of ['limestone','porcelain','cement','plaster','paint','door','wood','fabric','paving','asphalt','grass']){
   const maps=set.get(kind),pixels=surfacePixels(kind,256);assert.equal(set.get(kind),maps);assert.equal(maps.color.image.width,256);
   assert.equal(maps.color.colorSpace,THREE.SRGBColorSpace);assert.equal(maps.height.colorSpace,THREE.NoColorSpace);assert.equal(maps.roughness.colorSpace,THREE.NoColorSpace);
   assert.equal(maps.color.minFilter,THREE.LinearMipmapLinearFilter);assert(maps.color.generateMipmaps);

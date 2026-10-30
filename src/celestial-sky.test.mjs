@@ -63,6 +63,13 @@ test('noon diffuse illumination is useful indoors and fades with the Sun without
  assert(noon.environmentIntensity>.8);assert(night.environmentIntensity<.02);assert.equal(dark.environmentIntensity,0);assert.equal(dark.sunIntensity,0);
 });
 
+test('district ceilings receive warm daylight bounce from below without adding lights or changing celestial direction',()=>{
+ const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera();let settings=manual('2026-10-30',720);
+ const sky=installCelestialSky({renderer:{},scene,camera,getSettings:()=>settings,ownSun:true,mobile:true,environmentFactory:()=>({texture:new THREE.Texture(),dispose(){}})});
+ sky.update();const lights=[];scene.traverse(o=>{if(o.isLight)lights.push(o);});const fill=lights.find(o=>o.isHemisphereLight);assert(fill.groundColor.r>.5&&fill.groundColor.g>.4&&fill.groundColor.b>.3);assert(fill.intensity>.5);assert.equal(lights.length,3);
+ settings={...settings,light:'night'};sky.update();assert.equal(fill.intensity,0);sky.dispose();
+});
+
 test('opening defaults to noon and old saved live settings cannot turn on the clock implicitly',()=>{
  assert.equal(solarDefaults().live,false);assert.equal(normalizeSolar().live,false);
  const old={live:true,minutes:7,date:'2024-01-01',northBearing:82};

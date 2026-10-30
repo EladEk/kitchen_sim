@@ -16,12 +16,12 @@ class Session extends THREE.EventDispatcher{
  async requestReferenceSpace(type){if(this.localOnly&&type==='local-floor')throw Error('no floor');return {type};}
  async end(){this.ended++;this.dispatchEvent({type:'end'});}
 }
-function fixture({localOnly=false,request,supported=true,environment={},start={position:[2,0,4],yaw:0},move,canTeleport,onSelect,getModel}={}){
+function fixture({localOnly=false,request,supported=true,environment={},start={position:[2,0,4],yaw:0},move,canTeleport,onSelect,getModel,raycast}={}){
  const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(44,1.4,.06,120);camera.position.set(10,15,20);camera.rotation.set(.1,.6,.03);const parent=new THREE.Group();parent.add(camera);scene.add(parent);
  const controls={enabled:true,target:new THREE.Vector3(3,.5,8)},controllers=[new THREE.Group(),new THREE.Group()],grips=[new THREE.Group(),new THREE.Group()],sessions=[],states=[],requests=[],system=new THREE.EventDispatcher();
  system.isSessionSupported=async()=>supported;system.requestSession=(type,options)=>{requests.push({type,options});if(request)return request();const s=new Session({localOnly});sessions.push(s);return Promise.resolve(s);};
  const xr={enabled:false,isPresenting:false,setFramebufferScaleFactor(){},setFoveation(){},getController:i=>controllers[i],getControllerGrip:i=>grips[i],setReferenceSpaceType(type){this.type=type;},async setSession(s){this.session=s;this.isPresenting=true;s.addEventListener('end',()=>{this.isPresenting=false;this.session=null;});},setReferenceSpace(space){this.space=space;},getReferenceSpace(){return this.space;}};
- const renderer={xr,shadowMap:{enabled:true}},runtime=createVrRuntime({renderer,scene,camera,controls,getStart:()=>start,getModel,move,canTeleport,onSelect,onState:s=>states.push(s),environment:{isSecureContext:true,navigator:{xr:system},...environment}});
+ const renderer={xr,shadowMap:{enabled:true}},runtime=createVrRuntime({renderer,scene,camera,controls,getStart:()=>start,getModel,move,canTeleport,onSelect,raycast,onState:s=>states.push(s),environment:{isSecureContext:true,navigator:{xr:system},...environment}});
  return {runtime,scene,camera,parent,controls,controllers,grips,sessions,states,requests,system,renderer};
 }
 const frame=({x=0,y=1.65,z=0,yaw=0}={})=>({getViewerPose:()=>({transform:{position:{x,y,z},orientation:new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),yaw)}})});
@@ -92,4 +92,9 @@ test('controller rays open an actual kitchen front and stop at an opaque wall in
 test('immersive stereo bypasses the screen-only composer while retaining normal rendering after exit',()=>{
  let draws=0,targets=0;const renderer={xr:{isPresenting:true},getPixelRatio:()=>1,getSize:v=>v.set(400,300),render(){draws++;},getRenderTarget:()=>null,setRenderTarget(){targets++;}},scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(),p=createScenePresentation(renderer,scene,camera);
  try{p.render('realistic');assert.equal(draws,1);assert.equal(targets,0,'XR renders directly into the XR framebuffer');renderer.xr.isPresenting=false;p.render('light');assert.equal(draws,2);}finally{p.dispose();}
+});
+
+test('district VR pointer and trigger share the indexed query without traversing the full model',async()=>{
+ let queries=0,selections=0;const object={userData:{action:'door',doorId:'entry'}};const f=fixture({getModel:()=>{throw Error('Full scene traversal is forbidden for indexed district picking');},raycast:ray=>{queries++;assert(ray.ray.direction.length()>.99);return {object,distance:1,point:new THREE.Vector3()};},onSelect:data=>{assert.equal(data.doorId,'entry');selections++;}});
+ try{await f.runtime.ready;await f.runtime.start();f.runtime.update(0,frame());assert.equal(queries,2);f.controllers[0].dispatchEvent({type:'select'});assert.equal(queries,3);assert.equal(selections,1);}finally{f.runtime.dispose();}
 });

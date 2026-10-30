@@ -1,13 +1,14 @@
 import * as THREE from 'three';
 import {ENTRANCE_SERVICES as E} from './home-model.mjs';
 import {buildEntryWaterMeters} from './entry-water-meters-scene.js';
+import {createSurfacePalette} from './surface-materials.mjs';
 
 export function buildEntranceServices({group,box,cylinder,floor,mat,resources,motions,picks,settings,mode}){
- const groups=new Map(),opened=new Set(settings.openParts),paint=mat('#e6e3db',{roughness:.72}),frame=mat('#a4aaa5',{metalness:.5,roughness:.43}),white=mat('#f4f3ee',{roughness:.38}),black=mat('#242727',{roughness:.95}),blue=mat('#266b86',{roughness:.6}),grey=mat('#626561',{roughness:.75}),steel=mat('#9d9e91',{metalness:.66,roughness:.5}),brass=mat('#92754d',{metalness:.7,roughness:.42});
+ const surface=createSurfacePalette(resources),groups=new Map(),opened=new Set(settings.openParts),paint=surface('door','#e1dace'),ceilingFinish=surface('plaster','#f7f5ef'),frame=mat('#a4aaa5',{metalness:.5,roughness:.43}),white=mat('#f4f3ee',{roughness:.38}),black=mat('#242727',{roughness:.95}),blue=mat('#266b86',{roughness:.6}),grey=mat('#626561',{roughness:.75}),steel=mat('#9d9e91',{metalness:.66,roughness:.5}),brass=mat('#92754d',{metalness:.7,roughness:.42});
  const context=new THREE.Group();context.userData={part:'entry-common-context',outsideApartment:true,dimensionsInferred:true};group.add(context);
  floor(E.context.polygon,mat('#d3cec2'),-.005,context);
  // Show the public ceiling only in the full-height views, keeping the cutaway clear.
- if(mode==='walk'||!settings.cutaway){const slab=floor(E.context.polygon,paint,E.ceiling,context);slab.castShadow=true;slab.userData.part='entry-common-ceiling';}
+ if(mode==='walk'||!settings.cutaway){const slab=floor(E.context.polygon,ceilingFinish,E.ceiling,context);slab.castShadow=true;slab.userData.part='entry-common-ceiling';}
  for(const c of E.cabinets){
   const p=new THREE.Group();p.position.set(c.x,0,c.z);p.userData={buildingId:c.id,entryService:true,inspectionView:c.meters?{from:[c.x,1.4,c.z-1.7],target:[c.x,.72,c.z+.28]}:{from:[c.x,1.5,c.z-2.8],target:[c.x,1.3,c.z+.24]}};group.add(p);groups.set(c.id,p);
   const data={action:'building',buildingId:c.id,entryService:true};

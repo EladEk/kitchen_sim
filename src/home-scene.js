@@ -27,11 +27,11 @@ import {roomHasOrderedCladding} from './home-finish-schedule.mjs';
 import {buildElectricalPoints,buildWaterPoints} from './home-electrical-scene.js';
 import {LONG,SHORT,UPPERS,ISLAND,ISLAND_UNITS,MATERIALS,STONES,DEFAULTS} from './model.mjs';
 
-export function createHomeScene(settings,{mode='overview',selectedRoom='living',kitchenSettings=DEFAULTS}={}){
+export function createHomeScene(settings,{mode='overview',selectedRoom='living',kitchenSettings=DEFAULTS,context=true,daylight=true}={}){
  const group=new THREE.Group(),picks=[],resources=[],motions=[],roomGroups=new Map(),furnitureGroups=new Map(),doorGroups=new Map(),shutterGroups=new Map();
  const mat=(color,opts={})=>{const m=new THREE.MeshStandardMaterial({color,roughness:.78,...opts});resources.push(m);return m;};
  const surface=createSurfacePalette(resources);
- const offwhite=surface('paint','#efebe2'),oak=surface('wood','#ae8b61'),ink=mat('#35463d'),windowInk=mat('#343d3d',{metalness:.3,roughness:.5}),steel=mat('#a7b1ac',{metalness:.55,roughness:.35}),white=mat('#f0f0e8'),dark=mat('#29352f'),glass=mat('#b0c8be',{transparent:true,opacity:.28,roughness:.16,depthWrite:false}),linen=surface('fabric','#c5c5af'),clay=mat('#b58e75'),cap=mat('#c7c9bc');
+ const doorFinish=surface('door','#d8d0c3'),doorFrame=surface('paint','#e2dcd1'),ceilingFinish=surface('plaster','#f7f5ef',{side:THREE.FrontSide,shadowSide:THREE.DoubleSide}),offwhite=surface('paint','#efebe2'),oak=surface('wood','#ae8b61'),ink=mat('#35463d'),windowInk=mat('#343d3d',{metalness:.3,roughness:.5}),steel=mat('#a7b1ac',{metalness:.55,roughness:.35}),white=mat('#f0f0e8'),dark=mat('#29352f'),glass=mat('#b0c8be',{transparent:true,opacity:.28,roughness:.16,depthWrite:false}),linen=surface('fabric','#c5c5af'),clay=mat('#b58e75'),cap=mat('#c7c9bc');
  // Selecting a destination removes upper floors, but must not enable wall cuts.
  const wallCutaway=settings.cutaway===true&&mode!=='walk'&&(mode==='building'?settings.buildingLevel===0:mode==='unit'?parseDestination(settings.tourDestination).floor===0:true);
  const wallHeight=wallCutaway?.86:HOUSE.height;
@@ -49,7 +49,7 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
  function plant(x,z,size=1,parent=group){cylinder(x,.2*size,z,.2*size,.4*size,mat('#bcb6a1'),parent);cylinder(x,.48*size,z,.024*size,.75*size,oak,parent);for(let i=0;i<5;i++)sphere(x+Math.sin(i*1.8)*.13*size,(.75+i*.09)*size,z+Math.cos(i*1.8)*.13*size,.25*size,mat(i%2?'#7f9470':'#637d59'),parent,[1,.65,1]);}
  function roomMaterial(id){const value=settings.rooms[id]||settings.rooms.living;return value?.wall==='ordered-mona'?'#e9e5db':HOME_FINISHES.find(f=>f.id===value?.wall)?.color||'#e9e5db';}
  const green=surface('grass','#90a17b');floor(PLOT,green,-.035);floor(PUBLIC_ENTRY,surface('cement','#b9b9af'),-.01);floor(HOUSE_OUTLINE,mat('#d8d3c5'),0);
- if(mode==='walk'){const ceiling=floor(HOUSE_OUTLINE,offwhite,HOUSE.height);ceiling.castShadow=true;ceiling.userData.part='illustrative-ceiling';}
+ if(mode==='walk'){const ceiling=floor(HOUSE_OUTLINE,ceilingFinish,HOUSE.height);ceiling.material.side=THREE.FrontSide;ceiling.castShadow=true;ceiling.userData.part='illustrative-ceiling';}
  else if(!settings.cutaway){const m=new THREE.MeshBasicMaterial({colorWrite:false,depthWrite:false,transparent:true,opacity:0});resources.push(m);const ceiling=floor(HOUSE_OUTLINE,m,HOUSE.height);ceiling.castShadow=true;ceiling.userData.part='solar-ceiling-occluder';}
 
  function roomFloor(room,poly,parent,data){
@@ -75,7 +75,7 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
  for(const w of CONSTRUCTION_WALLS){const vertical=Math.abs(w.a[0]-w.b[0])<.001,lo=vertical?w.a[1]:w.a[0],hi=vertical?w.b[1]:w.b[0],holes=[...DOORS.filter(d=>!d.hostDoorId),...WINDOWS].filter(o=>o.wallId===w.id).sort((a,b)=>a.start-b.start);
   const vertexCuts=ROOMS.filter(r=>!['garden','outdoor'].includes(r.kind)).flatMap(r=>r.polygon).filter(p=>Math.abs(p[vertical?0:1]-w.a[vertical?0:1])<.45).map(p=>p[vertical?1:0]);
   const segment=(a,b,bottom,height)=>{if(b-a<.002||height<.002)return;const cuts=[...new Set([a,b,...vertexCuts.filter(n=>n>a+.002&&n<b-.002)])].sort((a,b)=>a-b);
-   for(let i=0;i<cuts.length-1;i++){const aa=cuts[i],bb=cuts[i+1],mid=vertical?[w.a[0],(aa+bb)/2]:[(aa+bb)/2,w.a[1]],regions=[roomAt([mid[0]+(vertical?.21:0),mid[1]+(vertical?0:.21)]),roomAt([mid[0]-(vertical?.21:0),mid[1]-(vertical?0:.21)])],m1=surface('paint',roomMaterial(regions[0]),{roughness:.9,bumpScale:.00012}),m2=surface('paint',roomMaterial(regions[1]),{roughness:.9,bumpScale:.00012}),mats=[m1,m2,cap,cap,m1,m2];
+   for(let i=0;i<cuts.length-1;i++){const aa=cuts[i],bb=cuts[i+1],mid=vertical?[w.a[0],(aa+bb)/2]:[(aa+bb)/2,w.a[1]],regions=[roomAt([mid[0]+(vertical?.21:0),mid[1]+(vertical?0:.21)]),roomAt([mid[0]-(vertical?.21:0),mid[1]-(vertical?0:.21)])],m1=surface('plaster',roomMaterial(regions[0])),m2=surface('plaster',roomMaterial(regions[1])),mats=[m1,m2,cap,cap,m1,m2];
     const facade=mode==='building'&&w.external?surface('limestone','#d9d2c5'):null;
     const mesh=vertical?box(w.a[0],bottom+height/2,(aa+bb)/2,w.thickness,height,bb-aa,facade||mats,group,{blockPick:true,wallId:w.id}):box((aa+bb)/2,bottom+height/2,w.a[1],bb-aa,height,w.thickness,facade||mats,group,{blockPick:true,wallId:w.id});mesh.userData.part='architectural-wall';
     for(let side=0;side<2;side++){const sign=side?-1:1,rr=settings.rooms[regions[side]],normal=w.a[vertical?0:1]+sign*(w.thickness/2+.004);
@@ -113,14 +113,14 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
  }
  for(const d of DOORS){const [x,z]=openingPoint(d),p=new THREE.Group();p.position.set(x+(d.vertical?d.faceOffset||0:0),0,z+(d.vertical?0:d.faceOffset||0));p.rotation.y=d.vertical?-Math.PI/2:0;p.userData.doorId=d.id;group.add(p);doorGroups.set(d.id,p);
   const h=Math.min(d.height,wallHeight),isOpen=settings.openDoors.includes(d.id),data={action:'door',doorId:d.id};
-  for(const xx of [-d.width/2,d.width/2])box(xx,h/2,0,.045,h,.1,offwhite,p);if(h>=d.height)box(0,h,0,d.width,.045,.1,offwhite,p);
+  for(const xx of [-d.width/2,d.width/2])box(xx,h/2,0,.052,h,.105,doorFrame,p,data);if(h>=d.height)box(0,h,0,d.width,.052,.105,doorFrame,p,data);
   if(d.type==='slider'){
    for(let i=0;i<2;i++){const leaf=new THREE.Group(),closed=-d.width/4+i*d.width/2;leaf.position.x=i?closed:(isOpen?d.width/4:closed);p.add(leaf);if(!i)motions.push({id:`door:${d.id}`,object:leaf,property:'x',axis:'position',target:leaf.position.x});
     glazing(d.id,h/2,d.width/2-.025,h,leaf,data);for(const xx of [-d.width/4,d.width/4])box(xx,h/2,.008,.025,h,.04,ink,leaf,data);for(const yy of [.015,h-.015])box(0,yy,.008,d.width/2,.025,.04,ink,leaf,data);box(-d.width/4+.07,h*.48,.04,.018,.22,.02,ink,leaf,data);
    }
   }else{
    const sign=d.hinge==='end'?-1:1,pivot=new THREE.Group(),openTarget=(d.swing||-1)*Math.PI*.48;pivot.position.x=-sign*d.width/2;pivot.rotation.y=isOpen?openTarget:0;p.add(pivot);motions.push({id:`door:${d.id}`,object:pivot,property:'y',axis:'rotation',target:pivot.rotation.y,openTarget});
-   box(sign*d.width/2,h/2,0,d.width-.045,h-.025,d.id==='safe'?.065:.035,d.material==='steel'?mat(d.id==='service-exit'?'#3e4946':'#c0c7bd'):offwhite,pivot,data,.009);box(sign*(d.width-.12),h*.48,.035,.095,.018,.04,steel,pivot,data);
+   box(sign*d.width/2,h/2,0,d.width-.045,h-.025,d.id==='safe'?.065:.035,d.material==='steel'?surface('door',d.id==='service-exit'?'#3e4946':'#b4bbb2',{metalness:.25}):doorFinish,pivot,data,.009);for(const side of [-1,1]){box(sign*(d.width-.12),h*.48,side*.025,.028,.16,.012,steel,pivot,data);box(sign*(d.width-.15),h*.48+.012,side*.047,.105,.018,.022,steel,pivot,data);}
   }
  }
  // Curtain outside the glass; the photographed dark access cover faces inside.
@@ -260,10 +260,10 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
   const v=Math.abs(w.a[0]-w.b[0])<.001,h=3.1-HOUSE.height;
   box((w.a[0]+w.b[0])/2,HOUSE.height+h/2,(w.a[1]+w.b[1])/2,v?w.thickness:Math.abs(w.b[0]-w.a[0]),h,v?Math.abs(w.b[1]-w.a[1]):w.thickness,surface('limestone','#d9d2c5'),group,{part:'building-apartment-top-band'});
  }
- const buildingContext=buildBuildingContext({group,resources,settings,mode,picks,apartmentOutline:HOUSE_OUTLINE});
+ const buildingContext=context?buildBuildingContext({group,resources,settings,mode,picks,apartmentOutline:HOUSE_OUTLINE}):{group:null,floors:new Map()};
  buildSecurityCameras({group,resources,settings,picks});
  buildOwnerCars({group,resources});
- const updateDaylight=buildDaylight({group,settings,resources,center:BUILDING_CENTER,radius:Math.max(BUILDING_BOUNDS.maxX-BUILDING_BOUNDS.minX,BUILDING_BOUNDS.maxZ-BUILDING_BOUNDS.minZ)*.8,distance:100});
+ const updateDaylight=daylight?buildDaylight({group,settings,resources,center:BUILDING_CENTER,radius:Math.max(BUILDING_BOUNDS.maxX-BUILDING_BOUNDS.minX,BUILDING_BOUNDS.maxZ-BUILDING_BOUNDS.minZ)*.8,distance:100}):()=>{};
  for(const [id,p] of buildLightingPoints({group,box,cylinder,mat,resources,settings,points:LIGHTING_LAYOUT.points,picks,selectedRoom}))gardenGroups.set(id,p);
  // One shadow budget for the apartment and common rooms together on mobile.
  group.updateMatrixWorld(true);
@@ -271,5 +271,5 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
  group.traverse(o=>{if(o.isLight&&o.userData.fixtureLight&&o.castShadow)shadowCandidates.push(o);});
  shadowCandidates.sort((a,b)=>{const pa=a.getWorldPosition(new THREE.Vector3()),pb=b.getWorldPosition(new THREE.Vector3());return Math.hypot(pa.x-focusXZ[0],pa.z-focusXZ[1])-Math.hypot(pb.x-focusXZ[0],pb.z-focusXZ[1]);});
  shadowCandidates.slice(6).forEach(light=>{light.castShadow=false;});
- return {group,picks,motions,roomGroups,furnitureGroups,doorGroups,shutterGroups,buildingGroups,gardenGroups,buildingContext,wallHeight,updateDaylight,dispose(){group.traverse(o=>{if(o.isLight&&o.shadow)o.shadow.dispose();});resources.forEach(r=>r.dispose?.());}};
+ let disposed=false;return {group,resources,picks,motions,roomGroups,furnitureGroups,doorGroups,shutterGroups,buildingGroups,gardenGroups,buildingContext,wallHeight,updateDaylight,dispose(){if(disposed)return;disposed=true;group.traverse(o=>{if(o.isLight&&o.shadow)o.shadow.dispose();});for(const r of new Set(resources)){r.dispose?.();if(r.isTexture&&r.source)r.source.data=null;}resources.length=picks.length=motions.length=0;for(const map of [roomGroups,furnitureGroups,doorGroups,shutterGroups,buildingGroups,gardenGroups])map.clear();group.removeFromParent();group.clear();}};
 }

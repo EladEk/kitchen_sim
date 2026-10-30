@@ -22,11 +22,11 @@ export async function createPublicBaseline(directory){
  buildBuildingContext({group:root,resources,settings,mode:'walk',picks});
  // Identity placement of the SAME base-plan template used for the neighbours.
  const temp=new THREE.Group(),bases=buildGroundApartments({root:temp,resources,picks:[],settings,mode:'walk'}),own=bases.get(1).clone(true);
- own.matrix.identity();own.name='public-base-apartment-4';own.userData={level:0};root.add(own);
+ own.matrix.identity();own.name='public-base-apartment-4';own.userData={level:0,variantSlot:4};root.add(own);
  // Replicate generic neighbour furnishing, never FURNITURE or owner layouts.
  const furniture=new THREE.Group();buildApartmentFurniture({parent:furniture,resources,level:0,base:0,settings});
  const t=groundTransform(1),[a,b,c,d]=t.matrix,inverse=new THREE.Matrix4().set(a,0,b,t.offset[0],0,1,0,0,c,0,d,t.offset[1],0,0,0,1).invert(),m=new THREE.Matrix4();
- for(const mesh of furniture.children){const indices=mesh.userData.placements.map((v,i)=>v.unit===1?i:-1).filter(i=>i>=0);if(!indices.length)continue;const clone=new THREE.InstancedMesh(mesh.geometry,mesh.material,indices.length);indices.forEach((i,j)=>{mesh.getMatrixAt(i,m);m.premultiply(inverse);clone.setMatrixAt(j,m);});clone.userData={level:0};clone.castShadow=clone.receiveShadow=true;root.add(clone);}
+ for(const mesh of furniture.children){const indices=mesh.userData.placements.map((v,i)=>v.unit===1?i:-1).filter(i=>i>=0);if(!indices.length)continue;const clone=new THREE.InstancedMesh(mesh.geometry,mesh.material,indices.length);indices.forEach((i,j)=>{mesh.getMatrixAt(i,m);m.premultiply(inverse);clone.setMatrixAt(j,m);});clone.userData={level:0,variantSlot:4};clone.castShadow=clone.receiveShadow=true;root.add(clone);}
  // Development is rendered once for the whole district. Remove the old
  // unrotated site surfaces and partial fences before sanitising the building.
  // Entrance doors, lintels and service-room geometry remain in the building.
@@ -34,7 +34,7 @@ export async function createPublicBaseline(directory){
  const obsolete=[];root.traverse(o=>{if(siteParts.has(o.userData.part))obsolete.push(o);});obsolete.forEach(o=>o.removeFromParent());
  refinePublicFacade(root,resources);
  // Strict metadata allowlist, no inspection descriptions, product IDs or sources.
- function clean(o,inherited=0){const f=o.userData.level??o.userData.buildingFloor??inherited;const part=o.userData.part||o.name||'';const ceiling=/ceiling/.test(part)||(o.geometry?.type==='ShapeGeometry'&&Math.abs(o.position.y-2.75)<.01),roof=/roof|lift-stair-head/.test(part),exterior=f===0||f===9||ceiling||roof||/building-(facade|window|glazing|rail|laundry|balcony|stone-sill|floor-slab|unit-finish|fascia)|public-curtain/.test(part);o.userData={level:f,ceiling,roof,exterior};o.name='';for(const child of o.children)clean(child,f);}
+ function clean(o,inherited=0){const f=o.userData.level??o.userData.buildingFloor??inherited;const part=o.userData.part||o.name||'';const ceiling=/ceiling/.test(part)||(o.geometry?.type==='ShapeGeometry'&&Math.abs(o.position.y-2.75)<.01),roof=/roof|lift-stair-head/.test(part),exterior=f===0||f===9||ceiling||roof||/building-(facade|window|glazing|rail|laundry|balcony|stone-sill|floor-slab|unit-finish|fascia)|public-curtain/.test(part);o.userData={level:f,ceiling,roof,exterior,...(o.userData.variantSlot===4?{variantSlot:4}:{})};o.name='';for(const child of o.children)clean(child,f);}
  clean(root);root.updateMatrixWorld(true);
  const geometryCache=new Map(),geometryByContent=new Map();root.traverse(o=>{
   // Parametric toJSON rebuilds constructor defaults and loses baked transforms.
@@ -57,7 +57,7 @@ export async function createPublicBaseline(directory){
   if(o.isMesh&&!o.isInstancedMesh)o.type='Mesh';
   if(o.material?.isShaderMaterial)o.material=new THREE.MeshStandardMaterial({color:'#9daaa7',metalness:.75,roughness:.16});
  });
- const seen=new Set(),textureCache=new Map();root.traverse(o=>{if(o.geometry)o.geometry.userData={};for(const mat of [o.material].flat().filter(Boolean)){if(seen.has(mat))continue;seen.add(mat);mat.userData={...(mat.userData.metricInstancedUVs?{metricInstancedUVs:true}:{}),...(['limestone','cement','porcelain','plaster','paint','wood','fabric'].includes(mat.userData.surfaceKind)?{surfaceKind:mat.userData.surfaceKind}:{}),...(["stone","floor"].includes(mat.userData.publicFinish)?{publicFinish:mat.userData.publicFinish}:{})};mat.name='';for(const [key,value] of Object.entries(mat))if(value?.isTexture&&!value.image?.data)mat[key]=null;for(const key of ['map','bumpMap','roughnessMap','normalMap']){const tex=mat[key];if(tex){
+ const seen=new Set(),textureCache=new Map();root.traverse(o=>{if(o.geometry)o.geometry.userData={};for(const mat of [o.material].flat().filter(Boolean)){if(seen.has(mat))continue;seen.add(mat);mat.userData={...(mat.userData.metricInstancedUVs?{metricInstancedUVs:true}:{}),...(['limestone','cement','porcelain','plaster','paint','door','wood','fabric'].includes(mat.userData.surfaceKind)?{surfaceKind:mat.userData.surfaceKind}:{}),...(["stone","floor"].includes(mat.userData.publicFinish)?{publicFinish:mat.userData.publicFinish}:{})};mat.name='';for(const [key,value] of Object.entries(mat))if(value?.isTexture&&!value.image?.data)mat[key]=null;for(const key of ['map','bumpMap','roughnessMap','normalMap']){const tex=mat[key];if(tex){
      // Compact procedural colours; external images and render-target mirrors
      // are never copied into the public snapshot.
      if(!tex.image?.data||!['map','bumpMap','roughnessMap'].includes(key)){mat[key]=null;continue;}
@@ -76,7 +76,7 @@ export async function createPublicBaseline(directory){
  const destinations=[];
  for(const f of BUILDING_FLOORS)for(const u of f.units){const duplex=duplexForUnit(u.number,f.level);if(duplex&&f.level!==duplex.entryFloor)continue;const source=BUILDING_INTERIORS.floors[f.level],entry=source.entries.find(e=>e.unit===u.number),door=source.doors.find(d=>d.id===entry?.doorId);let position,yaw=0;if(u.number===4){position=[6.1,2.8];yaw=Math.PI;}else if(door){const normal=door.opened.map((n,i)=>(n-door.hinge[i])/(Math.hypot(...door.opened.map((x,k)=>x-door.hinge[k]))||1));position=door.hinge.map((n,i)=>(n+door.closed[i])/2+normal[i]*.85);yaw=Math.atan2(-normal[0],-normal[1]);}else{position=[...u.polygon[0]];}destinations.push({id:`unit:${u.number}:${f.level}`,label:`דירה ${u.number}`,floor:f.level,unit:u.number,position,yaw,polygon:u.polygon});}
  for(const c of COMMON_SPACES)destinations.push({id:c.id,label:c.he||c.nameHe||c.id,floor:0,position:c.walk,yaw:c.yaw||0,polygon:c.polygon});
- await mkdir(directory,{recursive:true});await writeFile(directory+'/building.json',JSON.stringify(root.toJSON()));await writeFile(directory+'/site.json',JSON.stringify(publicSiteData()));await writeFile(directory+'/navigation.json',JSON.stringify({revision:98,center:BUILDING_CENTER,storey:BUILDING.storey,floors,destinations}));
+ await mkdir(directory,{recursive:true});await writeFile(directory+'/building.json',JSON.stringify(root.toJSON()));await writeFile(directory+'/site.json',JSON.stringify(publicSiteData()));await writeFile(directory+'/navigation.json',JSON.stringify({revision:100,center:BUILDING_CENTER,storey:BUILDING.storey,floors,destinations}));
  console.log('Public baseline: 43 apartments; original unit-4 kitchen and standard garden; owner geometry excluded.');
  return {root,floors,destinations};
 }

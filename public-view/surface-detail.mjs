@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-const profiles={limestone:[.87,.0018,1],porcelain:[.58,.00035,1],cement:[.91,.0015,1],plaster:[.96,.0006,3],paint:[.65,.00015,3],wood:[.69,.0007,1],fabric:[.99,.0012,8],paving:[.9,.0022,1],asphalt:[.96,.0015,1],grass:[1,.008,1]};
+const profiles={limestone:[.87,.0018,1],porcelain:[.58,.00035,1],cement:[.91,.0015,1],plaster:[.96,.00085,3],paint:[.65,.00015,3],door:[.5,.00025,1],wood:[.69,.0007,1],fabric:[.99,.0012,8],paving:[.9,.0022,1],asphalt:[.96,.0015,1],grass:[1,.008,1]};
 const fract=x=>x-Math.floor(x),mix=(a,b,t)=>a+(b-a)*t;
 const hash=(x,y,s=0)=>fract(Math.sin(x*127.1+y*311.7+s*74.7)*43758.5453);
 const smooth=t=>t*t*(3-2*t);
@@ -22,7 +22,8 @@ export function surfacePixels(kind,size=256){
   else if(kind==='grass'){const blades=Math.sin(v*Math.PI*240+noise(u,v,8,1)*5);c=224+(cloud-.5)*32+blades*9+(fine-.5)*14;h=128+blades*30+(fine-.5)*35;r=251;green=8;}
   else if(kind==='wood'){const grain=Math.sin(u*Math.PI*140+noise(u,v,8,3)*7);c=240+(cloud-.5)*12+grain*8;h=128+grain*16;r=225+(n-.5)*20;}
   else if(kind==='fabric'){const weave=Math.sin(x*Math.PI/2)*Math.cos(y*Math.PI/2);c=246+weave*5+(n-.5)*5;h=128+weave*35+(fine-.5)*12;r=250;}
-  else if(kind==='plaster'||kind==='paint'){c=251+(cloud-.5)*4+(fine-.5)*3;h=128+(fine-.5)*(kind==='plaster'?28:8);r=kind==='plaster'?249:226;}
+  else if(kind==='plaster'||kind==='paint'){c=250+(cloud-.5)*6+(fine-.5)*4;h=128+(fine-.5)*(kind==='plaster'?44:8);r=kind==='plaster'?249:226;}
+  else if(kind==='door'){const brushed=Math.sin(u*Math.PI*192+noise(u,v,8,12)*1.6);c=248+(cloud-.5)*4+brushed*1.5+(fine-.5)*2;h=128+brushed*8+(fine-.5)*10;r=229+(n-.5)*12;}
   const i=(y*size+x)*4;color.set([bytes(c-green/2),bytes(c+green/2),bytes(c-green),255],i);detail.set([bytes(h),bytes(r)],(y*size+x)*2);
  }
  const value={color,detail,height:detail,roughness:detail,size},cost=color.byteLength+detail.byteLength;

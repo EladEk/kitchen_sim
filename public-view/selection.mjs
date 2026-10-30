@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {motionAncestor,motionRoots,createMotionCopy} from './model-motions.mjs';
 
 // A section contains actual geometry, so live rendering, photo rendering and
 // bounds all agree. Generic navigation polygons are the only selection data.
@@ -24,9 +25,15 @@ function triangulate(polygon){
 }
 function compiledTriangles(triangles){return triangles.map(p=>({p,sign:Math.sign((p[1][0]-p[0][0])*(p[2][1]-p[0][1])-(p[1][1]-p[0][1])*(p[2][0]-p[0][0])),minX:Math.min(...p.map(v=>v[0])),maxX:Math.max(...p.map(v=>v[0])),minZ:Math.min(...p.map(v=>v[1])),maxZ:Math.max(...p.map(v=>v[1]))}));}
 export function createSelection(template,nav,state){
- const regions=selectionRegions(nav,state),group=new THREE.Group(),owned=[],instances=[],buckets=new Map();group.name='public-selected-section';
+ const regions=selectionRegions(nav,state),group=new THREE.Group(),owned=[],instances=[],moving=[],buckets=new Map();group.name='public-selected-section';
  template.updateWorldMatrix(true,true);const inverse=template.matrixWorld.clone().invert(),instance=new THREE.Matrix4();
  const compiled=regions.map(r=>({...r,triangles:r.polygon?(r.triangles?compiledTriangles(r.triangles):triangulate(r.polygon)):null}));
+ for(const source of motionRoots(template)){
+  const region=compiled.find(r=>r.level===(source.userData.level??0));if(!region)continue;
+  const bounds=new THREE.Box3().setFromObject(source).applyMatrix4(inverse);
+  if(region.polygon&&!region.triangles.some(t=>bounds.max.x>=t.minX&&bounds.min.x<=t.maxX&&bounds.max.z>=t.minZ&&bounds.min.z<=t.maxZ))continue;
+  const copy=createMotionCopy(source,template);moving.push(copy);group.add(copy.group);
+ }
  const append=(material,vertices)=>{
   if(!buckets.has(material))buckets.set(material,{positions:[],normals:[],uvs:[]});const out=buckets.get(material);
   for(let i=1;i+1<vertices.length;i++){
@@ -35,7 +42,7 @@ export function createSelection(template,nav,state){
   }
  };
  template.traverse(o=>{
-  if(!o.isMesh||o.userData.ceiling||o.userData.roof)return;
+  if(!o.isMesh||motionAncestor(o,template)||o.userData.ceiling||o.userData.roof||o.userData.sceneUi||(o.userData.securityOverlay||o.userData.tourNonPhysical)&&!o.userData.renderFixture)return;
   const region=compiled.find(r=>r.level===(o.userData.level??0));if(!region)return;
   const base=inverse.clone().multiply(o.matrixWorld);
   if(!region.polygon){const mesh=o.clone(false);mesh.matrixAutoUpdate=false;mesh.matrix.copy(base);group.add(mesh);if(mesh.isInstancedMesh)instances.push(mesh);return;}
@@ -61,5 +68,5 @@ export function createSelection(template,nav,state){
  });
  for(const [material,b] of buckets){const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(b.positions,3));geo.setAttribute('normal',new THREE.Float32BufferAttribute(b.normals,3));geo.setAttribute('uv',new THREE.Float32BufferAttribute(b.uvs,2));geo.computeBoundingSphere();owned.push(geo);const mesh=new THREE.Mesh(geo,material);mesh.castShadow=mesh.receiveShadow=true;group.add(mesh);}
  group.updateMatrixWorld(true);
- return {group,regions,dispose(){owned.forEach(g=>g.dispose());instances.forEach(m=>m.dispose());group.clear();owned.length=instances.length=0;buckets.clear();}};
+ return {group,regions,sync(){moving.forEach(c=>c.sync());group.updateMatrixWorld(true);},dispose(){owned.forEach(g=>g.dispose());instances.forEach(m=>m.dispose());moving.forEach(c=>c.dispose());group.clear();owned.length=instances.length=moving.length=0;buckets.clear();}};
 }

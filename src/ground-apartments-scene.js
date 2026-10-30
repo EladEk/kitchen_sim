@@ -12,7 +12,7 @@ import {lightOutput} from './lighting-controls.mjs';
 // movable owner furniture and the owner's kitchen never enter this builder.
 export function buildGroundApartments({root,resources,picks,settings,cut=false,mode='building',floorMaterial=null}){
  const profile=groundBaseProfile(),template=new THREE.Group(),h=cut?.85:profile.height,mat=(color,extra={})=>{const m=new THREE.MeshStandardMaterial({color,roughness:.72,...extra});resources.push(m);return m;},surface=createSurfacePalette(resources);
- const paint=surface('paint','#eeece5'),stone=surface('limestone','#d9d2c5'),neutralFloor=floorMaterial||surface('porcelain','#d0cdc5'),wetFloor=surface('cement','#c4c3bd'),white=mat('#f0f0e9'),metal=mat('#343e3d',{metalness:.35,roughness:.4}),glass=mat('#acc2ca',{transparent:true,opacity:.28,depthWrite:false,roughness:.18}),wood=surface('paint','#dedbd1');
+ const paint=surface('plaster','#eeece5'),stone=surface('limestone','#d9d2c5'),neutralFloor=floorMaterial||surface('porcelain','#d0cdc5'),wetFloor=surface('cement','#c4c3bd'),white=mat('#f0f0e9'),metal=mat('#343e3d',{metalness:.35,roughness:.4}),glass=mat('#acc2ca',{transparent:true,opacity:.28,depthWrite:false,roughness:.18}),wood=surface('paint','#dedbd1');
  for(const material of [paint,stone,neutralFloor,wetFloor,wood])installBuildingSurfaceUVs(material);
  const cube=new THREE.BoxGeometry(1,1,1);resources.push(cube);let interactive=false;
  const box=(x,y,z,w,hh,d,m,parent=template,data=null)=>{const mesh=new THREE.Mesh(cube,m);mesh.position.set(x,y,z);mesh.scale.set(w,hh,d);mesh.castShadow=mesh.receiveShadow=true;mesh.userData={...(data||{}),baseline:true};parent.add(mesh);if(interactive&&data?.action)picks.push(mesh);return mesh;};

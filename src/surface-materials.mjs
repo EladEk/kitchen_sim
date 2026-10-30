@@ -19,7 +19,8 @@ function surfaceData(kind,size=256,product=null){
   if(product?.photo){const i=(y*size+x)*4;color.set([...product.photo.previewRgb,255],i);height.set([128,128,128,255],i);roughness.set([245,245,245,255],i);continue;}
   const u=x/size,v=y/size,n=noise(u,v,8,3),cloud=noise(u,v,4,8),fine=hash(x,y,7),grain=Math.sin(2*Math.PI*(u*74+Math.sin(v*2*Math.PI)*.8+n*.4)),wood=kind==='wood'||kind==='terrace',fabric=kind==='fabric';
   let shade=248+(n-.5)*8+(fine-.5)*5,relief=128+(fine-.5)*20,r=235;
-  if(kind==='plaster'||kind==='paint'){shade=251+(cloud-.5)*3+(fine-.5)*3;relief=128+(fine-.5)*(kind==='plaster'?52:14);r=245;}
+  if(kind==='plaster'||kind==='paint'){shade=250+(cloud-.5)*6+(fine-.5)*4;relief=128+(fine-.5)*(kind==='plaster'?44:14);r=245;}
+  else if(kind==='door'){const brushed=Math.sin(u*2*Math.PI*96+noise(u,v,8,12)*1.6);shade=248+(cloud-.5)*4+brushed*1.5+(fine-.5)*2;relief=128+brushed*8+(fine-.5)*10;r=229+(n-.5)*12;}
   else if(wood){shade=239+(cloud-.5)*14+grain*(kind==='wood'?7:3)+(fine-.5)*5;relief=128+grain*14+(fine-.5)*12;r=217;}
   else if(fabric){const weave=Math.sin(x*Math.PI/2)*Math.sin(y*Math.PI/2);shade=243+weave*5+(n-.5)*7;relief=128+weave*45+(fine-.5)*16;r=250;}
   else if(kind==='cement'||kind==='limestone'){shade=244+(cloud-.5)*14+(n-.5)*9+(fine-.5)*8;relief=128+(n-.5)*36+(fine-.5)*26;r=242;}
@@ -37,15 +38,17 @@ function surfaceData(kind,size=256,product=null){
  }
  return {color,height,roughness,size};
 }
-const dataCache=new Map();
-const PROFILES={plaster:[.94,.0007],paint:[.57,.00016],porcelain:[.6,.00028],cement:[.9,.0012],limestone:[.88,.0018],stone:[.38,.0002],basalt:[.62,.00045],wood:[.66,.001],terrace:[.86,.001],fabric:[.98,.0017],grass:[1,.012],soil:[1,.006]};
+const dataCache=new Map();let dataBytes=0;const DATA_LIMIT=16*1024*1024;
+export function clearHomeSurfaceCache(){dataCache.clear();dataBytes=0;}
+export const homeSurfaceCacheStats=()=>({bytes:dataBytes,entries:dataCache.size,limit:DATA_LIMIT});
+const PROFILES={plaster:[.94,.00085],paint:[.57,.00016],door:[.5,.00025],porcelain:[.6,.00028],cement:[.9,.0012],limestone:[.88,.0018],stone:[.38,.0002],basalt:[.62,.00045],wood:[.66,.001],terrace:[.86,.001],fabric:[.98,.0017],grass:[1,.012],soil:[1,.006]};
 export function createSurfacePalette(resources){
  const textures=new Map(),materials=new Map();
  function surface(kind,color,options={}){
   const key=JSON.stringify([kind,color,options]);if(materials.has(key))return materials.get(key);
   const {productId,...materialOptions}=options,product=orderedSurface(productId),textureKey=product?`ordered:${product.sku}`:kind;
   if(!textures.has(textureKey)){
-   if(!dataCache.has(textureKey))dataCache.set(textureKey,surfaceData(kind,256,product));
+   if(!dataCache.has(textureKey)){const value=surfaceData(kind,256,product),bytes=value.color.byteLength+value.height.byteLength+value.roughness.byteLength;while(dataBytes+bytes>DATA_LIMIT&&dataCache.size){const [key,old]=dataCache.entries().next().value;dataBytes-=old.color.byteLength+old.height.byteLength+old.roughness.byteLength;dataCache.delete(key);}dataCache.set(textureKey,value);dataBytes+=bytes;}
    const data=dataCache.get(textureKey),maps={};
    const density=kind==='fabric'?16:kind==='paint'?8:kind==='plaster'?4:1;
    for(const channel of ['color','height','roughness']){const texture=new THREE.DataTexture(data[channel],data.size,data.size,THREE.RGBAFormat);texture.wrapS=texture.wrapT=FLOOR_RENDERING[productId]?THREE.ClampToEdgeWrapping:THREE.RepeatWrapping;texture.repeat.set(product?1/product.tile[0]:density,product?1/product.tile[1]:density);texture.magFilter=THREE.LinearFilter;texture.minFilter=THREE.LinearMipmapLinearFilter;texture.generateMipmaps=true;texture.anisotropy=FLOOR_RENDERING[productId]?16:4;texture.colorSpace=channel==='color'?THREE.SRGBColorSpace:THREE.NoColorSpace;texture.needsUpdate=true;maps[channel]=texture;resources.push(texture);}

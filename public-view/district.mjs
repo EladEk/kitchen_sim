@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import {inVariantSlot,hasVariantSlot} from './model-variants.mjs';
+import {motionAncestor,motionRoots,createMotionCopy} from './model-motions.mjs';
 import {compactRenderAttributes} from './compact-attributes.mjs';
 import {DISTRICT,PLAN_CENTER,PLAN_ROTATION} from './district-layout.mjs';
 import {createDistrictSite} from './site-scene.mjs';
@@ -11,27 +13,40 @@ export function districtLocation(position,data){
  for(const b of DISTRICT){const p=position.clone().applyMatrix4(buildingTransform(b).invert());if(p.x>=-4.1&&p.x<=27.5&&p.z>=-23.7&&p.z<=15.7){const floor=Math.max(0,Math.min(8,Math.floor((p.y-1.62+.35)/data.storey)));return {building:b.id,floor,position:p};}}
  return {building:null,floor:0,position};
 }
-// Only the already-sanitized public snapshot is accepted here. Reuse geometry
-// and batch identical materials into seven instances instead of seven downloads.
-export function createDistrict(template,siteData,{mobile=false}={}){
- const group=new THREE.Group(),geometries=[],materials=[],textures=[],buckets=new Map(),copies=[];template.updateMatrixWorld(true);
+// The public entry supplies only its sanitized snapshot. Authorized entries
+// may supply local variants; no private module is imported or fetched here.
+// Common surfaces stay shared across the entire district.
+export function createDistrict(template,siteData,{mobile=false,variants=new Map(),siteOptions={}}={}){
+ const group=new THREE.Group(),geometries=[],materials=[],textures=[],buckets=new Map(),copies=[],moving=[];template.updateMatrixWorld(true);
  const add=(o,matrix)=>{// The baseline is already sanitized. Keep all balcony returns and ground slabs.
 
  const mats=[o.material].flat(),total=o.geometry.index?.count??o.geometry.attributes.position.count;const ranges=mats.length>1?o.geometry.groups:[{start:0,count:total,materialIndex:0}];
- for(const range of ranges){const mat=mats[range.materialIndex];if(!mat||mat.opacity===0)continue;if(!buckets.has(mat))buckets.set(mat,new Map());const detail=o.userData.exterior===false?'interior':'exterior',byDetail=buckets.get(mat);if(!byDetail.has(detail))byDetail.set(detail,[]);byDetail.get(detail).push({geometry:o.geometry,matrix,start:range.start,count:range.count});}
+ for(const range of ranges){const mat=mats[range.materialIndex];if(!mat||mat.opacity===0)continue;if(!buckets.has(mat))buckets.set(mat,new Map());const detail=(o.userData.exterior===false?'interior':'exterior')+'|'+(o.castShadow?'1':'0'),byDetail=buckets.get(mat);if(!byDetail.has(detail))byDetail.set(detail,[]);byDetail.get(detail).push({geometry:o.geometry,matrix,start:range.start,count:range.count});}
  };
- template.traverse(o=>{if(!o.isMesh||!o.visible)return;if(o.isInstancedMesh){const m=new THREE.Matrix4();for(let i=0;i<o.count;i++){o.getMatrixAt(i,m);add(o,o.matrixWorld.clone().multiply(m));}}else add(o,o.matrixWorld);});
- for(const [mat,byDetail] of buckets)for(const [detail,parts] of byDetail){const geo=mergeDistrictParts(parts);if(!geo)continue;geometries.push(geo);
-  for(const mirror of [false,true]){const buildings=DISTRICT.filter(b=>!!b.mirror===mirror);if(!buildings.length)continue;const geometry=mirror?mirroredGeometry(geo):geo;if(mirror)geometries.push(geometry);const mesh=new THREE.InstancedMesh(geometry,mat,buildings.length);buildings.forEach((b,i)=>mesh.setMatrixAt(i,buildingTransform({...b,mirror:false})));mesh.castShadow=mesh.receiveShadow=true;mesh.userData={district:true,detail};copies.push({mesh,buildings,detail});group.add(mesh);}
+ const partitioned=variants.size>0&&hasVariantSlot(template)&&[...variants.values()].every(hasVariantSlot);
+ const plans=partitioned?[
+  {source:template,members:DISTRICT,include:o=>!inVariantSlot(o)},
+  {source:template,members:DISTRICT.filter(b=>!variants.has(b.id)),include:inVariantSlot},
+  ...[...variants].map(([id,source])=>({source,members:DISTRICT.filter(b=>b.id===id),include:inVariantSlot}))
+ ]:[{source:template,members:DISTRICT.filter(b=>!variants.has(b.id)),include:()=>true},...[...variants].map(([id,source])=>({source,members:DISTRICT.filter(b=>b.id===id),include:()=>true}))];
+ for(const {source,members,include} of plans){
+  if(!members.length)continue;source.updateWorldMatrix(true,true);const inverse=source.matrixWorld.clone().invert();
+  for(const motion of motionRoots(source)){if(!include(motion))continue;for(const b of members){const copy=createMotionCopy(motion,source),wrapper=new THREE.Group();wrapper.matrixAutoUpdate=false;wrapper.matrix.copy(buildingTransform(b));wrapper.add(copy.group);group.add(wrapper);moving.push({id:b.id,wrapper,copy});}}
+  source.traverseVisible(o=>{if(!o.isMesh||motionAncestor(o,source)||!include(o))return;const base=inverse.clone().multiply(o.matrixWorld);if(o.isInstancedMesh){const m=new THREE.Matrix4();for(let i=0;i<o.count;i++){o.getMatrixAt(i,m);add(o,base.clone().multiply(m));}}else add(o,base);});
+  for(const [mat,byDetail] of buckets)for(const [flags,parts] of byDetail){const [detail,cast]=flags.split('|');const geo=mergeDistrictParts(parts);if(!geo)continue;geometries.push(geo);
+   for(const mirror of [false,true]){const buildings=members.filter(b=>!!b.mirror===mirror);if(!buildings.length)continue;const geometry=mirror?mirroredGeometry(geo):geo;if(mirror)geometries.push(geometry);const mesh=new THREE.InstancedMesh(geometry,mat,buildings.length);buildings.forEach((b,i)=>mesh.setMatrixAt(i,buildingTransform({...b,mirror:false})));mesh.castShadow=cast==='1';mesh.receiveShadow=true;mesh.userData={district:true,detail};copies.push({mesh,buildings,detail});group.add(mesh);}
+  }
+  buckets.clear();
  }
+ plans.length=0;
  // Source transforms and merge staging records are no longer needed. Keeping
  // this map in the disposal closure retained tens of thousands of objects.
  buckets.clear();
- const site=createDistrictSite(siteData,{mobile});group.add(site.group);
+ const site=createDistrictSite(siteData,{mobile,...siteOptions});group.add(site.group);
  // Readable building numbers are scene labels, never camera-facing UI overlays.
  if(typeof document!=='undefined')for(const b of DISTRICT){const canvas=document.createElement('canvas');canvas.width=256;canvas.height=128;const ctx=canvas.getContext('2d');ctx.fillStyle=b.id==='4102'?'#315d50':'#36586c';ctx.fillRect(0,0,256,128);ctx.fillStyle='white';ctx.font='bold 70px Arial';ctx.textAlign='center';ctx.fillText(b.id,128,89);const tex=new THREE.CanvasTexture(canvas);textures.push(tex);const mat=new THREE.SpriteMaterial({map:tex,depthTest:true});materials.push(mat);const label=new THREE.Sprite(mat);label.position.set(center[0]+b.x,34,center[1]+b.z);label.scale.set(10,5,1);group.add(label);}
  let active='4102',lastDetailUpdate=-Infinity;const nearby=new Set(DISTRICT.map(b=>b.id)),threshold=mobile?90:130;
- const applyCopies=()=>updateBuildingCopies(copies,active,(b,copy)=>copy.detail!=='interior'||nearby.has(b.id));
+ const applyCopies=()=>{updateBuildingCopies(copies,active,(b,copy)=>copy.detail!=='interior'||nearby.has(b.id));for(const m of moving)m.wrapper.visible=m.id!==active&&nearby.has(m.id);};
  const setActiveBuilding=id=>{if(active===id&&lastDetailUpdate!==-Infinity)return;active=id;applyCopies();};
  const update=(position,now=0,{walking=false}={})=>{site.update(position,now);if(now-lastDetailUpdate<250)return;lastDetailUpdate=now;let changed=false;const radius=walking?36:threshold;
   for(const b of DISTRICT){const distance=Math.hypot(position.x-center[0]-b.x,position.y-14,position.z-center[1]-b.z),show=distance<radius*(nearby.has(b.id)?1.1:.9);if(show!==nearby.has(b.id)){show?nearby.add(b.id):nearby.delete(b.id);changed=true;}}
@@ -39,7 +54,7 @@ export function createDistrict(template,siteData,{mobile=false}={}){
  };
  setActiveBuilding('4102');group.updateMatrixWorld(true);
  let disposed=false;
- return {group,layout:site.layout,collisionRoot:site.group,setActiveBuilding,update,props:site.props,dispose(){if(disposed)return;disposed=true;site.dispose();copies.forEach(c=>c.mesh.dispose());geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());group.removeFromParent();group.clear();copies.length=0;buckets.clear();geometries.length=materials.length=textures.length=0;nearby.clear();}};
+ return {group,layout:site.layout,collisionRoot:site.group,setActiveBuilding,update,props:site.props,syncVariant(id){for(const m of moving)if(m.id===id)m.copy.sync();group.updateMatrixWorld(true);},dispose(){if(disposed)return;disposed=true;site.dispose();moving.forEach(m=>m.copy.dispose());moving.length=0;copies.forEach(c=>c.mesh.dispose());geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());group.removeFromParent();group.clear();copies.length=0;buckets.clear();geometries.length=materials.length=textures.length=0;nearby.clear();}};
 }
 
 // Reflections are baked, with corrected winding: negative instance matrices

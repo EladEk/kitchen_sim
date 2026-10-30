@@ -12,7 +12,9 @@ export function installCelestialSky({renderer,scene,camera,getSettings=()=>({}),
  const moon=new THREE.DirectionalLight('#c4d5ff',0);moon.target=target;moon.userData={part:'astronomical-moonlight',daylight:true};lightRig.add(moon);
  let sun,fill;
  if(ownSun){sun=new THREE.DirectionalLight('#fff4e1',0);sun.target=target;sun.castShadow=true;sun.shadow.mapSize.set(mobile?2048:4096,mobile?2048:4096);sun.shadow.bias=-.00015;sun.shadow.normalBias=.018;sun.shadow.radius=2;lightRig.add(sun);}
- fill=new THREE.HemisphereLight('#d6e5ff','#5b5142',0);fill.userData={part:'astronomical-sky-fill',daylight:true};lightRig.add(fill);
+ // A light ground bounce reaches downward-facing ceilings and soffits. It
+ // uses the existing solar intensity, so night/lamp-only modes stay dark.
+ fill=new THREE.HemisphereLight('#d6e5ff',ownSun?'#c8bdab':'#5b5142',0);fill.userData={part:'astronomical-sky-fill',daylight:true};lightRig.add(fill);
  function update({now=new Date(),focus=camera.position,shadowRadius=55}={}){
   if(disposed)return null;
   const settings=getSettings()||{},minute=Math.floor(now.getTime()/60000),nextKey=JSON.stringify([settings.solar,settings.light,settings.solar?.live===true?minute:null]);

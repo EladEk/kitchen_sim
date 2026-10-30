@@ -4,15 +4,18 @@ import * as THREE from 'three';
 import {LOBBY_POLYGON,PUMP_ROOM} from './common-spaces.mjs';
 import {LOBBY_BENCHES} from './lobby-reference.mjs';
 import {lightColour} from './lighting-controls.mjs';
+import {createSurfacePalette} from './surface-materials.mjs';
+import {installBuildingSurfaceUVs} from './building-surface-uvs.mjs';
 // Furniture-free finishes leave the documented circulation and door swings clear.
 // Equipment topology follows 298244.jpg; size/orientation are explicit estimates.
 export function buildCommonSpaces({parent,resources,settings,cut=false}){
  const root=new THREE.Group();root.name='common-spaces';root.userData={source:'building-plan',page:3};parent.add(root);
  const mat=(color,extra={})=>{const m=new THREE.MeshStandardMaterial({color,roughness:.72,...extra});resources.push(m);return m;};
  const white=mat('#eeece5'),blue=mat('#224e62',{metalness:.45,roughness:.4}),steel=mat('#a5aba7',{metalness:.75,roughness:.3}),black=mat('#303633'),cream=mat('#dfd8bc',{roughness:.42}),red=mat('#81443c'),stone=mat('#cbc5ba',{roughness:.55}),concrete=mat('#aca99e'),grout=mat('#b5b1a8');
+ const plaster=createSurfacePalette(resources)('plaster','#eeece5');installBuildingSurfaceUVs(plaster);
  const cube=new THREE.BoxGeometry(1,1,1),cylinder=new THREE.CylinderGeometry(1,1,1,16);resources.push(cube,cylinder);
  const batches=new Map(),dummy=new THREE.Object3D();
- function item(geo,m,p,s,q=null,name='common-detail'){const key=geo.uuid+m.uuid+name;let b=batches.get(key);if(!b)batches.set(key,b={geo,m,name,matrices:[]});dummy.position.set(...p);dummy.scale.set(...s);dummy.quaternion.copy(q||new THREE.Quaternion());dummy.updateMatrix();b.matrices.push(dummy.matrix.clone());}
+ function item(geo,m,p,s,q=null,name='common-detail'){if(m===white&&/wall|plaster/.test(name))m=plaster;const key=geo.uuid+m.uuid+name;let b=batches.get(key);if(!b)batches.set(key,b={geo,m,name,matrices:[]});dummy.position.set(...p);dummy.scale.set(...s);dummy.quaternion.copy(q||new THREE.Quaternion());dummy.updateMatrix();b.matrices.push(dummy.matrix.clone());}
  const box=(name,x,y,z,w,h,d,m)=>item(cube,m,[x,y,z],[w,h,d],null,name);
  function pipe(name,a,b,r,m){const va=new THREE.Vector3(...a),vb=new THREE.Vector3(...b),dir=vb.clone().sub(va),q=new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,1,0),dir.clone().normalize());item(cylinder,m,va.add(vb).multiplyScalar(.5).toArray(),[r,dir.length(),r],q,name);}
  function floor(poly,m,name,y=.025){const shape=new THREE.Shape();poly.forEach(([x,z],i)=>i?shape.lineTo(x,z):shape.moveTo(x,z));shape.closePath();const g=new THREE.ShapeGeometry(shape);g.rotateX(Math.PI/2);resources.push(g);m.side=THREE.DoubleSide;const mesh=new THREE.Mesh(g,m);mesh.position.y=y;mesh.name=name;mesh.receiveShadow=true;root.add(mesh);}

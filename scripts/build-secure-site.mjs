@@ -9,7 +9,7 @@ const env={...loadEnv('production',process.cwd(),''),...process.env},key=Buffer.
 if(key.length!==32)throw Error('Set DOCUMENTS_SECRET to a base64-encoded 32-byte server secret before building. No unprotected build is produced.');
 await rm('dist',{recursive:true,force:true,maxRetries:8,retryDelay:200});
 // Owner app is built in a separate protected namespace, with no public imports.
-await build({base:'/_personal/',publicDir:false,build:{outDir:'dist/client/_personal'}});
+await build({base:'/_personal/',publicDir:false,build:{outDir:'dist/client/_personal',rollupOptions:{input:{index:'index.html',district:'district.html'}}}});
 await build({configFile:false,root:'public-view',plugins:[react()],publicDir:false,build:{outDir:'../dist/client',emptyOutDir:false,target:'es2022'}});
 await createPublicBaseline('dist/client/baseline');
 // Original assets are copied only for sealing, never published in plaintext.

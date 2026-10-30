@@ -1,4 +1,55 @@
-# R98 — memory safeguards and stable tour menus
+# R100 — usable doors and restrained interior finishes
+
+Personal doors respond to a tap in both the apartment cutaway and the complete
+building tour. Moving branches retain their actions, hinges and shared buffers
+instead of being baked into selection/context geometry. Opening a door updates
+the small personal collision partition and the existing display copies; it does
+not rebuild the apartment. Drags, multiple pointers and canceled gestures do not
+trigger doors, and nearer physical surfaces still block selection.
+
+Interior walls use subtle matte plaster. Solid door leaves have a slightly warmer
+satin finish and distinct frames, with visible hardware on both sides. Public
+building replicas and the personal apartment use bounded, shared texture maps.
+The personal ceiling has its own white plaster material and downward-facing
+surface. The existing solar hemisphere receives a lighter ground-bounce colour
+for district views, illuminating ceilings without adding lights or changing the
+Sun/Moon directions; lamp-only/night behavior remains controlled by solar state.
+
+The R99 saved design keys, authenticated personal entry, full district layout,
+parking, native WebXR support and resource lifecycle safeguards are preserved.
+
+## R99 — one district for public and personal tours
+
+The protected personal entry now opens the same complete district viewer as the
+public entry: all eight buildings, public layout, parking, roads, floor/apartment
+selection, walking and WebXR. Only building 4102 receives the saved changes to
+apartment 4, its garden, cameras and cars. The public entry never imports the
+personal builder, plan data or editor; all personal entry pages and chunks remain
+password protected and sealed in the deployment vault.
+
+The saved HOME_STORAGE/KITCHEN_STORAGE keys and normalization are preserved.
+The editor remains available through “עריכת הבית שלי”; entering a tour or choosing
+a building/floor from the editor saves pending settings immediately and opens the
+shared district view. Personal and public pages use separate HTML entries so the
+editor CSS and heavy editing components do not load into the walking viewer.
+
+Common building surfaces and collision data are shared. The standard apartment
+slot is replaced only at 4102; other buildings retain the standard plan. A nearby
+building handoff changes the detailed source without rebuilding the scene or
+teleporting the walker. The personal builder omits the old full-building context
+and duplicate daylight rig. Static personal surfaces are batched, while doors and
+shutters retain interactive handles. Door changes refresh only the small personal
+collision partition, including when distant storeys are visually culled.
+
+On the actual scene in the CPU test environment, 1,832 static personal meshes
+become 254 material batches. The complete personal district collision index is
+about 4.53 MB, and the median short lobby movement query is about 0.2–0.3 ms. These
+measurements do not establish frame rate or total browser/GPU memory on a phone.
+The personal surface cache is bounded; optional render targets and context
+recovery keep the R98 lifecycle safeguards. XR pointer queries also use the same
+spatial index instead of recursively raycasting the full district.
+
+## R98 — memory safeguards and stable tour menus
 
 Opening Options during a walking tour now pauses navigation without running
 OrbitControls against the old building-view target. Position and gaze remain

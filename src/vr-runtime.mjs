@@ -14,7 +14,7 @@ export function vrSurfaceHit(root,raycaster){
  return raycaster.intersectObject(root,true).find(h=>h.object.isMesh&&objectVisible(h.object)&&!['electrical-annotation-hit','electrical-highlight'].includes(h.object.userData.part)&&(Array.isArray(h.object.material)?h.object.material:[h.object.material]).some(m=>m?.visible!==false&&m?.opacity>=.2))||null;
 }
 
-export function createVrRuntime({renderer,scene,camera,controls,getStart,move,canTeleport,onSelect,onState=()=>{},getModel=()=>null,getFloorHeight=null,environment=globalThis}){
+export function createVrRuntime({renderer,scene,camera,controls,getStart,move,canTeleport,onSelect,onState=()=>{},getModel=()=>null,getFloorHeight=null,raycast=null,environment=globalThis}){
  const xr=renderer.xr,system=environment.navigator?.xr,rig=new THREE.Group(),ray=new THREE.Raycaster(),resources=[],controllers=[],bindings=[];
  let state={status:'checking'},session=null,pending=null,disposed=false,saved=null,calibrate=true,startPose=null,lastTime=null,lastRayTime=-Infinity,turnHeld=false,exitHeld=false,floor=true;
  const headLocal=new THREE.Vector3(),headOrientation=new THREE.Quaternion(),headWorld=new THREE.Vector3(),forward=new THREE.Vector3(),right=new THREE.Vector3();
@@ -50,7 +50,7 @@ export function createVrRuntime({renderer,scene,camera,controls,getStart,move,ca
   marker.name='vr-floor-target';marker.rotation.x=-Math.PI/2;marker.visible=false;scene.add(marker);resources.push(markerGeo,markerMat);
   // Local lightweight grip; no device-profile/CDN downloads are required.
   const bodyGeo=new THREE.CylinderGeometry(.022,.018,.1,12),bodyMat=new THREE.MeshStandardMaterial({color:'#e4e7e1',roughness:.7}),body=new THREE.Mesh(bodyGeo,bodyMat);body.rotation.x=Math.PI/2;body.userData.vrHelper=true;grip.add(body);resources.push(bodyGeo,bodyMat);
-  const select=()=>{if(!session||!xr.isPresenting)return;getModel()?.group.updateWorldMatrix(true,true);controller.updateWorldMatrix(true,false);ray.ray.origin.setFromMatrixPosition(controller.matrixWorld);ray.ray.direction.set(0,0,-1).transformDirection(controller.matrixWorld);const hit=vrSurfaceHit(getModel()?.group,ray),target=landing(hit);if(target)teleport(target);else if(hit&&!hit.object.userData.navigationSurface)onSelect?.(hit.object.userData,hit);};
+  const select=()=>{if(!session||!xr.isPresenting)return;if(!raycast)getModel()?.group.updateWorldMatrix(true,true);controller.updateWorldMatrix(true,false);ray.ray.origin.setFromMatrixPosition(controller.matrixWorld);ray.ray.direction.set(0,0,-1).transformDirection(controller.matrixWorld);const hit=raycast?raycast(ray):vrSurfaceHit(getModel()?.group,ray),target=landing(hit);if(target)teleport(target);else if(hit&&!hit.object.userData.navigationSurface)onSelect?.(hit.object.userData,hit);};
   controller.addEventListener('select',select);bindings.push(()=>{controller.removeEventListener('select',select);controller.remove(line);grip.remove(body);marker.removeFromParent();});controllers.push({controller,grip,line,marker});rig.add(controller,grip);
  }
  async function start(){
@@ -88,8 +88,8 @@ export function createVrRuntime({renderer,scene,camera,controls,getStart,move,ca
   rig.position.x+=next[0]-headWorld.x;rig.position.z+=next[1]-headWorld.z;if(getFloorHeight)rig.position.y=getFloorHeight()+(floor?0:1.62);rig.updateMatrixWorld(true);headWorld.copy(headLocal).applyMatrix4(rig.matrixWorld);
   // Pointer feedback is sampled at 10 Hz; trigger selection always raycasts
   // immediately. Head tracking and movement remain at the headset frame rate.
-  if(time-lastRayTime>100){lastRayTime=time;getModel()?.group.updateWorldMatrix(true,true);
-  for(const {controller,line,marker} of controllers){controller.updateWorldMatrix(true,false);ray.ray.origin.setFromMatrixPosition(controller.matrixWorld);ray.ray.direction.set(0,0,-1).transformDirection(controller.matrixWorld);const hit=vrSurfaceHit(getModel()?.group,ray),target=landing(hit);line.scale.z=hit?Math.min(6,hit.distance):4;marker.visible=!!target;if(target)marker.position.set(target[0],hit.point.y+.012,target[1]);}}
+  if(time-lastRayTime>100){lastRayTime=time;if(!raycast)getModel()?.group.updateWorldMatrix(true,true);
+  for(const {controller,line,marker} of controllers){controller.updateWorldMatrix(true,false);ray.ray.origin.setFromMatrixPosition(controller.matrixWorld);ray.ray.direction.set(0,0,-1).transformDirection(controller.matrixWorld);const hit=raycast?raycast(ray):vrSurfaceHit(getModel()?.group,ray),target=landing(hit);line.scale.z=hit?Math.min(6,hit.distance):4;marker.visible=!!target;if(target)marker.position.set(target[0],hit.point.y+.012,target[1]);}}
   if(input.exit&&!exitHeld){exitHeld=true;void end();}else if(!input.exit)exitHeld=false;
  }
  const ready=probe();

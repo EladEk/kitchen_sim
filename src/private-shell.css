@@ -8,3 +8,5 @@
 .private-workspace>.app-loading{height:100%}
 .private-workspace .hs-simple-actions{flex-shrink:0}
 @media(max-height:420px){.private-workspace>.hs-app.hs-simple,.private-workspace>.app{min-height:320px}.private-access-banner{padding-block:3px}}
+
+.private-access-banner>a{flex-shrink:0;border:1px solid #dce5d3;border-radius:6px;padding:6px 9px;color:#fff;text-decoration:none;white-space:nowrap}.private-access-banner>button{max-width:45%}@media(max-width:480px){.private-access-banner{gap:5px;padding:4px 6px;font-size:10px}.private-access-banner>button{padding:5px 7px;min-height:32px}}
