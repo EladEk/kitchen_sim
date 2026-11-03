@@ -1,0 +1,24 @@
+Personal entrance movement median: 0.275ms; index: 5836736 bytes
+✔ personal district keeps all eight public transforms, roads and bays; private geometry occurs only at 4102 (7223.537506ms)
+✔ public build contains no owner application, drafts or unsealed source documents (288.594411ms)
+✔ unauthenticated visitors see the public app but cannot fetch ANY private asset, including direct or encoded paths (23.512501ms)
+✔ correct password opens preserved app and scripts with no-store, wrong password fails, logout clears access cookie (44.558989ms)
+✔ public scene is self-contained, parsable, contains 43 base apartments, and strips all private metadata (135.494815ms)
+✔ the personal district entry and every referenced asset stay behind the password gate (37.426721ms)
+✔ the actual scene contains one shared water fixture and supports a walk across the south street around the education buildings (1939.275017ms)
+✔ the actual rendered district permits a continuous walk along both planted axes and every court connector (2162.033243ms)
+✔ compiled parks preserve the measured parking, leave the pocket garden free of road and permit a real walk to the three shade pavilions and amphitheatre (1905.709657ms)
+✔ all 43 actual apartment destinations in eight buildings produce the matching interior plan and registered live marker (223.167665ms)
+✔ the compiled public master-bed footprint follows the annotated lower-left map location (168.246059ms)
+✔ the real district floor rays descend, reach both service rooms and climb back in all eight buildings (1593.908014ms)
+✔ the exported district permits continuous common-stair ascent and descent through all nine floors in every rotated and reflected building (2580.977846ms)
+✔ actual district repeatedly enters 4103 with one collision model, bounded buffers and correct building/floor handoff (2502.000564ms)
+✔ the real master-room facade stays stone outside and plaster inside after export, district batching, mirrors and photo conversion (1959.441088ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 24555.450929

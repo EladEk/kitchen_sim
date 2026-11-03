@@ -57,7 +57,7 @@ export function createSurfacePalette(resources){
    if(photo){let disposed=false;maps.color.addEventListener('dispose',()=>{disposed=true;});photo.then(data=>{if(disposed)return;for(const channel of ['color','height','roughness']){maps[channel].image={data:data[channel],width:data.size,height:data.size};if(!product)maps[channel].repeat.setScalar(PHOTO_MATERIALS[kind].repeat);maps[channel].wrapS=maps[channel].wrapT=FLOOR_RENDERING[productId]?THREE.ClampToEdgeWrapping:THREE.MirroredRepeatWrapping;maps[channel].needsUpdate=true;}},()=>{});}
   }
   const maps=textures.get(textureKey),[roughness,bumpScale]=PROFILES[kind]||PROFILES.porcelain;
-  const physical=FLOOR_RENDERING[productId],Material=physical?THREE.MeshPhysicalMaterial:THREE.MeshStandardMaterial;
+  const physical=FLOOR_RENDERING[productId],Material=physical||kind==='fabric'?THREE.MeshPhysicalMaterial:THREE.MeshStandardMaterial;
   const material=new Material({color:product?.photo?'#ffffff':product?.color||color,map:maps.color,bumpMap:maps.height,bumpScale:product?.bumpScale??bumpScale,roughnessMap:maps.roughness,roughness:product?.roughness??roughness,...(physical?{ior:physical.ior,specularIntensity:physical.specularIntensity,clearcoat:0}:{}),...materialOptions});material.userData={surfaceKind:kind,...(product?{productId:product.productId,sku:product.sku,tile:product.tile,textureBasis:product.textureBasis,manufacturerScan:product.manufacturerScan,...(product.photo?{photoSource:product.photo.image,photoSample:product.photo.sample}:{} )}:{} )};if(physical)installFloorMaterial(material,product);resources.push(material);materials.set(key,material);return material;
  }
  return surface;

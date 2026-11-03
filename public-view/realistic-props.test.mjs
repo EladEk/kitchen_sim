@@ -35,7 +35,7 @@ test('placement, scale and instance colors remain stable through every tier',()=
   for(const [y,now] of [[2,1000],[80,2000],[400,3000],[2,4000]]){
    props.update(new THREE.Vector3(0,y,0),now);const state=props.getState();assert.deepEqual(state.map(({tier,...p})=>p),initial);
    for(const mesh of props.group.children.filter(m=>m.instanceColor)){
-    const members=state.filter(p=>p.type===mesh.userData.propType&&p.tier===mesh.userData.detailTier);
+    const members=state.filter(p=>p.type===mesh.userData.propType&&p.tier===mesh.userData.detailTier&&(!mesh.userData.propModel||p.model===mesh.userData.propModel));
     assert.equal(mesh.count,members.length);
     for(let i=0;i<mesh.count;i++){mesh.getColorAt(i,color);color.toArray().forEach((v,k)=>close(v,members[i].color[k]));}
    }
@@ -53,7 +53,7 @@ test('the actual geometry of every car tier and contact decal remains entirely i
   for(const [y,now] of [[2,1000],[82,2000],[400,3000]]){
    props.update(new THREE.Vector3(0,y,0),now);const state=props.getState().filter(p=>p.type==='car');
    for(const mesh of props.group.children.filter(m=>m.userData.propType==='car'&&m.count)){
-    const members=mesh.userData.propPart==='contact-shadow'?state:state.filter(p=>p.tier===mesh.userData.detailTier),p=mesh.geometry.attributes.position;
+    const members=mesh.userData.propPart==='contact-shadow'?state:state.filter(p=>p.tier===mesh.userData.detailTier&&p.model===mesh.userData.propModel),p=mesh.geometry.attributes.position;
     assert.equal(mesh.count,members.length);
     for(let i=0;i<mesh.count;i++){
      const car=members[i];mesh.getMatrixAt(i,matrix);
@@ -76,4 +76,20 @@ test('native Three serialization keeps alpha leaves and geometry, and every owne
   for(const resource of [...props.resources.geometries,...props.resources.materials,...props.resources.textures]){const n={value:0};counts.push(n);resource.addEventListener('dispose',()=>n.value++);}
   props.dispose();props.dispose();assert(counts.every(n=>n.value===1));assert.equal(props.update(new THREE.Vector3(),5000),false);assert.equal(props.group.children.length,0);
  }finally{props.dispose();}
+});
+
+test('all three vehicle styles expose real glass ahead of their painted shell, retain a distinct roofline and keep daytime lenses unlit',()=>{
+ const roofs=[];
+ for(const [model,windshieldY] of [['sedan',1.18],['hatchback',1.25],['suv',1.36]]){
+  const props=createRealisticProps({cars:[{x:0,z:0,length:4,model}]});
+  try{
+   for(const [distance,now] of [[2,1000],[70,2000],[200,3000]]){
+    props.update(new THREE.Vector3(distance,1.6,0),now);props.group.updateMatrixWorld(true);const meshes=props.group.children.filter(o=>o.visible&&o.userData.propType==='car'&&o.userData.propPart!=='contact-shadow'),scaleY=props.getState()[0].scale[1],ray=new THREE.Raycaster(new THREE.Vector3(0,windshieldY*scaleY-.039,4),new THREE.Vector3(0,0,-1),0,6),hit=ray.intersectObjects(meshes,false)[0];
+    assert.equal(hit?.object.userData.propPart,'windows',`${model}: the windshield must remain in front of the body at tier ${props.getState()[0].tier}`);
+    for(const o of meshes.filter(o=>/headlights|tail-lights/.test(o.userData.propPart)))assert.equal(o.material.emissive.getHex(),0,'parked daylight lenses do not glow at night');
+   }
+   props.update(new THREE.Vector3(0,1.6,0),4000);props.group.updateMatrixWorld(true);const body=props.group.children.find(o=>o.visible&&o.userData.propPart==='body');body.geometry.computeBoundingBox();roofs.push(body.geometry.boundingBox.max.y);
+  }finally{props.dispose();}
+ }
+ assert(roofs[0]<roofs[1]&&roofs[1]<roofs[2],'the sedan, hatchback and SUV use distinct body geometry');
 });

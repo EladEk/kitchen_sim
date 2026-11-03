@@ -4,6 +4,7 @@ import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js'
 import {parkingCarPlacements,sitePlantingPositions} from './site-appearance.mjs';
 import {SITE_TRACE,SITE_CHAMBERS,COMMON_ENTRY_DOORS} from './building-site.mjs';
 import {createSurfacePalette,metricSurfaceUVs} from './surface-materials.mjs';
+import {siteMainMeterFeature} from './site-utility-layout.mjs';
 
 export function buildSiteContext({root,resources,picks,settings,cut=false,ceilingVisible=true}){
  const group=new THREE.Group();group.name='building-4102-surroundings';group.userData={part:'building-site-context',source:'building-plan',page:2};root.add(group);
@@ -41,7 +42,7 @@ export function buildSiteContext({root,resources,picks,settings,cut=false,ceilin
  for(const [mesh,part] of [[bodies,'site-illustrative-cars'],[cabins,'site-car-glass'],[wheels,'site-car-tyres']]){mesh.castShadow=mesh.receiveShadow=true;mesh.userData={part,illustrative:true};mesh.computeBoundingSphere();resources.push(mesh);group.add(mesh);}
  const planting=sitePlantingPositions(),leaf=surface('grass','#536d46'),trunk=mat('#7a6955'),crown=new THREE.IcosahedronGeometry(.47,1),stem=new THREE.CylinderGeometry(.045,.055,1.2,8);resources.push(crown,stem);
  planting.forEach(([x,z],i)=>{const tree=i%3===0;if(tree){const pole=new THREE.Mesh(stem,trunk);pole.position.set(x,.6,z);pole.castShadow=true;pole.userData={part:'site-illustrative-planting',illustrative:true};group.add(pole);}for(let j=0;j<(tree?3:2);j++){const plant=new THREE.Mesh(crown,leaf);plant.position.set(x+(j-1)*.19,tree?1.25+j*.18:.33,z);plant.scale.set(tree?1.1:.7,tree?.82:.6,tree?1.05:.7);plant.castShadow=plant.receiveShadow=true;plant.userData={part:'site-illustrative-planting',illustrative:true};group.add(plant);}});
- const meter=SITE_TRACE.features.find(p=>p.id==='site-main-water-meter');
+ const meter=siteMainMeterFeature();
  if(meter){const [x,z]=meter.position,[w,d,h]=meter.dimensions,data={action:'building',buildingId:meter.id,part:'site-main-meter-cabinet',heightInferred:true};box(x,h/2,z,w,h,d,kerb,data);for(let i=0;i<4;i++){const xx=x-w/2+(i+.5)*w/4;box(xx,h/2,z+d/2+.005,w/4-.012,h-.08,.02,paint,data);box(xx+w/8-.06,h*.5,z+d/2+.024,.018,.15,.02,cover,data);}}
  const entryGlass=mat('#a8c4ce',{transparent:true,opacity:.27,depthWrite:false,roughness:.18});
  for(const d of COMMON_ENTRY_DOORS){const end=settings.closedBuildingDoors?.includes(d.id)?d.closed:d.opened,dx=end[0]-d.hinge[0],dz=end[1]-d.hinge[1],width=Math.hypot(dx,dz),height=cut?.82:2.28,angle=-Math.atan2(dz,dx),data={action:'building-door',doorId:d.id,part:'site-common-entry-door',source:'building-plan',page:3};const pane=box((d.hinge[0]+end[0])/2,height/2,(d.hinge[1]+end[1])/2,width,height,.025,entryGlass,data);pane.rotation.y=angle;for(const q of [d.hinge,end])box(q[0],height/2,q[1],.04,height,.04,cover,data);for(const y of [.035,height-.035]){const rail=line(d.hinge,end,y,.04,cover);rail.userData=data;picks.push(rail);}}

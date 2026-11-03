@@ -1,0 +1,32 @@
+✔ all 32 CAD-number wall fragments are removed from rendering and collision input, with every genuine source run retained (61.545778ms)
+✔ the three garden replicas each receive five bedroom beds without crossing their actual walls or service fixtures (356.645922ms)
+✔ every upper independent apartment has one kitchen and each registered bedroom has a bed clear of walls and door swings (615.783734ms)
+✔ the video-matched stair portal is free of cabinet geometry and permits continuous descent to the pump landing (2347.714625ms)
+✔ service floor cuts keep the pump ceiling closed and retain the duplex stair ceiling aperture (461.417194ms)
+✔ four garden units retain independent service-room outlines and different traced garden plots (14.518381ms)
+✔ all 43 physical entrances spawn inside the selected unit, with either duplex destination using its single lower entry (1707.36502ms)
+✔ the two lifts align on every actual landing; absent or closed cars block the shaft, while every open landing admits a visitor (166.92544ms)
+✔ elevator travel closes before moving, opens only on arrival, serves floors 0–8 and keeps the second car independent (4.912294ms)
+✔ source common and duplex stairs keep flat floor landings and continuous floor-to-floor rise (0.973596ms)
+✔ analog joystick has a dead zone, proportional speed, clamped diagonals and neutral release (0.566209ms)
+✔ rendered cabins move with the travel state and only the destination landing doors open (1531.421068ms)
+✔ building sheets register multiple finished-wall controls to the original apartment without stretching it (28.71209ms)
+✔ all floor variants, the duplex continuation and the roof retain their actual PDF and photo sources (7.615577ms)
+✔ building cutaways remove upper storeys while the apartment view keeps non-occluding physical shadow casters (5920.685741ms)
+✔ context walls leave the apartment entry and service cabinets clear and its outline remains the unchanged original (603.820084ms)
+✔ the building camera fits its full volume on portrait phones and widescreen, and saved shadow/cut settings round-trip (246.00163ms)
+✔ the actual facade stone shader compiles and links with Three lighting and instancing on native GLES3 (1108.855277ms)
+✔ reference-based facade details remain within selected-floor limits, while unspecified interior finishes carry no owner product (2802.757742ms)
+✔ every repeated apartment number has one source-backed internal connection and only its lower hall entrance (445.482197ms)
+✔ a furnished duplex can be walked up and back down through the private stair at all three walking speeds (562.963075ms)
+✔ upper landing guards cannot be bypassed by treating an unrelated approach as a descent (17.921589ms)
+✔ the upper duplex is isolated from the sixth-floor hall even with every real door open (342.370002ms)
+✔ only the slab between the duplex storeys is open; the lower base and upper ceiling remain solid (3217.653823ms)
+ℹ tests 24
+ℹ suites 0
+ℹ pass 24
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 26381.741241

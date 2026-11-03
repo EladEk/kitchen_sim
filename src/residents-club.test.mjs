@@ -18,7 +18,7 @@ test('club destination persists and walks through the actual lobby door; closed 
 test('photographed club window replaces only the misclassified ground opening, and sill has actual opaque mesh',()=>{
  const openings=BUILDING_FLOORS[0].envelope.flatMap(p=>p.openings),wide=openings.find(o=>clubWindowProfile(0,o)&&Math.abs(o.b[1]-o.a[1])>2);assert(wide);assert.equal(wide.kind,'slider','original source trace is immutable');assert.equal(clubWindowProfile(0,wide).kind,'window');assert.equal(clubWindowProfile(1,wide),null);
  const group=new THREE.Group(),resources=[],model=buildBuildingContext({group,resources,settings,mode:'unit'});try{
-  group.updateMatrixWorld(true);const ray=new THREE.Raycaster(new THREE.Vector3(-1,.55,-7.8),new THREE.Vector3(1,0,0));const hit=ray.intersectObject(group,true)[0];assert(hit&&hit.distance<1.1,'exterior sill wall closes lower window span');assert.equal(hit.object.material.transparent,false);
+  group.updateMatrixWorld(true);const ray=new THREE.Raycaster(new THREE.Vector3(-1,.55,-7.8),new THREE.Vector3(1,0,0));const hit=ray.intersectObject(group,true)[0];assert(hit&&hit.distance<1.1,'exterior sill wall closes lower window span');assert.equal((Array.isArray(hit.object.material)?hit.object.material[hit.face.materialIndex]:hit.object.material).transparent,false);
   assert(model.floors.get(0).getObjectByName('residents-club'));assert(!group.getObjectByName('club-ceiling'),'selected overview ceiling stays open');
  }finally{resources.forEach(r=>r.dispose?.());}
 });

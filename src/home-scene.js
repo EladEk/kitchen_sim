@@ -1,3 +1,4 @@
+import {CEILING_COLOR,CEILING_MATERIAL} from './ceiling-finish.mjs';
 import {buildOwnerCars} from './owner-parking-scene.mjs';
 import {buildSecurityCameras} from './security-cameras.mjs';
 import {commonSpace} from './common-spaces.mjs';
@@ -19,6 +20,8 @@ import {buildGardenArchitecture} from './home-garden-scene.js';
 import {buildServiceYard} from './service-yard-scene.js';
 import {buildExteriorDetails} from './home-exterior-scene.js';
 import {createSurfacePalette,metricSurfaceUVs} from './surface-materials.mjs';
+import {createSoftGeometry} from './soft-furnishings.mjs';
+import {wallExteriorFaces,wallFaceMaterials} from './wall-face-finishes.mjs';
 import {createVegasSink,vegasCutoutPath} from './sink.js';
 import {KITCHEN_SINK as SINK} from './kitchen-sink.mjs';
 import {createCeramicBowl,createSkyToilet} from './sanitary-fixtures.js';
@@ -31,12 +34,12 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
  const group=new THREE.Group(),picks=[],resources=[],motions=[],roomGroups=new Map(),furnitureGroups=new Map(),doorGroups=new Map(),shutterGroups=new Map();
  const mat=(color,opts={})=>{const m=new THREE.MeshStandardMaterial({color,roughness:.78,...opts});resources.push(m);return m;};
  const surface=createSurfacePalette(resources);
- const entryDoorFinish=surface('door','#536c66'),doorFinish=surface('door','#d8d0c3'),doorFrame=surface('paint','#e2dcd1'),ceilingFinish=surface('plaster','#f7f5ef',{side:THREE.FrontSide,shadowSide:THREE.DoubleSide}),offwhite=surface('paint','#efebe2'),oak=surface('wood','#ae8b61'),ink=mat('#35463d'),windowInk=mat('#343d3d',{metalness:.3,roughness:.5}),steel=mat('#a7b1ac',{metalness:.55,roughness:.35}),white=mat('#f0f0e8'),dark=mat('#29352f'),glass=mat('#b0c8be',{transparent:true,opacity:.28,roughness:.16,depthWrite:false}),linen=surface('fabric','#c5c5af'),clay=mat('#b58e75'),cap=mat('#c7c9bc');
+ const entryDoorFinish=surface('door','#536c66'),doorFinish=surface('door','#d8d0c3'),doorFrame=surface('paint','#e2dcd1'),ceilingFinish=surface('plaster',CEILING_COLOR,{...CEILING_MATERIAL,side:THREE.FrontSide,shadowSide:THREE.DoubleSide}),offwhite=surface('paint','#efebe2'),oak=surface('wood','#ae8b61'),ink=mat('#35463d'),windowInk=mat('#343d3d',{metalness:.3,roughness:.5}),steel=mat('#a7b1ac',{metalness:.55,roughness:.35}),white=mat('#f0f0e8'),dark=mat('#29352f'),glass=mat('#b0c8be',{transparent:true,opacity:.28,roughness:.16,depthWrite:false}),linen=surface('fabric','#c5c5af'),clay=mat('#b58e75'),cap=mat('#c7c9bc');
  // Selecting a destination removes upper floors, but must not enable wall cuts.
  const wallCutaway=settings.cutaway===true&&mode!=='walk'&&(mode==='building'?settings.buildingLevel===0:mode==='unit'?parseDestination(settings.tourDestination).floor===0:true);
  const wallHeight=wallCutaway?.86:HOUSE.height;
  function box(x,y,z,w,h,d,material,parent=group,data=null,round=0){
-  const g=round?new RoundedBoxGeometry(w,h,d,material.userData?.surfaceKind==='fabric'?5:2,Math.min(round,w/5,h/5,d/5)):new THREE.BoxGeometry(w,h,d);metricSurfaceUVs(g,[x,y,z]);resources.push(g);const m=new THREE.Mesh(g,material);m.position.set(x,y,z);m.castShadow=m.receiveShadow=true;if(data)m.userData={...data};parent.add(m);if(data?.action||data?.blockPick)picks.push(m);return m;
+  const g=round&&material.userData?.surfaceKind==='fabric'?createSoftGeometry(w,h,d,{kind:h<.09?'duvet':'cushion',radius:round}):round?new RoundedBoxGeometry(w,h,d,2,Math.min(round,w/5,h/5,d/5)):new THREE.BoxGeometry(w,h,d);metricSurfaceUVs(g,[x,y,z]);resources.push(g);const m=new THREE.Mesh(g,material);m.position.set(x,y,z);m.castShadow=m.receiveShadow=true;if(data)m.userData={...data};parent.add(m);if(data?.action||data?.blockPick)picks.push(m);return m;
  }
  function glazing(id,y,width,height,parent,data=null){
   const double=DOUBLE_GLAZED_IDS.includes(id),material=double?mat('#b0c8be',{transparent:true,opacity:.15,roughness:.16,depthWrite:false}):glass;
@@ -76,8 +79,8 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
   const vertexCuts=ROOMS.filter(r=>!['garden','outdoor'].includes(r.kind)).flatMap(r=>r.polygon).filter(p=>Math.abs(p[vertical?0:1]-w.a[vertical?0:1])<.45).map(p=>p[vertical?1:0]);
   const segment=(a,b,bottom,height)=>{if(b-a<.002||height<.002)return;const cuts=[...new Set([a,b,...vertexCuts.filter(n=>n>a+.002&&n<b-.002)])].sort((a,b)=>a-b);
    for(let i=0;i<cuts.length-1;i++){const aa=cuts[i],bb=cuts[i+1],mid=vertical?[w.a[0],(aa+bb)/2]:[(aa+bb)/2,w.a[1]],regions=[roomAt([mid[0]+(vertical?.21:0),mid[1]+(vertical?0:.21)]),roomAt([mid[0]-(vertical?.21:0),mid[1]-(vertical?0:.21)])],m1=surface('plaster',roomMaterial(regions[0])),m2=surface('plaster',roomMaterial(regions[1])),mats=[m1,m2,cap,cap,m1,m2];
-    const facade=mode==='building'&&w.external?surface('limestone','#d9d2c5'):null;
-    const mesh=vertical?box(w.a[0],bottom+height/2,(aa+bb)/2,w.thickness,height,bb-aa,facade||mats,group,{blockPick:true,wallId:w.id}):box((aa+bb)/2,bottom+height/2,w.a[1],bb-aa,height,w.thickness,facade||mats,group,{blockPick:true,wallId:w.id});mesh.userData.part='architectural-wall';
+    const facade=w.external?surface('limestone','#d9d2c5'):null,faces=facade?wallExteriorFaces({centre:mid,normal:vertical?[1,0]:[0,1],thickness:w.thickness,inside:p=>insidePolygon(p,HOUSE_OUTLINE),positiveFace:vertical?0:4,negativeFace:vertical?1:5}):null,wallMaterials=faces?wallFaceMaterials(mats,facade,faces):mats;
+    const mesh=vertical?box(w.a[0],bottom+height/2,(aa+bb)/2,w.thickness,height,bb-aa,wallMaterials,group,{blockPick:true,wallId:w.id}):box((aa+bb)/2,bottom+height/2,w.a[1],bb-aa,height,w.thickness,wallMaterials,group,{blockPick:true,wallId:w.id});mesh.userData.part='architectural-wall';
     for(let side=0;side<2;side++){const sign=side?-1:1,rr=settings.rooms[regions[side]],normal=w.a[vertical?0:1]+sign*(w.thickness/2+.004);
      if(rr?.wall==='ordered-mona'&&roomHasOrderedCladding(regions[side])){
       const top=Math.min(bottom+height,claddingHeight(regions[side]));
@@ -202,7 +205,9 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
 
   }else if(f.kind==='bed'){
    if(f.userDimensions)p.scale.y=f.h/FURNITURE.find(item=>item.id===f.id).h;
-   box(0,.19,0,f.w+.06,.3,f.d+.06,wood,p,data,.025);const mattress=box(0,.39,0,f.w,.2,f.d,surface('fabric','#f0f0e8'),p,data,.05);mattress.userData.part='mattress';mattress.userData.furnitureId=f.id;box(0,.52,-f.d/2+.25,f.w*.82,.16,.4,linen,p,null,.045);box(0,.51,.28,f.w+.02,.045,f.d*.61,surface('fabric',f.roomId==='master'?'#a7ad95':'#b2bdb1'),p,null,.01);const headH=f.headboardHeight||.85;box(0,.185+headH/2,-f.d/2,f.w+.08,headH,.07,wood,p,data,.02);
+   box(0,.19,0,f.w+.06,.3,f.d+.06,wood,p,data,.025);const mattress=box(0,.39,0,f.w,.2,f.d,surface('fabric','#f0f0e8'),p,data,.05);mattress.userData.part='mattress';mattress.userData.furnitureId=f.id;
+   const pillows=f.w>1.3?2:1;for(let i=0;i<pillows;i++){const pillow=box((i-(pillows-1)/2)*f.w*.46,.54,-f.d/2+.27,f.w/pillows-.12,.15,.4,linen,p,null,.06);pillow.userData.part='pillow';}
+   const cover=box(0,.525,.25,f.w-.025,.075,f.d*.63,surface('fabric',f.roomId==='master'?'#a7ad95':'#b2bdb1'),p,null,.018);cover.userData.part='duvet';const headH=f.headboardHeight||.85;box(0,.185+headH/2,-f.d/2,f.w+.08,headH,.07,wood,p,data,.02);
    for(const x of [-f.w/2-.21,f.w/2+.21])if(f.w>1.3&&f.nightstands!==false){box(x,.26,-f.d/2+.27,.35,.5,.4,wood,p,data,.01);cylinder(x,.57,-f.d/2+.27,.09,.1,offwhite,p);}
   }else if(f.kind==='sofa'){
    box(0,.12,0,f.w-.12,.14,f.d-.1,wood,p,data,.025);

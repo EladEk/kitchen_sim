@@ -1,0 +1,14 @@
+✔ moving tours capture six HDR faces over separate frames, reuse a single room environment and restore renderer state (11.223964ms)
+✔ XR and overloaded devices skip probe work; existing XR reflections work and night/exterior never reuse daylight (4.945286ms)
+✔ room/solar/door changes invalidate probes, resource count stays bounded, and capture failures restore the screen (3.393046ms)
+✔ room identity follows private room polygons and never leaks their layout to other buildings (0.705025ms)
+✔ devices without float colour attachments retain the solar fallback without allocating an unsupported framebuffer (0.443334ms)
+✔ cloth has a shaped silhouette and folds, finite normals and a bounded measured footprint (12.294822ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1904.805679

@@ -1,0 +1,24 @@
+✔ master bed turns 180 degrees, headboard clears the ensuite wall and TV faces the bed across a usable foot passage (1477.533528ms)
+✔ safe-room wardrobe side meets the bed wall, with its doors and drawers clear of the bed and protected window (6068.593165ms)
+✔ moving the safe-room wardrobe frees the entrance landing and keeps the walking route usable (38.710835ms)
+✔ both 120 × 190 cm beds tuck against two walls with skirting clearance; the office stays an office (205.917403ms)
+✔ bedroom wardrobes follow the entrance wall, face inward and fit with each part open (780.668932ms)
+✔ both bedroom entrance doors sweep clear of furniture after the room 2 desk swap (831.650083ms)
+✔ every selectable room item has positive centimetre dimensions in its own axes (3.24424ms)
+✔ assumed dimensions are never presented as documented measurements (0.472957ms)
+✔ safe-room double bed fits below the window and leaves a usable indoor route (2640.70394ms)
+✔ only the outdoor-kitchen-side tree is removed and every furniture mesh supports item inspection (308.204071ms)
+✔ cancelled furniture is removed and the two bedrooms have real 120 × 190 cm mattresses (2372.184263ms)
+✔ living sofa and TV face each other; master bed follows the requested half-turn with its television opposite (330.695879ms)
+✔ Harash products replace the defaults, and legacy saves migrate without losing individual openings (4.676194ms)
+✔ Hercules has the documented module chain, faces the slider from the opposite fence and opens independently (1036.260149ms)
+✔ actual room floors and tiled walls carry the scheduled metric sizes (710.730925ms)
+✔ cloth has a shaped silhouette and folds, finite normals and a bounded measured footprint (18.223598ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 77582.556451

@@ -1,0 +1,38 @@
+Personal entrance movement median: 0.307ms; index: 4826000 bytes
+✔ personal district keeps all eight public transforms, roads and bays; private geometry occurs only at 4102 (8639.701498ms)
+✔ public build contains no owner application, drafts or unsealed source documents (135.217545ms)
+✔ unauthenticated visitors see the public app but cannot fetch ANY private asset, including direct or encoded paths (42.194901ms)
+✔ correct password opens preserved app and scripts with no-store, wrong password fails, logout clears access cookie (78.90484ms)
+✔ public scene is self-contained, parsable, contains 43 base apartments, and strips all private metadata (223.647497ms)
+✔ the personal district entry and every referenced asset stay behind the password gate (117.568752ms)
+✔ all source balconies and split penthouse terrace pieces remain covered by public display outlines (51.914831ms)
+✔ every standard door has two poses, all 43 apartment entries are dark, and every floor has a separate corridor finish (2542.14311ms)
+Verified entry poses: 344 ; context batches: 16 ; collision bytes: 6182580
+✔ all 43 entries block while closed and release their old collider after opening in every rotated or mirrored building (7521.141014ms)
+✔ beveled sills preserve plan bounds and all curtain geometry remains inside its own floor envelope (1762.656067ms)
+Public baseline: 43 apartments; original unit-4 kitchen and standard garden; owner geometry excluded.
+Geometry count: 259 snapshot bytes: 9977384
+✔ full public model retains baked geometry and horizontal ground after export/reload (5635.853353ms)
+✔ compiled grass has no area under any bay, street, drive or footpath (74.320569ms)
+✔ rendered grass triangles never cover the parking samples at any elevation (2328.976344ms)
+✔ all 43 actual apartment destinations in eight buildings produce the matching interior plan and registered live marker (353.474317ms)
+✔ production district construction/disposal releases buffers even when disposed handles are retained (7490.084402ms)
+MeshBVH: "maxLeafTris" option has been deprecated. Use "targetLeafSize", instead.
+✔ packed production apartment attributes still build the real photo acceleration structure (345.76189ms)
+✔ actual viewer controller switches every building to a real floor and apartment, retaining its balcony and framing (3689.120731ms)
+unit:4:0 67506 vertices 394ms
+unit:1:0 140703 vertices 502ms
+unit:5:1 57396 vertices 123ms
+unit:32:5 88371 vertices 139ms
+entrance 15012 vertices 72ms
+✔ real public geometry isolates ground/upper apartments, common spaces and the duplex (1572.858142ms)
+✔ the real district floor rays descend, reach both service rooms and climb back in all eight buildings (2599.215293ms)
+✔ actual district repeatedly enters 4103 with one collision model, bounded buffers and correct building/floor handoff (2703.478918ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10325.73626

@@ -1,0 +1,24 @@
+✔ scans retain chosen colours and product floors, use real metre UVs and linear data maps, and release all owned textures once (4.41326ms)
+✔ late completion after cancellation cannot bind textures or start additional decoders (0.702898ms)
+✔ paint and plaster share their GPU maps while doors retain their selected colour and lawn retains natural albedo (3.132032ms)
+✔ live Israel time handles local date rollover and DST repeated hours without shifting the UTC instant (29.309828ms)
+✔ moon phases agree with US Naval Observatory primary phases and the Sun/Moon align near the NASA 2024 eclipse (11.461828ms)
+✔ celestial directions use plan north and the kitchen rotation, and a daylight Moon remains possible (5.086155ms)
+✔ HDR sky includes finite night illumination and the phase renderer makes a full disk brighter than a new one (126.061205ms)
+✔ the same infinite sky drives the raster and photo renderers, updates once per minute, and respects lamp-only mode (308.246147ms)
+✔ Sun disk pixels match Three equirectUv coordinates, so north and the horizon are not mirrored (214.081976ms)
+✔ noon diffuse illumination is useful indoors and fades with the Sun without brightening lamps-only mode (2.166075ms)
+✔ district ceilings receive warm daylight bounce from below without adding lights or changing celestial direction (192.359453ms)
+✔ indoor daylight warms smoothly without swapping or rebuilding the sky environment at room boundaries (88.859892ms)
+✔ opening defaults to noon and old saved live settings cannot turn on the clock implicitly (3.248862ms)
+✔ screen-resolution celestial disks keep direction, phase and horizon visibility and do not enter the photo BVH (5.767463ms)
+✔ manual noon sky does not regenerate each minute and toggling live time resumes the clock (191.456351ms)
+✔ wide district shadow coverage keeps astronomical directions and snaps sub-texel camera motion (118.852541ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1525.555785

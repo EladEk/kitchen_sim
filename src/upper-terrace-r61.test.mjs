@@ -10,7 +10,7 @@ import {buildingBoxes,moveBuildingPlayer} from './building-navigation.mjs';
 import {createElevators} from './elevator-model.mjs';
 
 function model(){const root=new THREE.Group(),resources=[],settings=normalizeHomeSettings({buildingLevel:9,cutaway:false,furniture:false}),m=buildBuildingContext({group:root,resources,settings,mode:'building'});root.updateMatrixWorld(true);return {...m,settings,dispose:()=>resources.forEach(r=>r.dispose?.())};}
-function opaque(node,p){const point=new THREE.Vector3(...p),matrix=new THREE.Matrix4();return ['building-facade-wall','building-interior-wall'].some(part=>{const mesh=node.getObjectByName(part);if(!mesh)return false;mesh.geometry.computeBoundingBox();for(let i=0;i<mesh.count;i++){mesh.getMatrixAt(i,matrix);matrix.premultiply(mesh.matrixWorld);if(mesh.geometry.boundingBox.clone().applyMatrix4(matrix).containsPoint(point))return true;}return false;});}
+function opaque(node,p){const point=new THREE.Vector3(...p),matrix=new THREE.Matrix4();return node.children.filter(o=>['building-facade-wall','building-interior-wall'].includes(o.name)).some(mesh=>{mesh.geometry.computeBoundingBox();for(let i=0;i<mesh.count;i++){mesh.getMatrixAt(i,matrix);matrix.premultiply(mesh.matrixWorld);if(mesh.geometry.boundingBox.clone().applyMatrix4(matrix).containsPoint(point))return true;}return false;});}
 
 test('the apparent doors to nowhere stay inside complete upper en suites, with floor, ceiling and walkable entry',()=>{
  const m=model(),cars=createElevators();

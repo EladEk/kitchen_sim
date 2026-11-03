@@ -51,7 +51,7 @@ export function createDistrict(template,siteData,{mobile=false,variants=new Map(
  let active='4102',doorView={},doorViewKey='',lastDetailUpdate=-Infinity;const nearby=new Set(DISTRICT.map(b=>b.id)),threshold=mobile?90:130;
  const applyCopies=()=>{updateBuildingCopies(copies,active,(b,copy)=>copy.detail!=='interior'||nearby.has(b.id));for(const m of moving)m.wrapper.visible=m.id!==active&&nearby.has(m.id);doorContext.setVisibility(active,nearby,{...doorView,includeActive:!!doorController});};
  const setActiveBuilding=(id,view={})=>{const key=JSON.stringify([!!view.walking,view.floor??0]);if(active===id&&doorViewKey===key&&lastDetailUpdate!==-Infinity)return;active=id;doorView=view;doorViewKey=key;applyCopies();};
- const update=(position,now=0,{walking=false}={})=>{site.update(position,now);if(now-lastDetailUpdate<250)return;lastDetailUpdate=now;let changed=false;const radius=walking?36:threshold;
+ const update=(position,now=0,{walking=false,detailScale=1}={})=>{site.update(position,now,{detailScale,walking});if(now-lastDetailUpdate<250)return;lastDetailUpdate=now;let changed=false;const radius=(walking?36:threshold)*Math.max(.5,detailScale);
   for(const b of DISTRICT){const distance=Math.hypot(position.x-center[0]-b.x,position.y-14,position.z-center[1]-b.z),show=distance<radius*(nearby.has(b.id)?1.1:.9);if(show!==nearby.has(b.id)){show?nearby.add(b.id):nearby.delete(b.id);changed=true;}}
   if(changed)applyCopies();
  };

@@ -10,6 +10,11 @@ export function interiorLabel(polygon){
 }
 export function tourMapKey(where){return `${where.building||''}:${where.floor??0}:${where.unit||''}`;}
 export function mapIsVisible(choice,where){return choice?.key===tourMapKey(where)?choice.open:!!(where.building&&where.unit);}
+export function roomAtMap(plan,point){return plan?.rooms?.find(r=>r.polygons.some(p=>inside(point,p)))||null;}
+export function zoomMapView(base,current,factor,anchor=null){
+ const [bx,bz,bw,bh]=base,[x,z,w,h]=current,scale=Math.max(1,Math.min(5,bw/w*factor)),nw=bw/scale,nh=bh/scale,a=anchor||[x+w/2,z+h/2],rx=(a[0]-x)/w,rz=(a[1]-z)/h;
+ return [Math.max(bx,Math.min(bx+bw-nw,a[0]-nw*rx)),Math.max(bz,Math.min(bz+bh-nh,a[1]-nh*rz)),nw,nh];
+}
 export function mapForLocation(data,where,overrides=new Map()){
  if(!where.building)return null;const floor=data?.floors.find(f=>f.level===where.floor);if(!floor)return null;
  const unit=floor.units.find(u=>u.number===where.unit),override=unit?overrides.get(tourMapKey(where)):null;
@@ -18,6 +23,7 @@ export function mapForLocation(data,where,overrides=new Map()){
  return {floor:floor.level,unit:unit?.number,viewBox:[bounds.minX,bounds.minZ,bounds.maxX-bounds.minX,bounds.maxZ-bounds.minZ].join(' '),clip:unit?polygons.map(polygonPath).join(''):null,
   units:units.map(u=>({number:u.number,path:(override?.polygons||u.displayPolygons||[u.polygon]).map(polygonPath).join(''),label:interiorLabel(u.polygon)})),core:polygonPath(floor.core),
   walls:layer.walls.filter(p=>overlaps(p,bounds)).map(polygonPath).join(''),furniture:layer.furniture.filter(f=>overlaps(f.polygon,bounds)).map(f=>({kind:f.kind,path:polygonPath(f.polygon)})),
+  rooms:(layer.rooms||[]).filter(r=>(!unit||r.unit===unit.number)&&r.polygons.some(p=>overlaps(p,bounds))).map(r=>({...r,path:r.polygons.map(polygonPath).join('')})),originalPlan:override?.originalPlan,
   doors:layer.doors.filter(d=>overlaps(d.closed,bounds)||overlaps(d.open,bounds)).map(d=>({...d,closed:polygonPath(d.closed),open:polygonPath(d.open)}))};
 }
 

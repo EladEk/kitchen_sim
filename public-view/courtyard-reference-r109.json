@@ -1,0 +1,42 @@
+{
+  "revision": 109,
+  "sourceURL": "https://efficapital.co.il/Effi-Afikim/wp-content/uploads/2024/08/104187-5_effi_hadmaya_c_press_-1.pdf",
+  "sourceKind": "user-supplied-official-developer-aerial",
+  "sourceSHA256": "35546b8ad233b41cf0fdf0a32ff0fc6532361791ab705cda0c89730f13536bf8",
+  "verifiedAsBuilt": false,
+  "registration": "Relative planting arrangement reconciled to the existing plot1410 ground controls, fixed building/private-plot boundaries and parking bays. This oblique marketing image does not supply surveyed dimensions.",
+  "evidence": {
+    "crop": {"renderWidth":6000,"origin":[650,740],"size":[2110,1530],"pixelUncertainty":[20,40]},
+    "mainPath": [[980,700],[1320,492],[1605,310]],
+    "crossPath": [[835,390],[1320,492],[1620,560]],
+    "burgundyBeds": [[[970,690],[1185,550]],[[1005,382],[1220,438]],[[1470,540],[1610,565]]],
+    "treePocketBounds": [[[855,410],[995,495]],[[1020,445],[1190,535]],[[1340,525],[1545,615]]]
+  },
+  "paths": [
+    {"id":"inner-long-axis","points":[[112,-27],[112,178]],"width":4},
+    {"id":"inner-cross-axis","points":[[-25,74.55],[205,74.55]],"width":3.2},
+    {"id":"north-court-link-1","points":[[99,27.5],[112,27.5]],"width":2.2},
+    {"id":"north-court-link-2","points":[[99,43.5],[112,43.5]],"width":2.2},
+    {"id":"north-court-link-3","points":[[99,60],[112,60]],"width":2.2},
+    {"id":"south-court-link-1","points":[[99,87.5],[112,87.5]],"width":2.2},
+    {"id":"south-court-link-2","points":[[99,104.5],[112,104.5]],"width":2.2},
+    {"id":"south-court-link-3","points":[[99,121.2],[112,121.2]],"width":2.2}
+  ],
+  "plantingBands": [
+    {"id":"long-west-green","bounds":[103.5,108.4,-20,168],"foliage":"green","height":0.48},
+    {"id":"long-west-burgundy","bounds":[108.5,109.4,-18,165],"foliage":"burgundy","height":0.3},
+    {"id":"long-east-green","bounds":[116,120.2,-18,165],"foliage":"green","height":0.48},
+    {"id":"long-east-burgundy","bounds":[114.7,115.6,-16,164],"foliage":"burgundy","height":0.3},
+    {"id":"cross-north-green","bounds":[-20,202,68.9,70.85],"foliage":"green","height":0.42},
+    {"id":"cross-north-burgundy","bounds":[-18,201,71.1,72.15],"foliage":"burgundy","height":0.28},
+    {"id":"cross-south-green","bounds":[-20,202,78.1,79.6],"foliage":"green","height":0.42},
+    {"id":"cross-south-burgundy","bounds":[-18,201,76.8,77.8],"foliage":"burgundy","height":0.28}
+  ],
+  "treePockets": {"id":"court-tree-pocket","boundsX":[91.4,98.1],"centresZ":[35,52,96,113],"depth":6.5},
+  "limits": [
+    "The crossing paths, burgundy/green planted edges and rectangular tree/lawn pockets are visible. Widths, counts, plant species and planting construction are reconstructed.",
+    "Some shared entrance/parking paving is opened into tree pockets; the measured bays, drive access, building entrances and all private garden plots stay clear.",
+    "No palm species, bench count, playground or large central plaza can be established from this view.",
+    "The rear central building is labelled 4102 in this image. Existing accepted 4103 identity and all building positions are retained."
+  ]
+}

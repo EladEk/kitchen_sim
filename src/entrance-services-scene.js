@@ -1,10 +1,11 @@
+import {CEILING_COLOR,CEILING_MATERIAL} from './ceiling-finish.mjs';
 import * as THREE from 'three';
 import {ENTRANCE_SERVICES as E} from './home-model.mjs';
 import {buildEntryWaterMeters} from './entry-water-meters-scene.js';
 import {createSurfacePalette} from './surface-materials.mjs';
 
 export function buildEntranceServices({group,box,cylinder,floor,mat,resources,motions,picks,settings,mode}){
- const surface=createSurfacePalette(resources),groups=new Map(),opened=new Set(settings.openParts),paint=surface('door','#e1dace'),ceilingFinish=surface('plaster','#f7f5ef'),frame=mat('#a4aaa5',{metalness:.5,roughness:.43}),white=mat('#f4f3ee',{roughness:.38}),black=mat('#242727',{roughness:.95}),blue=mat('#266b86',{roughness:.6}),grey=mat('#626561',{roughness:.75}),steel=mat('#9d9e91',{metalness:.66,roughness:.5}),brass=mat('#92754d',{metalness:.7,roughness:.42});
+ const surface=createSurfacePalette(resources),groups=new Map(),opened=new Set(settings.openParts),paint=surface('door','#e1dace'),ceilingFinish=surface('plaster',CEILING_COLOR,CEILING_MATERIAL),frame=mat('#a4aaa5',{metalness:.5,roughness:.43}),white=mat('#f4f3ee',{roughness:.38}),black=mat('#242727',{roughness:.95}),blue=mat('#266b86',{roughness:.6}),grey=mat('#626561',{roughness:.75}),steel=mat('#9d9e91',{metalness:.66,roughness:.5}),brass=mat('#92754d',{metalness:.7,roughness:.42});
  const context=new THREE.Group();context.userData={part:'entry-common-context',outsideApartment:true,dimensionsInferred:true};group.add(context);
  floor(E.context.polygon,mat('#d3cec2'),-.005,context);
  // Show the public ceiling only in the full-height views, keeping the cutaway clear.

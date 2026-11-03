@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import {groundBaseProfile,groundTransform,groundBaseServices,baseOpeningPosition,GROUND_KITCHEN} from './ground-apartments.mjs';
-import {point,DOORS} from './home-model.mjs';
+import {point,DOORS,HOUSE_OUTLINE,insidePolygon} from './home-model.mjs';
+import {wallExteriorFaces,wallFaceMaterials} from './wall-face-finishes.mjs';
 import {markPublicDoor} from './public-door-motion.mjs';
 import {createSurfacePalette,metricSurfaceUVs} from './surface-materials.mjs';
 import {installBuildingSurfaceUVs} from './building-surface-uvs.mjs';
@@ -8,22 +9,23 @@ import {buildObservedArchitecture} from './home-observed-scene.js';
 import {buildElectricalPoints,buildWaterPoints} from './home-electrical-scene.js';
 import {createCeramicBowl} from './sanitary-fixtures.js';
 import {lightOutput} from './lighting-controls.mjs';
+import {CEILING_COLOR,CEILING_MATERIAL} from './ceiling-finish.mjs';
 
 // One shared base geometry, three rigid placements. Gardens, ordered products,
 // movable owner furniture and the owner's kitchen never enter this builder.
 export function buildGroundApartments({root,resources,picks,settings,cut=false,mode='building',floorMaterial=null,interactiveDoors=false}){
  const profile=groundBaseProfile(),template=new THREE.Group(),h=cut?.85:profile.height,mat=(color,extra={})=>{const m=new THREE.MeshStandardMaterial({color,roughness:.72,...extra});resources.push(m);return m;},surface=createSurfacePalette(resources);
- const paint=surface('plaster','#eeece5'),stone=surface('limestone','#d9d2c5'),neutralFloor=floorMaterial||surface('porcelain','#d0cdc5'),wetFloor=surface('cement','#c4c3bd'),white=mat('#f0f0e9'),metal=mat('#343e3d',{metalness:.35,roughness:.4}),glass=mat('#acc2ca',{transparent:true,opacity:.28,depthWrite:false,roughness:.18}),wood=surface('paint','#dedbd1');
+ const paint=surface('plaster','#eeece5'),ceilingFinish=surface('plaster',CEILING_COLOR,CEILING_MATERIAL),stone=surface('limestone','#d9d2c5'),neutralFloor=floorMaterial||surface('porcelain','#d0cdc5'),wetFloor=surface('cement','#c4c3bd'),white=mat('#f0f0e9'),metal=mat('#343e3d',{metalness:.35,roughness:.4}),glass=mat('#acc2ca',{transparent:true,opacity:.28,depthWrite:false,roughness:.18}),wood=surface('paint','#dedbd1');
  const innerDoor=surface('door','#d8d0c3'),entryDoor=surface('door','#536c66');for(const material of [innerDoor,entryDoor])installBuildingSurfaceUVs(material);
- for(const material of [paint,stone,neutralFloor,wetFloor,wood])installBuildingSurfaceUVs(material);
+ for(const material of [paint,ceilingFinish,stone,neutralFloor,wetFloor,wood])installBuildingSurfaceUVs(material);
  const cube=new THREE.BoxGeometry(1,1,1);resources.push(cube);let interactive=false;
  const box=(x,y,z,w,hh,d,m,parent=template,data=null)=>{const mesh=new THREE.Mesh(cube,m);mesh.position.set(x,y,z);mesh.scale.set(w,hh,d);mesh.castShadow=mesh.receiveShadow=true;mesh.userData={...(data||{}),baseline:true};parent.add(mesh);if(interactive&&data?.action)picks.push(mesh);return mesh;};
  const cylinder=(x,y,z,r,hh,m,parent=template,data=null)=>{const g=new THREE.CylinderGeometry(r,r,hh,20);resources.push(g);const mesh=new THREE.Mesh(g,m);mesh.position.set(x,y,z);mesh.userData={...(data||{}),baseline:true};mesh.castShadow=true;parent.add(mesh);if(interactive&&data?.action)picks.push(mesh);return mesh;};
  const polygon=(poly,y,m,parent=template,depth=0)=>{const shape=new THREE.Shape();poly.forEach(([x,z],i)=>i?shape.lineTo(x,z):shape.moveTo(x,z));shape.closePath();const geo=depth?new THREE.ExtrudeGeometry(shape,{depth,bevelEnabled:false}):new THREE.ShapeGeometry(shape);geo.rotateX(Math.PI/2);metricSurfaceUVs(geo);if(!depth)m.side=THREE.DoubleSide;resources.push(geo);const mesh=new THREE.Mesh(geo,m);mesh.position.y=y;mesh.receiveShadow=true;mesh.castShadow=!!depth;parent.add(mesh);return mesh;};
- for(const room of profile.rooms){const floor=polygon(room.polygon,.012,['bathroom','wc','utility'].includes(room.kind)?wetFloor:neutralFloor);floor.userData={part:'ground-base-room',roomId:room.id,baseline:true};if(!cut&&mode==='walk')polygon(room.polygon,profile.height,paint);}
+ for(const room of profile.rooms){const floor=polygon(room.polygon,.012,['bathroom','wc','utility'].includes(room.kind)?wetFloor:neutralFloor);floor.userData={part:'ground-base-room',roomId:room.id,baseline:true};if(!cut&&mode==='walk'){const ceiling=polygon(room.polygon,profile.height,ceilingFinish);ceiling.userData={part:'ground-base-ceiling',roomId:room.id,baseline:true};}}
  for(const wall of profile.walls){
   const vertical=Math.abs(wall.a[0]-wall.b[0])<.001,lo=wall.a[vertical?1:0],hi=wall.b[vertical?1:0],holes=[...profile.doors,...profile.windows].filter(o=>o.wallId===wall.id).sort((a,b)=>a.start-b.start);
-  const segment=(a,b,bottom,hh)=>{if(b-a<.002||hh<.002)return;const m=box(vertical?wall.a[0]:(a+b)/2,bottom+hh/2,vertical?(a+b)/2:wall.a[1],vertical?wall.thickness:b-a,hh,vertical?b-a:wall.thickness,wall.external?stone:paint);m.userData={part:'ground-base-wall',baseWallId:wall.id,blockPick:true,baseline:true};};
+  const segment=(a,b,bottom,hh)=>{if(b-a<.002||hh<.002)return;const centre=vertical?[wall.a[0],(a+b)/2]:[(a+b)/2,wall.a[1]],faces=wall.external?wallExteriorFaces({centre,normal:vertical?[1,0]:[0,1],thickness:wall.thickness,inside:p=>insidePolygon(p,HOUSE_OUTLINE),positiveFace:vertical?0:4,negativeFace:vertical?1:5}):null,material=faces?wallFaceMaterials(paint,stone,faces):paint;const m=box(centre[0],bottom+hh/2,centre[1],vertical?wall.thickness:b-a,hh,vertical?b-a:wall.thickness,material);m.userData={part:'ground-base-wall',baseWallId:wall.id,blockPick:true,baseline:true};};
   let cursor=lo;for(const o of holes){segment(cursor,o.start,0,h);if(o.sill)segment(o.start,o.end,0,Math.min(h,o.sill));if(h>o.sill+o.height)segment(o.start,o.end,o.sill+o.height,h-o.sill-o.height);cursor=o.end;}segment(cursor,hi,0,h);
   if(!cut&&wall.external)segment(lo,hi,profile.height,3.1-profile.height);
  }

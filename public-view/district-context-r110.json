@@ -1,0 +1,396 @@
+{
+  "revision": 110,
+  "label": "מתחם חינוך · לפי הדמיית היזם",
+  "sourceURL": "https://efficapital.co.il/Effi-Afikim/wp-content/uploads/2024/08/104187-5_effi_hadmaya_c_press_-1.pdf",
+  "sourceKind": "official-developer-aerial-and-user-identification",
+  "verifiedAsBuilt": false,
+  "institutionNamesVerified": false,
+  "near": [
+    "4092",
+    "4091"
+  ],
+  "accuracy": "Relative layout reconstructed from the developer aerial across the south perimeter street. Ground dimensions, heights, landscape and fixtures are estimates. No municipal parcel or institution name has been spatially matched.",
+  "bounds": {
+    "west": -27,
+    "east": 251,
+    "north": 184,
+    "south": 290
+  },
+  "buildings": [
+    {
+      "id": "education-main-street-wing",
+      "bounds": [
+        -10,
+        58,
+        208,
+        221
+      ],
+      "height": 9.6,
+      "floors": 3,
+      "style": "glazed"
+    },
+    {
+      "id": "education-main-return-wing",
+      "bounds": [
+        -10,
+        3,
+        221,
+        275
+      ],
+      "height": 9.6,
+      "floors": 3,
+      "style": "glazed"
+    },
+    {
+      "id": "education-rectangular-annex",
+      "bounds": [
+        95,
+        154,
+        207,
+        220
+      ],
+      "height": 6.6,
+      "floors": 2,
+      "style": "accent"
+    },
+    {
+      "id": "education-low-block-a",
+      "bounds": [
+        178,
+        200,
+        207,
+        225
+      ],
+      "height": 9.2,
+      "floors": 3,
+      "style": "classroom"
+    },
+    {
+      "id": "education-low-block-b",
+      "bounds": [
+        211,
+        233,
+        207,
+        225
+      ],
+      "height": 9.2,
+      "floors": 3,
+      "style": "classroom"
+    },
+    {
+      "id": "education-low-block-c",
+      "bounds": [
+        178,
+        200,
+        240,
+        258
+      ],
+      "height": 9.2,
+      "floors": 3,
+      "style": "classroom"
+    }
+  ],
+  "drives": [
+    {
+      "id": "education-entry",
+      "bounds": [
+        71.9,
+        78.1,
+        184,
+        272
+      ]
+    },
+    {
+      "id": "education-parking-west",
+      "bounds": [
+        23.9,
+        30.1,
+        232,
+        272
+      ]
+    },
+    {
+      "id": "education-parking-east",
+      "bounds": [
+        52.9,
+        59.1,
+        232,
+        272
+      ]
+    },
+    {
+      "id": "education-parking-head",
+      "bounds": [
+        27,
+        75,
+        228.9,
+        235.1
+      ]
+    },
+    {
+      "id": "education-parking-tail",
+      "bounds": [
+        27,
+        75,
+        268.9,
+        275.1
+      ]
+    },
+    {
+      "id": "education-annex-entry",
+      "bounds": [
+        164.9,
+        171.1,
+        184,
+        265
+      ]
+    }
+  ],
+  "parkingCourts": [
+    [
+      14,
+      78.1,
+      228.9,
+      275.1
+    ],
+    [
+      158,
+      177,
+      231,
+      264
+    ]
+  ],
+  "walks": [
+    {
+      "id": "education-street-footway",
+      "bounds": [
+        -27,
+        244,
+        193.5,
+        197.5
+      ]
+    },
+    {
+      "id": "education-west-walk",
+      "bounds": [
+        -18,
+        -14,
+        195.5,
+        282
+      ]
+    },
+    {
+      "id": "education-south-walk",
+      "bounds": [
+        -16,
+        85,
+        279,
+        283
+      ]
+    },
+    {
+      "id": "education-east-walk",
+      "bounds": [
+        82,
+        86,
+        195.5,
+        281
+      ]
+    },
+    {
+      "id": "education-main-entry-walk",
+      "bounds": [
+        4,
+        71.9,
+        222,
+        226
+      ]
+    },
+    {
+      "id": "education-annex-walk",
+      "bounds": [
+        90,
+        158,
+        221,
+        225
+      ]
+    },
+    {
+      "id": "education-block-a-entry",
+      "bounds": [
+        171.1,
+        202,
+        227,
+        230
+      ]
+    },
+    {
+      "id": "education-block-b-entry",
+      "bounds": [
+        205,
+        239,
+        227,
+        230
+      ]
+    },
+    {
+      "id": "education-block-c-entry",
+      "bounds": [
+        171.1,
+        202,
+        260,
+        264
+      ]
+    }
+  ],
+  "crossings": [
+    {
+      "x": 112,
+      "z": 184,
+      "axis": "z",
+      "length": 10.5,
+      "derived": true
+    }
+  ],
+  "trees": [
+    [
+      -21,
+      204
+    ],
+    [
+      -21,
+      220
+    ],
+    [
+      -21,
+      238
+    ],
+    [
+      -21,
+      256
+    ],
+    [
+      -21,
+      275
+    ],
+    [
+      8,
+      286
+    ],
+    [
+      26,
+      286
+    ],
+    [
+      44,
+      286
+    ],
+    [
+      62,
+      286
+    ],
+    [
+      91,
+      231
+    ],
+    [
+      91,
+      249
+    ],
+    [
+      91,
+      270
+    ],
+    [
+      110,
+      228
+    ],
+    [
+      128,
+      228
+    ],
+    [
+      147,
+      228
+    ],
+    [
+      180,
+      198
+    ],
+    [
+      197,
+      198
+    ],
+    [
+      215,
+      198
+    ],
+    [
+      235,
+      198
+    ],
+    [
+      241,
+      214
+    ],
+    [
+      241,
+      235
+    ],
+    [
+      221,
+      245
+    ],
+    [
+      214,
+      267
+    ],
+    [
+      188,
+      272
+    ],
+    [
+      154,
+      276
+    ],
+    [
+      134,
+      280
+    ]
+  ],
+  "traceEvidence": {
+    "image": "public/house/efi-reference/site-opposite-view.png",
+    "imageSize": [
+      1920,
+      1080
+    ],
+    "mainBuildingPixelBounds": [
+      750,
+      555,
+      1010,
+      790
+    ],
+    "annexPixelBounds": [
+      955,
+      475,
+      1130,
+      565
+    ],
+    "smallBlocksPixelBounds": [
+      1005,
+      390,
+      1225,
+      475
+    ],
+    "method": "Observed L-shaped building, separate rectangular annex and three smaller low-rise blocks reconciled to the existing south street and district ground frame. Pixel bounds include elevated roofs; they are not a surveyed footprint registration.",
+    "uncertaintyMetres": [
+      15,
+      30
+    ]
+  },
+  "limits": [
+    "Building roles follow the user's identification of the adjacent education area. The municipal schools on plots1717,1709,1704 were found but not reliably matched to this campus.",
+    "No school name, pupil data, precise classroom layout, statutory boundary or completed-construction status is asserted.",
+    "The L-shaped wings, long annex and smaller blocks are visible; facade/window construction and parking bay counts are illustrative."
+  ]
+}

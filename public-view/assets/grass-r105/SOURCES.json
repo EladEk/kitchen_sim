@@ -1,0 +1,97 @@
+{
+  "asset": "Grass004",
+  "official_page": "https://ambientcg.com/view?id=Grass004",
+  "provider": "ambientCG",
+  "checked_utc": "2026-11-03",
+  "license": "CC0-1.0",
+  "license_source": "https://docs.ambientcg.com/license/",
+  "license_summary": "Official ambientCG license permits copying, modification, redistribution, commercial use and inclusion of raw asset files in a game, without attribution requirements.",
+  "creation_technique": "Procedural (as identified by official page); not a photoscan.",
+  "physical_dimensions_m": [
+    1.4,
+    1.4
+  ],
+  "physical_dimensions_source": "Official asset page states approximate dimensions 1.4 m x 1.4 m.",
+  "download": {
+    "requested_url": "https://ambientcg.com/get?file=Grass004_1K-JPG.zip",
+    "resolved_url": "https://acg-download.struffelproductions.com/file/ambientCG-Web/download/Grass004_8f7ZrdgN/Grass004_1K-JPG.zip",
+    "bytes": 11003149,
+    "archive_sha256": "4b63495f459db8481f4d5144e4e9069345c81cf898cc71f2216f5dd3bb344469",
+    "archive_retained": false
+  },
+  "files": [
+    {
+      "channel": "diff",
+      "archive_member": "Grass004_1K-JPG_Color.jpg",
+      "local_path": "/workspace/scratch/9d294e932994/grass_research/diff.jpg",
+      "bytes": 1985561,
+      "dimensions_px": [
+        1024,
+        1024
+      ],
+      "sha256": "9e1c60da44b34a9738b1256ba827541f097dc583521b1d281e61b5f4b4217bc5",
+      "source_url": "https://acg-download.struffelproductions.com/file/ambientCG-Web/download/Grass004_8f7ZrdgN/Grass004_1K-JPG.zip",
+      "source_archive_member": "Grass004_1K-JPG_Color.jpg"
+    },
+    {
+      "channel": "nor_gl",
+      "archive_member": "Grass004_1K-JPG_NormalGL.jpg",
+      "local_path": "/workspace/scratch/9d294e932994/grass_research/nor_gl.jpg",
+      "bytes": 2339612,
+      "dimensions_px": [
+        1024,
+        1024
+      ],
+      "sha256": "8014a81d896a5c589b60612a769bc39eb1213e48d96f6146f485ea36e9e9610f",
+      "source_url": "https://acg-download.struffelproductions.com/file/ambientCG-Web/download/Grass004_8f7ZrdgN/Grass004_1K-JPG.zip",
+      "source_archive_member": "Grass004_1K-JPG_NormalGL.jpg"
+    },
+    {
+      "channel": "rough",
+      "archive_member": "Grass004_1K-JPG_Roughness.jpg",
+      "local_path": "/workspace/scratch/9d294e932994/grass_research/rough.jpg",
+      "bytes": 851664,
+      "dimensions_px": [
+        1024,
+        1024
+      ],
+      "sha256": "706580983860f942e141acdd68c4128dd683be50fcc5d85b7c67a9a3a8c7bac0",
+      "source_url": "https://acg-download.struffelproductions.com/file/ambientCG-Web/download/Grass004_8f7ZrdgN/Grass004_1K-JPG.zip",
+      "source_archive_member": "Grass004_1K-JPG_Roughness.jpg"
+    }
+  ],
+  "contact_sheet": "/workspace/scratch/9d294e932994/grass_research/contact-sheet.jpg",
+  "visual_review": "Dense short green/olive lawn with fine blade variation. No paving, rocks, exposed mud paths, or tall weed clumps visible. Fits maintained lawn better than Poly Haven sparse/leafy/dead/dirty candidates.",
+  "integration_recommendations": [
+    "Diffuse uses sRGB; normal and roughness use no color space / linear data.",
+    "Use physical repeat approximately one tile per 1.4 m; avoid enlarging blade scale.",
+    "Use restrained tangent-space normal amplitude and geometric blades only in a near-camera band if performance permits.",
+    "Raw roughness image is dark. Remap toward matte range 0.78-0.97 or omit map and choose high material roughness; multiplying an already dark map by material roughness=1 does not raise it.",
+    "Diffuse is natural olive rather than vivid synthetic green. Calibrate scene lighting before boosting saturation.",
+    "Original 1K JPGs total 5.18 MB; production recompression is reasonable."
+  ],
+  "selection_limitation": "No clean short-grass photoscan was established from allowed primary providers. Poly Haven official grass category has only grass_ground (dirty worn turf), leafy_grass (leaves/twigs), sparse_grass (visible soil/roots), withered_grass (dead brown grass). Selected clean procedural PBR material instead and labeled technique accurately.",
+  "polyhaven_comparison_source": "https://api.polyhaven.com/assets?type=textures&category=ground-terrain/grass-vegetation",
+  "runtime_preparation": {
+    "colour": "JPEG quality89, retains natural albedo; no artificial green tint",
+    "normal": "OpenGL tangent normal; JPEG quality94",
+    "roughness": "Linear remap: 211 + source/255 * 37, stored lossless. Avoids the original low roughness/waxy lawn."
+  },
+  "bundled_files": [
+    {
+      "file": "normal.jpg",
+      "bytes": 709049,
+      "sha256": "eb53a23cc7347e0d05527a6eecebd54c8bc21954a03f72ee2523e4f4d4215a3c"
+    },
+    {
+      "file": "roughness.png",
+      "bytes": 472642,
+      "sha256": "f1a4301c7b0dbb544be97974f3ece1bffb10bd8b05321a774f85151751490ae3"
+    },
+    {
+      "file": "color.jpg",
+      "bytes": 437256,
+      "sha256": "5df8242d3c9605fe76d6a4ba258bb2c358bda3a8f8f7dd8b5fa4da25f4f63d97"
+    }
+  ]
+}

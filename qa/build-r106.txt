@@ -1,0 +1,105 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> kitchen-studio@1.0.0 build
+> node scripts/build-secure-site.mjs
+
+vite v8.0.13 building client environment for production...
+[2Ktransforming...✓ 2293 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/client/_personal/index.html                                       1.55 kB │ gzip:   0.90 kB
+dist/client/_personal/district.html                                    2.03 kB │ gzip:   0.98 kB
+dist/client/_personal/assets/beige_wall_001_rough-D34SXaBp.jpg       151.25 kB
+dist/client/_personal/assets/beige_wall_001_nor_gl-DOXyawE1.jpg      153.43 kB
+dist/client/_personal/assets/generateMeshBVH.worker-C344-BZO.js      164.77 kB
+dist/client/_personal/assets/parallelMeshBVH.worker-GICtnu8D.js      169.14 kB
+dist/client/_personal/assets/color-Ch_O5qiS.jpg                      437.25 kB
+dist/client/_personal/assets/roughness-Brdn8VSQ.png                  472.64 kB
+dist/client/_personal/assets/oak_veneer_01_nor_gl-DhURCAW6.jpg       484.84 kB
+dist/client/_personal/assets/cotton_jersey_diff-CZANGZZH.jpg         581.36 kB
+dist/client/_personal/assets/asphalt_03_rough--mSi9D6M.jpg           590.10 kB
+dist/client/_personal/assets/oak_veneer_01_diff-CgJfTe1u.jpg         641.75 kB
+dist/client/_personal/assets/cotton_jersey_nor_gl-D84rKSq1.jpg       678.67 kB
+dist/client/_personal/assets/normal-mWumv4-X.jpg                     709.04 kB
+dist/client/_personal/assets/asphalt_03_diff-aaAqAqwI.jpg            788.84 kB
+dist/client/_personal/assets/oak_veneer_01_rough-DUEVTQ3M.jpg        865.19 kB
+dist/client/_personal/assets/cotton_jersey_rough-GMzaDDJb.jpg        865.26 kB
+dist/client/_personal/assets/asphalt_03_nor_gl-DEFNxkm0.jpg          974.67 kB
+dist/client/_personal/assets/limestone-r96-6ZV3zpR8.png            3,464.94 kB
+dist/client/_personal/assets/personal-district-state-CBwTTffm.css      1.30 kB │ gzip:   0.60 kB
+dist/client/_personal/assets/index-BzaZOLnX.css                        1.83 kB │ gzip:   0.72 kB
+dist/client/_personal/assets/preload-helper-B6qVyEFg.css               2.74 kB │ gzip:   0.98 kB
+dist/client/_personal/assets/planning-pair-C5RxUc03.css                3.07 kB │ gzip:   1.14 kB
+dist/client/_personal/assets/district-C178nVP6.css                    11.10 kB │ gzip:   3.16 kB
+dist/client/_personal/assets/FloorSpecification-BZ9ZIoGS.css          25.78 kB │ gzip:   5.84 kB
+dist/client/_personal/assets/KitchenApp-CfYb61q2.css                  58.88 kB │ gzip:  12.17 kB
+dist/client/_personal/assets/HomeApp--S4NgYbs.css                     65.53 kB │ gzip:  13.37 kB
+dist/client/_personal/assets/home-measurements-DGpxKgNc.js             2.45 kB │ gzip:   1.17 kB
+dist/client/_personal/assets/index-Bl8dWc5d.js                         2.52 kB │ gzip:   1.18 kB
+dist/client/_personal/assets/workers-DIcHwfto.js                       3.77 kB │ gzip:   1.32 kB
+dist/client/_personal/assets/PlanViews-DOtbI_7V.js                    15.00 kB │ gzip:   5.41 kB
+dist/client/_personal/assets/EquirectCamera-AioQ1mih.js               16.08 kB │ gzip:   6.22 kB
+dist/client/_personal/assets/MeshBVH-I_zSoIPg.js                      47.02 kB │ gzip:  15.31 kB
+dist/client/_personal/assets/personal-district-state-BzDnC2ak.js      56.87 kB │ gzip:  21.69 kB
+dist/client/_personal/assets/KitchenApp-CvSUSUza.js                  109.10 kB │ gzip:  37.62 kB
+dist/client/_personal/assets/FloorSpecification-DSZFqBG8.js          116.54 kB │ gzip:  37.81 kB
+dist/client/_personal/assets/src-Cg3v5rz8.js                         151.62 kB │ gzip:  41.85 kB
+dist/client/_personal/assets/HomeApp-CBM-HStL.js                     169.46 kB │ gzip:  54.00 kB
+dist/client/_personal/assets/district-Wi1A-g24.js                    184.22 kB │ gzip:  57.07 kB
+dist/client/_personal/assets/export-planning-D8ranLyR.js             195.89 kB │ gzip:  61.49 kB
+dist/client/_personal/assets/preload-helper-Cnh4ZKHn.js              199.59 kB │ gzip:  63.89 kB
+dist/client/_personal/assets/webgpu-naeHmWG9.js                      260.77 kB │ gzip:  72.52 kB
+dist/client/_personal/assets/three.webgpu-D9_QLCN7.js                664.67 kB │ gzip: 186.84 kB
+dist/client/_personal/assets/planning-pair-BdrTBbLR.js             1,902.28 kB │ gzip: 478.26 kB
+
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 7.52s
+vite v8.0.13 building client environment for production...
+[2Ktransforming...✓ 2095 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/client/index.html                                     1.24 kB │ gzip:   0.79 kB
+dist/client/assets/beige_wall_001_rough-D34SXaBp.jpg     151.25 kB
+dist/client/assets/beige_wall_001_nor_gl-DOXyawE1.jpg    153.43 kB
+dist/client/assets/generateMeshBVH.worker-C344-BZO.js    164.77 kB
+dist/client/assets/parallelMeshBVH.worker-GICtnu8D.js    169.14 kB
+dist/client/assets/color-Ch_O5qiS.jpg                    437.25 kB
+dist/client/assets/roughness-Brdn8VSQ.png                472.64 kB
+dist/client/assets/oak_veneer_01_nor_gl-DhURCAW6.jpg     484.84 kB
+dist/client/assets/cotton_jersey_diff-CZANGZZH.jpg       581.36 kB
+dist/client/assets/asphalt_03_rough--mSi9D6M.jpg         590.10 kB
+dist/client/assets/oak_veneer_01_diff-CgJfTe1u.jpg       641.75 kB
+dist/client/assets/cotton_jersey_nor_gl-D84rKSq1.jpg     678.67 kB
+dist/client/assets/normal-mWumv4-X.jpg                   709.04 kB
+dist/client/assets/asphalt_03_diff-aaAqAqwI.jpg          788.84 kB
+dist/client/assets/oak_veneer_01_rough-DUEVTQ3M.jpg      865.19 kB
+dist/client/assets/cotton_jersey_rough-GMzaDDJb.jpg      865.26 kB
+dist/client/assets/asphalt_03_nor_gl-DEFNxkm0.jpg        974.67 kB
+dist/client/assets/limestone-r96-6ZV3zpR8.png          3,464.94 kB
+dist/client/assets/index-B4DoMVou.css                     17.55 kB │ gzip:   4.66 kB
+dist/client/assets/workers-DpcPCAaQ.js                     3.71 kB │ gzip:   1.31 kB
+dist/client/assets/EquirectCamera-ByzfYae3.js             16.07 kB │ gzip:   6.22 kB
+dist/client/assets/src-BfrjycNk.js                       151.58 kB │ gzip:  41.83 kB
+dist/client/assets/webgpu-CkJMmDFg.js                    260.70 kB │ gzip:  72.46 kB
+dist/client/assets/three.webgpu-Cet7RKbl.js              664.68 kB │ gzip: 186.79 kB
+dist/client/assets/index-Z7UhZZh2.js                   1,225.12 kB │ gzip: 343.43 kB
+
+✓ built in 1.74s
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+Public baseline: 43 apartments; original unit-4 kitchen and standard garden; owner geometry excluded.
+vite v8.0.13 building ssr environment for production...
+[2Ktransforming...✓ 4 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/server/index.js  71.55 kB │ gzip: 23.34 kB
+
+✓ built in 73ms
+Protected 232 source files; server-only environment access, no plaintext originals in public output.

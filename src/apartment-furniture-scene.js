@@ -3,13 +3,14 @@ import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js'
 import {APARTMENT_FURNITURE,GROUND_APARTMENT_FURNITURE} from './apartment-furniture-layout.mjs';
 import {createSurfacePalette} from './surface-materials.mjs';
 import {installBuildingSurfaceUVs} from './building-surface-uvs.mjs';
+import {createSoftGeometry} from './soft-furnishings.mjs';
 export function groundProposedBeds(){return GROUND_APARTMENT_FURNITURE.filter(r=>r.kind==='bed');}
 export function neighbourFurniture(level){return level===0?GROUND_APARTMENT_FURNITURE:APARTMENT_FURNITURE.filter(r=>r.floor===level);}
 export function apartmentFurnitureBoxes(level){return neighbourFurniture(level).map(r=>({...r.box,apartmentFurniture:r.id,unit:r.unit}));}
 export function buildApartmentFurniture({parent,resources,level,base,settings,surfaces=null}){
  if(settings.furniture===false)return;
  const items=neighbourFurniture(level);if(!items.length)return;
- const cube=new THREE.BoxGeometry(1,1,1),soft=new RoundedBoxGeometry(1,1,1,2,.07);resources.push(cube,soft);
+ const cube=new THREE.BoxGeometry(1,1,1),soft=new RoundedBoxGeometry(1,1,1,2,.07),cushion=createSoftGeometry(),duvet=createSoftGeometry(1,1,1,{kind:'duvet',radius:.12});resources.push(cube,soft,cushion,duvet);
  const surface=surfaces||createSurfacePalette(resources),mat=(color,extra={})=>{const m=new THREE.MeshStandardMaterial({color,roughness:.75,...extra});resources.push(m);return m;},fabric=color=>surface('fabric',color),palette={wood:surface('wood','#a28d76'),mattress:fabric('#f1eee5'),linen:fabric('#a9b8b3'),pillow:fabric('#faf8ef'),sofa:fabric('#b9b4a7'),rug:fabric('#d1c9b7'),cabinet:surface('paint','#e5dfd2'),stone:surface('stone','#c7c2b4'),dark:mat('#303a3c',{roughness:.32}),screen:mat('#172126',{roughness:.18,metalness:.12}),steel:mat('#9ea8a5',{metalness:.75,roughness:.28})},batches=new Map(),matrix=new THREE.Matrix4(),q=new THREE.Quaternion(),position=new THREE.Vector3(),scale=new THREE.Vector3();
  for(const m of Object.values(palette))installBuildingSurfaceUVs(m);
  function box(r,part,m,x,y,z,w,h,d){const c=Math.cos(r.angle),s=Math.sin(r.angle),key=part;let b=batches.get(key);if(!b)batches.set(key,b={part,m,items:[]});b.items.push([r.x+x*c+z*s,base+y,r.z-x*s+z*c,w,h,d,r.angle,r.id,r.unit]);}
@@ -17,7 +18,7 @@ export function buildApartmentFurniture({parent,resources,level,base,settings,su
   if(r.kind==='bed'){
    box(r,'apartment-bed-frame',palette.wood,0,.22,0,r.w,.30,r.d);
    box(r,'apartment-mattress',palette.mattress,0,.44,0,r.w-.04,.22,r.d-.05);
-   box(r,'apartment-duvet',palette.linen,0,.565,.25,r.w-.07,.04,r.d-.64);
+   box(r,'apartment-duvet',palette.linen,0,.565,.25,r.w-.07,.075,r.d-.64);
    box(r,'apartment-headboard',palette.wood,0,.54,-r.d/2+.025,r.w,.86,.05);
    const count=r.w>1.25?2:1;for(let i=0;i<count;i++)box(r,'apartment-pillow',palette.pillow,(i-(count-1)/2)*r.w*.45,.585,-r.d/2+.28,r.w/count-.12,.10,.38);
   }else if(r.kind==='sofa'){
@@ -52,5 +53,5 @@ export function buildApartmentFurniture({parent,resources,level,base,settings,su
    for(const x of [r.w*.25-.15,r.w*.25+.15])box(r,'apartment-kitchen-hob-zone',palette.steel,x,.929,0,.17,.002,.22);
   }
  }
- for(const b of batches.values()){const rounded=/mattress|duvet|pillow|sofa-(?:base|arm|back|seat|cushion)|coffee-top/.test(b.part),mesh=new THREE.InstancedMesh(rounded?soft:cube,b.m,b.items.length);b.items.forEach(([x,y,z,w,h,d,angle],i)=>{q.setFromAxisAngle(THREE.Object3D.DEFAULT_UP,angle);position.set(x,y,z);scale.set(w,h,d);matrix.compose(position,q,scale);mesh.setMatrixAt(i,matrix);});mesh.name=b.part;mesh.userData={part:b.part,buildingFloor:level,proposed:true,dimensionsInferred:true,placements:b.items.map(r=>({id:r[7],unit:r[8]}))};mesh.castShadow=mesh.receiveShadow=true;mesh.computeBoundingSphere();resources.push(mesh);parent.add(mesh);}
+ for(const b of batches.values()){const rounded=/mattress|sofa-(?:base|arm|back)|coffee-top/.test(b.part),geometry=/duvet/.test(b.part)?duvet:/pillow|sofa-(?:seat|cushion)/.test(b.part)?cushion:rounded?soft:cube,mesh=new THREE.InstancedMesh(geometry,b.m,b.items.length);b.items.forEach(([x,y,z,w,h,d,angle],i)=>{q.setFromAxisAngle(THREE.Object3D.DEFAULT_UP,angle);position.set(x,y,z);scale.set(w,h,d);matrix.compose(position,q,scale);mesh.setMatrixAt(i,matrix);});mesh.name=b.part;mesh.userData={part:b.part,buildingFloor:level,proposed:true,dimensionsInferred:true,placements:b.items.map(r=>({id:r[7],unit:r[8]}))};mesh.castShadow=mesh.receiveShadow=true;mesh.computeBoundingSphere();resources.push(mesh);parent.add(mesh);}
 }

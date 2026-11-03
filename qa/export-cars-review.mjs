@@ -1,0 +1,14 @@
+// Actual vehicle triangles for the existing native GLES geometry reviewer.
+// This does not reproduce the browser's environment reflections or tone map.
+import * as THREE from 'three';
+import {writeFileSync} from 'node:fs';
+import {createRealisticProps} from '../public-view/realistic-props.mjs';
+const prefix=process.argv[2];if(!prefix)throw Error('Pass an output prefix outside the checkout');
+const props=createRealisticProps({cars:[{x:-4.5,z:0,length:4.1,model:'sedan',color:'#667d90'},{x:0,z:0,length:3.8,model:'hatchback',color:'#e8e8df'},{x:4.5,z:0,length:4.2,model:'suv',color:'#6b777b'}]});
+props.update(new THREE.Vector3(0,1.6,0),1000);const root=new THREE.Group();root.add(props.group);const floor=new THREE.Mesh(new THREE.BoxGeometry(18,.04,10),new THREE.MeshStandardMaterial({color:'#636a6c'}));floor.position.y=-.07;root.add(floor);root.updateMatrixWorld(true);
+const chunks=[],matrix=new THREE.Matrix4(),normal=new THREE.Matrix3(),point=new THREE.Vector3(),n=new THREE.Vector3(),colour=new THREE.Color(),instanceColour=new THREE.Color();let vertices=0;
+root.traverseVisible(o=>{if(!o.isMesh||o.userData.propPart==='contact-shadow')return;const g=o.geometry,p=g.attributes.position,no=g.attributes.normal,index=g.index,count=index?.count??p.count,material=o.material;if(!no||!material?.color)return;
+ for(let k=0;k<(o.isInstancedMesh?o.count:1);k++){matrix.copy(o.matrixWorld);instanceColour.set('#ffffff');if(o.isInstancedMesh){o.getMatrixAt(k,matrix);matrix.premultiply(o.matrixWorld);if(o.instanceColor)o.getColorAt(k,instanceColour);}normal.getNormalMatrix(matrix);const data=new Float32Array(count*9);for(let j=0;j<count;j++){const i=index?index.getX(j):j;point.fromBufferAttribute(p,i).applyMatrix4(matrix);n.fromBufferAttribute(no,i).applyNormalMatrix(normal);colour.copy(material.color).multiply(instanceColour);if(material.vertexColors&&g.attributes.color)colour.multiply(new THREE.Color().fromBufferAttribute(g.attributes.color,i));data.set([...point,...n,colour.r,colour.g,colour.b],j*9);}chunks.push(Buffer.from(data.buffer));vertices+=count;}
+});
+const cameras={};for(const [name,eye,target] of [['all-front',[10,6,14],[0,.65,0]],['all-rear',[-9,5,-14],[0,.65,0]],['suv-close',[8,2.9,5.5],[4.5,.8,0]],['sedan-close',[-1.2,2.3,4.7],[-4.5,.65,0]]]){const camera=new THREE.PerspectiveCamera(name.startsWith('all')?45:39,1,.05,80);camera.position.set(...eye);camera.lookAt(...target);camera.updateMatrixWorld(true);cameras[name]=new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse).elements;}
+writeFileSync(prefix+'.bin',Buffer.concat(chunks));writeFileSync(prefix+'.json',JSON.stringify({vertices,cameras,note:'Actual vehicle geometry; simple native lighting, without browser material effects.'}));props.dispose();floor.geometry.dispose();floor.material.dispose();console.log(JSON.stringify({vertices,views:Object.keys(cameras)}));

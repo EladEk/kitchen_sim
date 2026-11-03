@@ -1,0 +1,1031 @@
+{
+  "sourceImage": "public/house/efi-reference/site.png",
+  "sourceImageSize": [
+    1920,
+    1080
+  ],
+  "method": "Ground-plan affine approximation fitted to manually identified parking/drive boundaries in accepted plot1410. No roof-centre controls or roof homography used.",
+  "quality": "Insufficient precise, spatially spread ground controls to justify a stable projective extrapolation. An unconstrained homography fit was unstable beyond the parking court and has been rejected. This affine result is a bounded illustrative relative layout, not a survey.",
+  "controls": [
+    {
+      "id": "north-aisle-mouth-centre",
+      "world": [
+        46.50181,
+        -24.16539
+      ],
+      "pixel": [
+        738,
+        282
+      ],
+      "basis": "plan main cross aisle at northern row; aerial road mouth between4102/4103",
+      "reprojectedPixel": [
+        731.2592928530565,
+        284.023523681514
+      ],
+      "errorPixels": 7.037881849711793
+    },
+    {
+      "id": "north-row-east-end",
+      "world": [
+        58.80934,
+        -24.16539
+      ],
+      "pixel": [
+        791,
+        277
+      ],
+      "basis": "end of parking46/47 tandem strip at north edge; partly obscured",
+      "reprojectedPixel": [
+        791.668036547067,
+        277.38516846829555
+      ],
+      "errorPixels": 0.7711209873854704
+    },
+    {
+      "id": "main-aisle-entry-crossing",
+      "world": [
+        46.50181,
+        23.47328
+      ],
+      "pixel": [
+        765,
+        401
+      ],
+      "basis": "centre of perpendicular parking drives",
+      "reprojectedPixel": [
+        760.5343425339713,
+        390.809657161512
+      ],
+      "errorPixels": 11.12587901110835
+    },
+    {
+      "id": "southwest-bay-row-corner",
+      "world": [
+        28.30289,
+        70.20267
+      ],
+      "pixel": [
+        692,
+        501
+      ],
+      "basis": "outer parking row/landscape boundary below4101",
+      "reprojectedPixel": [
+        699.9253120602086,
+        505.373576834439
+      ],
+      "errorPixels": 9.052002296642982
+    },
+    {
+      "id": "southeast-bay-row-corner",
+      "world": [
+        86.95219,
+        70.20267
+      ],
+      "pixel": [
+        1004,
+        478
+      ],
+      "basis": "outer parking row beside eastern pedestrian strip",
+      "reprojectedPixel": [
+        987.7922139920449,
+        473.73970014215297
+      ],
+      "errorPixels": 16.758355592313805
+    },
+    {
+      "id": "south-aisle-mouth-centre",
+      "world": [
+        46.50181,
+        70.20267
+      ],
+      "pixel": [
+        790,
+        494
+      ],
+      "basis": "main cross aisle joins south parking-row drive",
+      "reprojectedPixel": [
+        789.2506189079515,
+        495.5575621298683
+      ],
+      "errorPixels": 1.7284593745644157
+    },
+    {
+      "id": "east-top-parking-row-corner",
+      "world": [
+        86.95219,
+        27.81465
+      ],
+      "pixel": [
+        944,
+        373
+      ],
+      "basis": "top bay-row edge just south of4103 garden",
+      "reprojectedPixel": [
+        961.7438085395919,
+        378.7233455362661
+      ],
+      "errorPixels": 18.6440184943373
+    },
+    {
+      "id": "east-middle-row-corner",
+      "world": [
+        86.95219,
+        53.98547
+      ],
+      "pixel": [
+        976,
+        437
+      ],
+      "basis": "end of middle island/bay row on eastern walkway",
+      "reprojectedPixel": [
+        977.8263745661052,
+        437.3874660459487
+      ],
+      "errorPixels": 1.867022761639247
+    }
+  ],
+  "worldToImageHomography": [
+    [
+      4.908275153016938,
+      0.614522816882058,
+      517.8657977935954
+    ],
+    [
+      -0.5393734740616857,
+      2.2415851131024027,
+      363.2741449676841
+    ],
+    [
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "imageToWorldHomography": [
+    [
+      0.1977792347522626,
+      -0.05422049412726713,
+      -82.72619754817896
+    ],
+    [
+      0.04758992746786511,
+      0.4330662699546968,
+      -181.96697468722206
+    ],
+    [
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "rmsReprojectionPixels": 10.552047143999863,
+  "worldFrame": "Existing district world metres, same accepted4102 anchor and PLAN_ROTATION; not a geographical CRS.",
+  "uncertainty": {
+    "nearParkingMetres": [
+      2,
+      5
+    ],
+    "mainParkExtrapolationMetres": [
+      12,
+      25
+    ],
+    "pocketGardenMetres": [
+      8,
+      18
+    ],
+    "warning": "Several control matches are partly occluded or simplified in the marketing render. Do not relocate accepted buildings or measured parking. Use topology and visible features; reconcile park edges against current approximate roads with open access kept."
+  },
+  "mainPark": {
+    "pixelPolygon": [
+      [
+        500,
+        210
+      ],
+      [
+        508,
+        142
+      ],
+      [
+        517,
+        76
+      ],
+      [
+        542,
+        46
+      ],
+      [
+        697,
+        42
+      ],
+      [
+        859,
+        40
+      ],
+      [
+        1018,
+        40
+      ],
+      [
+        1200,
+        43
+      ],
+      [
+        1314,
+        52
+      ],
+      [
+        1401,
+        87
+      ],
+      [
+        1470,
+        124
+      ],
+      [
+        1512,
+        158
+      ],
+      [
+        1458,
+        186
+      ],
+      [
+        1371,
+        200
+      ],
+      [
+        1280,
+        209
+      ],
+      [
+        1182,
+        212
+      ],
+      [
+        1082,
+        221
+      ],
+      [
+        986,
+        232
+      ],
+      [
+        892,
+        242
+      ],
+      [
+        804,
+        252
+      ],
+      [
+        708,
+        263
+      ],
+      [
+        618,
+        261
+      ],
+      [
+        533,
+        248
+      ],
+      [
+        502,
+        235
+      ]
+    ],
+    "worldPolygon": [
+      [
+        4.78,
+        -67.23
+      ],
+      [
+        10.05,
+        -96.3
+      ],
+      [
+        15.4,
+        -124.45
+      ],
+      [
+        21.98,
+        -136.25
+      ],
+      [
+        52.85,
+        -130.61
+      ],
+      [
+        85.0,
+        -123.76
+      ],
+      [
+        116.44,
+        -116.2
+      ],
+      [
+        152.28,
+        -106.24
+      ],
+      [
+        174.34,
+        -96.91
+      ],
+      [
+        189.65,
+        -77.62
+      ],
+      [
+        201.29,
+        -58.31
+      ],
+      [
+        207.75,
+        -41.59
+      ],
+      [
+        195.55,
+        -32.03
+      ],
+      [
+        177.59,
+        -30.11
+      ],
+      [
+        159.1,
+        -30.54
+      ],
+      [
+        139.55,
+        -33.91
+      ],
+      [
+        119.29,
+        -34.77
+      ],
+      [
+        99.7,
+        -34.57
+      ],
+      [
+        80.57,
+        -34.71
+      ],
+      [
+        62.62,
+        -34.57
+      ],
+      [
+        43.04,
+        -34.38
+      ],
+      [
+        25.35,
+        -39.53
+      ],
+      [
+        9.24,
+        -49.2
+      ],
+      [
+        3.82,
+        -56.31
+      ]
+    ],
+    "paths": [
+      {
+        "id": "south-edge-walk",
+        "width": 2.5,
+        "pixelPoints": [
+          [
+            500,
+            231
+          ],
+          [
+            610,
+            247
+          ],
+          [
+            710,
+            251
+          ],
+          [
+            813,
+            241
+          ],
+          [
+            920,
+            225
+          ],
+          [
+            1017,
+            218
+          ],
+          [
+            1125,
+            210
+          ],
+          [
+            1235,
+            206
+          ],
+          [
+            1358,
+            197
+          ],
+          [
+            1466,
+            180
+          ]
+        ],
+        "worldPoints": [
+          [
+            3.64,
+            -58.13
+          ],
+          [
+            24.53,
+            -45.97
+          ],
+          [
+            44.09,
+            -39.48
+          ],
+          [
+            65.0,
+            -38.91
+          ],
+          [
+            87.03,
+            -40.74
+          ],
+          [
+            106.6,
+            -39.16
+          ],
+          [
+            128.39,
+            -37.48
+          ],
+          [
+            150.36,
+            -33.98
+          ],
+          [
+            175.18,
+            -32.03
+          ],
+          [
+            197.46,
+            -34.25
+          ]
+        ]
+      },
+      {
+        "id": "west-pavilion-approach",
+        "width": 2.2,
+        "pixelPoints": [
+          [
+            668,
+            249
+          ],
+          [
+            682,
+            221
+          ],
+          [
+            707,
+            202
+          ],
+          [
+            738,
+            185
+          ],
+          [
+            771,
+            166
+          ],
+          [
+            801,
+            143
+          ],
+          [
+            816,
+            134
+          ]
+        ],
+        "worldPoints": [
+          [
+            35.89,
+            -42.34
+          ],
+          [
+            40.18,
+            -53.8
+          ],
+          [
+            46.15,
+            -60.84
+          ],
+          [
+            53.2,
+            -66.73
+          ],
+          [
+            60.76,
+            -73.39
+          ],
+          [
+            67.94,
+            -81.92
+          ],
+          [
+            71.4,
+            -85.1
+          ]
+        ]
+      },
+      {
+        "id": "central-amphitheatre-approach",
+        "width": 2.5,
+        "pixelPoints": [
+          [
+            933,
+            235
+          ],
+          [
+            942,
+            215
+          ],
+          [
+            968,
+            193
+          ],
+          [
+            995,
+            168
+          ],
+          [
+            1029,
+            145
+          ],
+          [
+            1061,
+            120
+          ],
+          [
+            1092,
+            99
+          ]
+        ],
+        "worldPoints": [
+          [
+            89.06,
+            -35.79
+          ],
+          [
+            91.92,
+            -44.03
+          ],
+          [
+            98.26,
+            -52.32
+          ],
+          [
+            104.96,
+            -61.86
+          ],
+          [
+            112.93,
+            -70.2
+          ],
+          [
+            120.61,
+            -79.51
+          ],
+          [
+            127.88,
+            -87.13
+          ]
+        ]
+      },
+      {
+        "id": "east-winding-loop",
+        "width": 1.8,
+        "pixelPoints": [
+          [
+            1105,
+            209
+          ],
+          [
+            1153,
+            183
+          ],
+          [
+            1196,
+            160
+          ],
+          [
+            1241,
+            137
+          ],
+          [
+            1276,
+            110
+          ],
+          [
+            1301,
+            89
+          ],
+          [
+            1319,
+            77
+          ],
+          [
+            1330,
+            90
+          ],
+          [
+            1337,
+            112
+          ],
+          [
+            1341,
+            137
+          ],
+          [
+            1336,
+            161
+          ],
+          [
+            1330,
+            184
+          ],
+          [
+            1351,
+            191
+          ],
+          [
+            1387,
+            193
+          ],
+          [
+            1426,
+            193
+          ]
+        ],
+        "worldPoints": [
+          [
+            124.49,
+            -38.87
+          ],
+          [
+            135.39,
+            -47.84
+          ],
+          [
+            145.14,
+            -55.76
+          ],
+          [
+            155.29,
+            -63.58
+          ],
+          [
+            163.68,
+            -73.6
+          ],
+          [
+            169.76,
+            -81.51
+          ],
+          [
+            173.97,
+            -85.85
+          ],
+          [
+            175.44,
+            -79.7
+          ],
+          [
+            175.63,
+            -69.84
+          ],
+          [
+            175.07,
+            -58.82
+          ],
+          [
+            172.78,
+            -48.66
+          ],
+          [
+            170.34,
+            -38.99
+          ],
+          [
+            174.12,
+            -34.96
+          ],
+          [
+            181.13,
+            -32.38
+          ],
+          [
+            188.84,
+            -30.52
+          ]
+        ]
+      },
+      {
+        "id": "east-branch",
+        "width": 1.7,
+        "pixelPoints": [
+          [
+            1408,
+            192
+          ],
+          [
+            1434,
+            170
+          ],
+          [
+            1444,
+            151
+          ],
+          [
+            1430,
+            133
+          ],
+          [
+            1408,
+            119
+          ],
+          [
+            1381,
+            106
+          ],
+          [
+            1351,
+            96
+          ],
+          [
+            1330,
+            90
+          ]
+        ],
+        "worldPoints": [
+          [
+            185.34,
+            -31.81
+          ],
+          [
+            191.67,
+            -40.1
+          ],
+          [
+            194.68,
+            -47.85
+          ],
+          [
+            192.89,
+            -56.32
+          ],
+          [
+            189.29,
+            -63.43
+          ],
+          [
+            184.66,
+            -70.34
+          ],
+          [
+            179.27,
+            -76.1
+          ],
+          [
+            175.44,
+            -79.7
+          ]
+        ]
+      }
+    ],
+    "shadePavilions": [
+      {
+        "id": "west-shade",
+        "groundPixel": [
+          807,
+          138
+        ],
+        "roofPixel": [
+          793,
+          112
+        ],
+        "radiusEstimate": 7.5,
+        "worldCentre": [
+          69.4,
+          -83.8
+        ]
+      },
+      {
+        "id": "north-shade",
+        "groundPixel": [
+          1100,
+          91
+        ],
+        "roofPixel": [
+          1096,
+          70
+        ],
+        "radiusEstimate": 7,
+        "worldCentre": [
+          129.9,
+          -90.21
+        ]
+      },
+      {
+        "id": "south-shade",
+        "groundPixel": [
+          1105,
+          196
+        ],
+        "roofPixel": [
+          1097,
+          174
+        ],
+        "radiusEstimate": 7.5,
+        "worldCentre": [
+          125.19,
+          -44.5
+        ]
+      }
+    ],
+    "amphitheatre": {
+      "pixelCentre": [
+        987,
+        90
+      ],
+      "worldCentre": [
+        107.6,
+        -96.02
+      ],
+      "pixelArcOuter": [
+        [
+          932,
+          66
+        ],
+        [
+          961,
+          61
+        ],
+        [
+          994,
+          65
+        ],
+        [
+          1022,
+          77
+        ],
+        [
+          1040,
+          93
+        ]
+      ],
+      "worldArcOuter": [
+        [
+          98.03,
+          -109.03
+        ],
+        [
+          104.03,
+          -109.82
+        ],
+        [
+          110.34,
+          -106.51
+        ],
+        [
+          115.23,
+          -99.98
+        ],
+        [
+          117.92,
+          -92.2
+        ]
+      ],
+      "radiiMetresEstimate": [
+        15,
+        9
+      ],
+      "rowsEstimate": 6
+    },
+    "bounds": {
+      "minX": 3.82,
+      "maxX": 207.75,
+      "minZ": -136.25,
+      "maxZ": -30.11
+    }
+  },
+  "pocketGarden": {
+    "pixelPolygon": [
+      [
+        1444,
+        351
+      ],
+      [
+        1482,
+        349
+      ],
+      [
+        1517,
+        360
+      ],
+      [
+        1544,
+        378
+      ],
+      [
+        1558,
+        398
+      ],
+      [
+        1544,
+        413
+      ],
+      [
+        1509,
+        420
+      ],
+      [
+        1479,
+        416
+      ],
+      [
+        1456,
+        401
+      ],
+      [
+        1448,
+        378
+      ]
+    ],
+    "worldPolygon": [
+      [
+        183.84,
+        38.76
+      ],
+      [
+        191.46,
+        39.7
+      ],
+      [
+        197.79,
+        46.13
+      ],
+      [
+        202.15,
+        55.21
+      ],
+      [
+        203.83,
+        64.54
+      ],
+      [
+        200.25,
+        70.37
+      ],
+      [
+        192.95,
+        71.73
+      ],
+      [
+        187.23,
+        68.57
+      ],
+      [
+        183.5,
+        60.98
+      ],
+      [
+        183.16,
+        50.64
+      ]
+    ],
+    "confidence": "lower; partly occluded by massing and vegetation; trace approximate",
+    "bounds": {
+      "minX": 183.16,
+      "maxX": 203.83,
+      "minZ": 38.76,
+      "maxZ": 71.73
+    }
+  },
+  "placementGuidance": {
+    "mainPark": "North of the first building row, across the perimeter street. Ground-fit trace reaches roughly z=-140 and x up to210; all edges carry stated extrapolation uncertainty. Keep accepted road/plot1410 unchanged; clip park paving at road where needed rather than pushing measured geometry.",
+    "pocketGarden": "Affine trace places this small landscaped recess roughly x182..207,z40..73. This supports the parent suspicion that the old generic east street atx186 may be too far inward; exact replacement street position is not source-measured.",
+    "status": "Source is an official developer marketing aerial, not an as-built image; no play equipment is confirmed for either reconstructed park."
+  },
+  "sourceURL": "https://efficapital.co.il/Effi-Afikim/wp-content/uploads/2024/06/104187-5_effi_hadmaya_c-1-1.pdf",
+  "sourceKind": "official-developer-marketing-aerial",
+  "verifiedAsBuilt": false,
+  "checked": "2026-11-03"
+}

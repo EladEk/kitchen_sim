@@ -1,9 +1,10 @@
 import * as THREE from 'three';
 import {HVAC_PROFILE as H} from './hvac-profile.mjs';
+import {CEILING_COLOR,CEILING_MATERIAL} from './ceiling-finish.mjs';
 
 // Shared by both simulators. The supplied box helper accepts metre dimensions.
 export function createKitchenHvac({box,mat,data={}}){
- const group=new THREE.Group(),white=mat('#efeee8',{roughness:.85}),metal=mat('#bec3bf',{roughness:.48,metalness:.25}),dark=mat('#343b3b');
+ const group=new THREE.Group(),white=mat(CEILING_COLOR,CEILING_MATERIAL),metal=mat('#bec3bf',{roughness:.48,metalness:.25}),dark=mat('#343b3b');
  group.userData={part:'kitchen-hvac',dimensionsInferred:true,source:'site-photos',page:H.photoPage};
  for(const s of H.sections){const mesh=box((s.start+s.end)/2,(H.bottom+H.top)/2,(H.back+s.front)/2,s.end-s.start,H.top-H.bottom,s.front-H.back,white,group,{...data,part:'hvac-bulkhead',hvacSection:s.id});mesh.userData.hvacSection=s.id;}
  for(const g of H.grilles){

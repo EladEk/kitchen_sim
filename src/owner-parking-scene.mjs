@@ -1,4 +1,14 @@
 import * as THREE from 'three';
-import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
+import {createRealisticProps} from '../public-view/realistic-props.mjs';
 import {ownerCars} from './owner-parking.mjs';
-export function buildOwnerCars({group,resources}){for(const car of ownerCars()){const root=new THREE.Group();root.position.set(car.x,0,car.z);root.userData={part:'private-owner-car',parking:car.label,illustrative:true};group.add(root);const mat=(color,metalness=0)=>{const m=new THREE.MeshStandardMaterial({color,metalness,roughness:.4});resources.push(m);return m;},paint=mat(car.color,.4),glass=mat('#243b43',.25),rubber=mat('#222826'),lamp=mat('#f1ecd7');const box=(w,h,d,x,y,z,m)=>{const g=new RoundedBoxGeometry(w,h,d,2,.07),mesh=new THREE.Mesh(g,m);mesh.position.set(x,y,z);mesh.castShadow=mesh.receiveShadow=true;root.add(mesh);resources.push(g);};box(car.width,.62,car.length,0,.58,0,paint);box(car.width*.86,.7,car.length*.53,0,1.21,.1,glass);box(car.width*.88,.07,car.length*.54,0,1.575,.1,paint);for(const side of [-1,1]){for(const end of [-1,1]){const g=new THREE.CylinderGeometry(.29,.29,.19,16),mesh=new THREE.Mesh(g,rubber);mesh.rotation.z=Math.PI/2;mesh.position.set(side*car.width/2,.29,end*car.length*.31);root.add(mesh);resources.push(g);}box(.28,.12,.05,side*.58,.65,-car.length/2,lamp);}}}
+export function buildOwnerCars({group,resources}){
+ for(const car of ownerCars()){
+  const root=new THREE.Group();root.position.set(car.x,.039,car.z);root.rotation.y=Math.PI;root.userData={part:'private-owner-car',parking:car.label,illustrative:true};group.add(root);
+  const props=createRealisticProps({cars:[{...car,x:0,z:0,model:car.label==='24'?'suv':'hatchback'}]});
+  props.update(new THREE.Vector3(0,1.62,0),0);
+  // These two parked personal cars are static close-up models. Remove empty
+  // distance tiers so bounding-box and plan inspectors never see empty meshes.
+  for(const mesh of [...props.group.children])if(mesh.isInstancedMesh&&mesh.count===0){mesh.dispose();mesh.removeFromParent();}
+  root.add(props.group);resources.push({dispose:()=>props.dispose()});
+ }
+}

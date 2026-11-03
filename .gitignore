@@ -8,3 +8,6 @@ dist/
 !.env.example
 .site-private/
 tmp/
+
+# Incomplete source-asset transfer staging files.
+public/**/.*

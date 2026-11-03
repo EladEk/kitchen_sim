@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import {daylightState} from './solar-lighting.mjs';
 export function buildDaylight({group,settings,resources,center=[3,0,8],radius=15,distance=35,kitchen=false}){
- const sky=new THREE.HemisphereLight('#e9f1ff','#827461',0);sky.userData.daylight=true;group.add(sky);
+ const sky=new THREE.HemisphereLight('#e9f1ff','#b7b7b3',0);sky.userData.daylight=true;group.add(sky);
  const sun=new THREE.DirectionalLight('#fff4e1',0),target=new THREE.Object3D();target.position.set(...center);group.add(target);sun.target=target;sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-radius,right:radius,top:radius,bottom:-radius,near:.1,far:Math.max(80,distance+radius*2)});sun.shadow.normalBias=.012;sun.shadow.bias=-.00015;sun.shadow.radius=2;group.add(sun);
  let previousKey='',previousState;
  // Update only the light rig while dragging the clock, preserving geometry,

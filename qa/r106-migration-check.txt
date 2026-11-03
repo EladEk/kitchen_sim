@@ -1,0 +1,18 @@
+✔ bedroom/safe-room furniture moves persist through normalization and update actual meshes and walking obstacles (2449.678965ms)
+✔ furniture editor restricts changes to requested rooms, keeps rotated footprints inside the room and rejects overlaps/doorways (32.683368ms)
+✔ custom furniture dimensions resize the actual body and obstacles, survive saves and movement, and reset independently (283.793648ms)
+✔ master bed follows the annotated lower-left map position, puts the headboard against the lower wall and leaves the side route accessible (2586.158283ms)
+✔ the R105 master-bed facing migrates once while dimensions and subsequent deliberate facing edits survive (3.528787ms)
+✔ safe-room wardrobe side meets the bed wall, with its doors and drawers clear of the bed and protected window (4774.024465ms)
+✔ moving the safe-room wardrobe frees the entrance landing and keeps the walking route usable (53.805366ms)
+✔ both 120 × 190 cm beds tuck against two walls with skirting clearance; the office stays an office (261.427313ms)
+✔ bedroom wardrobes follow the entrance wall, face inward and fit with each part open (975.988977ms)
+✔ both bedroom entrance doors sweep clear of furniture after the room 2 desk swap (996.284856ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10147.923562

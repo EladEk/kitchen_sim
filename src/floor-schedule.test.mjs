@@ -34,7 +34,7 @@ test('Mona is unavailable on dry-room walls and cannot render there even when pa
  for(const room of ROOMS){assert.equal(wallFinishesForRoom(room.id).some(f=>f.id==='ordered-mona'),roomHasOrderedCladding(room.id));if(!roomHasOrderedCladding(room.id))assert.notEqual(settings.rooms[room.id].wall,'ordered-mona');}
  settings.rooms.living.wall='ordered-mona';settings.rooms['bedroom-a'].wall='ordered-mona';
  const scene=createHomeScene(settings,{mode:'walk'});let count=0,paintedWalls=0;
- try{scene.group.traverse(o=>{if(o.userData.wallTile){count++;assert(roomHasOrderedCladding(o.userData.roomId));}if(o.userData.part==='architectural-wall'){paintedWalls++;assert(o.material.some(m=>m.userData.surfaceKind==='paint'));}});assert(count>0);assert(paintedWalls>10);}finally{scene.dispose();}
+ try{scene.group.traverse(o=>{if(o.userData.wallTile){count++;assert(roomHasOrderedCladding(o.userData.roomId));}if(o.userData.part==='architectural-wall'){paintedWalls++;assert(o.material.some(m=>['paint','plaster'].includes(m.userData.surfaceKind)));}});assert(count>0);assert(paintedWalls>10);}finally{scene.dispose();}
 });
 
 test('loading corrected floors gives every rendered room its ordered SKU, with separate shower overlay and matching detailed kitchen',()=>{

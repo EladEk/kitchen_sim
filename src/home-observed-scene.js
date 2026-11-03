@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import {HOUSE,ROOMS,WINDOWS,WALLS,KITCHEN_ANCHOR,openingPoint,point} from './home-model.mjs';
 import {OBSERVED_ELEMENTS} from './home-photo-reference.mjs';
 import {createKitchenHvac} from './kitchen-hvac.js';
+import {CEILING_COLOR,CEILING_MATERIAL} from './ceiling-finish.mjs';
 
 // Permanent, photo-observed fittings remain visible when furniture is hidden.
 // All vertical sizes below are explicit estimates, independent of plan x/z.
@@ -20,7 +21,7 @@ export function buildObservedArchitecture({group,box,cylinder,mat,resources,wall
    const poly=e.kind==='hall-ceiling'?ROOMS.find(r=>r.id==='hall').polygon:[[719.4,635.32],[815.76,635.32],[815.76,743.02],[719.4,743.02]].map(v=>point(...v));
    const shape=new THREE.Shape();poly.forEach(([x,z],i)=>i?shape.lineTo(x,z):shape.moveTo(x,z));shape.closePath();
    const geometry=new THREE.ExtrudeGeometry(shape,{depth:HOUSE.height-e.bottom,bevelEnabled:false,steps:1});geometry.rotateX(Math.PI/2);resources.push(geometry);
-   const mesh=new THREE.Mesh(geometry,white);mesh.position.y=HOUSE.height;mesh.castShadow=mesh.receiveShadow=true;mesh.userData=data;p.add(mesh);
+   const mesh=new THREE.Mesh(geometry,mat(CEILING_COLOR,CEILING_MATERIAL));mesh.position.y=HOUSE.height;mesh.castShadow=mesh.receiveShadow=true;mesh.userData=data;p.add(mesh);
    // Register this non-box mesh with the same pick helper, without duplicating geometry.
    p.userData.pickMeshes=[mesh];
   }else if(e.kind==='safe-filter'){

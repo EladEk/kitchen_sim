@@ -8,15 +8,23 @@ import {randomBytes,createCipheriv,createHash} from 'node:crypto';
 const env={...loadEnv('production',process.cwd(),''),...process.env},key=Buffer.from(env.DOCUMENTS_ASSET_SECRET||env.DOCUMENTS_SECRET||'','base64');
 if(key.length!==32)throw Error('Set DOCUMENTS_SECRET to a base64-encoded 32-byte server secret before building. No unprotected build is produced.');
 await rm('dist',{recursive:true,force:true,maxRetries:8,retryDelay:200});
-// Owner app is built in a separate protected namespace, with no public imports.
-await build({base:'/_personal/',publicDir:false,build:{outDir:'dist/client/_personal',rollupOptions:{input:{index:'index.html',district:'district.html'}}}});
+// Stage owner output outside the deployment tree so delayed filesystem writes
+// cannot recreate plaintext in the public asset directory after sealing.
+const personalBuild='.site-private/personal-build';
+await rm(personalBuild,{recursive:true,force:true,maxRetries:8,retryDelay:200});
+await build({base:'/_personal/',publicDir:false,build:{outDir:personalBuild,rollupOptions:{input:{index:'index.html',district:'district.html'}}}});
 await build({configFile:false,root:'public-view',plugins:[react()],publicDir:false,build:{outDir:'../dist/client',emptyOutDir:false,target:'es2022'}});
 await createPublicBaseline('dist/client/baseline');
-// Original assets are copied only for sealing, never published in plaintext.
-await cp('public','dist/client',{recursive:true});
 const roots=['_personal','house','plans','materials'],manifest={};
-async function seal(directory){for(const name of await readdir(directory,{withFileTypes:true})){const file=join(directory,name.name);if(name.isDirectory()){await seal(file);continue;}const path='/'+relative('dist/client',file).replaceAll('\\','/'),raw=await readFile(file),iv=randomBytes(12),cipher=createCipheriv('aes-256-gcm',key,iv);cipher.setAAD(Buffer.from(path));const encrypted=Buffer.concat([cipher.update(raw),cipher.final(),cipher.getAuthTag()]),asset='/_vault/'+createHash('sha256').update(path).digest('hex')+'.bin';await writeFile(join('dist/client',asset),encrypted);const ext=path.split('.').pop().toLowerCase(),type=({pdf:'application/pdf',jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',webp:'image/webp',mp4:'video/mp4',json:'application/json',md:'text/plain',js:'text/javascript; charset=utf-8',css:'text/css; charset=utf-8',html:'text/html; charset=utf-8',svg:'image/svg+xml'})[ext]||'application/octet-stream';manifest[path]={path,asset,type,iv:iv.toString('base64'),size:raw.length};await rm(file);}}
-await mkdir('dist/client/_vault',{recursive:true});for(const root of roots){await seal(join('dist/client',root));await rm(join('dist/client',root),{recursive:true,force:true,maxRetries:8,retryDelay:200});}
+// Read protected originals directly. Staging a recursive copy in the public
+// output can leave late copy/temp files after sealing on a lazy filesystem.
+// Only ciphertext is ever written there for these source roots.
+async function seal(directory,sourceRoot,prefix=''){for(const name of await readdir(directory,{withFileTypes:true})){if(name.name.startsWith('.'))continue;const file=join(directory,name.name);if(name.isDirectory()){await seal(file,sourceRoot,prefix);continue;}const path=prefix+'/'+relative(sourceRoot,file).replaceAll('\\','/'),raw=await readFile(file),iv=randomBytes(12),cipher=createCipheriv('aes-256-gcm',key,iv);cipher.setAAD(Buffer.from(path));const encrypted=Buffer.concat([cipher.update(raw),cipher.final(),cipher.getAuthTag()]),asset='/_vault/'+createHash('sha256').update(path).digest('hex')+'.bin';await writeFile(join('dist/client',asset),encrypted);const ext=path.split('.').pop().toLowerCase(),type=({pdf:'application/pdf',jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',webp:'image/webp',mp4:'video/mp4',json:'application/json',md:'text/plain',js:'text/javascript; charset=utf-8',css:'text/css; charset=utf-8',html:'text/html; charset=utf-8',svg:'image/svg+xml'})[ext]||'application/octet-stream';manifest[path]={path,asset,type,iv:iv.toString('base64'),size:raw.length};}}
+await mkdir('dist/client/_vault',{recursive:true});
+await seal(personalBuild,personalBuild,'/_personal');
+await rm(personalBuild,{recursive:true,force:true,maxRetries:8,retryDelay:200});
+for(const root of roots.filter(r=>r!=='_personal'))await seal(join('public',root),'public');
+for(const entry of await readdir('public',{withFileTypes:true}))if(!roots.includes(entry.name)&&!entry.name.startsWith('.'))await cp(join('public',entry.name),join('dist/client',entry.name),{recursive:true});
 await mkdir('.site-private',{recursive:true});await writeFile('.site-private/document-manifest.mjs','export const DOCUMENT_MANIFEST='+JSON.stringify(manifest)+';\n');
 await build({configFile:false,publicDir:false,build:{ssr:'server/worker.mjs',outDir:'dist/server',target:'es2022',rollupOptions:{output:{entryFileNames:'index.js'}}}});
 // Keep the final deploy tree clean after both Vite builds. A later build phase

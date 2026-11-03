@@ -1,0 +1,231 @@
+{
+  "created_utc": "2026-11-03",
+  "purpose": "HomeStudio R104: shipped CC0 material maps and additional official-project visual references.",
+  "license_evidence": {
+    "url": "https://polyhaven.com/license",
+    "summary": "Poly Haven states its assets are CC0, including commercial use and redistribution; attribution is appreciated rather than required."
+  },
+  "usage": {
+    "diff": "sRGB",
+    "nor_gl": "OpenGL tangent normal; NoColorSpace",
+    "rough": "linear data; NoColorSpace",
+    "warning": "Candidate material family only. Owner photographs and exact specifications remain authoritative; do not change architecture to match textures."
+  },
+  "assets": [
+    {
+      "asset": "beige_wall_001",
+      "official_page": "https://polyhaven.com/a/beige_wall_001",
+      "license": "CC0-1.0",
+      "license_source": "https://polyhaven.com/license",
+      "physical_scan_width_m_from_asset_page": 3.0,
+      "recommendation": "Best clean wall candidate. Almost uniform beige painted plaster. Calibrate toward owner photo warm off-white and keep normal scale restrained.",
+      "files": [
+        {
+          "asset": "beige_wall_001",
+          "channel": "nor_gl",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/beige_wall_001/beige_wall_001_nor_gl_1k.jpg",
+          "path": "beige_wall_001_nor_gl.jpg",
+          "bytes": 153434,
+          "sha256": "cec747be50f91da0693986080b6f59ef868d53cb2ab7d577982165ece63ed75e",
+          "image_size_px": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "asset": "beige_wall_001",
+          "channel": "rough",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/beige_wall_001/beige_wall_001_rough_1k.jpg",
+          "path": "beige_wall_001_rough.jpg",
+          "bytes": 151256,
+          "sha256": "fc8328f47f4d2d82d5311a75bcb5c8cd8979d171a0ee097ad9e44ca9c5a00d60",
+          "image_size_px": [
+            1024,
+            1024
+          ]
+        }
+      ]
+    },
+    {
+      "asset": "cotton_jersey",
+      "official_page": "https://polyhaven.com/a/cotton_jersey",
+      "license": "CC0-1.0",
+      "license_source": "https://polyhaven.com/license",
+      "physical_scan_width_m_from_asset_page": 0.3,
+      "recommendation": "Fine low-contrast fabric candidate for bedding/upholstery. Source is 1024x1025, not square. Physical repeat matters.",
+      "files": [
+        {
+          "asset": "cotton_jersey",
+          "channel": "diff",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/cotton_jersey/cotton_jersey_diff_1k.jpg",
+          "path": "cotton_jersey_diff.jpg",
+          "bytes": 581360,
+          "sha256": "0f1b790e4087223275aaa6fdffdd46a556a26d2af72cd811acf72ba9c21ec1f6",
+          "image_size_px": [
+            1024,
+            1025
+          ]
+        },
+        {
+          "asset": "cotton_jersey",
+          "channel": "nor_gl",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/cotton_jersey/cotton_jersey_nor_gl_1k.jpg",
+          "path": "cotton_jersey_nor_gl.jpg",
+          "bytes": 678670,
+          "sha256": "9b79709806511b62567fb007ff61009c3b194bb0d0821fbaee3faf1b2bff0318",
+          "image_size_px": [
+            1024,
+            1025
+          ]
+        },
+        {
+          "asset": "cotton_jersey",
+          "channel": "rough",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/cotton_jersey/cotton_jersey_rough_1k.jpg",
+          "path": "cotton_jersey_rough.jpg",
+          "bytes": 865264,
+          "sha256": "89bed18f5c3f03fc7b4c2382446891629716278e521e06e8b7f6c8f02dd22590",
+          "image_size_px": [
+            1024,
+            1025
+          ]
+        }
+      ]
+    },
+    {
+      "asset": "oak_veneer_01",
+      "official_page": "https://polyhaven.com/a/oak_veneer_01",
+      "license": "CC0-1.0",
+      "license_source": "https://polyhaven.com/license",
+      "physical_scan_width_m_from_asset_page": 1.8,
+      "recommendation": "Clean warm vertical grain. Useful furniture/lobby veneer; actual owner photo has darker gray-brown finish, so calibrate color. Not evidence of installed wood species.",
+      "files": [
+        {
+          "asset": "oak_veneer_01",
+          "channel": "diff",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/oak_veneer_01/oak_veneer_01_diff_1k.jpg",
+          "path": "oak_veneer_01_diff.jpg",
+          "bytes": 641756,
+          "sha256": "c14681f72f59f17bff568cae7a837641443b607b899f0c279cd64a5638f877a7",
+          "image_size_px": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "asset": "oak_veneer_01",
+          "channel": "nor_gl",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/oak_veneer_01/oak_veneer_01_nor_gl_1k.jpg",
+          "path": "oak_veneer_01_nor_gl.jpg",
+          "bytes": 484844,
+          "sha256": "1297acf7b4476d5ccd83cc8b27be96aa6110f7a9c3a40be0bd767bf81b17db01",
+          "image_size_px": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "asset": "oak_veneer_01",
+          "channel": "rough",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/oak_veneer_01/oak_veneer_01_rough_1k.jpg",
+          "path": "oak_veneer_01_rough.jpg",
+          "bytes": 865194,
+          "sha256": "ca2af5649b628ef05f196793d68cdca874c12ceb6e9ae566976546d9dd5a2604",
+          "image_size_px": [
+            1024,
+            1024
+          ]
+        }
+      ]
+    },
+    {
+      "asset": "asphalt_03",
+      "official_page": "https://polyhaven.com/a/asphalt_03",
+      "license": "CC0-1.0",
+      "license_source": "https://polyhaven.com/license",
+      "physical_scan_width_m_from_asset_page": 2.0,
+      "recommendation": "Fine matte brown-black asphalt grit. Exterior road candidate; calibrate color to site photo.",
+      "files": [
+        {
+          "asset": "asphalt_03",
+          "channel": "diff",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/asphalt_03/asphalt_03_diff_1k.jpg",
+          "path": "asphalt_03_diff.jpg",
+          "bytes": 788840,
+          "sha256": "95ad02e2631c41cf9fdd6a37596cf75adb4fb8a8b6880567cc78ed1c41dc5681",
+          "image_size_px": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "asset": "asphalt_03",
+          "channel": "nor_gl",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/asphalt_03/asphalt_03_nor_gl_1k.jpg",
+          "path": "asphalt_03_nor_gl.jpg",
+          "bytes": 974676,
+          "sha256": "978de8349ce2e9989325099a6fd1f5ea6b2826528e1264606a5c51296b1e2888",
+          "image_size_px": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "asset": "asphalt_03",
+          "channel": "rough",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/asphalt_03/asphalt_03_rough_1k.jpg",
+          "path": "asphalt_03_rough.jpg",
+          "bytes": 590105,
+          "sha256": "069b6ea342aaad04fd1582f59c16fbbe5c7a6f0f3a87bc9d57648ed53336fb3a",
+          "image_size_px": [
+            1024,
+            1024
+          ]
+        }
+      ]
+    }
+  ],
+  "official_project_visual_sources": [
+    {
+      "url": "https://efficapital.co.il/Effi-Afikim/",
+      "classification": "Official marketing gallery",
+      "note": "Existing provenance already cites it; gallery states images are illustrative."
+    },
+    {
+      "url": "https://www.efficapital.co.il/פרויקטים/אפי-באפיקי-נחל-אופקים-שלב-א/",
+      "classification": "Official project page",
+      "note": "Illustrative marketing material; not a current-condition photograph."
+    },
+    {
+      "url": "https://efficapital.co.il/Effi-Afikim/wp-content/uploads/2024/05/2228_fn_001t-scaled.jpg",
+      "classification": "Additional official marketing render",
+      "note": "Found via actual gallery link. Not in existing efi-reference provenance. Exact building identity not asserted."
+    },
+    {
+      "url": "https://efficapital.co.il/Effi-Afikim/wp-content/uploads/2024/05/both-scaled.jpg",
+      "classification": "Additional official marketing render",
+      "note": "Found via actual gallery link. Not in existing efi-reference provenance. Exact building identity not asserted."
+    },
+    {
+      "url": "https://efficapital.co.il/Effi-Afikim/wp-content/uploads/2024/06/104187-5_effi_hadmaya_c-1-1.pdf",
+      "classification": "Existing labeled official marketing aerial",
+      "note": "Existing project provenance identifies building 4102 in complex 5 from this June aerial. August opposite aerial has contradictory labels; do not infer identity from generic renders."
+    },
+    {
+      "url": "https://www.efficapital.co.il/wp-content/uploads/2026/04/דוחות_כספיים_-_אפי_קפיטל_נדלן_-_31122025_isa_.pdf",
+      "classification": "Official annual report 2025",
+      "note": "Indexed project description confirms stage A-A includes plots 1346-1347 and 1410, complex 5, 8 buildings/367 units. Identity/layout evidence, not installed-finish evidence."
+    }
+  ],
+  "actual_photo_observations": [
+    {
+      "path": "/workspace/scratch/9d294e932994/homestudio/public/house/exterior/reference-1.jpg",
+      "observation": "Warm pale ivory/gray limestone with porous relief and fine masonry joints; matte dark entry door; raw concrete construction soffit. Do not substitute shiny polished stone or ancient mossy blocks."
+    },
+    {
+      "path": "/workspace/scratch/9d294e932994/homestudio/public/house/lobby-oct24/307558.jpg",
+      "observation": "Smooth matte warm-white plaster, light beige low-sheen floor, restrained fine grain, thin grout, gray metal skirting, circular downlights, broad mirror with thin warm wood frame, gray-brown fine vertical veneer services wall."
+    }
+  ],
+  "research_limits": "No additional verified current-condition photograph of exact building 4102 was established in the searches. Extra official sources are marketing renders. No suitable clean exact pale ivory ashlar limestone scan was found; owner photo should drive the facade shader. Official gallery image downloads blocked by 403 in shell; URLs were observed through official gallery links and images in web tool."
+}

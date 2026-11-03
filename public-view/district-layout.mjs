@@ -20,7 +20,9 @@ export function districtPoint([x,z],building){
  return [PLAN_CENTER[0]+building.x+dx*c+dz*s,PLAN_CENTER[1]+building.z-dx*s+dz*c];
 }
 export const PLAN_BOUNDS={minX:-4.0547,maxX:27.4775,minZ:-23.5998,maxZ:15.6228};
-export const DISTRICT_GROUND={west:-34,east:186,north:-33,south:184,promenadeX:112,parkingAisleX:46.5};
+// Eastern street is an aerial reconstruction. Its old centre cut through the
+// landscaped recess east of 3461/3471; leave that observed public space open.
+export const DISTRICT_GROUND={west:-34,east:214,north:-33,south:184,promenadeX:112,parkingAisleX:46.5};
 // All copies are quarter turns/reflections, so these bounds are exact for the
 // rectangular envelope and are also used to keep paths/trees out of buildings.
 export function districtFootprint(building,padding=0){

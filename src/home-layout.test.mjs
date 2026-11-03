@@ -2,13 +2,27 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import {OBB} from 'three/addons/math/OBB.js';
-import {FURNITURE,WALLS,DOORS,WINDOWS,getRoom,getFurniture,furnitureParts,insidePolygon,polygonBounds,normalizeHomeSettings,findWalkPath,doorsOnPath,collisionBoxes,canStand,movePlayer} from './home-model.mjs';
+import {FURNITURE,WALLS,DOORS,WINDOWS,getRoom,getFurniture,furnitureParts,insidePolygon,polygonBounds,normalizeHomeSettings,normalizeFurnitureLayout,point,findWalkPath,doorsOnPath,collisionBoxes,canStand,movePlayer} from './home-model.mjs';
 import {createHomeScene} from './home-scene.js';
 
 const bedrooms=[{suffix:'a',roomId:'bedroom-a',wallId:'bed-a-east-upper'},{suffix:'b',roomId:'bedroom-b',wallId:'bed-b-east'}];
 function meshBoxes(group){
  const boxes=[];group.traverse(o=>{if(o.isMesh){o.geometry.computeBoundingBox();boxes.push(new OBB().fromBox3(o.geometry.boundingBox).applyMatrix4(o.matrixWorld));}});return boxes;
 }
+
+test('master bed follows the annotated lower-left map position, puts the headboard against the lower wall and leaves the side route accessible',()=>{
+ const scene=createHomeScene(normalizeHomeSettings(),{mode:'walk',context:false,daylight:false});
+ try{scene.group.updateMatrixWorld(true);const bed=getFurniture('master-bed'),group=scene.furnitureGroups.get(bed.id),bounds=new THREE.Box3().setFromObject(group),tv=scene.furnitureGroups.get('master-tv'),tvBounds=new THREE.Box3().setFromObject(tv),wardrobe=scene.furnitureGroups.get('master-wardrobe');
+  assert.equal(bed.rotation,Math.PI);assert.equal(bed.w,1.8);assert.equal(bed.d,2);assert(Math.abs(bed.position[1]-14.38)<.002);assert(Math.abs(bed.position[0]-1.7)<.002);const footGap=polygonBounds(getRoom('master').polygon).maxZ-bounds.max.z;assert(footGap>.02&&footGap<.06);assert(tvBounds.min.z>point(606,743.02)[1]);assert(tvBounds.max.x<point(719.4,743.02)[0]);assert(bounds.min.z-tvBounds.max.z>.9);assert(new THREE.Vector3(0,0,1).transformDirection(tv.matrixWorld).z>.99);assert(!bounds.intersectsBox(new THREE.Box3().setFromObject(wardrobe)));
+  const door=scene.motions.find(m=>m.id==='door:master'),boxes=meshBoxes(group);for(let i=0;i<=48;i++){door.object.rotation.y=door.openTarget*i/48;scene.group.updateMatrixWorld(true);for(const leaf of meshBoxes(door.object))assert(!boxes.some(box=>leaf.intersectsOBB(box)),'entrance door clears the rotated bed');}
+  const path=findWalkPath(getRoom('hall').walk,getRoom('master').walk);assert(path?.length,'walking destination remains accessible after turning the bed');
+ }finally{scene.dispose();}
+ const old={position:point(680,862.88),rotation:Math.PI};assert.deepEqual(normalizeFurnitureLayout({'master-bed':old}),{});const custom={position:[getFurniture('master-bed').position[0]+.04,getFurniture('master-bed').position[1]],rotation:0};assert(normalizeFurnitureLayout({'master-bed':custom})['master-bed'],'intentional layouts survive');
+});
+
+test('the R105 master-bed facing migrates once while dimensions and subsequent deliberate facing edits survive',()=>{
+ const bed=getFurniture('master-bed'),dimensions={w:1.8,d:2,h:.5},input={'master-bed':{position:bed.position,rotation:0,dimensions}},migrated=normalizeFurnitureLayout(input)['master-bed'];assert.equal(migrated.rotation,Math.PI);assert.deepEqual(migrated.dimensions,dimensions);assert.equal(migrated.placementRevision,106);const chosen={'master-bed':{...migrated,rotation:0}};assert.equal(normalizeFurnitureLayout(chosen)['master-bed'].rotation,0,'an intentional new edit is not repeatedly migrated');assert.equal(input['master-bed'].rotation,0,'normalization does not mutate the saved input');
+});
 
 test('safe-room wardrobe side meets the bed wall, with its doors and drawers clear of the bed and protected window',()=>{
  const wardrobe=getFurniture('safe-storage'),wall=WALLS.find(w=>w.id==='safe-south'),wallFace=wall.a[1]-wall.thickness/2,window=WINDOWS.find(w=>w.id==='safe-window'),parts=furnitureParts(wardrobe).map(p=>p.id);

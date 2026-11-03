@@ -1,3 +1,4 @@
+import {CEILING_COLOR,CEILING_MATERIAL} from './ceiling-finish.mjs';
 import {installStoneCourses,installFloorCourses} from './building-finish-shaders.mjs';
 import {serviceSlabHoles} from './service-access.mjs';
 import {buildApartmentFurniture} from './apartment-furniture-scene.js';
@@ -19,6 +20,7 @@ import {buildingNumberPlate} from './building-signage.js';
 import {buildGroundApartments} from './ground-apartments-scene.js';
 import {buildSiteContext} from './building-site-scene.js';
 import {wrapPublicDoor} from './public-door-motion.mjs';
+import {wallExteriorFaces,wallFaceMaterials} from './wall-face-finishes.mjs';
 
 // Shared instanced cubes keep nine storeys affordable on phones. Physical
 // shadow geometry remains present while the apartment is viewed as a cutaway;
@@ -31,7 +33,7 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
  const floors=new Map(),cube=new THREE.BoxGeometry(1,1,1);resources.push(cube);
  function material(color,extra={}){const m=shown?new THREE.MeshStandardMaterial({color,roughness:.8,...extra}):new THREE.MeshBasicMaterial({colorWrite:false,depthWrite:false,transparent:true,opacity:0});resources.push(m);return m;}
  const surface=shown?createSurfacePalette(resources):null,finish=(kind,color,extra={})=>shown?surface(kind,color,extra):material(color,extra);
- const limestone=finish('limestone','#e2ddd3',{roughness:.83}),concrete=finish('cement','#d5d2ca'),deck=finish('porcelain','#d8d2c5'),metal=material('#303b3e',{roughness:.42,metalness:.45}),glass=shown?new THREE.MeshPhysicalMaterial({color:'#d2e1df',roughness:.075,metalness:0,ior:1.5,specularIntensity:1,envMapIntensity:1.15,transparent:true,opacity:.28,depthWrite:false,side:THREE.DoubleSide}):material('#d2e1df'),voidMat=material('#485052',{roughness:.4}),roofMat=finish('cement','#ddd9cc'),insideWall=finish('plaster','#f1efe9',{roughness:.9}),doorMat=finish('door','#d8d0c3',{roughness:.55}),interiorFloor=finish('porcelain','#dcd7ce',{roughness:.56}),soffit=finish('plaster','#f4f2eb',{roughness:.91}),fascia=finish('paint','#606665',{roughness:.72}),trimMat=finish('paint','#eeece5',{roughness:.62}),handleMat=material('#a9afad',{metalness:.8,roughness:.27});
+ const limestone=finish('limestone','#e2ddd3',{roughness:.83}),concrete=finish('cement','#d5d2ca'),deck=finish('porcelain','#d8d2c5'),metal=material('#303b3e',{roughness:.42,metalness:.45}),glass=shown?new THREE.MeshPhysicalMaterial({color:'#d2e1df',roughness:.075,metalness:0,ior:1.5,specularIntensity:1,envMapIntensity:1.15,transparent:true,opacity:.28,depthWrite:false,side:THREE.DoubleSide}):material('#d2e1df'),voidMat=material('#485052',{roughness:.4}),roofMat=finish('cement','#ddd9cc'),insideWall=finish('plaster','#f1efe9',{roughness:.9}),doorMat=finish('door','#d8d0c3',{roughness:.55}),interiorFloor=finish('porcelain','#dcd7ce',{roughness:.56}),soffit=finish('plaster',CEILING_COLOR,CEILING_MATERIAL),fascia=finish('paint','#606665',{roughness:.72}),trimMat=finish('paint','#eeece5',{roughness:.62}),handleMat=material('#a9afad',{metalness:.8,roughness:.27});
  if(shown){
   // Metre-scale stone courses, restrained grain and staggered vertical joints.
   // Colours/profile follow the supplied facade photos; this is no scan claim.
@@ -47,6 +49,12 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
   if(!items.length)return;const mesh=new THREE.InstancedMesh(cube,mat,items.length);mesh.name=part;mesh.userData={part,buildingFloor:level,source:'building-plan',heightInferred:true,...(shown&&level!==null?{action:'building-floor'}:{})};
   items.forEach(([x,y,z,w,h,d,angle=0],i)=>{rotation.setFromAxisAngle(THREE.Object3D.DEFAULT_UP,angle);position.set(x,y,z);scale.set(Math.max(.001,w),Math.max(.001,h),Math.max(.001,d));matrix.compose(position,rotation,scale);mesh.setMatrixAt(i,matrix);});
   mesh.castShadow=cast;mesh.receiveShadow=true;mesh.computeBoundingSphere();resources.push(mesh);parent.add(mesh);if(mesh.userData.action)picks.push(mesh);return mesh;
+ }
+ function facadeBatch(parent,items,def){
+  if(!shown)return batch(parent,limestone,items,'building-facade-wall',def.level);
+  const groups=new Map(),inside=p=>def.units.some(u=>pointInPolygon(p,u.polygon))||pointInPolygon(p,def.core);
+  for(const row of items){const [x,,z,,,,angle=0]=row,faces=wallExteriorFaces({centre:[x,z],normal:[Math.sin(angle),Math.cos(angle)],thickness:row[5],inside}),key=faces.map(Number).join('');if(!groups.has(key))groups.set(key,{faces,rows:[]});groups.get(key).rows.push(row);}
+  for(const {faces,rows} of groups.values())batch(parent,wallFaceMaterials(insideWall,limestone,faces),rows,'building-facade-wall',def.level);
  }
  function slab(poly,y,thickness,mat,parent,part,level,holes=[]){
   if(poly.length<3)return;const s=new THREE.Shape();poly.forEach(([x,z],i)=>i?s.lineTo(x,z):s.moveTo(x,z));s.closePath();for(const poly of holes){const hole=new THREE.Path();poly.forEach(([x,z],i)=>i?hole.lineTo(x,z):hole.moveTo(x,z));hole.closePath();s.holes.push(hole);}const geo=new THREE.ExtrudeGeometry(s,{depth:thickness,bevelEnabled:false});geo.rotateX(Math.PI/2);resources.push(geo);const mesh=new THREE.Mesh(geo,mat);mesh.position.y=y;mesh.castShadow=mesh.receiveShadow=true;mesh.userData={part,buildingFloor:level,source:'building-plan'};parent.add(mesh);return mesh;
@@ -125,12 +133,17 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
   }
   // Actual PDF flight footprints and directions; vertical rise is estimated.
   if(shown){
-   const steps=[],[a,b]=source.stairs.rect,mx=(a[0]+b[0])/2,n=a[1]+1.55,s=b[1]-1.14,pitch=(s-n)/9;
-   slab([[a[0],a[1]],[b[0],a[1]],[b[0],n],[a[0],n]],base-.01,.14,concrete,node,'building-stair-floor-landing',def.level);
+   const steps=[],[a,b]=source.stairs.rect,mx=(a[0]+b[0])/2,n=a[1]+1.55,s=b[1]-1.14,pitch=(s-n)/9,rise=BUILDING.storey/18,treadDepth=rise+.12;
+   // Repeated PDF floor traces differ by a few millimetres. Overlap the
+   // landing and arriving flight so no unsupported seam stops a floor ray.
+   slab([[a[0],a[1]],[b[0],a[1]],[b[0],n+.025],[a[0],n+.025]],base-.01,.14,concrete,node,'building-stair-floor-landing',def.level);
    if(def.level<8)for(let j=0;j<9;j++){
-    const sy=(j+1)*BUILDING.storey/18,sy2=BUILDING.storey/2+sy;
-    if(!cut||sy<=h)steps.push([(a[0]+mx-.12)/2,base+sy/2,n+(j+.5)*pitch,mx-a[0]-.12,sy,pitch]);
-    if(!cut||sy2<=h)steps.push([(b[0]+mx+.12)/2,base+sy2/2,s-(j+.5)*pitch,b[0]-mx-.12,sy2,pitch]);
+    const sy=(j+1)*rise,sy2=BUILDING.storey/2+sy;
+    // Finite concrete steps keep the flight below clear. Extruding each
+    // tread down to this storey's floor turned the return flight overhead
+    // into a solid obstruction for walkers on the previous storey.
+    if(!cut||sy<=h)steps.push([(a[0]+mx-.12)/2,base+sy-treadDepth/2,n+(j+.5)*pitch,mx-a[0]-.12,treadDepth,pitch]);
+    if(!cut||sy2<=h)steps.push([(b[0]+mx+.12)/2,base+sy2-treadDepth/2,s-(j+.5)*pitch,b[0]-mx-.12,treadDepth,pitch]);
    }
    if(def.level<8&&!cut)steps.push([mx,base+BUILDING.storey/2-.07,(s+b[1])/2,b[0]-a[0],.14,b[1]-s]);
    batch(node,concrete,steps,'building-common-stair',def.level);
@@ -159,7 +172,7 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
   }
   const screenMesh=batch(node,metal,louvres,'building-laundry-screen',def.level);if(screenMesh)screenMesh.userData.screens=laundryScreens(def.level);
   batch(node,trimMat,trims,'building-interior-trim',def.level);batch(node,handleMat,handles,'building-door-hardware',def.level);batch(node,fascia,fascias,'building-balcony-fascia',def.level);
-  batch(node,corridorFinish,corridorFaces,'building-corridor-finish',def.level);batch(node,limestone,walls,'building-facade-wall',def.level);batch(node,insideWall,interiorWalls,'building-interior-wall',def.level);batch(node,metal,frames,'building-window-frame',def.level);batch(node,glass,panes,'building-glazing',def.level,false);batch(node,voidMat,dark,'building-fascia-and-service-screen',def.level);batch(node,metal,rails,'building-rail-and-louvres',def.level);batch(node,limestone,decks,'building-stone-sill',def.level);
+  batch(node,corridorFinish,corridorFaces,'building-corridor-finish',def.level);facadeBatch(node,walls,def);batch(node,insideWall,interiorWalls,'building-interior-wall',def.level);batch(node,metal,frames,'building-window-frame',def.level);batch(node,glass,panes,'building-glazing',def.level,false);batch(node,voidMat,dark,'building-fascia-and-service-screen',def.level);batch(node,metal,rails,'building-rail-and-louvres',def.level);batch(node,limestone,decks,'building-stone-sill',def.level);
   if(shown)buildApartmentFurniture({parent:node,resources,level:def.level,base,settings,surfaces:surface});
   if(def.level===0&&shown)buildCommonSpaces({parent:node,resources,settings,cut});
   if(def.level===0&&shown)buildResidentsClub({parent:node,resources,settings,cut,ceilingVisible:walking||limit>0});

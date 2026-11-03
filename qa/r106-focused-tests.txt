@@ -1,0 +1,30 @@
+✔ building sheets register multiple finished-wall controls to the original apartment without stretching it (24.6223ms)
+✔ all floor variants, the duplex continuation and the roof retain their actual PDF and photo sources (3.141017ms)
+✔ building cutaways remove upper storeys while the apartment view keeps non-occluding physical shadow casters (4305.392451ms)
+✔ context walls leave the apartment entry and service cabinets clear and its outline remains the unchanged original (428.005836ms)
+✔ the building camera fits its full volume on portrait phones and widescreen, and saved shadow/cut settings round-trip (217.456178ms)
+✔ the actual facade stone shader compiles and links with Three lighting and instancing on native GLES3 (993.739744ms)
+✔ reference-based facade details remain within selected-floor limits, while unspecified interior finishes carry no owner product (1542.091127ms)
+✔ master bed follows the annotated lower-left map position, puts the headboard against the lower wall and leaves the side route accessible (1666.412444ms)
+✔ safe-room wardrobe side meets the bed wall, with its doors and drawers clear of the bed and protected window (8444.390483ms)
+✔ moving the safe-room wardrobe frees the entrance landing and keeps the walking route usable (74.212564ms)
+✔ both 120 × 190 cm beds tuck against two walls with skirting clearance; the office stays an office (338.008842ms)
+✔ bedroom wardrobes follow the entrance wall, face inward and fit with each part open (1540.977566ms)
+✔ both bedroom entrance doors sweep clear of furniture after the room 2 desk swap (1393.692042ms)
+✔ cancelled furniture is removed and the two bedrooms have real 120 × 190 cm mattresses (3327.4726ms)
+✔ living sofa and TV face each other; master bed follows the requested half-turn with its television opposite (360.494692ms)
+✔ Harash products replace the defaults, and legacy saves migrate without losing individual openings (2.894084ms)
+✔ Hercules has the documented module chain, faces the slider from the opposite fence and opens independently (1169.919754ms)
+✔ actual room floors and tiled walls carry the scheduled metric sizes (985.617019ms)
+✔ opposite broad faces have independent finishes and cut ends never inherit the stone material (3.475324ms)
+✔ ground base and personal external walls expose plaster to rooms in walking and building views (1677.475087ms)
+✔ upper facade batches keep their inward-facing broad surfaces plaster, with unchanged physical wall bounds (1335.476177ms)
+✔ photo snapshots retain the same per-face interior/exterior assignment as the walking renderer (60.518393ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 22
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 17659.498395

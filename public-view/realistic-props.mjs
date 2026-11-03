@@ -1,34 +1,11 @@
 import * as THREE from 'three';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
-import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
+import {CAR_MODELS,createCarTemplates} from './car-geometry.mjs';
 
 const TAU=Math.PI*2;
 const random=(n,seed=0)=>{const x=Math.sin(n*127.1+seed*311.7)*43758.5453;return x-Math.floor(x);};
 const TREE_COLORS=['#496d3e','#587546','#3e6540','#637b49','#4d7043'];
-const CAR_COLORS=['#b5c2c9','#344b5d','#e1dfd6','#8c9189','#647a89','#653f3c','#ced0cf'];
-
-function loft(stations){
- const positions=[],uv=[],index=[];
- for(let i=0;i<stations.length;i++){
-  const [z,width,top,bottom]=stations[i],ring=[[-width*.46,bottom],[-width*.5,bottom+.09],[-width*.5,top-.09],[-width*.43,top],[width*.43,top],[width*.5,top-.09],[width*.5,bottom+.09],[width*.46,bottom]];
-  ring.forEach(([x,y],j)=>{positions.push(x,y,z);uv.push(j/8,i/(stations.length-1));});
- }
- for(let i=1;i<stations.length;i++)for(let j=0;j<8;j++){const a=(i-1)*8+j,b=(i-1)*8+(j+1)%8,c=i*8+j,d=i*8+(j+1)%8;index.push(a,c,b,b,c,d);}
- for(let i=1;i<7;i++){index.push(0,i,i+1);const b=(stations.length-1)*8;index.push(b,b+i+1,b+i);}
- const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));g.setIndex(index);g.computeVertexNormals();return g;
-}
-
-function carBodyStations(tier){
- const base=[[-1.94,1.38,.72,.31],[-1.64,1.74,.86,.28],[-1.05,1.78,.92,.28],[1.03,1.78,.86,.28],[1.65,1.69,.78,.30],[1.94,1.31,.66,.34]];
- if(tier===2)return base;
- const positions=new Set(base.map(s=>s[0])),segments=tier===0?12:6,radius=.32;
- for(const center of [-1.20,1.20])for(let j=0;j<=segments;j++)positions.add(center-radius+radius*2*j/segments);
- return [...positions].sort((a,b)=>a-b).map(z=>{
-  const i=base.findIndex((s,i)=>i<base.length-1&&z>=s[0]&&z<=base[i+1][0]),a=base[Math.max(0,i)],b=base[Math.max(0,i)+1],t=(z-a[0])/(b[0]-a[0]),row=[z,...a.slice(1).map((v,k)=>v+(b[k+1]-v)*t)];
-  for(const center of [-1.20,1.20])if(Math.abs(z-center)<radius)row[3]=Math.max(row[3],.278+Math.sqrt(radius*radius-(z-center)**2));
-  return row;
- });
-}
+const CAR_COLORS=['#d4d9dc','#f0f0eb','#30383d','#7b858c','#3a5266','#763c38','#b7b6ae'];
 
 function alphaTexture(kind,size=128){
  const data=new Uint8Array(size*size*4);
@@ -62,7 +39,6 @@ export function createRealisticProps({trees=[],cars=[],mobile=false}={}){
   for(let i=0;i<parts.length;i++){if(list[i]!==parts[i])list[i].dispose();parts[i].dispose();}
   if(!merged)throw Error('Incompatible prop geometry');return geometry(merged);
  };
- const box=(x,y,z,w,h,d,r=.012)=>new RoundedBoxGeometry(w,h,d,1,Math.min(r,w/3,h/3,d/3)).translate(x,y,z);
  const cylinder=(a,b,r0,r1,segments=8)=>{
   const from=new THREE.Vector3(...a),to=new THREE.Vector3(...b),direction=to.clone().sub(from);
   return new THREE.CylinderGeometry(r1,r0,direction.length(),segments,1).applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,1,0),direction.normalize())).translate(...from.add(to).multiplyScalar(.5).toArray());
@@ -72,11 +48,11 @@ export function createRealisticProps({trees=[],cars=[],mobile=false}={}){
  const contactMap=trees.length||cars.length?texture(alphaTexture('contact',64)):null;
  const shadowMaterial=contactMap?material(new THREE.MeshBasicMaterial({map:contactMap,color:'#000000',transparent:true,opacity:.22,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-2,toneMapped:false})):null;
 
- function family(type,placements,templates){
+ function family(type,placements,templates,model=null){
   if(!placements.length)return;
   const levels=new Uint8Array(placements.length).fill(255),tiers=templates.map((parts,tier)=>parts.map(part=>{
-   const mesh=new THREE.InstancedMesh(part.geometry,part.material,placements.length);mesh.name=`${type}-${['near','middle','far'][tier]}-${part.name}`;
-   mesh.count=0;mesh.visible=false;mesh.castShadow=part.shadow!==false;mesh.receiveShadow=true;mesh.userData={propType:type,detailTier:tier,propPart:part.name};group.add(mesh);return {...part,mesh};
+   const mesh=new THREE.InstancedMesh(part.geometry,part.material,placements.length);mesh.name=`${type}${model?'-'+model:''}-${['near','middle','far'][tier]}-${part.name}`;
+   mesh.count=0;mesh.visible=false;mesh.castShadow=part.shadow!==false;mesh.receiveShadow=true;mesh.userData={propType:type,detailTier:tier,propPart:part.name,...(model?{propModel:model}:{})};group.add(mesh);return {...part,mesh};
   }));
   families.push({type,placements,levels,tiers,initialized:false});
  }
@@ -121,51 +97,27 @@ export function createRealisticProps({trees=[],cars=[],mobile=false}={}){
    }
    treeTemplates.push([{name:'branches',geometry:combine(trunk),material:bark},{name:'foliage',geometry:combine(leafParts),material:tier===0?leaves:canopy,colorize:true},{name:'shrubs',geometry:combine(shrubs),material:canopy,colorize:true}]);
   }
-  const placements=trees.map(([x,z],i)=>({id:i,x,z,y:-.09,angle:random(i,42)*TAU,scale:[.9+random(i,41)*.22,.91+random(i,40)*.22,.9+random(i,41)*.22],color:new THREE.Color(TREE_COLORS[i%TREE_COLORS.length])}));
+  const placements=trees.map(([x,z],i)=>{const form=i%3,width=form===0?.86+random(i,41)*.14:form===1?1.01+random(i,41)*.11:.91+random(i,41)*.18,height=form===0?1.12+random(i,40)*.10:form===1?.80+random(i,40)*.12:.94+random(i,40)*.13;return {id:i,x,z,y:-.09,angle:random(i,42)*TAU,scale:[width,height,width],color:new THREE.Color(TREE_COLORS[i%TREE_COLORS.length])};});
   family('tree',placements,treeTemplates);contactShadows('tree',placements,p=>3.6*p.scale[0],p=>3.6*p.scale[2],-.079);
  }
 
  if(cars.length){
-  const body=material(new THREE.MeshPhysicalMaterial({color:'#ffffff',roughness:.28,metalness:.48,clearcoat:.65,clearcoatRoughness:.2})),glass=material(new THREE.MeshPhysicalMaterial({color:'#263d47',roughness:.12,metalness:0,ior:1.5,clearcoat:.7,envMapIntensity:1.15})),rubber=material(new THREE.MeshStandardMaterial({color:'#202529',roughness:.96})),chrome=material(new THREE.MeshStandardMaterial({color:'#a6aeb2',metalness:.9,roughness:.26})),trim=material(new THREE.MeshStandardMaterial({color:'#273036',roughness:.65})),headlight=material(new THREE.MeshStandardMaterial({color:'#e5ece7',roughness:.19,metalness:.25})),tail=material(new THREE.MeshStandardMaterial({color:'#8e2420',roughness:.27}));
-  const carTemplates=[];
-  for(let tier=0;tier<3;tier++){
-   const bodyParts=[loft(carBodyStations(tier))],glassParts=[loft([[-1.17,1.40,.91,.87],[-.73,1.27,1.39,.88],[.57,1.25,1.36,.88],[1.24,1.42,.91,.87]])],rubberParts=[],rimParts=[],trimParts=[],frontParts=[],rearParts=[];
-   bodyParts.push(box(0,1.385,-.03,1.13,.065,1.35,.025));
-   for(const side of [-1,1])for(const end of [-1,1]){
-    const x=side*.815,z=end*1.20;
-    rubberParts.push(new THREE.CylinderGeometry(.278,.278,.185,tier===0?20:tier===1?12:8).rotateZ(Math.PI/2).translate(x,.278,z));
-    if(tier<2){
-     rimParts.push(new THREE.CylinderGeometry(.178,.178,.192,tier===0?20:10).rotateZ(Math.PI/2).translate(x,.278,z));
-     if(tier===0){
-      for(let j=0;j<5;j++){const spoke=box(0,0,0,.197,.027,.29,.006);spoke.rotateX(j*TAU/5);spoke.translate(x,.278,z);trimParts.push(spoke);}
-      rimParts.push(new THREE.CylinderGeometry(.047,.047,.201,12).rotateZ(Math.PI/2).translate(x,.278,z));
-     }
-    }
-   }
-   for(const side of [-1,1]){
-    frontParts.push(box(side*.56,.65,1.928,.40,.125,.075,.018));rearParts.push(box(side*.59,.68,-1.948,.38,.12,.065,.012));
-    if(tier<2){
-     trimParts.push(box(side*.715,1.115,.03,.041,.45,.075,.008));
-     trimParts.push(box(side*.89,.43,0,.027,.045,2.15,.009));
-     bodyParts.push(box(side*.9,1.06,.77,.10,.105,.18,.024));
-     if(tier===0){
-      for(const z of [-.56,.64])rimParts.push(box(side*.892,.866,z,.023,.028,.15,.009));
-      for(const z of [-.94,.13,1.06])trimParts.push(box(side*.891,.66,z,.006,.34,.008,.002));
-      rimParts.push(box(side*.899,1.063,.768,.098,.062,.143,.015));
-     }
-    }
-   }
-   if(tier<2){
-    trimParts.push(box(0,.46,1.94,.83,.13,.07,.015),box(0,.37,-1.943,1.12,.09,.075,.015));
-    rimParts.push(box(0,.52,1.975,.36,.085,.035,.008),box(0,.59,-1.975,.36,.085,.035,.008));
-   }
-   const parts=[{name:'body',geometry:combine(bodyParts),material:body,colorize:true},{name:'windows',geometry:combine(glassParts),material:glass},{name:'tyres',geometry:combine(rubberParts),material:rubber},{name:'headlights',geometry:combine(frontParts),material:headlight},{name:'tail-lights',geometry:combine(rearParts),material:tail}];
-   if(rimParts.length)parts.push({name:'rims-and-handles',geometry:combine(rimParts),material:chrome});
-   if(trimParts.length)parts.push({name:'trim-and-door-seams',geometry:combine(trimParts),material:trim});
-   carTemplates.push(parts);
-  }
-  const placements=cars.map((car,i)=>{if(!Number.isFinite(car.length)||car.length<=0)throw Error('Car length must be positive');return {id:i,x:car.x,z:car.z,y:-.039,angle:car.angle||0,scale:[1,.96+random(i,58)*.07,car.length/4],length:car.length,color:new THREE.Color(CAR_COLORS[i%CAR_COLORS.length])};});
-  family('car',placements,carTemplates);contactShadows('car',placements,1.82,p=>p.length*.95,-.028);
+  const carMaterials={
+   body:material(new THREE.MeshPhysicalMaterial({color:'#ffffff',roughness:.31,metalness:.28,ior:1.5,clearcoat:.88,clearcoatRoughness:.13})),
+   glass:material(new THREE.MeshPhysicalMaterial({color:'#243138',roughness:.095,metalness:0,ior:1.52,clearcoat:.8,clearcoatRoughness:.08,envMapIntensity:1.1})),
+   rubber:material(new THREE.MeshStandardMaterial({color:'#171b1d',roughness:.97})),
+   chrome:material(new THREE.MeshStandardMaterial({color:'#b7bec3',metalness:.9,roughness:.25})),
+   trim:material(new THREE.MeshStandardMaterial({color:'#252c31',roughness:.72})),
+   headlight:material(new THREE.MeshStandardMaterial({color:'#ffffff',vertexColors:true,roughness:.18,metalness:.18})),
+   tail:material(new THREE.MeshStandardMaterial({color:'#912721',roughness:.23,metalness:.12}))
+  };
+  const placements=cars.map((car,i)=>{
+   if(!Number.isFinite(car.length)||car.length<=0)throw Error('Car length must be positive');
+   const model=CAR_MODELS.includes(car.model)?car.model:car.length<3.65?'hatchback':CAR_MODELS[i%CAR_MODELS.length],width=car.width?Math.min(1,car.width/1.9):1;
+   return {id:i,model,x:car.x,z:car.z,y:-.039,angle:car.angle||0,scale:[width,.97+random(i,58)*.04,car.length/4],length:car.length,color:new THREE.Color(car.color||CAR_COLORS[i%CAR_COLORS.length])};
+  });
+  for(const model of CAR_MODELS){const members=placements.filter(p=>p.model===model);if(members.length)family('car',members,createCarTemplates({model,combine,materials:carMaterials}),model);}
+  contactShadows('car',placements,1.82,p=>p.length*.95,-.028);
  }
 
  const matrix=new THREE.Matrix4(),quaternion=new THREE.Quaternion(),position=new THREE.Vector3(),scale=new THREE.Vector3();
@@ -175,10 +127,10 @@ export function createRealisticProps({trees=[],cars=[],mobile=false}={}){
   if(previous===1)return distance<thresholds[0]*(1-hysteresis)?0:distance>thresholds[1]*(1+hysteresis)?2:1;
   return distance<thresholds[0]*(1-hysteresis)?0:distance<thresholds[1]*(1-hysteresis)?1:2;
  }
- function update(cameraPosition,now=globalThis.performance?.now?.()??Date.now()){
+ function update(cameraPosition,now=globalThis.performance?.now?.()??Date.now(),{detailScale=1}={}){
   if(disposed||now>=lastUpdate&&now-lastUpdate<220)return false;lastUpdate=now;let any=false;
   for(const family of families){let changed=false;
-   for(let i=0;i<family.placements.length;i++){const p=family.placements[i],distance=Math.hypot(cameraPosition.x-p.x,cameraPosition.y-(p.y+(family.type==='tree'?2.5:.7)),cameraPosition.z-p.z),level=chooseTier(family.initialized?family.levels[i]:255,distance);if(level!==family.levels[i]){family.levels[i]=level;changed=true;}}
+   for(let i=0;i<family.placements.length;i++){const p=family.placements[i],distance=Math.hypot(cameraPosition.x-p.x,cameraPosition.y-(p.y+(family.type==='tree'?2.5:.7)),cameraPosition.z-p.z)/Math.max(.4,detailScale),level=chooseTier(family.initialized?family.levels[i]:255,distance);if(level!==family.levels[i]){family.levels[i]=level;changed=true;}}
    family.initialized=true;
    if(!changed)continue;any=true;
    for(let level=0;level<3;level++){
@@ -197,7 +149,7 @@ export function createRealisticProps({trees=[],cars=[],mobile=false}={}){
  lastUpdate=-Infinity;
  families.forEach(f=>f.initialized=false);
  return {group,update,thresholds:thresholds.slice(),
-  getState(){return families.flatMap(f=>f.placements.map((p,i)=>({type:f.type,id:p.id,tier:f.levels[i],position:[p.x,p.y,p.z],angle:p.angle,scale:p.scale.slice(),color:p.color.toArray(),...(p.length?{length:p.length}:{})})));},
+  getState(){return families.flatMap(f=>f.placements.map((p,i)=>({type:f.type,id:p.id,tier:f.levels[i],position:[p.x,p.y,p.z],angle:p.angle,scale:p.scale.slice(),color:p.color.toArray(),...(p.length?{length:p.length,model:p.model}:{})})));},
   get resources(){return {geometries:[...geometries],materials:[...materials],textures:[...textures]};},
   get stats(){return {drawCalls:group.children.filter(m=>m.visible&&m.count>0).length,maxDrawCalls:group.children.length,activeInstances:group.children.reduce((n,m)=>n+(m.visible?m.count:0),0),templateTriangles:[...geometries].reduce((n,g)=>n+(g.index?.count??g.attributes.position.count)/3,0)};},
   dispose(){if(disposed)return;disposed=true;group.removeFromParent();for(const mesh of group.children)mesh.dispose?.();geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());group.clear();geometries.clear();materials.clear();textures.clear();families.length=0;}

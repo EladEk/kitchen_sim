@@ -70,6 +70,11 @@ test('district ceilings receive warm daylight bounce from below without adding l
  settings={...settings,light:'night'};sky.update();assert.equal(fill.intensity,0);sky.dispose();
 });
 
+test('indoor daylight warms smoothly without swapping or rebuilding the sky environment at room boundaries',()=>{
+ const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera();let builds=0;const sky=installCelestialSky({renderer:{},scene,camera,getSettings:()=>manual('2026-11-03',720),ownSun:true,mobile:true,environmentFactory:()=>{builds++;return {texture:new THREE.Texture(),dispose(){}};}});
+ try{sky.update({interior:0});const environment=scene.environment,intensity=scene.environmentIntensity;let fill;scene.traverse(o=>{if(o.isHemisphereLight)fill=o;});assert(fill.color.b>fill.color.r);for(let i=1;i<=60;i++){sky.update({interior:i/60});assert.equal(scene.environment,environment);}assert.equal(builds,1);assert(fill.color.r>fill.color.b);near(scene.environmentIntensity,intensity*.45);for(let i=0;i<20;i++)sky.update({interior:1});assert.equal(builds,1);assert.equal(scene.environment,environment);}finally{sky.dispose();}
+});
+
 test('opening defaults to noon and old saved live settings cannot turn on the clock implicitly',()=>{
  assert.equal(solarDefaults().live,false);assert.equal(normalizeSolar().live,false);
  const old={live:true,minutes:7,date:'2024-01-01',northBearing:82};

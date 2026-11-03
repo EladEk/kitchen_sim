@@ -1,0 +1,17 @@
+✔ all assets are present on the first frame and stay batched at district scale (104.708119ms)
+✔ distance tiers use hysteresis, throttling and full 3D camera distance (42.222169ms)
+✔ placement, scale and instance colors remain stable through every tier (77.061442ms)
+✔ the actual geometry of every car tier and contact decal remains entirely inside its bay (92.663229ms)
+✔ native Three serialization keeps alpha leaves and geometry, and every owned resource is released once (100.196251ms)
+✔ all three vehicle styles expose real glass ahead of their painted shell, retain a distinct roofline and keep daytime lenses unlit (38.707401ms)
+✔ overview and walking scenes build finite geometry and every independent control is clickable (1661.523069ms)
+✔ opening a single furniture drawer leaves all other furniture and doors unchanged (300.969283ms)
+✔ hiding illustrative furniture preserves the architecture and detailed-kitchen link (106.301416ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2357.574137

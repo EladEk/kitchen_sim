@@ -1,0 +1,43 @@
+✔ walking between rooms never swaps the sky IBL, renders a cube or changes colour management (1.818027ms)
+✔ interior fill has one neutral local shadow, bounded mobile maps, gentle room transitions and no daylight at night (5.193836ms)
+✔ room identity and ceiling fill use the occupied private polygon without copying it to another building (1.198091ms)
+✔ lowered common rooms use their real floor elevation for the interior shadow (0.281578ms)
+✔ public material channels have finite bounded detail and suitable linear/color spaces (511.031678ms)
+✔ restored public stone/floor shaders retain physical UVs, independent channels and stable glass (8.852131ms)
+✔ live Israel time handles local date rollover and DST repeated hours without shifting the UTC instant (50.61654ms)
+✔ moon phases agree with US Naval Observatory primary phases and the Sun/Moon align near the NASA 2024 eclipse (6.895736ms)
+✔ celestial directions use plan north and the kitchen rotation, and a daylight Moon remains possible (2.988654ms)
+✔ HDR sky includes finite night illumination and the phase renderer makes a full disk brighter than a new one (141.685522ms)
+✔ the same infinite sky drives the raster and photo renderers, updates once per minute, and respects lamp-only mode (405.997561ms)
+✔ Sun disk pixels match Three equirectUv coordinates, so north and the horizon are not mirrored (237.085812ms)
+✔ noon diffuse illumination is useful indoors and fades with the Sun without brightening lamps-only mode (2.575489ms)
+✔ district ceilings receive warm daylight bounce from below without adding lights or changing celestial direction (178.545599ms)
+✔ indoor daylight warms smoothly without swapping or rebuilding the sky environment at room boundaries (105.094275ms)
+✔ opening defaults to noon and old saved live settings cannot turn on the clock implicitly (3.510947ms)
+✔ screen-resolution celestial disks keep direction, phase and horizon visibility and do not enter the photo BVH (4.970626ms)
+✔ manual noon sky does not regenerate each minute and toggling live time resumes the clock (205.235643ms)
+✔ wide district shadow coverage keeps astronomical directions and snaps sub-texel camera motion (66.357145ms)
+✔ photo-observed HVAC and ceiling drops stay above doors, cabinets and the walking eye height (2162.352763ms)
+✔ the safe-room filter is inside, above the protected window, separate from the furniture toggle (1124.786687ms)
+✔ dark photographed shutter covers face indoors while independent curtains stay outdoors (246.450147ms)
+✔ all supplied photos and the video have local, portable preview assets and attachment provenance (12.399602ms)
+✔ water points keep photographed evidence separate from assumed fixture connections and never reintroduce K05 or feed the dryer (3.189406ms)
+✔ all actual electrical faceplates and water valves follow the same palette in the home and detailed kitchen (2097.715237ms)
+✔ water visibility persists through design saves and global closure, with no effect on electrical observations or furniture opening states (409.908357ms)
+✔ the kitchen water point can be selected without labels through hidden cabinets and remains blocked by the wall (137.530538ms)
+✔ surface maps use correct color spaces, metric scale and shared resources that dispose once per scene (336.665209ms)
+✔ solar position follows civil Israel time, seasons and the independently published NREL reference (8.768119ms)
+✔ the plan north arrow supplies the default bearing and invalid imports cannot corrupt the sun (3.015518ms)
+✔ dark mode and time after sunset remove the sun, sky and environment, and daylight restores them (3.977423ms)
+✔ both real scenes have only fixture illumination in dark mode and no illumination with lamps switched off (3049.802486ms)
+✔ the moving sun updates in place in both coordinate systems and glass admits sunlight (442.407883ms)
+✔ temporary lights fill only undocumented rooms, never claim photo evidence and remain physical in clean view (269.164917ms)
+✔ both save formats retain time, dark mode and temporary lamp choices with 4000K defaults (3.774314ms)
+ℹ tests 35
+ℹ suites 0
+ℹ pass 35
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 14012.46881

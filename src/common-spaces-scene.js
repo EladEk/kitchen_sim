@@ -62,8 +62,12 @@ export function buildCommonSpaces({parent,resources,settings,cut=false}){
   box('service-descending-step',(access.minX+access.maxX)/2,(top+bot)/2,access.topZ-(i+.5)*pitch,access.maxX-access.minX,top-bot,pitch+.002,stone);
   box('service-step-nosing',(access.minX+access.maxX)/2,top+.004,access.topZ-i*pitch-.015,access.maxX-access.minX,.012,.035,grout);
  }
- for(const x of [18.40,19.75])box('service-stair-retaining-wall',x,-access.depth/2,-6.76,.09,access.depth,2.2,white);
- box('service-bottom-landing',19.05,-access.depth-.06,-8.45,1.40,.12,1,stone);
+ // The east source portal begins at z=-7.30; the old retaining wall crossed
+ // most of its opening. Stop at its upper jamb and bridge both lower thresholds.
+ box('service-stair-retaining-wall',18.40,-access.depth/2,-6.76,.09,access.depth,2.2,white);
+ box('service-stair-retaining-wall',19.75,-access.depth/2,-6.475,.09,access.depth,1.65,white);
+ box('service-bottom-landing',19.075,-access.depth-.06,-8.50,1.75,.12,1.10,stone);
+ box('service-meter-threshold',19.80,-access.depth-.06,-7.70,.30,.12,1.0,stone);
  for(const poly of Object.values(SERVICE_ROOM_POLYGONS))for(let i=0;i<poly.length;i++){
   const a=poly[i],b=poly[(i+1)%poly.length],dx=b[0]-a[0],dz=b[1]-a[1];
   // Preserve both source door portals at the bottom landing.

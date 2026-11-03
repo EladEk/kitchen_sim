@@ -13,12 +13,12 @@ test('cancelled furniture is removed and the two bedrooms have real 120 × 190 c
  scene.dispose();
 });
 
-test('living sofa and TV face each other at their swapped walls; master bed is rotated and flush',()=>{
+test('living sofa and TV face each other; master bed follows the requested half-turn with its television opposite',()=>{
  const sofa=getFurniture('living-sofa'),console=getFurniture('living-console'),bed=getFurniture('master-bed'),tv=getFurniture('master-tv');
- near(sofa.rotation,0);near(console.rotation,Math.PI);assert(sofa.position[1]<console.position[1]);near(bed.rotation,Math.PI);near(bed.position[0],tv.position[0]);assert(tv.position[1]<bed.position[1]);
+ near(sofa.rotation,0);near(console.rotation,Math.PI);assert(sofa.position[1]<console.position[1]);near(bed.rotation,Math.PI);near(tv.rotation,0);assert(tv.position[0]+tv.w/2<2);assert(tv.position[1]<bed.position[1]);
  const scene=createHomeScene(normalizeHomeSettings());scene.group.updateMatrixWorld(true);
  const sofaBox=new THREE.Box3().setFromObject(scene.furnitureGroups.get(sofa.id)),bedBox=new THREE.Box3().setFromObject(scene.furnitureGroups.get(bed.id)),consoleBox=new THREE.Box3().setFromObject(scene.furnitureGroups.get(console.id));
- near(sofaBox.min.z,point(798,45.7)[1],.003);near(consoleBox.max.z,point(798,300.82)[1],.005);near(bedBox.max.z,point(680,921.58)[1],.005);assert(bedBox.min.x>=0,'bed and bedside tables stay inside the west wall');scene.dispose();
+ near(sofaBox.min.z,point(798,45.7)[1],.003);near(consoleBox.max.z,point(798,300.82)[1],.005);near(bedBox.max.z,point(680,921.58)[1]-.035,.002);assert(bedBox.min.x>=0,'bed and bedside tables stay inside the west wall');scene.dispose();
 });
 
 test('Harash products replace the defaults, and legacy saves migrate without losing individual openings',()=>{

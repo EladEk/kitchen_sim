@@ -1,0 +1,25 @@
+✔ one shared main meter replaces per-building copies, reconciles outside private plots and keeps inspection/collision data consistent (26.706007ms)
+✔ education context lies across the street behind4092/4091, with the source shapes and no claimed institution identity (154.554672ms)
+✔ context geometry is batched, finite, shaded and disposed without duplicating the shared utility (15.035243ms)
+✔ development transforms follow each building rotation/reflection, with all 32 gardens fenced (2.867649ms)
+✔ shared garden boundaries terminate at the facade and never cross apartment interiors (0.607188ms)
+✔ 4102 keeps every source bay, number and all 13 tandem pairs without a separating aisle (1.524424ms)
+✔ drives and bays avoid every private garden, and bays do not overlap a drive or each other (59.57311ms)
+✔ every parking bay can reach the connected road network, including tandem rear bays (6.234164ms)
+✔ kerbs leave parking mouths and drive junctions open; scene stays batched and disposable (1056.603464ms)
+✔ source-derived internal planting leaves every numbered bay, drive and private garden free, with real holes in shared paving (74.640629ms)
+✔ tree/lawn pockets are rendered as grass beside clear paving, and both crossing path centre-lines remain free of plant beds (1021.516658ms)
+✔ botanical detail shares bounded batches, contains finite instance transforms and disposes every owned resource once (26.914056ms)
+✔ compiled grass has no area under any bay, street, drive or footpath (111.116225ms)
+✔ rendered grass triangles never cover the parking samples at any elevation (2772.585649ms)
+✔ photographed bin towers and reservoir shell render at the shared collision locations (1620.180439ms)
+✔ both entrances retain a clear approach between planted courtyard borders (4.619818ms)
+✔ screen plane follows the outer wall return and manhole coordinates agree between views (1.17047ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4610.981859

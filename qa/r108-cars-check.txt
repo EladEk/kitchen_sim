@@ -1,0 +1,14 @@
+✔ all assets are present on the first frame and stay batched at district scale (109.727482ms)
+✔ distance tiers use hysteresis, throttling and full 3D camera distance (41.708127ms)
+✔ placement, scale and instance colors remain stable through every tier (71.516638ms)
+✔ the actual geometry of every car tier and contact decal remains entirely inside its bay (76.326837ms)
+✔ native Three serialization keeps alpha leaves and geometry, and every owned resource is released once (79.743593ms)
+✔ all three vehicle styles expose real glass ahead of their painted shell, retain a distinct roofline and keep daytime lenses unlit (47.446459ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 563.022061

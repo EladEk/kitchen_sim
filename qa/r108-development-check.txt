@@ -1,0 +1,29 @@
+✔ all assets are present on the first frame and stay batched at district scale (95.814773ms)
+✔ distance tiers use hysteresis, throttling and full 3D camera distance (44.535888ms)
+✔ placement, scale and instance colors remain stable through every tier (54.551033ms)
+✔ the actual geometry of every car tier and contact decal remains entirely inside its bay (68.099864ms)
+✔ native Three serialization keeps alpha leaves and geometry, and every owned resource is released once (75.902825ms)
+✔ all three vehicle styles expose real glass ahead of their painted shell, retain a distinct roofline and keep daytime lenses unlit (47.848809ms)
+✔ development transforms follow each building rotation/reflection, with all 32 gardens fenced (4.762144ms)
+✔ shared garden boundaries terminate at the facade and never cross apartment interiors (0.627582ms)
+✔ 4102 keeps every source bay, number and all 13 tandem pairs without a separating aisle (1.965318ms)
+✔ drives and bays avoid every private garden, and bays do not overlap a drive or each other (71.576765ms)
+✔ every parking bay can reach the connected road network, including tandem rear bays (6.745219ms)
+✔ kerbs leave parking mouths and drive junctions open; scene stays batched and disposable (783.197842ms)
+✔ three mounts stay on the owner external walls and outside the apartment, even at allowed extremes (1.760171ms)
+✔ target projection and obstacles distinguish visible, behind, out-of-frame and blocked targets (2.915985ms)
+✔ default plan covers the selected reference targets but honestly retains blind spots (3.550977ms)
+✔ camera overlays are opt-in, with no objects added to default scene (3.500862ms)
+✔ optical frustum stays 87 by 44 degrees across portrait and landscape viewports (0.404907ms)
+✔ two private illustrative cars fit entirely inside their designated bays (0.185448ms)
+✔ C2 moves to the marked service return and migrates only its old saved placement (0.388673ms)
+✔ C3 migration covers the four requested reference points with original optics (1.101913ms)
+✔ all cameras migrate onto the inter-storey band (0.228063ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2796.83491

@@ -1,0 +1,22 @@
+Personal entrance movement median: 0.265ms; index: 4874328 bytes
+✔ personal district keeps all eight public transforms, roads and bays; private geometry occurs only at 4102 (6879.855176ms)
+✔ public build contains no owner application, drafts or unsealed source documents (312.158341ms)
+✔ unauthenticated visitors see the public app but cannot fetch ANY private asset, including direct or encoded paths (28.380321ms)
+✔ correct password opens preserved app and scripts with no-store, wrong password fails, logout clears access cookie (47.815066ms)
+✔ public scene is self-contained, parsable, contains 43 base apartments, and strips all private metadata (140.636968ms)
+✔ the personal district entry and every referenced asset stay behind the password gate (38.521006ms)
+✔ compiled parks preserve the measured parking, leave the pocket garden free of road and permit a real walk to the three shade pavilions and amphitheatre (1927.923243ms)
+✔ all 43 actual apartment destinations in eight buildings produce the matching interior plan and registered live marker (247.373186ms)
+✔ the compiled public master-bed footprint follows the annotated lower-left map location (151.51267ms)
+✔ the real district floor rays descend, reach both service rooms and climb back in all eight buildings (1561.621999ms)
+✔ the exported district permits continuous common-stair ascent and descent through all nine floors in every rotated and reflected building (2551.826728ms)
+✔ actual district repeatedly enters 4103 with one collision model, bounded buffers and correct building/floor handoff (2555.321535ms)
+✔ the real master-room facade stays stone outside and plaster inside after export, district batching, mirrors and photo conversion (1946.716004ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 19912.210825

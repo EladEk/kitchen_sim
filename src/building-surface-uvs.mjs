@@ -2,7 +2,7 @@
 // for texture coordinates so cloth/wood detail does not stretch with a panel.
 export function installBuildingSurfaceUVs(material){
  if(material.userData.metricInstancedUVs)return material;
- if(!material.map&&!material.bumpMap&&!material.roughnessMap)return material;
+ if(!material.map&&!material.bumpMap&&!material.normalMap&&!material.roughnessMap)return material;
  const before=material.onBeforeCompile,key=material.customProgramCacheKey();
  material.onBeforeCompile=function(shader,...args){before.call(this,shader,...args);shader.vertexShader=shader.vertexShader.replace('#include <uv_vertex>',`#include <uv_vertex>
   vec3 metricPosition=position;
@@ -22,6 +22,9 @@ export function installBuildingSurfaceUVs(material){
   #ifdef USE_ROUGHNESSMAP
    vRoughnessMapUv=(roughnessMapTransform*vec3(metricUv,1.0)).xy;
   #endif
+  #ifdef USE_NORMALMAP
+   vNormalMapUv=(normalMapTransform*vec3(metricUv,1.0)).xy;
+  #endif
  `);};
- material.customProgramCacheKey=()=>key+'-building-metric-surfaces-r62';material.userData={...material.userData,metricInstancedUVs:true};return material;
+ material.customProgramCacheKey=()=>key+'-building-metric-surfaces-r104';material.userData={...material.userData,metricInstancedUVs:true};return material;
 }

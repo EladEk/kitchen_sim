@@ -127,7 +127,9 @@ export const FURNITURE=[
  // north-west corners. Frame/headboard clearance includes the wall skirting.
  furniture('bed-a','bedroom-a','bed',[643.42,363.44],1.2,1.9,.48),furniture('wardrobe-a','bedroom-a','wardrobe',[791.12,358.77],1.8,.55,2.3,-Math.PI/2),furniture('desk-a','bedroom-a','desk',[730,447],1.1,.5,.76),
  furniture('bed-b','bedroom-b','bed',[643.42,527.9],1.2,1.9,.48),furniture('wardrobe-b','bedroom-b','wardrobe',[799.6,578],1.7,.55,2.3,-Math.PI/2),furniture('desk-b','bedroom-b','desk',[742,489],.95,.48,.76),
- furniture('master-bed','master','bed',[680,862.88],1.8,2,.5,Math.PI),furniture('master-wardrobe','master','wardrobe',[797,835],2.1,.55,2.3,-Math.PI/2),furniture('master-tv','master','tv',[680,744.4],1.2,.045,.68),
+ // R106: retain the annotated centre, turn the headboard toward the lower wall.
+ // The TV fits on the opposite ensuite wall, clear of the entrance-side return.
+ furniture('master-bed','master','bed',[702.38,860.94],1.8,2,.5,Math.PI),furniture('master-wardrobe','master','wardrobe',[797,835],2.1,.55,2.3,-Math.PI/2),furniture('master-tv','master','tv',[682.54,745.86],1.2,.045,.68,0),
  furniture('wardrobe-c','bedroom-c','office-cabinet',[955,736],1.1,.55,2.3),furniture('desk-c','bedroom-c','desk',[960,850],1.4,.65,.76,-Math.PI/2),furniture('office-chair','bedroom-c','office-chair',[924,850],.58,.58,1.1,Math.PI/2),
  {...furniture('safe-bed','safe-room','bed',[1020,636.11],1.4,1.9,.48,Math.PI),nightstands:false,headboardHeight:.7},
  furniture('safe-desk','safe-room','desk',[1013,544],1.2,.55,.76),
@@ -184,8 +186,13 @@ export function normalizeFurnitureLayout(value){
  const layout={};if(!value||typeof value!=='object'||Array.isArray(value))return layout;
  for(const f of FURNITURE.filter(editableFurniture)){
   const p=value[f.id];if(p?.dimensions&&!validFurnitureSize(f,p.dimensions))continue;if(!Array.isArray(p?.position)||p.position.length!==2||!p.position.every(Number.isFinite)||!Number.isFinite(p.rotation))continue;
-  const rotation=((Math.round(p.rotation/(Math.PI/2))%4)+4)%4*Math.PI/2,dimensions=p.dimensions?Object.fromEntries(['w','d','h'].map(k=>[k,Math.round(p.dimensions[k]*1000)/1000])):undefined,item={...f,...dimensions,nightstands:f.nightstands??f.w>1.3,position:p.position.map(n=>Math.round(n*1000)/1000),rotation};
-  if(furnitureFitsRoom(item))layout[f.id]={position:item.position,rotation,...(dimensions?{dimensions}:{})};
+  // Only the old shipped default is migrated; deliberate custom arrangements
+  // and user dimensions retain their exact meaning.
+  if(f.id==='master-bed'&&!p.dimensions&&Math.hypot(p.position[0]-point(680,862.88)[0],p.position[1]-point(680,862.88)[1])<.002&&Math.abs(Math.atan2(Math.sin(p.rotation-Math.PI),Math.cos(p.rotation-Math.PI)))<.002)continue;
+  if(f.id==='master-bed'&&!p.dimensions&&Math.hypot(p.position[0]-point(680,803.11)[0],p.position[1]-point(680,803.11)[1])<.002&&Math.abs(Math.atan2(Math.sin(p.rotation),Math.cos(p.rotation)))<.002)continue;
+  const previousMaster=f.id==='master-bed'&&p.placementRevision!==106&&Math.hypot(p.position[0]-point(702.38,860.94)[0],p.position[1]-point(702.38,860.94)[1])<.002&&Math.abs(Math.atan2(Math.sin(p.rotation),Math.cos(p.rotation)))<.002;
+  const rotation=previousMaster?Math.PI:((Math.round(p.rotation/(Math.PI/2))%4)+4)%4*Math.PI/2,dimensions=p.dimensions?Object.fromEntries(['w','d','h'].map(k=>[k,Math.round(p.dimensions[k]*1000)/1000])):undefined,item={...f,...dimensions,nightstands:f.nightstands??f.w>1.3,position:p.position.map(n=>Math.round(n*1000)/1000),rotation};
+  if(furnitureFitsRoom(item))layout[f.id]={position:item.position,rotation,...(f.id==='master-bed'?{placementRevision:106}:{}),...(dimensions?{dimensions}:{})};
  }return layout;
 }
 export function moveHomeFurniture(settings,id,{dx=0,dz=0,rotate=false,reset=false,dimensions,resetDimensions=false}={}){
@@ -203,7 +210,7 @@ export function moveHomeFurniture(settings,id,{dx=0,dz=0,rotate=false,reset=fals
  if(furnitureForSettings(settings).some(f=>f.id!==id&&f.roomId===next.roomId&&intersects(furnitureBounds(f))))return {settings,error:'furniture'};
  for(const door of DOORS.filter(d=>d.rooms.includes(next.roomId))){const wall=WALLS.find(w=>w.id===door.wallId),axis=door.vertical?wall.a[0]:wall.a[1];if(intersects(door.vertical?{minX:axis-.45,maxX:axis+.45,minZ:door.start,maxZ:door.end}:{minX:door.start,maxX:door.end,minZ:axis-.45,maxZ:axis+.45}))return {settings,error:'door'};}
  const stored=resetDimensions?null:dimensions||layout[id]?.dimensions;
- layout[id]={position:next.position,rotation:next.rotation,...(stored?{dimensions:{w:next.w,d:next.d,h:next.h}}:{})};return {settings:{...settings,furnitureLayout:layout}};
+ layout[id]={position:next.position,rotation:next.rotation,...(id==='master-bed'?{placementRevision:106}:{}),...(stored?{dimensions:{w:next.w,d:next.d,h:next.h}}:{})};return {settings:{...settings,furnitureLayout:layout}};
 }
 export function furnitureParts(f){
  if(!f)return [];

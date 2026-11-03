@@ -132,6 +132,7 @@ export function createWalkingWorld({model, site, buildings = DISTRICT, variants 
  const doorInclude=o=>!!publicDoorAncestor(o),defaultDoors=createSpatialCollisionIndex(model,{trees,include:doorInclude,visibleOnly:false}),doorIndexes=new Map();
  const outside = createSpatialCollisionIndex(site, {trees, include: object => {
   const p = object.userData;
+  if(p.tourNonPhysical)return false;
   if (p.propType) return p.detailTier === 2 && ['body', 'branches'].includes(p.propPart);
   return ![object.material].flat().some(m => m?.polygonOffset || m?.transparent && m.opacity < .5);
  }});

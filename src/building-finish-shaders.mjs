@@ -24,8 +24,13 @@ export function installStoneCourses(limestone){
     float grain=sin(horizontal*41.0+sin(vBuildingWorld.y*27.0))*sin(vBuildingWorld.y*57.0)*.004;
     float base=mix(.9875,.945+variation*.085,1.0-smoothstep(.12,.8,aa));
     diffuseColor.rgb*=mix(base+grain*(1.0-smoothstep(.003,.03,aa)),.79,joint*.65);
+    float stoneRelief=-.0016*joint*(1.0-smoothstep(.003,.04,aa));
+   `).replace('#include <normal_fragment_maps>',`#include <normal_fragment_maps>
+    #ifdef USE_BUMPMAP
+     normal=perturbNormalArb(-vViewPosition,normal,vec2(dFdx(stoneRelief),dFdy(stoneRelief)),faceDirection);
+    #endif
    `);
-  };limestone.customProgramCacheKey=()=> 'building-stone-courses-r96';
+  };limestone.customProgramCacheKey=()=> 'building-stone-courses-r104';
 
 }
 export function installFloorCourses(interiorFloor){

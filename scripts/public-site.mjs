@@ -4,6 +4,10 @@ import {BUILDING_FLOORS} from '../src/building-layout.mjs';
 import {SITE_TRACE} from '../src/building-site-trace.mjs';
 import {createSiteLayout} from '../public-view/site-layout.mjs';
 import {publicGroundCover} from './public-ground-cover.mjs';
+import {compilePublicLandscape} from './public-landscape.mjs';
+import context from '../public-view/district-context-r110.json' with {type:'json'};
+import {siteMainMeterFeature} from '../src/site-utility-layout.mjs';
+import {DISTRICT,districtPoint,PLAN_ROTATION} from '../public-view/district-layout.mjs';
 
 const distance=(p,a,b)=>{const dx=b[0]-a[0],dz=b[1]-a[1],t=Math.max(0,Math.min(1,((p[0]-a[0])*dx+(p[1]-a[1])*dz)/(dx*dx+dz*dz||1)));return Math.hypot(p[0]-a[0]-dx*t,p[1]-a[1]-dz*t);};
 const boundaryDistance=(p,poly)=>Math.min(...poly.map((a,i)=>distance(p,a,poly[(i+1)%poly.length])));
@@ -27,6 +31,10 @@ export function publicSiteData(){
   }
  }
  const data={revision:101,gardens:floor.gardens.map(g=>({unit:g.unit,polygon:g.polygon,plot:g.plot})),fences:[...fences.values()],parking:SITE_TRACE.parking.map(b=>({id:b.id,label:b.label,accessible:b.accessible,polygon:b.polygon})),roads:SITE_TRACE.roads.map(r=>({id:r.id,polygon:r.polygon})),walkable:SITE_TRACE.walkable.map(w=>({id:w.id,polygon:w.polygon})),curbs:SITE_TRACE.curbs.map(c=>({id:c.id,points:c.points})),accuracy:{building4102:'Gardens and adjacent numbered bays retain the source trace. Public district geometry adds the entire plot1410 parking plan (204 numbered bays and N1–N5), registered to the same control.',otherBuildings:'Standard garden template rotated/reflected with each building. Plot1409 parking uses the plot1410 module checked against both official aerials; 1346/1347 courts and external street connections remain aerial reconstructions, not surveyed counts or parking allocations.',heights:'Fence, kerb and landscape heights are illustrative.'}};
+ const meter=siteMainMeterFeature();
+ data.context=context;data.utilities=[{id:'shared-plot1410-main-water-meter',position:districtPoint(meter.position,DISTRICT[0]),size:[meter.dimensions[0],meter.dimensions[2],meter.dimensions[1]],angle:PLAN_ROTATION,scope:'plot1410',placementReconciled:true,verifiedAsBuilt:false}];
+ data.landscape=compilePublicLandscape(createSiteLayout(data));
+ data.accuracy.publicLandscape='Park and pocket garden traced from official developer aerials. Interior planted pedestrian cross, burgundy/green beds and tree/lawn pockets reconciled to the supplied opposite aerial. Positions, widths, planting and furniture are reconstructed; not surveyed boundaries or verified completed construction.';
  data.groundCover=publicGroundCover(createSiteLayout(data));
  return data;
 }

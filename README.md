@@ -1,4 +1,84 @@
-# R102 — corrected living areas and a live apartment map
+# R110 — shared water-meter correction and education context
+
+Removes eight per-building copies of the shared main-meter fixture and renders
+one in the reconciled common location. Adds the source-derived education area
+across the south street behind4092/4091: L-shaped wings, a separate annex and
+three smaller low-rise blocks, with forecourt parking, paths and trees.
+See [UPDATE-R110.md](UPDATE-R110.md) for evidence and placement limits.
+
+# R109 — planted pedestrian corridors between the buildings
+
+Reconstructs the internal pedestrian cross, green and burgundy planted edges,
+rectangular tree/lawn pockets and court connections visible in the supplied
+opposite aerial. Existing building positions, the 209 traced numbered bays
+and all private gardens remain fixed. Details are shared by public, personal
+and VR tours. See [UPDATE-R109.md](UPDATE-R109.md) for sources and limits.
+
+# R108 — source-derived public parks and more detailed vehicles
+
+Adds the park across the road from 4102/4103/3461 and the landscaped pocket
+beside 3461/3471 from the developer's labelled aerials, with curved paths,
+three shade pavilions and the amphitheatre. The reconstructed eastern street
+and court exit now leave the small garden open. Measured plot1410 parking and
+accepted building placements stay fixed. Vehicles gain distinct sedan,
+hatchback and SUV shapes, including the two private parked cars.
+See [UPDATE-R108.md](UPDATE-R108.md) for sources, uncertainty and installation.
+
+## R107 — white matte ceilings and neutral reflected daylight
+
+Ceilings and the photographed gypsum drops now share a subtle matte-white
+finish. Neutral diffuse ground bounce removes the brown cast on downward-facing
+surfaces in both public and personal tours. Solar changes, night behaviour and
+real shadows remain active. See [UPDATE-R107.md](UPDATE-R107.md).
+
+## R106 — correct bed facing, separate wall finishes and clear stairs
+
+The master bed keeps its annotated position and turns 180 degrees so its
+headboard meets the lower wall. The television faces it from the opposite wall.
+Exterior wall faces retain stone, while the faces inside rooms use fine plaster,
+including photo mode and rotated/reflected buildings. Common stair treads now
+have finite thickness so the flight overhead no longer blocks the climb below.
+See [UPDATE-R106.md](UPDATE-R106.md) for installation and verification limits.
+
+## R105 — stable interior colour, annotated bed placement and natural lawn
+
+Removes the R104 room-environment swaps that caused blue colour transitions.
+Adds stable neutral interior fill with one bounded local shadow, door/paint
+surface detail, a matte PBR lawn with nearby short blades, and the master-bed
+position shown in the supplied map annotation in both public and personal views.
+Public furnishings remain generic; the authorized personal layout stays private.
+See [UPDATE-R105.md](UPDATE-R105.md) for installation, sources and test limits.
+
+## R104 — scanned surfaces, room reflections and the corrected master bed
+
+Walking now uses physically scaled scanned normal/roughness maps, room-local HDR
+reflection/indirect-light probes, a less uniform interior fill, restrained fabric
+sheen, sculpted cushions/bedding, relief at facade joints, and AgX highlights.
+Colours remain tied to the existing owner finishes. Exact ordered flooring is
+preserved. The master's bed turns 180 degrees as requested, with the television
+moved to face it from the opposite wall.
+
+React remains the interface; Three.js remains the renderer. No new dependency
+or account is needed. The existing public/personal district, doors, walking,
+map, service descent, automatic quality, saved views and WebXR remain available.
+See [UPDATE-R104.md](UPDATE-R104.md) for details, sources and validation limits.
+
+## R103 — smoother tours, interior daylight and an interactive map
+
+Automatic quality adapts resolution, shadows and distant detail gradually.
+Interior daylight gains a shared floor/wall bounce approximation and gentle
+exposure changes. The vector map expands, zooms and pans, labels rooms, highlights
+the current room and offers the original contractor-plan overlay in the
+password-protected personal apartment. Named walking views, image export and a
+safe recovery button are available.
+
+The actual full-district service descent is fixed: the independent ground no
+longer bridges the stair void, thresholds have continuous support, the east
+retaining wall leaves its source portal open, and service destinations start at
+the lowered floor. Physical down/room/up walks are verified in all eight copies.
+See [UPDATE-R103.md](UPDATE-R103.md) for details, installation and validation limits.
+
+## R102 — corrected living areas and a live apartment map
 
 Living seating in 16 upper apartments and the standard ground template is
 registered to the original plan's living area, with door/glazing approaches

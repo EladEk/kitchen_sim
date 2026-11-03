@@ -1,0 +1,16 @@
+✔ development transforms follow each building rotation/reflection, with all 32 gardens fenced (4.900232ms)
+✔ shared garden boundaries terminate at the facade and never cross apartment interiors (1.415293ms)
+✔ 4102 keeps every source bay, number and all 13 tandem pairs without a separating aisle (2.747923ms)
+✔ drives and bays avoid every private garden, and bays do not overlap a drive or each other (83.027593ms)
+✔ every parking bay can reach the connected road network, including tandem rear bays (11.571722ms)
+✔ kerbs leave parking mouths and drive junctions open; scene stays batched and disposable (1328.656098ms)
+✔ compiled grass has no area under any bay, street, drive or footpath (110.684647ms)
+✔ rendered grass triangles never cover the parking samples at any elevation (2616.043985ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4071.406093

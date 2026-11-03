@@ -1,0 +1,16 @@
+Personal entrance movement median: 0.419ms; index: 4825920 bytes
+✔ personal district keeps all eight public transforms, roads and bays; private geometry occurs only at 4102 (15055.780394ms)
+✔ all 43 actual apartment destinations in eight buildings produce the matching interior plan and registered live marker (765.946166ms)
+✔ the compiled public master-bed footprint follows the annotated lower-left map location (548.5319ms)
+✔ the real district floor rays descend, reach both service rooms and climb back in all eight buildings (4265.798055ms)
+✔ the exported district permits continuous common-stair ascent and descent through all nine floors in every rotated and reflected building (6724.920342ms)
+✔ actual district repeatedly enters 4103 with one collision model, bounded buffers and correct building/floor handoff (2804.061605ms)
+✔ the real master-room facade stays stone outside and plaster inside after export, district batching, mirrors and photo conversion (5442.86592ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 38932.738741

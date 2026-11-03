@@ -9,7 +9,7 @@ import {createDistrictSite} from '../public-view/site-scene.mjs';
 const source=publicSiteData(),layout=createSiteLayout(source);
 const area=polygons=>polygons.reduce((sum,rings)=>sum+rings.reduce((a,ring,i)=>a+(i?-1:1)*Math.abs(ring.reduce((s,p,j)=>{const q=ring[(j+1)%ring.length];return s+p[0]*q[1]-q[0]*p[1];},0)/2),0),0);
 test('compiled grass has no area under any bay, street, drive or footpath',()=>{
- const hardscape=[...layout.roadSurfaces.map(rectanglePolygon),...layout.parking.map(b=>b.polygon),...layout.sidewalks.map(w=>w.polygon)].map(p=>[p]);
+ const hardscape=[...layout.roadSurfaces.map(r=>[rectanglePolygon(r)]),...layout.parking.map(b=>[b.polygon]),...layout.sidewalks.map(w=>[w.polygon,...(w.holes||[])])];
  const grass=source.groundCover.grass.flatMap(l=>l.polygons);
  assert(area(grass)>1000,'actual green spaces remain');
  assert(area(clipping.intersection(grass,clipping.union(...hardscape)))<1e-6);

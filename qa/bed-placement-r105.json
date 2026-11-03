@@ -1,0 +1,32 @@
+{
+  "annotation": "/house/bed-placement-r105.jpg",
+  "sha256": "4686dad7dbc12238e7ff3926e15fb3f9207dea804ce6179847c8cf8ab818c3ac",
+  "reference_image_pixels": [
+    709,
+    1536
+  ],
+  "map_region_pixels": {
+    "left": 371,
+    "top": 597,
+    "right": 678,
+    "bottom": 1002
+  },
+  "orange_mark_approximate_centre_pixels": [
+    420,
+    974
+  ],
+  "native_plan_target_metres": [
+    1.7,
+    14.38
+  ],
+  "facing_radians": 0,
+  "private_mattress_metres": [
+    1.8,
+    2
+  ],
+  "public_mattress_metres": [
+    1.55,
+    2.02
+  ],
+  "note": "Approximate furnishing registration from the user annotation; preserve exact architectural survey and existing door/window coordinates."
+}

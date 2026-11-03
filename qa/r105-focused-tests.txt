@@ -1,0 +1,31 @@
+✔ nearby grass has blade silhouettes within real lawn polygons, bounded instances and deterministic placement (82.354878ms)
+✔ populated lawn never becomes floor support or a walking collision (15.628079ms)
+✔ walking between rooms never swaps the sky IBL, renders a cube or changes colour management (3.634376ms)
+✔ interior fill has one neutral local shadow, bounded mobile maps, gentle room transitions and no daylight at night (8.39895ms)
+✔ room identity and ceiling fill use the occupied private polygon without copying it to another building (2.06976ms)
+✔ lowered common rooms use their real floor elevation for the interior shadow (0.50669ms)
+✔ scans retain chosen colours and product floors, use real metre UVs and linear data maps, and release all owned textures once (9.736499ms)
+✔ late completion after cancellation cannot bind textures or start additional decoders (1.722175ms)
+✔ adaptive quality ignores suspension/XR, degrades gradually and recovers only after sustained headroom (5.937567ms)
+✔ interior exposure and shared floor/wall bounce ease in and out while preserving solar night (4.075977ms)
+✔ map zoom is anchored, bounded to the plan and room highlighting follows the actual polygon (0.546911ms)
+✔ saved views reject malformed coordinates and image export restores renderer size even when capture fails (2.046514ms)
+✔ master bed follows the annotated lower-left map position, retains its facing and leaves the side route accessible (1449.082197ms)
+✔ safe-room wardrobe side meets the bed wall, with its doors and drawers clear of the bed and protected window (5659.396493ms)
+✔ moving the safe-room wardrobe frees the entrance landing and keeps the walking route usable (36.701057ms)
+✔ both 120 × 190 cm beds tuck against two walls with skirting clearance; the office stays an office (265.154118ms)
+✔ bedroom wardrobes follow the entrance wall, face inward and fit with each part open (891.664228ms)
+✔ both bedroom entrance doors sweep clear of furniture after the room 2 desk swap (897.597529ms)
+✔ cancelled furniture is removed and the two bedrooms have real 120 × 190 cm mattresses (2288.78964ms)
+✔ living sofa and TV face each other; master bed follows the requested half-turn with its television opposite (265.605214ms)
+✔ Harash products replace the defaults, and legacy saves migrate without losing individual openings (1.986924ms)
+✔ Hercules has the documented module chain, faces the slider from the opposite fence and opens independently (737.585783ms)
+✔ actual room floors and tiled walls carry the scheduled metric sizes (578.761762ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9746.383061

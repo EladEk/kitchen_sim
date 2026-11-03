@@ -8,6 +8,8 @@ import {createSurfacePalette} from './surface-materials.mjs';
 import {ORDERED_FLOORS} from './ordered-flooring.mjs';
 import {configureSurfaceRenderer} from './scene-environment.js';
 import {FLOOR_SHADER_COMMON} from './floor-material.mjs';
+import {installBuildingSurfaceUVs} from './building-surface-uvs.mjs';
+import {installStoneCourses} from './building-finish-shaders.mjs';
 
 const decode=v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4;};
 const encode=v=>Math.round(255*(v<=.0031308?v*12.92:1.055*v**(1/2.4)-.055));
@@ -47,7 +49,7 @@ test('actual ordered materials use non-mirrored photographic tiles, matte dielec
 
 function expand(source){
  source=source.replace(/^[ \t]*#include +<([\w\d./]+)>/gm,(_,name)=>expand(THREE.ShaderChunk[name]));
- source=source.replace(/NUM_[A-Z_]+|UNION_CLIPPING_PLANES/g,name=>({NUM_DIR_LIGHTS:1,NUM_HEMI_LIGHTS:1,NUM_DIR_LIGHT_SHADOWS:1})[name]??0);
+ source=source.replace(/NUM_[A-Z_]+|UNION_CLIPPING_PLANES/g,name=>({NUM_DIR_LIGHTS:1,NUM_HEMI_LIGHTS:1,NUM_DIR_LIGHT_SHADOWS:1,NUM_SPOT_LIGHTS:1,NUM_SPOT_LIGHT_SHADOWS:1,NUM_SPOT_LIGHT_COORDS:1})[name]??0);
  return source.replace(/#pragma unroll_loop_start\s+for\s*\(\s*int\s+i\s*=\s*(\d+)\s*;\s*i\s*<\s*(\d+)\s*;\s*i\s*\+\+\s*\)\s*{([\s\S]+?)}\s+#pragma unroll_loop_end/g,(_,start,end,body)=>Array.from({length:end-start},(_,j)=>body.replace(/\[\s*i\s*\]/g,`[${+start+j}]`).replace(/UNROLLED_LOOP_INDEX/g,+start+j)).join(''));
 }
 
@@ -59,12 +61,16 @@ test('the complete patched Three physical shaders compile/link on native GLES3 a
  const programs=[{vertex:vertex+expand(shader.vertexShader),fragment:fragment+expand(shader.fragmentShader)}];
  const environment='#define DOUBLE_SIDED\n#define USE_ENVMAP\n#define ENVMAP_TYPE_CUBE_UV\n#define ENVMAP_MODE_REFLECTION\n#define CUBEUV_TEXEL_WIDTH .00130208333\n#define CUBEUV_TEXEL_HEIGHT .0009765625\n#define CUBEUV_MAX_MIP 8.0\n';
  programs.push({vertex:vertex.replace(common,common+environment)+expand(shader.vertexShader),fragment:fragment.replace(common,common+environment)+expand(shader.fragmentShader)});
+ const cloth=new THREE.MeshPhysicalMaterial({map:new THREE.Texture(),normalMap:new THREE.Texture(),roughnessMap:new THREE.Texture()}),fabricShader={vertexShader:THREE.ShaderLib.physical.vertexShader,fragmentShader:THREE.ShaderLib.physical.fragmentShader};installBuildingSurfaceUVs(cloth);cloth.onBeforeCompile(fabricShader);
+ const clothCommon=common.replace('#define USE_BUMPMAP\n','')+'#define USE_NORMALMAP\n#define USE_NORMALMAP_TANGENTSPACE\n#define NORMALMAP_UV uv\n#define USE_SHEEN\n'+environment;
+ programs.push({vertex:vertex.replace(common,clothCommon+'#define USE_INSTANCING\nin mat4 instanceMatrix;\n')+expand(fabricShader.vertexShader),fragment:fragment.replace(common,clothCommon)+expand(fabricShader.fragmentShader)});
+ const stone=new THREE.MeshStandardMaterial({map:new THREE.Texture(),bumpMap:new THREE.Texture(),roughnessMap:new THREE.Texture()}),stoneShader={vertexShader:THREE.ShaderLib.physical.vertexShader,fragmentShader:THREE.ShaderLib.physical.fragmentShader};installStoneCourses(stone);installBuildingSurfaceUVs(stone);stone.onBeforeCompile(stoneShader);programs.push({vertex:vertex.replace(common,common+environment)+expand(stoneShader.vertexShader),fragment:fragment.replace(common,common+environment)+expand(stoneShader.fragmentShader)});
  // Keep the sampling/coverage helper exact, rather than duplicating its maths.
  const input={programs,common:FLOOR_SHADER_COMMON};
  const result=spawnSync('python',['qa/check-floor-gpu.py'],{cwd:new URL('../',import.meta.url),input:JSON.stringify(input),encoding:'utf8',timeout:30000,maxBuffer:1000000});resources.forEach(r=>r.dispose());
  if(result.error?.code==='ENOENT'){t.skip('Native shader check needs Python and EGL');return;}
  if(result.status===77){t.skip(result.stdout.trim());return;}
- assert.equal(result.status,0,result.stderr||result.stdout||String(result.error));const checked=JSON.parse(result.stdout);assert.equal(checked.linked,2);assert.deepEqual(checked.coverage,[255,128,0,26]);assert.equal(checked.rotations,true);
+ for(const m of [cloth,stone]){for(const t of [m.map,m.normalMap,m.bumpMap,m.roughnessMap])t?.dispose();m.dispose();}assert.equal(result.status,0,result.stderr||result.stdout||String(result.error));const checked=JSON.parse(result.stdout);assert.equal(checked.linked,4);assert.deepEqual(checked.coverage,[255,128,0,26]);assert.equal(checked.rotations,true);
 });
 
 test('the real owner photo loses its centre hotspot and dark perimeter before it is repeated across tiles',t=>{

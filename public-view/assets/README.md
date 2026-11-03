@@ -13,3 +13,13 @@ Generation prompt:
 Other surface maps, foliage masks and contact masks are deterministic code-native
 textures. No owner photographs, catalog samples or personal design changes are
 used by these new public assets.
+
+## R104 scanned surfaces
+
+`pbr-r104/` contains eleven CC0 maps from Poly Haven for clean plaster, cotton,
+oak and asphalt. `SOURCES.json` records exact URLs, physical widths, hashes and
+licence evidence. Normal and roughness maps are linear data; diffuse detail is
+sRGB and normalized at runtime to retain the chosen finish tint. The existing
+limestone albedo above remains illustrative; these scans do not turn it into a
+photograph or a manufacturer material. Owner-ordered floors keep their own
+protected photographed samples.

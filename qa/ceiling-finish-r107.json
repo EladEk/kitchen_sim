@@ -1,0 +1,18 @@
+{
+  "publicPlasterCeilings": 76,
+  "privateCeilingsAndDrops": 6,
+  "samples": [
+    {
+      "room": "master",
+      "colour": "#f4f4f2",
+      "height": 2.750000000000001
+    },
+    {
+      "room": "living",
+      "colour": "#f4f4f2",
+      "height": 2.75
+    }
+  ],
+  "photoColourPreserved": true,
+  "diffuseGroundBounce": "#dddcd8"
+}
