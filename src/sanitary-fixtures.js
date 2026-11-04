@@ -5,7 +5,7 @@ import {roundedRect} from './kitchen-sink.mjs';
 // documented; all bowl slopes, radii and thicknesses are visual estimates.
 export function createCeramicBowl(resources,{productId,w,d,top,depth,innerW,innerD,innerZ=.025,radius=.02,innerRadius=.025,lowerScale=.8,tapHole=null,drainX=0,drainZ=.015}){
  const group=new THREE.Group();group.userData={productId,shapeBasis:'catalog-product-image',detailsInferred:true};
- const ceramic=new THREE.MeshStandardMaterial({color:'#f5f4ef',roughness:.23,metalness:0,side:THREE.DoubleSide}),metal=new THREE.MeshStandardMaterial({color:'#b9c1be',roughness:.23,metalness:.88,side:THREE.DoubleSide}),dark=new THREE.MeshStandardMaterial({color:'#525d59',roughness:.6});resources.push(ceramic,metal,dark);
+ const ceramic=new THREE.MeshPhysicalMaterial({color:'#f5f4ef',roughness:.09,clearcoat:1,clearcoatRoughness:.08,ior:1.5,metalness:0,side:THREE.DoubleSide}),metal=new THREE.MeshStandardMaterial({color:'#b9c1be',roughness:.23,metalness:.88,side:THREE.DoubleSide}),dark=new THREE.MeshStandardMaterial({color:'#525d59',roughness:.6});ceramic.userData={surfaceKind:'ceramic',architecturalInterior:true};resources.push(ceramic,metal,dark);
  const add=(geometry,material,part)=>{resources.push(geometry);const mesh=new THREE.Mesh(geometry,material);mesh.userData={productId,part,detailsInferred:true};mesh.castShadow=mesh.receiveShadow=true;group.add(mesh);return mesh;};
  const outline=(width,dd,r,z=0,path=new THREE.Shape())=>roundedRect(path,width,dd,Math.min(r,width/2-.001,dd/2-.001),0,z);
  const cap=(shape,y,thickness,material,part)=>{const g=new THREE.ExtrudeGeometry(shape,{depth:thickness,bevelEnabled:false,curveSegments:12});g.rotateX(Math.PI/2);g.translate(0,y,0);return add(g,material,part);};
@@ -36,7 +36,7 @@ export function createCeramicBowl(resources,{productId,w,d,top,depth,innerW,inne
 
 export function createSkyToilet(resources,f){
  const group=createCeramicBowl(resources,{productId:'toilet',w:f.w,d:f.d,top:.424,depth:.205,innerW:f.w-.105,innerD:f.d-.15,innerZ:.035,radius:.135,innerRadius:.10,lowerScale:.73,drainZ:.035});
- const seatMaterial=new THREE.MeshStandardMaterial({color:'#f8f7f2',roughness:.25,side:THREE.DoubleSide}),gapMaterial=new THREE.MeshStandardMaterial({color:'#5c635f',roughness:.7});resources.push(seatMaterial,gapMaterial);
+ const seatMaterial=new THREE.MeshPhysicalMaterial({color:'#f8f7f2',roughness:.16,clearcoat:.65,clearcoatRoughness:.12,side:THREE.DoubleSide}),gapMaterial=new THREE.MeshStandardMaterial({color:'#5c635f',roughness:.7});resources.push(seatMaterial,gapMaterial);
  for(const [y,thickness,material,part] of [[.434,.007,gapMaterial,'sky-seat-gap'],[.451,.015,seatMaterial,'sky-slim-lid']]){
   const shape=roundedRect(new THREE.Shape(),f.w-.014,f.d-.008,.13),g=new THREE.ExtrudeGeometry(shape,{depth:thickness,bevelEnabled:true,bevelSegments:2,steps:1,bevelSize:.002,bevelThickness:.001,curveSegments:14});g.rotateX(Math.PI/2);g.translate(0,y,0);resources.push(g);const mesh=new THREE.Mesh(g,material);mesh.castShadow=mesh.receiveShadow=true;mesh.userData={productId:'toilet',part,cataloguePage:26,depth:.52};group.add(mesh);
  }

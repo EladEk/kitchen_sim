@@ -1,0 +1,18 @@
+✔ room reflections use a bounded cache and material-local maps without ever swapping the sky or allocating in XR (4.509681ms)
+✔ only one nearby mirror exists and it is suppressed in stereo and during AO passes (2.035837ms)
+✔ progressive mode waits for stillness, hides stale camera images, and releases tracing during native WebXR (12.565246ms)
+✔ leaving photo mode during asynchronous initialization disposes the stale renderer without attaching a canvas (1.642647ms)
+✔ photo preparation keeps a visible loader until the first image exists, then retains a non-blocking render indicator (4.789791ms)
+✔ a failed photo backend removes the preparation overlay and leaves the live tour available (0.797778ms)
+✔ sustained camera movement and background suspension retire photo buffers before rebuilding (1.703387ms)
+✔ walking never performs a whole-scene photo signature scan (0.64616ms)
+✔ warmup uploads shared textures once, compiles real draw types and keeps object ownership (2.357119ms)
+✔ paint precedes texture upload, and a stale shader completion cannot mark a canceled room ready (4.673798ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 160.090787

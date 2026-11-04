@@ -1,0 +1,25 @@
+Personal entrance movement median: 0.297ms; index: 5876748 bytes
+✔ personal district keeps all eight public transforms, roads and bays; private geometry occurs only at 4102 (7398.189665ms)
+✔ the exported sanitary fixtures have free real standing approaches in all eight reflected/rotated buildings and wet rooms appear on the map (1728.154512ms)
+✔ public build contains no owner application, drafts or unsealed source documents (463.870075ms)
+✔ unauthenticated visitors see the public app but cannot fetch ANY private asset, including direct or encoded paths (28.83922ms)
+✔ correct password opens preserved app and scripts with no-store, wrong password fails, logout clears access cookie (40.132458ms)
+✔ public scene is self-contained, parsable, contains 43 base apartments, and strips all private metadata (163.172994ms)
+✔ the personal district entry and every referenced asset stay behind the password gate (43.021575ms)
+✔ the actual scene contains one shared water fixture and supports a walk across the south street around the education buildings (1989.126447ms)
+✔ the actual rendered district permits a continuous walk along both planted axes and every court connector (2308.539715ms)
+✔ compiled parks preserve the measured parking, leave the pocket garden free of road and permit a real walk to the three shade pavilions and amphitheatre (2243.414098ms)
+✔ all 43 actual apartment destinations in eight buildings produce the matching interior plan and registered live marker (220.865828ms)
+✔ the compiled public master-bed footprint returns to the pre-annotation sleeping zone (144.945883ms)
+✔ the real district floor rays descend, reach both service rooms and climb back in all eight buildings (1924.148156ms)
+✔ the exported district permits continuous common-stair ascent and descent through all nine floors in every rotated and reflected building (2906.435934ms)
+✔ actual district repeatedly enters 4103 with one collision model, bounded buffers and correct building/floor handoff (2439.065683ms)
+✔ the real master-room facade stays stone outside and plaster inside after export, district batching, mirrors and photo conversion (2152.338206ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 28107.201566

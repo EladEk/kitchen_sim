@@ -1,5 +1,5 @@
 import {CEILING_COLOR,CEILING_MATERIAL} from './ceiling-finish.mjs';
-import {installStoneCourses,installFloorCourses} from './building-finish-shaders.mjs';
+import {installStoneCourses,installFloorCourses,installWallCavity} from './building-finish-shaders.mjs';
 import {serviceSlabHoles} from './service-access.mjs';
 import {buildApartmentFurniture} from './apartment-furniture-scene.js';
 import {createSurfacePalette} from './surface-materials.mjs';
@@ -9,6 +9,7 @@ import {buildCommonSpaces} from './common-spaces-scene.js';
 import {clubWindowProfile} from './residents-club.mjs';
 import {buildResidentsClub} from './residents-club-scene.js';
 import * as THREE from 'three';
+import {facadeSkinRows,appendFacadeVeneers} from './facade-veneers.mjs';
 import {BUILDING,BUILDING_FLOORS,BUILDING_ROOF,BUILDING_SITE,BUILDING_CENTER,normalizeBuildingLevel} from './building-layout.mjs';
 import {BUILDING_INTERIORS} from './building-interiors.mjs';
 import {onDetailedGround,segmentDistance,parseDestination,isDoorOpening,gardenFenceEdge} from './building-navigation.mjs';
@@ -37,14 +38,14 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
  if(shown){
   // Metre-scale stone courses, restrained grain and staggered vertical joints.
   // Colours/profile follow the supplied facade photos; this is no scan claim.
-  resources.push(glass);installStoneCourses(limestone);installFloorCourses(interiorFloor);
+  resources.push(glass);installStoneCourses(limestone);installFloorCourses(interiorFloor);installWallCavity(insideWall,{storey:BUILDING.storey,height:BUILDING.storey});
   limestone.userData.publicFinish="stone";interiorFloor.userData.publicFinish="floor";
   interiorFloor.userData={...interiorFloor.userData,finishInferred:true,tile:[.8,.8],productId:null};
   for(const mat of [limestone,concrete,deck,roofMat,insideWall,doorMat,interiorFloor,soffit,fascia,trimMat])installBuildingSurfaceUVs(mat);
 
  }
  const matrix=new THREE.Matrix4(),rotation=new THREE.Quaternion(),position=new THREE.Vector3(),scale=new THREE.Vector3();
- const entranceFinish=finish('door','#536c66',{roughness:.5}),corridorFinish=finish('plaster','#cddbd2',{roughness:.94});if(shown)for(const mat of [entranceFinish,corridorFinish])installBuildingSurfaceUVs(mat);
+ const entranceFinish=finish('door','#536c66',{roughness:.5}),corridorFinish=finish('plaster','#cddbd2',{roughness:.94});if(shown){installWallCavity(corridorFinish,{storey:BUILDING.storey,height:BUILDING.storey});for(const mat of [entranceFinish,corridorFinish])installBuildingSurfaceUVs(mat);}
  function batch(parent,mat,items,part,level,cast=true){
   if(!items.length)return;const mesh=new THREE.InstancedMesh(cube,mat,items.length);mesh.name=part;mesh.userData={part,buildingFloor:level,source:'building-plan',heightInferred:true,...(shown&&level!==null?{action:'building-floor'}:{})};
   items.forEach(([x,y,z,w,h,d,angle=0],i)=>{rotation.setFromAxisAngle(THREE.Object3D.DEFAULT_UP,angle);position.set(x,y,z);scale.set(Math.max(.001,w),Math.max(.001,h),Math.max(.001,d));matrix.compose(position,rotation,scale);mesh.setMatrixAt(i,matrix);});
@@ -52,9 +53,11 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
  }
  function facadeBatch(parent,items,def){
   if(!shown)return batch(parent,limestone,items,'building-facade-wall',def.level);
+  const skinRows=[],beltRows=[],beltMaterial=finish('cement','#b1aba1',{roughness:.95});
   const groups=new Map(),inside=p=>def.units.some(u=>pointInPolygon(p,u.polygon))||pointInPolygon(p,def.core);
-  for(const row of items){const [x,,z,,,,angle=0]=row,faces=wallExteriorFaces({centre:[x,z],normal:[Math.sin(angle),Math.cos(angle)],thickness:row[5],inside}),key=faces.map(Number).join('');if(!groups.has(key))groups.set(key,{faces,rows:[]});groups.get(key).rows.push(row);}
+  for(const row of items){const [x,,z,,,,angle=0]=row,faces=wallExteriorFaces({centre:[x,z],normal:[Math.sin(angle),Math.cos(angle)],thickness:row[5],inside}),key=faces.map(Number).join('');if(!groups.has(key))groups.set(key,{faces,rows:[]});groups.get(key).rows.push(row);const skin=facadeSkinRows(row,faces);skinRows.push(...skin.skin);beltRows.push(...skin.belt);}
   for(const {faces,rows} of groups.values())batch(parent,wallFaceMaterials(insideWall,limestone,faces),rows,'building-facade-wall',def.level);
+  appendFacadeVeneers(parent,skinRows,limestone,resources,{geometry:cube,part:'building-facade-cladding',level:def.level});appendFacadeVeneers(parent,beltRows,beltMaterial,resources,{geometry:cube,part:'garden-storey-separation',level:def.level});
  }
  function slab(poly,y,thickness,mat,parent,part,level,holes=[]){
   if(poly.length<3)return;const s=new THREE.Shape();poly.forEach(([x,z],i)=>i?s.lineTo(x,z):s.moveTo(x,z));s.closePath();for(const poly of holes){const hole=new THREE.Path();poly.forEach(([x,z],i)=>i?hole.lineTo(x,z):hole.moveTo(x,z));hole.closePath();s.holes.push(hole);}const geo=new THREE.ExtrudeGeometry(s,{depth:thickness,bevelEnabled:false});geo.rotateX(Math.PI/2);resources.push(geo);const mesh=new THREE.Mesh(geo,mat);mesh.position.y=y;mesh.castShadow=mesh.receiveShadow=true;mesh.userData={part,buildingFloor:level,source:'building-plan'};parent.add(mesh);return mesh;

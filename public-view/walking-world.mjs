@@ -31,7 +31,7 @@ export function createSpatialCollisionIndex(root, {trees = new Map(), include = 
  const inverseRoot = root.matrixWorld.clone().invert(), sources = [], counts = [];
  let count = 0;
  (visibleOnly?root.traverseVisible:root.traverse).call(root,object => {
-  if (!object.isMesh || !object.geometry?.attributes.position || !include(object)) return;
+  if (!object.isMesh || !object.geometry?.attributes.position || object.userData.tourNonPhysical || !include(object)) return;
   if (![object.material].flat().some(m => m && m.visible !== false && m.opacity !== 0)) return;
   const n = object.isInstancedMesh ? object.count : 1;
   if (n) { sources.push(object); counts.push(n); count += n; }
@@ -126,7 +126,7 @@ export function createSpatialCollisionIndex(root, {trees = new Map(), include = 
 // index. The eight buildings do not own eight collision models or BVHs.
 export function createWalkingWorld({model, site, buildings = DISTRICT, variants = new Map()}) {
  const partitioned=variants.size>0&&hasVariantSlot(model)&&[...variants.values()].every(hasVariantSlot);
- const staticObject=o=>!publicDoorAncestor(o);
+ const staticObject=o=>!o.userData.tourNonPhysical&&o.userData.part!=='furniture-contact-shadow'&&!o.userData.visualOnly&&!publicDoorAncestor(o);
  const trees = new Map(), building = createSpatialCollisionIndex(model, {trees,include:o=>staticObject(o)&&(!partitioned||!inVariantSlot(o))});
  const standardSlot=partitioned?createSpatialCollisionIndex(model,{trees,include:o=>staticObject(o)&&inVariantSlot(o)}):null;
  const doorInclude=o=>!!publicDoorAncestor(o),defaultDoors=createSpatialCollisionIndex(model,{trees,include:doorInclude,visibleOnly:false}),doorIndexes=new Map();

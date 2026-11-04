@@ -1,0 +1,179 @@
+{
+  "revision": 113,
+  "source_provenance": [
+    "../pbr-r104/SOURCES.json",
+    "../grass-r105/SOURCES.json"
+  ],
+  "codec": "Basis Universal ETC1S color/roughness, UASTC linear normals, complete mip chain",
+  "color_preparation": "Neutralized scan albedo using the existing material controller method; grass retains original albedo. Product photographs are unchanged.",
+  "textures": [
+    {
+      "source": "public-view/assets/pbr-r104/asphalt_03_diff.jpg",
+      "output": "public-view/assets/pbr-r113/asphalt_03_diff.ktx2",
+      "channel": "color",
+      "source_sha256": "95ad02e2631c41cf9fdd6a37596cf75adb4fb8a8b6880567cc78ed1c41dc5681",
+      "sha256": "ffe698d5179f2f7e14abd06653746990e6703e96963f9259609ada96beb5abf4",
+      "bytes": 202879,
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "source": "public-view/assets/pbr-r104/asphalt_03_nor_gl.jpg",
+      "output": "public-view/assets/pbr-r113/asphalt_03_nor_gl.ktx2",
+      "channel": "normal",
+      "source_sha256": "978de8349ce2e9989325099a6fd1f5ea6b2826528e1264606a5c51296b1e2888",
+      "sha256": "20734da2766ff9958729c0984028bccdb57387e67d1e0e77105f674119512348",
+      "bytes": 1228617,
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "source": "public-view/assets/pbr-r104/asphalt_03_rough.jpg",
+      "output": "public-view/assets/pbr-r113/asphalt_03_rough.ktx2",
+      "channel": "roughness",
+      "source_sha256": "069b6ea342aaad04fd1582f59c16fbbe5c7a6f0f3a87bc9d57648ed53336fb3a",
+      "sha256": "b7ffc8ab39b010ee73e9a15e0fede6dc9d082da5ea16ecfb04619754fa1b92b6",
+      "bytes": 166899,
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "source": "public-view/assets/pbr-r104/beige_wall_001_nor_gl.jpg",
+      "output": "public-view/assets/pbr-r113/beige_wall_001_nor_gl.ktx2",
+      "channel": "normal",
+      "source_sha256": "cec747be50f91da0693986080b6f59ef868d53cb2ab7d577982165ece63ed75e",
+      "sha256": "48d7ac0b22cda53ee82e0a41dfde8cf5099cdc6d8b4b1ca15a5a9dece1b2b100",
+      "bytes": 1007444,
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "source": "public-view/assets/pbr-r104/beige_wall_001_rough.jpg",
+      "output": "public-view/assets/pbr-r113/beige_wall_001_rough.ktx2",
+      "channel": "roughness",
+      "source_sha256": "fc8328f47f4d2d82d5311a75bcb5c8cd8979d171a0ee097ad9e44ca9c5a00d60",
+      "sha256": "dc101653f53c88fc4ef5815430a06dbfb5e7069b9ce86551a26ef78c52c7366b",
+      "bytes": 162404,
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "source": "public-view/assets/pbr-r104/cotton_jersey_diff.jpg",
+      "output": "public-view/assets/pbr-r113/cotton_jersey_diff.ktx2",
+      "channel": "color",
+      "source_sha256": "0f1b790e4087223275aaa6fdffdd46a556a26d2af72cd811acf72ba9c21ec1f6",
+      "sha256": "e38f20bc433eb8939567c593eaee2be3d8cedf88006c948707ef069cbc71e500",
+      "bytes": 160529,
+      "size": [
+        1023,
+        1024
+      ]
+    },
+    {
+      "source": "public-view/assets/pbr-r104/cotton_jersey_nor_gl.jpg",
+      "output": "public-view/assets/pbr-r113/cotton_jersey_nor_gl.ktx2",
+      "channel": "normal",
+      "source_sha256": "9b79709806511b62567fb007ff61009c3b194bb0d0821fbaee3faf1b2bff0318",
+      "sha256": "8c19dd907fb2a16a47a3898dee4d8788dd8363b0c2458d50329181634aa6c0a2",
+      "bytes": 1030175,
+      "size": [
+        1023,
+        1024
+      ]
+    },
+    {
+      "source": "public-view/assets/pbr-r104/cotton_jersey_rough.jpg",
+      "output": "public-view/assets/pbr-r113/cotton_jersey_rough.ktx2",
+      "channel": "roughness",
+      "source_sha256": "89bed18f5c3f03fc7b4c2382446891629716278e521e06e8b7f6c8f02dd22590",
+      "sha256": "68c9617b9df8fc7e60a9cacbe932a387cfcfee64e2ebd102d7cf54ee16fb21fe",
+      "bytes": 181898,
+      "size": [
+        1023,
+        1024
+      ]
+    },
+    {
+      "source": "public-view/assets/pbr-r104/oak_veneer_01_diff.jpg",
+      "output": "public-view/assets/pbr-r113/oak_veneer_01_diff.ktx2",
+      "channel": "color",
+      "source_sha256": "c14681f72f59f17bff568cae7a837641443b607b899f0c279cd64a5638f877a7",
+      "sha256": "3d46a316beaa38d4fea68f5d0553197991177feb14323afa704154021decc617",
+      "bytes": 207117,
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "source": "public-view/assets/pbr-r104/oak_veneer_01_nor_gl.jpg",
+      "output": "public-view/assets/pbr-r113/oak_veneer_01_nor_gl.ktx2",
+      "channel": "normal",
+      "source_sha256": "1297acf7b4476d5ccd83cc8b27be96aa6110f7a9c3a40be0bd767bf81b17db01",
+      "sha256": "7020ea612270fb2947601b30b16917549fa6a9c9f7068810d51a1e0f6a2d6716",
+      "bytes": 989757,
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "source": "public-view/assets/pbr-r104/oak_veneer_01_rough.jpg",
+      "output": "public-view/assets/pbr-r113/oak_veneer_01_rough.ktx2",
+      "channel": "roughness",
+      "source_sha256": "ca2af5649b628ef05f196793d68cdca874c12ceb6e9ae566976546d9dd5a2604",
+      "sha256": "171b315b863b90a0551e755d03b7b7778f134d73f23245564a35d554dd5b1e2c",
+      "bytes": 204365,
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "source": "public-view/assets/grass-r105/color.jpg",
+      "output": "public-view/assets/pbr-r113/color.ktx2",
+      "channel": "color",
+      "source_sha256": "5df8242d3c9605fe76d6a4ba258bb2c358bda3a8f8f7dd8b5fa4da25f4f63d97",
+      "sha256": "7cd94c9b1a1365bf7ead09029d43a4da1210260f9a870ae78ac0910327c8672a",
+      "bytes": 240376,
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "source": "public-view/assets/grass-r105/normal.jpg",
+      "output": "public-view/assets/pbr-r113/normal.ktx2",
+      "channel": "normal",
+      "source_sha256": "eb53a23cc7347e0d05527a6eecebd54c8bc21954a03f72ee2523e4f4d4215a3c",
+      "sha256": "5e66979657fb9ed884658cbced5c976d0124afaae089e2f1bab8f3cf4566e4fe",
+      "bytes": 1342350,
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "source": "public-view/assets/grass-r105/roughness.png",
+      "output": "public-view/assets/pbr-r113/roughness.ktx2",
+      "channel": "roughness",
+      "source_sha256": "f1a4301c7b0dbb544be97974f3ece1bffb10bd8b05321a774f85151751490ae3",
+      "sha256": "657b247db938bf06bbe92a659aadf343aed709216f929b70cad34cb314a19b18",
+      "bytes": 152401,
+      "size": [
+        1024,
+        1024
+      ]
+    }
+  ]
+}

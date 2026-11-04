@@ -15,6 +15,8 @@ export function groundPoint(unit,p){const t=groundTransform(unit),[a,b,c,d]=t.ma
 export function groundInverse(unit,p){const t=groundTransform(unit),[a,b,c,d]=t.matrix,x=p[0]-t.offset[0],z=p[1]-t.offset[1],det=a*d-b*c;return [(d*x-b*z)/det,(-c*x+a*z)/det];}
 export function groundDirection(unit,p){const [a,b,c,d]=groundTransform(unit).matrix;return [a*p[0]+b*p[1],c*p[0]+d*p[1]];}
 
+export function groundAngle(unit,angle){const v=groundDirection(unit,[Math.sin(angle),Math.cos(angle)]);return Math.atan2(v[0],v[1]);}
+
 export function groundBaseFurniture(){return GROUND_BASE_SOURCE.originalWetFixtures.map(f=>{
  const kind=f.kind==='toilet'?'wc':['vanity','wall-basin'].includes(f.kind)?'basin':f.kind,rotation=f.id==='ensuite-toilet'?Math.PI/2:f.id==='ensuite-vanity'?Math.PI:f.id==='guest-basin'?-Math.PI/2:0,[w,d]=f.sourcePlanFootprintMetres;
  return {id:`base-${f.id}`,roomId:f.roomId,kind,position:[...f.nativeCenterWorld],w:Math.abs(Math.sin(rotation))>.5?d:w,d:Math.abs(Math.sin(rotation))>.5?w:d,h:kind==='wc'?.45:kind==='tub'?.58:kind==='shower'?2:.85,rotation,source:'house-plan',page:1,sourceFootprint:true,heightInferred:true};

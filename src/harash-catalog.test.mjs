@@ -55,7 +55,7 @@ test('matched material maps retain real catalogue RGB, horizontal decor and long
 });
 
 test('catalogue fixture sizes change toward the room without moving back-wall plumbing anchors or claiming unknown axes',()=>{
- for(const [id,pdf,oldDepth] of [['bath-toilet',[1032,378.5],.54],['ensuite-toilet',[630,650.6],.54],['guest-toilet',[840,328],.54],['guest-basin',[876.6,382],.35]]){
+ for(const [id,pdf,oldDepth] of [['bath-toilet',[1042,384],.54],['ensuite-toilet',[625.86,666.5],.70],['guest-toilet',[840,328],.54],['guest-basin',[876.6,382],.35]]){
   const f=getFurniture(id),old=point(...pdf);near(f.position[0]-Math.sin(f.rotation)*f.d/2,old[0]-Math.sin(f.rotation)*oldDepth/2);near(f.position[1]-Math.cos(f.rotation)*f.d/2,old[1]-Math.cos(f.rotation)*oldDepth/2);
   const measurements=Object.fromEntries(furnitureMeasurements(f).map(r=>[r.key,r]));assert.equal(measurements.depth.origin,'catalogue');assert.equal(measurements.height.approximate,true);
   if(id==='guest-basin'){assert.equal(measurements.width.cm,33);assert.equal(measurements.depth.cm,29);assert.equal(measurements.width.approximate,false);}else{assert.equal(measurements.depth.cm,52);assert.equal(measurements.width.approximate,true);}

@@ -1,4 +1,4 @@
-import {installStoneCourses,installFloorCourses} from '../src/building-finish-shaders.mjs';
+import {installStoneCourses,installFloorCourses,installWallCavity} from '../src/building-finish-shaders.mjs';
 import {installBuildingSurfaceUVs} from '../src/building-surface-uvs.mjs';
 import {createSurfaceDetails} from './surface-detail.mjs';
 // Reinstall shader functions lost by Three ObjectLoader JSON serialization.
@@ -11,7 +11,8 @@ export function restorePublicFinishes(root,{mobile=false,stoneUrl=null,signal}={
   if(kind)details.apply(mat,kind);
   if(mat.isMeshPhysicalMaterial&&mat.transparent){mat.color.set('#d1dcd9');mat.roughness=.105;mat.ior=1.52;mat.envMapIntensity=1.05;mat.opacity=.34;mat.needsUpdate=true;}
   if(mat.userData.publicFinish==='stone')installStoneCourses(mat);
-  if(mat.userData.publicFinish==='floor')installFloorCourses(mat);
+  if(mat.userData.publicFinish==='floor')installFloorCourses(mat,mat.userData.floorCourses||{});
+  if(mat.userData.wallCavity){const profile=mat.userData.wallCavity;delete mat.userData.wallCavity;installWallCavity(mat,profile);}
   if(mat.userData.metricInstancedUVs||kind){delete mat.userData.metricInstancedUVs;installBuildingSurfaceUVs(mat);}
  }});
  const used=new Set();root.traverse(o=>{for(const mat of [o.material].flat().filter(Boolean))for(const value of Object.values(mat))if(value?.isTexture)used.add(value);});

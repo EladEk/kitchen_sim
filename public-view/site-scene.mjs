@@ -12,7 +12,7 @@ import {createDistrictContext,contextParking,contextPolygon} from './context-sce
 export function createDistrictSite(source,{mobile=false,includeFence=()=>true,includeCar=()=>true,lawnRegions=[]}={}){
  const layout=createSiteLayout(source),group=new THREE.Group(),geometries=[],materials=[],textures=[],surfaces=new Map(),boxes=new Map();group.name='public-district-development';const details=createSurfaceDetails({mobile});
  function material(color,kind='plain',extra={}){
-  const m=new THREE.MeshStandardMaterial({color,roughness:.88,...extra});materials.push(m);
+  const m=new THREE.MeshStandardMaterial({color,roughness:.88,...extra});m.userData.siteSurface=kind;materials.push(m);
   if(['asphalt','grass'].includes(kind))m.userData.scanKind=kind;
   if(['grass','asphalt','paving','stone'].includes(kind))details.apply(m,kind==='stone'?'limestone':kind);
   if(kind!=='plain'){
@@ -40,7 +40,7 @@ export function createDistrictSite(source,{mobile=false,includeFence=()=>true,in
  function box(x,y,z,w,h,d,m,angle=0){if(!boxes.has(m))boxes.set(m,[]);boxes.get(m).push([x,y,z,w,h,d,angle]);}
  function line(a,b,y,h,w,m){const dx=b[0]-a[0],dz=b[1]-a[1],len=Math.hypot(dx,dz);if(len>.015)box((a[0]+b[0])/2,y,(a[1]+b[1])/2,len,h,w,m,-Math.atan2(dz,dx));}
  const cover=source.groundCover;
- if(cover?.revision!==110)throw Error('נתוני הקרקע אינם תואמים לגרסה R110. יש לרענן לאחר העלאת הגרסה.');
+ if(cover?.revision!==115)throw Error('נתוני הקרקע אינם תואמים לגרסה R115. יש לרענן לאחר העלאת הגרסה.');
  for(const layer of cover.grass)for(const [outer,...holes] of layer.polygons)slab(outer,layer.y,grass,holes);
  for(const r of layout.roadSurfaces)slab(rectanglePolygon(r),-.04,r.kind==='street'?asphalt:parkingPavers);
  for(const p of layout.parking)slab(p.polygon,-.039,parkingPavers);

@@ -1,7 +1,12 @@
 .studio-loader{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;min-height:160px;padding:24px;color:#354e3c;background:#f7f8f1;font:14px/1.5 system-ui,sans-serif;text-align:center;box-sizing:border-box}
 .studio-loader strong{font-size:16px;font-weight:600}.studio-loader small{font-size:12px;color:#6f7e70;max-width:30em}
-.studio-loader-ring{display:inline-block;width:38px;height:38px;flex:none;border:3px solid #d9e1d3;border-top-color:#48664b;border-radius:50%;animation:studio-loading-spin .9s linear infinite}
-.studio-loader--overlay{position:absolute;inset:0;z-index:25;background:#f7f8f1f5;min-height:0}
+.studio-loader-ring{display:inline-block;width:38px;height:38px;flex:none;border:3px solid #d9e1d3;border-top-color:#48664b;border-radius:50%;animation:studio-loading-spin .9s linear infinite;will-change:transform}
+.studio-loader--overlay{position:absolute;inset:0;z-index:90;background:#f7f8f1f5;min-height:0}
+.studio-loader--render-task{pointer-events:none}
 .app-loading>.studio-loader{width:100%;height:100%}
 @keyframes studio-loading-spin{to{transform:rotate(360deg)}}
-@media(prefers-reduced-motion:reduce){.studio-loader-ring{animation:none;border-style:dotted}}
+@media(prefers-reduced-motion:reduce){.studio-loader-ring{animation:none;border-style:dotted;will-change:auto}}
+
+.studio-loader--transition{position:absolute;z-index:90;inset:auto 50% 24px auto;transform:translateX(50%);min-height:0;max-width:calc(100% - 32px);width:max-content;padding:12px 18px;gap:10px;flex-direction:row;border:1px solid #ccd5c5;border-radius:14px;box-shadow:0 5px 22px #1d302a30;background:#f7f8f1f5;pointer-events:none}
+.studio-loader--transition .studio-loader-ring{width:22px;height:22px;border-width:2px}
+.studio-loader--transition strong{font-size:14px}

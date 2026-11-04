@@ -26,21 +26,28 @@ export function surfacePixels(kind,size=256){
   else if(kind==='door'){const brushed=Math.sin(u*Math.PI*192+noise(u,v,8,12)*1.6);c=248+(cloud-.5)*4+brushed*1.5+(fine-.5)*2;h=128+brushed*8+(fine-.5)*10;r=229+(n-.5)*12;}
   const i=(y*size+x)*4;color.set([bytes(c-green/2),bytes(c+green/2),bytes(c-green),255],i);detail.set([bytes(h),bytes(r)],(y*size+x)*2);
  }
- const value={color,detail,height:detail,roughness:detail,size},cost=color.byteLength+detail.byteLength;
- while(cacheBytes+cost>CACHE_BYTES&&dataCache.size){const [oldKey,old]=dataCache.entries().next().value;cacheBytes-=old.color.byteLength+old.detail.byteLength;dataCache.delete(oldKey);}
- dataCache.set(key,value);cacheBytes+=cost;return value;
+ const normal=surfaceNormalPixels(detail,size);
+ const value={color,detail,normal,height:detail,roughness:detail,size},cost=color.byteLength+detail.byteLength+normal.byteLength;
+ while(cacheBytes+cost>CACHE_BYTES&&dataCache.size){const [oldKey,old]=dataCache.entries().next().value;cacheBytes-=old.color.byteLength+old.detail.byteLength+old.normal.byteLength;dataCache.delete(oldKey);}
+ if(cost<=CACHE_BYTES){dataCache.set(key,value);cacheBytes+=cost;}return value;
 }
 
+// Tangent-space XYZ normals derived from the fallback height, not an albedo
+// photograph. Measured scan normals replace these when available.
+export function surfaceNormalPixels(detail,size){
+ const out=new Uint8Array(size*size*4),at=(x,y)=>detail[(((y+size)%size)*size+(x+size)%size)*2];
+ for(let y=0;y<size;y++)for(let x=0;x<size;x++){const dx=(at(x-1,y)-at(x+1,y))*.004,dy=(at(x,y-1)-at(x,y+1))*.004,inv=1/Math.hypot(dx,dy,1),i=(y*size+x)*4;out.set([bytes((dx*inv*.5+.5)*255),bytes((dy*inv*.5+.5)*255),bytes((inv*.5+.5)*255),255],i);}return out;
+}
 export function createSurfaceDetails({mobile=false}={}){
  const maps=new Map(),owned=new Set(),pending=new Set();let disposed=false;
  function get(kind){
   if(disposed)throw new Error('Surface details disposed');
   if(maps.has(kind))return maps.get(kind);
-  const data=surfacePixels(kind,mobile?256:512),out={};
-  for(const channel of ['color','detail']){const t=new THREE.DataTexture(data[channel],data.size,data.size,channel==='color'?THREE.RGBAFormat:THREE.RGFormat);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.magFilter=THREE.LinearFilter;t.minFilter=THREE.LinearMipmapLinearFilter;t.generateMipmaps=true;t.anisotropy=mobile?4:8;t.colorSpace=channel==='color'?THREE.SRGBColorSpace:THREE.NoColorSpace;t.repeat.setScalar(profiles[kind]?.[2]||1);t.needsUpdate=true;out[channel]=t;owned.add(t);}
+  const data=surfacePixels(kind,mobile?256:['limestone','porcelain'].includes(kind)?1024:512),out={};
+  for(const channel of ['color','detail','normal']){const t=new THREE.DataTexture(data[channel],data.size,data.size,channel==='detail'?THREE.RGFormat:THREE.RGBAFormat);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.magFilter=THREE.LinearFilter;t.minFilter=THREE.LinearMipmapLinearFilter;t.generateMipmaps=true;t.anisotropy=mobile?4:8;t.colorSpace=channel==='color'?THREE.SRGBColorSpace:THREE.NoColorSpace;t.repeat.setScalar(profiles[kind]?.[2]||1);t.needsUpdate=true;out[channel]=t;owned.add(t);}
   out.height=out.roughness=out.detail;maps.set(kind,out);return out;
  }
- function apply(material,kind){const p=profiles[kind];if(!p)return material;const m=get(kind);Object.assign(material,{map:m.color,bumpMap:m.height,roughnessMap:m.roughness,roughness:p[0],bumpScale:p[1]});material.needsUpdate=true;return material;}
+ function apply(material,kind){const p=profiles[kind];if(!p)return material;const m=get(kind);Object.assign(material,{map:m.color,bumpMap:null,normalMap:m.normal,roughnessMap:m.roughness,roughness:p[0],bumpScale:p[1]});material.normalScale.setScalar(kind==='plaster'?.12:kind==='fabric'?.4:.25);material.needsUpdate=true;return material;}
  // Bump uses R and roughness uses G: one RG texture preserves both channels.
  async function loadStone(url,{signal}={}){
   if(!url||typeof document==='undefined'||disposed)return;

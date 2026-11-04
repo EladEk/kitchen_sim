@@ -2,13 +2,169 @@
   "referenceWidth": 1600,
   "basis": "Living areas manually checked against the living/dining/kitchen labels and openings on building-plan.pdf pages 4-10. Rectangles constrain proposed furniture, not construction walls.",
   "pages": {
-    "4": [{"unitIndex":0,"rect":[795,256,934,390]},{"unitIndex":1,"rect":[946,256,1088,390]}],
-    "5": [{"unitIndex":0,"rect":[778,313,922,421]},{"unitIndex":1,"rect":[938,313,1080,421]}],
-    "6": [{"unitIndex":0,"rect":[751,313,896,421]},{"unitIndex":1,"rect":[914,313,1059,421]}],
-    "7": [{"unitIndex":0,"rect":[823,313,970,422]},{"unitIndex":1,"rect":[985,313,1134,422]}],
-    "8": [{"unitIndex":0,"rect":[745,313,891,425]},{"unitIndex":1,"rect":[910,313,1058,425]}],
-    "9": [{"unitIndex":0,"rect":[945,358,1135,462],"allowFloating":true},{"unitIndex":1,"rect":[668,1130,907,1257],"allowFloating":true}],
-    "10": [{"unitIndex":0,"rect":[929,404,1093,540],"allowFloating":true},{"unitIndex":1,"rect":[714,1106,902,1221],"allowFloating":true}]
+    "4": [
+      {
+        "unitIndex": 0,
+        "rect": [
+          795,
+          256,
+          934,
+          390
+        ]
+      },
+      {
+        "unitIndex": 1,
+        "rect": [
+          946,
+          256,
+          1088,
+          390
+        ]
+      }
+    ],
+    "5": [
+      {
+        "unitIndex": 0,
+        "rect": [
+          778,
+          313,
+          922,
+          421
+        ]
+      },
+      {
+        "unitIndex": 1,
+        "rect": [
+          938,
+          313,
+          1080,
+          421
+        ]
+      }
+    ],
+    "6": [
+      {
+        "unitIndex": 0,
+        "rect": [
+          751,
+          313,
+          896,
+          421
+        ]
+      },
+      {
+        "unitIndex": 1,
+        "rect": [
+          914,
+          313,
+          1059,
+          421
+        ]
+      }
+    ],
+    "7": [
+      {
+        "unitIndex": 0,
+        "rect": [
+          823,
+          313,
+          970,
+          422
+        ]
+      },
+      {
+        "unitIndex": 1,
+        "rect": [
+          985,
+          313,
+          1134,
+          422
+        ]
+      }
+    ],
+    "8": [
+      {
+        "unitIndex": 0,
+        "rect": [
+          745,
+          313,
+          891,
+          425
+        ]
+      },
+      {
+        "unitIndex": 1,
+        "rect": [
+          910,
+          313,
+          1058,
+          425
+        ]
+      }
+    ],
+    "9": [
+      {
+        "unitIndex": 0,
+        "rect": [
+          945,
+          354,
+          1135,
+          550
+        ]
+      },
+      {
+        "unitIndex": 1,
+        "rect": [
+          653,
+          1062,
+          930,
+          1280
+        ]
+      }
+    ],
+    "10": [
+      {
+        "unitIndex": 0,
+        "rect": [
+          929,
+          404,
+          1093,
+          540
+        ]
+      },
+      {
+        "unitIndex": 1,
+        "rect": [
+          710,
+          1074,
+          1000,
+          1224
+        ]
+      }
+    ]
   },
-  "ground": {"polygon":[[1.35,0.06],[5.04,0.06],[5.04,4.43],[1.35,4.43]],"anchor":[3.4,2.2]}
+  "ground": {
+    "polygon": [
+      [
+        1.35,
+        0.06
+      ],
+      [
+        5.04,
+        0.06
+      ],
+      [
+        5.04,
+        4.43
+      ],
+      [
+        1.35,
+        4.43
+      ]
+    ],
+    "anchor": [
+      3.4,
+      2.2
+    ]
+  }
 }

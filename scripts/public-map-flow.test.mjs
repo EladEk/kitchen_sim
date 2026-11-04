@@ -9,7 +9,7 @@ import {inside} from '../public-view/navigation.mjs';
 import {disposeObjectResources} from '../src/photo-resources.mjs';
 
 test('all 43 actual apartment destinations in eight buildings produce the matching interior plan and registered live marker',async()=>{
- const nav=JSON.parse(await readFile('dist/client/baseline/navigation.json','utf8'));assert.equal(nav.revision,110);let poses=0;
+ const nav=JSON.parse(await readFile('dist/client/baseline/navigation.json','utf8'));assert.equal(nav.revision,115);let poses=0;
  assert.equal(nav.floors.reduce((n,f)=>n+f.map.doors.length,0),400,'the map includes every standard moving door');
  assert(Buffer.byteLength(JSON.stringify(nav))<700000,'maps stay compact and shared across all eight buildings');
  for(const b of DISTRICT)for(const d of nav.destinations.filter(d=>d.unit)){
@@ -22,9 +22,9 @@ test('all 43 actual apartment destinations in eight buildings produce the matchi
  for(const f of nav.floors){const map=mapForLocation(nav,{building:'4102',floor:f.level});assert.equal(map.unit,undefined);assert.equal(map.units.length,f.units.length);for(const p of f.map.walls){assert(p.length>=3);assert(Object.values(polygonBounds([p])).every(Number.isFinite));}}
 });
 
-test('the compiled public master-bed footprint follows the annotated lower-left map location',async()=>{
+test('the compiled public master-bed footprint returns to the pre-annotation sleeping zone',async()=>{
  const nav=JSON.parse(await readFile('dist/client/baseline/navigation.json','utf8')),floor=nav.floors[0],room=floor.map.rooms.find(r=>r.unit===4&&r.id==='4:master'),beds=floor.map.furniture.filter(f=>f.kind==='bed').map(f=>({polygon:f.polygon,centre:[f.polygon.reduce((n,p)=>n+p[0],0)/f.polygon.length,f.polygon.reduce((n,p)=>n+p[1],0)/f.polygon.length]})).filter(f=>room.polygons.some(p=>inside(f.centre,p)));
- assert.equal(beds.length,1);assert(Math.hypot(beds[0].centre[0]-1.7,beds[0].centre[1]-14.38)<.003);const bounds=polygonBounds([beds[0].polygon]);assert(bounds.maxZ<15.45);assert(bounds.minX>0);assert(bounds.maxZ-bounds.minZ>bounds.maxX-bounds.minX,'the bed length runs toward the lower edge shown in the annotation');
+ assert.equal(beds.length,1);assert(Math.hypot(beds[0].centre[0]-1.3052777778,beds[0].centre[1]-13.3598708333)<.003);const bounds=polygonBounds([beds[0].polygon]);assert(bounds.maxZ<15.45);assert(bounds.minX>0);assert(bounds.maxZ-bounds.minZ>bounds.maxX-bounds.minX,'the bed length runs toward the lower edge shown in the annotation');
  const model=await new THREE.ObjectLoader().parseAsync(JSON.parse(await readFile('dist/client/baseline/building.json','utf8'))),matrix=new THREE.Matrix4(),p=new THREE.Vector3(),q=new THREE.Quaternion(),size=new THREE.Vector3();let headboard=false;
- try{model.traverse(o=>{if(!o.isInstancedMesh||o.userData.variantSlot!==4)return;for(let i=0;i<o.count;i++){o.getMatrixAt(i,matrix);matrix.decompose(p,q,size);if(Math.abs(p.x-1.7)<.01&&Math.abs(size.y-.86)<.01&&Math.abs(size.z-.05)<.01&&p.z>15.3){assert(new THREE.Vector3(0,0,1).applyQuaternion(q).z<-.99);headboard=true;}}});assert(headboard,'the actual serialized headboard, rather than only the 2D footprint, is against the lower wall');}finally{disposeObjectResources(model);}
+ try{model.traverse(o=>{if(!o.isInstancedMesh||o.userData.variantSlot!==4)return;for(let i=0;i<o.count;i++){o.getMatrixAt(i,matrix);matrix.decompose(p,q,size);if(Math.abs(p.x-1.3052777778)<.01&&Math.abs(size.y-.86)<.01&&Math.abs(size.z-.05)<.01&&p.z<12.5&&p.z>12.2){assert(new THREE.Vector3(0,0,1).applyQuaternion(q).z>.99);headboard=true;}}});assert(headboard,'the actual serialized headboard, rather than only the 2D footprint, is against the inner bedroom wall');}finally{disposeObjectResources(model);}
 });

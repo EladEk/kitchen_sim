@@ -30,5 +30,5 @@ export function roomLightingRegion(data,location,overrides){
   if(!inside(centre,poly))centre=p;
  }
  const ground=shared?.elevation??floor.elevation??floor.level*data.storey;
- return {key:base+':'+(room?.id||shared?.id||'common'),position:[centre[0],ground+2.55,centre[1]],target:[centre[0],ground,centre[1]]};
+ return {key:base+':'+(room?.id||shared?.id||'common'),...(room?.kind?{kind:room.kind}:{}),position:[centre[0],ground+2.55,centre[1]],target:[centre[0],ground,centre[1]]};
 }

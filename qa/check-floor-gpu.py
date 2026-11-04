@@ -57,6 +57,8 @@ def program(vertex,fragment):
 
 payload=json.load(sys.stdin)
 for pair in payload['programs']:program(pair['vertex'],pair['fragment'])
+if payload.get('compileOnly'):
+    print(json.dumps({'linked':len(payload['programs'])}));sys.exit(0)
 vertex='#version 300 es\nvoid main(){vec2 p=vec2(float((gl_VertexID<<1)&2),float(gl_VertexID&2));gl_Position=vec4(p*2.-1.,0.,1.);}'
 prefix='#version 300 es\nprecision highp float;\nprecision highp int;\nout vec4 result;\n'+payload['common']
 coverage=program(vertex,prefix+'\nuniform float distanceMetres,footprintMetres;\nvoid main(){float c=floorLineCoverage(vec2(distanceMetres),vec2(footprintMetres)).x;result=vec4(c,c,c,1.);}')

@@ -1,0 +1,23 @@
+✔ adaptive quality ignores suspension/XR, degrades gradually and recovers only after sustained headroom (2.760398ms)
+✔ interior exposure and shared floor/wall bounce ease in and out while preserving solar night (2.625248ms)
+✔ map zoom is anchored, bounded to the plan and room highlighting follows the actual polygon (0.314415ms)
+✔ saved views reject malformed coordinates and image export restores renderer size even when capture fails (0.714676ms)
+✔ progressive mode waits for stillness, hides stale camera images, and releases tracing during native WebXR (9.156237ms)
+✔ leaving photo mode during asynchronous initialization disposes the stale renderer without attaching a canvas (1.153064ms)
+✔ photo preparation keeps a visible loader until the first image exists, then retains a non-blocking render indicator (1.571401ms)
+✔ a failed photo backend removes the preparation overlay and leaves the live tour available (1.12358ms)
+✔ sustained camera movement and background suspension retire photo buffers before rebuilding (1.572363ms)
+✔ renderer status is readable, updates one node, clears on completion and cannot reattach after disposal (2.408498ms)
+✔ loader tracks concurrent real work, clears rejected loads and releases subscriptions (2.180351ms)
+✔ heavy scene work waits for a real paint opportunity and cancels its fallback after the second frame (1.484142ms)
+✔ aborted preparation releases frames/timers and cannot mutate an unmounted scene (1.155637ms)
+✔ rapid view changes prepare only the latest scene and cancellation never reports a load failure (0.933109ms)
+✔ a throttled animation clock has a bounded fallback, and preparation failures reach the error view (0.367422ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 179.137706

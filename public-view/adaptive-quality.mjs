@@ -21,7 +21,7 @@ export function createAdaptiveQuality({mobile=false,pixelRatio=1,mode='auto'}={}
    if(currentMode!=='auto')return false;
    average=average?average+(dt-average)*(1-Math.exp(-dt/650)):dt;
    if(settling>0){settling-=dt;return false;}
-   const bad=mobile?40:27,good=mobile?29:19;
+   const bad=22,good=17;
    slow=average>bad?slow+dt:Math.max(0,slow-dt*2);
    fast=average<good?fast+dt:0;
    const before=scale;

@@ -4,7 +4,7 @@ import {BUILDING,BUILDING_FLOORS} from '../src/building-layout.mjs';
 import {BUILDING_INTERIORS} from '../src/building-interiors.mjs';
 import {connectedWallRuns,wallFootprint} from '../src/building-geometry.mjs';
 import {HOUSE_OUTLINE,CONSTRUCTION_WALLS,DOORS,WALLS} from '../src/home-model.mjs';
-import {groundPoint,groundDirection,groundFurnitureBoxes} from '../src/ground-apartments.mjs';
+import {groundPoint,groundAngle,groundFurnitureBoxes} from '../src/ground-apartments.mjs';
 import {APARTMENT_FURNITURE,GROUND_APARTMENT_FURNITURE} from '../src/apartment-furniture-layout.mjs';
 import {furnitureContext,placeLiving,footprint} from './neighbour-furniture-tools.mjs';
 
@@ -21,7 +21,7 @@ export function reviseLiving(){
   const values=set.map(a=>rounded({...a,id:`f${guide.floor}-unit-${guide.unit}-${a.kind}`,floor:guide.floor,unit:guide.unit,sourcePage:guide.sourcePage,seed:guide.anchor,livingZone:guide.polygon,layoutRevision:102}));replacements.set(guide.floor+'|'+guide.unit,values);report.push({floor:guide.floor,unit:guide.unit,sourcePage:guide.sourcePage,zone:guide.polygon,sofa:values[0],floatingMedia:!values[2].wallBacked});
  }
  const baseGuide=config.ground,room=groundLivingContext(),base=placeLiving(room,groundFurnitureBoxes(4),baseGuide);if(!base)throw Error('No source-zone living arrangement fits the standard ground apartment');
- const groundSets=new Map();for(const unit of [1,2,3]){const values=base.map(a=>{const [x,z]=groundPoint(unit,[a.x,a.z]),direction=groundDirection(unit,[Math.sin(a.angle),Math.cos(a.angle)]),angle=Math.atan2(direction[0],direction[1]),zone=baseGuide.polygon.map(p=>groundPoint(unit,p));return rounded({...a,x,z,angle,box:footprint(x,z,a.w,a.d,angle),id:`ground-${unit}-${a.kind}`,floor:0,unit,sourcePage:3,livingZone:zone,layoutRevision:102});});groundSets.set(unit,values);report.push({floor:0,unit,sofa:values[0],zone:values[0].livingZone});}
+ const groundSets=new Map();for(const unit of [1,2,3]){const values=base.map(a=>{const [x,z]=groundPoint(unit,[a.x,a.z]),angle=groundAngle(unit,a.angle),zone=baseGuide.polygon.map(p=>groundPoint(unit,p));return rounded({...a,x,z,angle,box:footprint(x,z,a.w,a.d,angle),id:`ground-${unit}-${a.kind}`,floor:0,unit,sourcePage:3,livingZone:zone,layoutRevision:102});});groundSets.set(unit,values);report.push({floor:0,unit,sofa:values[0],zone:values[0].livingZone});}
  const upper=APARTMENT_FURNITURE.filter(a=>!replacements.has(a.floor+'|'+a.unit)||!['sofa','coffee','media'].includes(a.kind));for(const values of replacements.values())upper.push(...values);
  const ground=GROUND_APARTMENT_FURNITURE.filter(a=>!['sofa','coffee','media'].includes(a.kind));for(const values of groundSets.values())ground.push(...values);
  writeFileSync('src/apartment-furniture-layout.mjs','// Source-registered proposed furniture; R102 living zones reviewed on the original floor plans.\nexport const APARTMENT_FURNITURE='+JSON.stringify(upper)+';\nexport const GROUND_APARTMENT_FURNITURE='+JSON.stringify(ground)+';\n');

@@ -21,7 +21,7 @@ export function publicGroundCover(layout){
  const serviceVoids=DISTRICT.flatMap(b=>serviceSlabHoles().map(poly=>[poly.map(p=>districtPoint(p,b))]));
  const {west,east,north,south}=layout.bounds;
  const base=rectanglePolygon({minX:west,maxX:east,minZ:north,maxZ:south});
- return {revision:110,grass:[
+ return {revision:115,grass:[
   {y:-.09,polygons:clipping.difference([base],hardscape,...gardens,...islands,...beds,...serviceVoids)},
   {y:-.032,polygons:clipping.difference(gardens,hardscape,...serviceVoids)},
   {y:-.01,polygons:islands.length?clipping.difference(islands,hardscape,...serviceVoids):[]}

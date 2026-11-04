@@ -17,7 +17,7 @@ test('restored public stone/floor shaders retain physical UVs, independent chann
  const root=new THREE.Group(),old=new THREE.DataTexture(new Uint8Array(16),2,2),stone=new THREE.MeshStandardMaterial({map:old}),floor=new THREE.MeshStandardMaterial(),glass=new THREE.MeshPhysicalMaterial({transparent:true,opacity:.28});stone.userData={publicFinish:'stone',metricInstancedUVs:true};floor.userData={publicFinish:'floor'};
  let released=0;old.addEventListener('dispose',()=>released++);for(const mat of [stone,floor,glass])root.add(new THREE.Mesh(new THREE.BoxGeometry(),mat));
  const finish=restorePublicFinishes(root,{mobile:true});await finish.ready;
- assert.equal(released,1);assert.equal(stone.map.image.width,256);assert.notEqual(stone.map,stone.bumpMap);assert.notEqual(stone.map,floor.map);assert.equal(glass.ior,1.52);assert(glass.opacity<.5);
+ assert.equal(released,1);assert.equal(stone.map.image.width,256);assert.notEqual(stone.map,stone.normalMap);assert(stone.normalMap);assert.notEqual(stone.map,floor.map);assert.equal(glass.ior,1.52);assert(glass.opacity<.5);
  const shader={vertexShader:THREE.ShaderLib.standard.vertexShader,fragmentShader:THREE.ShaderLib.standard.fragmentShader};stone.onBeforeCompile(shader);assert(shader.vertexShader.includes('metricPosition'));assert(shader.fragmentShader.includes('stoneId'));
  finish.dispose();const textures=new Set();root.traverse(o=>{if(!o.isMesh)return;o.geometry.dispose();for(const v of Object.values(o.material))if(v?.isTexture)textures.add(v);o.material.dispose();});textures.forEach(t=>t.dispose());
 });

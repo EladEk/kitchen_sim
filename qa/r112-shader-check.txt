@@ -1,0 +1,18 @@
+✔ walking between rooms never swaps the sky IBL, renders a cube or changes colour management (1.680073ms)
+✔ interior fill has one neutral local shadow, bounded mobile maps, gentle room transitions and no daylight at night (16.010764ms)
+✔ room identity and ceiling fill use the occupied private polygon without copying it to another building (2.208264ms)
+✔ lowered common rooms use their real floor elevation for the interior shadow (0.350267ms)
+✔ public material channels have finite bounded detail and suitable linear/color spaces (531.599852ms)
+✔ restored public stone/floor shaders retain physical UVs, independent channels and stable glass (2.930191ms)
+✔ photo preparation reduces broad lighting falloff, preserves fine flecks and colour ratios, and never edits input pixels (29.875556ms)
+✔ actual ordered materials use non-mirrored photographic tiles, matte dielectric reflection and physical joints without affecting wall decor (55.725472ms)
+✔ the complete patched Three physical shaders compile/link on native GLES3 and physical joints retain their subpixel coverage (185.864298ms)
+✔ the real owner photo loses its centre hotspot and dark perimeter before it is repeated across tiles (127.131395ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 699.147738

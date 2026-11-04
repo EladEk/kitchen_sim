@@ -1,0 +1,25 @@
+✔ packed shading attributes roundtrip through ObjectLoader while positions and tiled UVs remain exact (8.784674ms)
+✔ surface cache is byte bounded and texture ownership is retired exactly once (1384.661616ms)
+✔ surface image abort/deadline settles without waiting for the loader and retires late completions (0.535654ms)
+✔ postprocessing never retains more than one pipeline across resize, suspend, XR and failure (0.837297ms)
+✔ background and BFCache pause one render loop; context recovery is bounded and teardown removes listeners/timers (1.306232ms)
+✔ an invalid postprocess draw drops the pipeline and redraws the actual scene directly in the same frame (0.307001ms)
+✔ native backend requires secure support and preserves explicit compatibility and XR paths (1.718271ms)
+✔ driver rejection and timeout use one fresh fallback and retire a late GPU instance (10.91284ms)
+✔ unmount cancels pending initialization without constructing another canvas (2.442829ms)
+✔ TSL conversion shares materials and restores the original photo material without changing geometry (4.674681ms)
+✔ photographic floor conversion retains dimensions, non-mirrored rotation and dielectric parameters (1.589919ms)
+✔ warmup uploads shared textures once, compiles real draw types and keeps object ownership (3.975601ms)
+✔ paint precedes texture upload, and a stale shader completion cannot mark a canceled room ready (6.177028ms)
+✔ startup remains pending until a real frame has drawn and its shadow targets exist (1.080613ms)
+✔ a failed GPU draw or missing visible shadow never marks an empty first frame ready (1.32538ms)
+✔ native batches preserve instancing identity, parent pointers and first shadow flags (2.178502ms)
+✔ a native device budget failure restores shadows and never marks a pending view ready (0.924448ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1641.130659

@@ -1,0 +1,9 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {readFile} from 'node:fs/promises';import * as THREE from 'three';
+import {APARTMENT_BATHROOMS} from '../src/apartment-bathroom-layout.mjs';import {BUILDING_FLOORS} from '../src/building-layout.mjs';import {createDistrict,DISTRICT,buildingTransform} from '../public-view/district.mjs';import {createWalkingWorld} from '../public-view/walking-world.mjs';import {stepWalker} from '../public-view/walking.mjs';import {disposeObjectResources} from '../src/photo-resources.mjs';
+test('the exported sanitary fixtures have free real standing approaches in all eight reflected/rotated buildings and wet rooms appear on the map',async()=>{
+ const load=async n=>JSON.parse(await readFile('dist/client/baseline/'+n+'.json','utf8')),[json,nav,site]=await Promise.all(['building','navigation','site'].map(load)),model=await new THREE.ObjectLoader().parseAsync(json),district=createDistrict(model,site,{mobile:true}),world=createWalkingWorld({model,site:district.collisionRoot}),ray=new THREE.Raycaster();
+ try{assert.equal(nav.floors.filter(f=>f.level>0).flatMap(f=>f.map.rooms).filter(r=>r.kind==='bathroom').length,103);
+  for(const building of DISTRICT){const matrix=buildingTransform(building);for(const f of APARTMENT_BATHROOMS.filter(f=>f.kind!=='shower')){const floor=BUILDING_FLOORS[f.floor],p=new THREE.Vector3(f.approach[0],floor.elevation+1.62,f.approach[1]).applyMatrix4(matrix),movement=new THREE.Vector3(Math.sin(f.angle),0,Math.cos(f.angle)).transformDirection(matrix).multiplyScalar(.005);assert(stepWalker(p,movement.x,movement.z,world,ray),`${building.id} ${f.id} has an actual standing approach`);assert(Math.abs(p.y-floor.elevation-1.62)<.05);}}
+  assert.equal(world.stats.collisionCopies,1);
+ }finally{world.dispose();district.dispose();disposeObjectResources(model);}
+});

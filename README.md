@@ -1,3 +1,48 @@
+# R115 — WebGPU + TSL with WebGL2 compatibility
+
+The district viewer automatically selects native WebGPU on supported secure
+devices and retains WebGL2 for compatibility and WebXR. TSL preserves the
+architectural finishes, sky, probes and mirrors. AO, restrained bloom, AgX/FXAA
+and optional desktop indoor SSGI/SSR follow the quality settings. Options show
+the active renderer. See [UPDATE-R115.md](UPDATE-R115.md).
+
+# R114 — buildings visible on the first frame
+
+A zero-intensity manual spotlight now initializes its shadow depth texture before
+the first outdoor frame. Startup keeps loading visible through an actual draw;
+invalid postprocessing falls back to direct rendering. Supported PCF is selected
+before compilation, and the district selector label is corrected. See
+[UPDATE-R114.md](UPDATE-R114.md).
+
+# R113 — textured floors, clean stone cladding and prepared room transitions
+
+Ground-floor tiles now show physical joints and grain in live and photo modes.
+Continuous outer stone skins hide plaster-end stripes; interior plaster and
+openings stay intact. The master bed returns to its pre-annotation position.
+Painted loaders cover room/quality work, while photo hashing waits for stillness.
+A small Meshopt upholstery library, 14 KTX2 PBR maps, bounded local probes, one
+live bathroom mirror and restrained bloom improve the tour. Full baked GI and
+whole-model replacement are not enabled. See [UPDATE-R113.md](UPDATE-R113.md).
+
+# R112 — architectural surface relief and source-checked bathrooms
+
+Generic floors gain micro-bevels and separate tile/grout roughness. Wall contacts
+gain analytic cavity shading; indoor materials use a fixed neutral HDR probe
+while the sky stays external. Tours use a 14 m sun-shadow radius, bounded area
+lighting, fabric sheen, glazed ceramic, shared contact decals and budgeted shower
+glass. Source-registered wet rooms now contain 213 illustrative fixtures in 103
+upper-floor rooms, with map labels and physical door/approach checks. Corrected
+lounges all have wall-backed media cabinets. See [UPDATE-R112.md](UPDATE-R112.md).
+
+# R111 — visible loading while scenes and photo renders prepare
+
+Loading feedback now paints before heavy scene work and stays until the first
+rendered view is ready. It covers district/floor/apartment changes, tour entry,
+manual quality changes, personal home/kitchen rebuilds, photo-mode preparation
+and image export. Photo refinement keeps a smaller indicator after the image
+appears. Rapid changes cancel stale preparations; errors, cancellation and
+unmounts clear their loading state. See [UPDATE-R111.md](UPDATE-R111.md).
+
 # R110 — shared water-meter correction and education context
 
 Removes eight per-building copies of the shared main-meter fixture and renders

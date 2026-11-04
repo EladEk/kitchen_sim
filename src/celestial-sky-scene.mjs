@@ -3,10 +3,10 @@ import {createCelestialDisks} from './celestial-disks.mjs';
 import {celestialState,skyPixels} from './celestial-sky.mjs';
 // Background is an infinite equirectangular sky: identical celestial direction
 // in both XR eyes, with the same HDR supplied to progressive path tracing.
-export function installCelestialSky({renderer,scene,camera,getSettings=()=>({}),onDaylight=null,kitchen=false,mobile=false,ownSun=false,environmentFactory=null}){
+export function installCelestialSky({renderer,scene,camera,getSettings=()=>({}),onDaylight=null,kitchen=false,mobile=false,ownSun=false,environmentFactory=null,disksFactory=createCelestialDisks}){
  const original={background:scene.background,environment:scene.environment,photo:scene.userData.photoEnvironment};
  let key='',state=null,source=null,filtered=null,disposed=false,lastSettings=null;
- const disks=createCelestialDisks();scene.add(disks.mesh);
+ const disks=disksFactory();scene.add(disks.mesh);
  const lightRig=new THREE.Group();lightRig.name='astronomical-light-rig';scene.add(lightRig);
  const target=new THREE.Object3D();lightRig.add(target);
  const moon=new THREE.DirectionalLight('#c4d5ff',0);moon.target=target;moon.userData={part:'astronomical-moonlight',daylight:true};lightRig.add(moon);

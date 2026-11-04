@@ -12,7 +12,7 @@ const records=[],failures=[];
 for(const f of BUILDING_FLOORS.filter(f=>f.level>0)){
  const source=BUILDING_INTERIORS.floors[f.level],walls=connectedWallRuns(source,f).map(wallFootprint),doors=source.doors.map(d=>({minX:Math.min(d.hinge[0],d.closed[0],d.opened[0])-.12,maxX:Math.max(d.hinge[0],d.closed[0],d.opened[0])+.12,minZ:Math.min(d.hinge[1],d.closed[1],d.opened[1])-.12,maxZ:Math.max(d.hinge[1],d.closed[1],d.opened[1])+.12})),portalWalls=source.doors.map(d=>({minX:Math.min(d.hinge[0],d.closed[0])-.07,maxX:Math.max(d.hinge[0],d.closed[0])+.07,minZ:Math.min(d.hinge[1],d.closed[1])-.07,maxZ:Math.max(d.hinge[1],d.closed[1])+.07}));
  const built=[];
- for(const [kind,ps] of Object.entries(seeds[f.page]))for(let n=0;n<ps.length;n++){
+ for(const [kind,ps] of Object.entries(seeds[f.page]).filter(([kind])=>['beds','kitchens'].includes(kind)))for(let n=0;n<ps.length;n++){
   const p=world(f.page,ps[n]),unit=f.units.find(u=>polygonContains(p,u.polygon));if(!unit){failures.push({floor:f.level,kind,seed:ps[n],reason:'unit'});continue;}
   const xs=unit.polygon.map(p=>p[0]),zs=unit.polygon.map(p=>p[1]),minX=Math.floor(Math.min(...xs)/step)*step,minZ=Math.floor(Math.min(...zs)/step)*step,nx=Math.ceil((Math.max(...xs)-minX)/step)+1,nz=Math.ceil((Math.max(...zs)-minZ)/step)+1;
   const xy=i=>[minX+(i%nx)*step,minZ+Math.floor(i/nx)*step],idx=(x,z)=>Math.round((z-minZ)/step)*nx+Math.round((x-minX)/step),free=new Uint8Array(nx*nz);

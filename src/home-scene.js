@@ -1,3 +1,7 @@
+import {RectAreaLightUniformsLib} from 'three/addons/lights/RectAreaLightUniformsLib.js';
+import {createArchitecturalGlass} from './architectural-glass.mjs';
+import {installWallCavity,installStoneCourses} from './building-finish-shaders.mjs';
+import {createContactShadows} from './contact-shadows.mjs';
 import {CEILING_COLOR,CEILING_MATERIAL} from './ceiling-finish.mjs';
 import {buildOwnerCars} from './owner-parking-scene.mjs';
 import {buildSecurityCameras} from './security-cameras.mjs';
@@ -10,6 +14,7 @@ import {buildBuildingContext} from './building-scene.js';
 import {BUILDING_CENTER,BUILDING_BOUNDS} from './building-layout.mjs';
 import {parseDestination} from './building-navigation.mjs';
 import * as THREE from 'three';
+import {facadeSkinRows,appendFacadeVeneers} from './facade-veneers.mjs';
 import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
 import {HOUSE,HOUSE_OUTLINE,PLOT,TERRACE,SERVICE_APRON,PUBLIC_ENTRY,ROOMS,WALLS,CONSTRUCTION_WALLS,DOORS,WINDOWS,SHUTTERS,FURNITURE,furnitureForSettings,GARDEN_PLANTS,HOME_FINISHES,FLOOR_FINISHES,KITCHEN_ANCHOR,GARDEN_LAYOUT,WATER_LAYOUT,LIGHTING_LAYOUT,point,polygonBounds,insidePolygon,roomAt,openingPoint} from './home-model.mjs';
 import {buildOutdoorKitchen} from './outdoor-kitchen.js';
@@ -51,6 +56,7 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
  function lines(points,color='#a4a293',opacity=.3,parent=group){const g=new THREE.BufferGeometry().setFromPoints(points.map(p=>new THREE.Vector3(...p)));resources.push(g);const m=new THREE.LineBasicMaterial({color,transparent:true,opacity});resources.push(m);parent.add(new THREE.LineSegments(g,m));}
  function plant(x,z,size=1,parent=group){cylinder(x,.2*size,z,.2*size,.4*size,mat('#bcb6a1'),parent);cylinder(x,.48*size,z,.024*size,.75*size,oak,parent);for(let i=0;i<5;i++)sphere(x+Math.sin(i*1.8)*.13*size,(.75+i*.09)*size,z+Math.cos(i*1.8)*.13*size,.25*size,mat(i%2?'#7f9470':'#637d59'),parent,[1,.65,1]);}
  function roomMaterial(id){const value=settings.rooms[id]||settings.rooms.living;return value?.wall==='ordered-mona'?'#e9e5db':HOME_FINISHES.find(f=>f.id===value?.wall)?.color||'#e9e5db';}
+ const showerGlass=createArchitecturalGlass(resources,{mobile:settings.xr===true||globalThis.matchMedia?.('(pointer: coarse)').matches===true});
  const green=surface('grass','#90a17b');floor(PLOT,green,-.035);floor(PUBLIC_ENTRY,surface('cement','#b9b9af'),-.01);floor(HOUSE_OUTLINE,mat('#d8d3c5'),0);
  if(mode==='walk'){const ceiling=floor(HOUSE_OUTLINE,ceilingFinish,HOUSE.height);ceiling.material.side=THREE.FrontSide;ceiling.castShadow=true;ceiling.userData.part='illustrative-ceiling';}
  else if(!settings.cutaway){const m=new THREE.MeshBasicMaterial({colorWrite:false,depthWrite:false,transparent:true,opacity:0});resources.push(m);const ceiling=floor(HOUSE_OUTLINE,m,HOUSE.height);ceiling.castShadow=true;ceiling.userData.part='solar-ceiling-occluder';}
@@ -75,12 +81,14 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
  for(const def of GARDEN_PLANTS){const p=new THREE.Group();p.userData.plantId=def.id;group.add(p);plant(def.position[0],def.position[1],def.size,p);}
  // One construction opening per host door; a secondary leaf shares its hole.
  // Opening heights follow the RG/RG1 table, while sill/ceiling heights are assumed.
+ const claddingRows=[],beltRows=[],facadeStone=surface('limestone','#d9d2c5'),beltMaterial=surface('cement','#b1aba1',{roughness:.95});installStoneCourses(facadeStone);
  for(const w of CONSTRUCTION_WALLS){const vertical=Math.abs(w.a[0]-w.b[0])<.001,lo=vertical?w.a[1]:w.a[0],hi=vertical?w.b[1]:w.b[0],holes=[...DOORS.filter(d=>!d.hostDoorId),...WINDOWS].filter(o=>o.wallId===w.id).sort((a,b)=>a.start-b.start);
   const vertexCuts=ROOMS.filter(r=>!['garden','outdoor'].includes(r.kind)).flatMap(r=>r.polygon).filter(p=>Math.abs(p[vertical?0:1]-w.a[vertical?0:1])<.45).map(p=>p[vertical?1:0]);
   const segment=(a,b,bottom,height)=>{if(b-a<.002||height<.002)return;const cuts=[...new Set([a,b,...vertexCuts.filter(n=>n>a+.002&&n<b-.002)])].sort((a,b)=>a-b);
-   for(let i=0;i<cuts.length-1;i++){const aa=cuts[i],bb=cuts[i+1],mid=vertical?[w.a[0],(aa+bb)/2]:[(aa+bb)/2,w.a[1]],regions=[roomAt([mid[0]+(vertical?.21:0),mid[1]+(vertical?0:.21)]),roomAt([mid[0]-(vertical?.21:0),mid[1]-(vertical?0:.21)])],m1=surface('plaster',roomMaterial(regions[0])),m2=surface('plaster',roomMaterial(regions[1])),mats=[m1,m2,cap,cap,m1,m2];
-    const facade=w.external?surface('limestone','#d9d2c5'):null,faces=facade?wallExteriorFaces({centre:mid,normal:vertical?[1,0]:[0,1],thickness:w.thickness,inside:p=>insidePolygon(p,HOUSE_OUTLINE),positiveFace:vertical?0:4,negativeFace:vertical?1:5}):null,wallMaterials=faces?wallFaceMaterials(mats,facade,faces):mats;
+   for(let i=0;i<cuts.length-1;i++){const aa=cuts[i],bb=cuts[i+1],mid=vertical?[w.a[0],(aa+bb)/2]:[(aa+bb)/2,w.a[1]],regions=[roomAt([mid[0]+(vertical?.21:0),mid[1]+(vertical?0:.21)]),roomAt([mid[0]-(vertical?.21:0),mid[1]-(vertical?0:.21)])],m1=installWallCavity(surface('plaster',roomMaterial(regions[0])),{height:HOUSE.height,skirting:0}),m2=installWallCavity(surface('plaster',roomMaterial(regions[1])),{height:HOUSE.height,skirting:0}),mats=[m1,m2,cap,cap,m1,m2];
+    const facade=w.external?facadeStone:null,faces=facade?wallExteriorFaces({centre:mid,normal:vertical?[1,0]:[0,1],thickness:w.thickness,inside:p=>insidePolygon(p,HOUSE_OUTLINE),positiveFace:vertical?0:4,negativeFace:vertical?1:5}):null,wallMaterials=faces?wallFaceMaterials(mats,facade,faces):mats;
     const mesh=vertical?box(w.a[0],bottom+height/2,(aa+bb)/2,w.thickness,height,bb-aa,wallMaterials,group,{blockPick:true,wallId:w.id}):box((aa+bb)/2,bottom+height/2,w.a[1],bb-aa,height,w.thickness,wallMaterials,group,{blockPick:true,wallId:w.id});mesh.userData.part='architectural-wall';
+    if(faces){const skin=facadeSkinRows([mid[0],bottom+height/2,mid[1],vertical?w.thickness:bb-aa,height,vertical?bb-aa:w.thickness],faces,{vertical,positiveFace:vertical?0:4,negativeFace:vertical?1:5});claddingRows.push(...skin.skin);beltRows.push(...skin.belt);}
     for(let side=0;side<2;side++){const sign=side?-1:1,rr=settings.rooms[regions[side]],normal=w.a[vertical?0:1]+sign*(w.thickness/2+.004);
      if(rr?.wall==='ordered-mona'&&roomHasOrderedCladding(regions[side])){
       const top=Math.min(bottom+height,claddingHeight(regions[side]));
@@ -95,6 +103,7 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
 
   let at=lo;for(const o of holes){segment(at,o.start,0,wallHeight);if(o.sill)segment(o.start,o.end,0,Math.min(o.sill,wallHeight));if(o.sill+o.height<wallHeight)segment(o.start,o.end,o.sill+o.height,wallHeight-o.sill-o.height);at=o.end;}segment(at,hi,0,wallHeight);
  }
+ appendFacadeVeneers(group,claddingRows,facadeStone,resources);
  for(const o of WINDOWS){const [x,z]=openingPoint(o),height=Math.min(o.height,wallHeight-o.sill);if(height<=0)continue;const p=new THREE.Group();p.position.set(x,o.sill,z);p.rotation.y=o.vertical?Math.PI/2:0;group.add(p);
   p.userData.windowId=o.id;p.userData.schedule=o.schedule;
   const sliding=o.operation==='sliding';
@@ -185,7 +194,7 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
   }else box(0,h/2,0,w-.05,.018,d-.05,offwhite,p);
  }
  function tap(p,x,y,z){const stem=cylinder(x,y+.08,z,.02,.16,steel,p);stem.userData.productId='basin-tap';cylinder(x,y+.009,z,.03,.018,steel,p);const lever=box(x,y+.171,z+.025,.026,.009,.095,steel,p,null,.003);lever.userData.productId='basin-tap';const curve=new THREE.CatmullRomCurve3([new THREE.Vector3(x,y+.13,z),new THREE.Vector3(x,y+.14,z+.06),new THREE.Vector3(x,y+.12,z+.115)]),geo=new THREE.TubeGeometry(curve,16,.012,10,false);resources.push(geo);const spout=new THREE.Mesh(geo,steel);spout.userData={productId:'basin-tap',variant:'medium-chrome',dimensionsInferred:true};p.add(spout);}
- function mirror(p,w,y,z){box(0,y,z,w,.68,.025,steel,p);const m=box(0,y,z+.015,w-.025,.655,.008,mat('#9bb1a9',{metalness:.35,roughness:.12}),p);m.userData.productId='mirror';}
+ function mirror(p,w,y,z){if(settings.lampsOn&&mode==='walk'&&['bathroom','ensuite'].includes(selectedRoom)){const active=furnitureForSettings(settings).find(f=>f.roomId===selectedRoom&&f.kind==='vanity');if(active&&p.userData.furnitureId===active.id){RectAreaLightUniformsLib.init();const light=new THREE.RectAreaLight('#fff5e8',1.3,w,.6);light.position.set(0,y,z-.003);light.lookAt(0,y,z-.3);light.userData={fixtureLight:true,part:'bath-mirror-area-light'};p.add(light);}}box(0,y,z,w,.68,.025,steel,p);const m=box(0,y,z+.015,w-.025,.655,.008,mat('#dedfdd',{metalness:1,roughness:.06}),p);m.userData.productId='mirror';m.userData.mirrorSurface=true;const rim=mat('#f4f1e9',{emissive:'#fff5df',emissiveIntensity:settings.lampsOn?.6:0});for(const x of [-w/2+.006,w/2-.006])box(x,y,z+.011,.012,.65,.008,rim,p);}
  function bathFittings(p,x,z,overhead){
   // Four-way family is known, exact cover is unresolved; keep ordered chrome.
   const y=1.05,railX=x+.17;cylinder(railX,1.39,z+.055,.012,.75,steel,p).userData.productId='hand-shower';
@@ -223,7 +232,7 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
   }else if(f.kind==='tub'){
    p.add(createCeramicBowl(resources,{productId:'tub',w:f.w,d:f.d,top:f.h,depth:.43,innerW:f.w-.16,innerD:f.d-.14,innerZ:0,radius:.014,innerRadius:.03,lowerScale:.98,drainX:-f.w/2+.22,drainZ:0}));for(const z of [-f.d/2+.013,f.d/2-.013])box(0,.08,z,f.w-.025,.14,.026,white,p,data,.006);bathFittings(p,-f.w/2+.25,-f.d/2-.012,false);
   }else if(f.kind==='shower'){
-   const patch=floor([[-.4,-.4],[.4,-.4],[.4,.4],[-.4,.4]],surface('cement','#999d99',{productId:'shower-floor'}),.012,p);patch.userData.productId='shower-floor';patch.userData.tile=[.33,.3];bathFittings(p,-.18,-f.d/2-.01,true);
+   const patch=floor([[-.4,-.4],[.4,-.4],[.4,.4],[-.4,.4]],surface('cement','#999d99',{productId:'shower-floor'}),.012,p);patch.userData.productId='shower-floor';patch.userData.tile=[.33,.3];bathFittings(p,-.18,-f.d/2-.01,true);box(f.w/2-.01,1.02,0,.008,2,f.d,showerGlass,p);
   }else if(f.kind==='tv'){
    box(0,1.5,0,f.w,f.h,f.d,dark,p,data,.012);box(0,1.5,f.d/2+.001,f.w-.035,f.h-.035,.003,mat('#273a35',{roughness:.2}),p,data);box(0,1.5,-f.d/2,.18,.16,.04,steel,p);
   }else if(f.kind==='office-chair'){
@@ -235,7 +244,7 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
   }
   p.traverse(o=>{if(o.isMesh&&!o.userData.action){o.userData={...o.userData,action:'furniture',furnitureId:f.id};picks.push(o);}});
  }
- if(settings.furniture)furnitureForSettings(settings).forEach(furnish);
+ if(settings.furniture){const items=furnitureForSettings(settings);items.forEach(furnish);const shadows=createContactShadows(resources);for(const f of items)if(!['shower','tv','wall-basin','wall-toilet'].includes(f.kind)){const shadow=shadows.mesh(f.w,f.d);shadow.position.set(f.position[0],.014,f.position[1]);shadow.rotation.y=f.rotation;roomGroups.get(f.roomId)?.add(shadow);}}
  // Kitchen proxy preserves the exact cabinet chains and island from the existing
  // simulator. Its dedicated route retains the complete detailed mechanisms.
  const kg=new THREE.Group();kg.position.set(KITCHEN_ANCHOR[0],0,KITCHEN_ANCHOR[1]);kg.rotation.y=Math.PI;group.add(kg);
@@ -263,8 +272,10 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
  for(const [id,p] of buildWaterPoints({group,box,cylinder,mat,resources,settings,points:WATER_LAYOUT.points}))gardenGroups.set(id,p);
  if(['building','unit','walk'].includes(mode)&&!wallCutaway)for(const w of CONSTRUCTION_WALLS.filter(w=>w.external)){
   const v=Math.abs(w.a[0]-w.b[0])<.001,h=3.1-HOUSE.height;
-  box((w.a[0]+w.b[0])/2,HOUSE.height+h/2,(w.a[1]+w.b[1])/2,v?w.thickness:Math.abs(w.b[0]-w.a[0]),h,v?Math.abs(w.b[1]-w.a[1]):w.thickness,surface('limestone','#d9d2c5'),group,{part:'building-apartment-top-band'});
+  box((w.a[0]+w.b[0])/2,HOUSE.height+h/2,(w.a[1]+w.b[1])/2,v?w.thickness:Math.abs(w.b[0]-w.a[0]),h,v?Math.abs(w.b[1]-w.a[1]):w.thickness,facadeStone,group,{part:'building-apartment-top-band'});
+  const centre=[(w.a[0]+w.b[0])/2,(w.a[1]+w.b[1])/2],faces=wallExteriorFaces({centre,normal:v?[1,0]:[0,1],thickness:w.thickness,inside:p=>insidePolygon(p,HOUSE_OUTLINE),positiveFace:v?0:4,negativeFace:v?1:5}),skin=facadeSkinRows([centre[0],HOUSE.height+h/2,centre[1],v?w.thickness:Math.abs(w.b[0]-w.a[0]),h,v?Math.abs(w.b[1]-w.a[1]):w.thickness],faces,{vertical:v,positiveFace:v?0:4,negativeFace:v?1:5});appendFacadeVeneers(group,skin.skin,facadeStone,resources);beltRows.push(...skin.belt);
  }
+ appendFacadeVeneers(group,beltRows,beltMaterial,resources,{part:'garden-storey-separation'});
  const buildingContext=context?buildBuildingContext({group,resources,settings,mode,picks,apartmentOutline:HOUSE_OUTLINE}):{group:null,floors:new Map()};
  buildSecurityCameras({group,resources,settings,picks});
  buildOwnerCars({group,resources});

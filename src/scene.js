@@ -1,3 +1,4 @@
+import {RectAreaLightUniformsLib} from 'three/addons/lights/RectAreaLightUniformsLib.js';
 import {buildLightingPoints} from './home-lighting-scene.js';
 import {buildDaylight} from './daylight-scene.js';
 import {buildBuildingContext} from './building-scene.js';
@@ -285,7 +286,7 @@ export function createKitchen(settings){
  const updateDaylight=buildDaylight({group,settings,resources,kitchen:true,center:[2.725,0,1.65],radius:45,distance:100});
  if(settings.led&&settings.lampsOn!==false){
   const ledmat=mat(lightColour(4000),{emissive:lightColour(4000),emissiveIntensity:2});for(const [a,b] of [[1095,3470],[4370,4845]])furnishingRoots.push(box((a+b)/2,1494,300,b-a,4,12,ledmat));
-  for(const x of [1.65,2.65,3.65,4.55]){const l=new THREE.PointLight(lightColour(4000),settings.intensity/100*2,2.5,2);l.userData.fixtureLight=true;l.position.set(x,1.42,.37);group.add(l);furnishingRoots.push(l);}
+  RectAreaLightUniformsLib.init();const l=new THREE.RectAreaLight(lightColour(4000),settings.intensity/100*3,3.4,.035);l.userData={fixtureLight:true,part:'kitchen-linear-area-light'};l.position.set(2.95,1.49,.30);l.lookAt(2.95,.92,.55);group.add(l);furnishingRoots.push(l);
  }
  const dimensionGroup=new THREE.Group();group.add(dimensionGroup);dimensionGroup.visible=settings.dimensions;
  const dimmat=new THREE.LineBasicMaterial({color:'#526e60'});resources.push(dimmat);

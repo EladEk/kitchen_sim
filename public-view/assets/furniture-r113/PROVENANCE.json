@@ -1,0 +1,13 @@
+{
+  "revision": 113,
+  "author": "HomeStudio",
+  "type": "authored upholstery component meshes",
+  "source": "scripts/build-furniture-library.mjs",
+  "compression": "EXT_meshopt_compression",
+  "components": [
+    "cushion",
+    "duvet"
+  ],
+  "bytes": 19260,
+  "limits": "Illustrative geometry, not a scan or the exact purchased sofa. Structural and furniture footprints remain source-controlled."
+}

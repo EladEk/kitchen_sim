@@ -20,7 +20,7 @@ test('surface cache is byte bounded and texture ownership is retired exactly onc
  clearSurfacePixelCache();for(const kind of ['limestone','porcelain','cement','plaster','paint','wood','fabric','paving','asphalt','grass'])surfacePixels(kind,512);
  const stats=surfaceCacheStats();assert(stats.bytes<=8*1024*1024);assert(stats.entries<10);assert.throws(()=>surfacePixels('invalid',256),RangeError);assert.throws(()=>surfacePixels('grass',4096),RangeError);
  const details=createSurfaceDetails({mobile:true}),maps=details.get('grass');assert.equal(maps.height,maps.roughness);assert.equal(maps.detail.format,THREE.RGFormat);assert.equal(maps.color.image.data.length,256*256*4);assert.equal(maps.detail.image.data.length,256*256*2);
- const textures=details.textures;let disposed=0;textures.forEach(t=>t.addEventListener('dispose',()=>disposed++));details.dispose();details.dispose();assert.equal(disposed,2);assert.equal(details.textures.length,0);assert(textures.every(t=>t.source.data===null));clearSurfacePixelCache();assert.equal(surfaceCacheStats().bytes,0);
+ const textures=details.textures;let disposed=0;textures.forEach(t=>t.addEventListener('dispose',()=>disposed++));details.dispose();details.dispose();assert.equal(disposed,3);assert.equal(details.textures.length,0);assert(textures.every(t=>t.source.data===null));clearSurfacePixelCache();assert.equal(surfaceCacheStats().bytes,0);
 });
 test('surface image abort/deadline settles without waiting for the loader and retires late completions',async()=>{
  let complete,tick;const pending=new Set(),signal=new AbortController(),loader={load(url,done){complete=done;}};
@@ -42,4 +42,8 @@ test('background and BFCache pause one render loop; context recovery is bounded 
  win.fire('pagehide');assert.equal(loop,null);win.fire('pageshow');assert(loop);
  for(let i=0;i<2;i++){assert(canvas.fire('webglcontextlost').defaultPrevented);assert.equal(loop,null);assert.equal(timers.size,1);canvas.fire('webglcontextrestored');assert(loop);assert.equal(timers.size,0);now+=1000;}
  canvas.fire('webglcontextlost');assert.equal(failures,1);canvas.fire('webglcontextrestored');assert.equal(loop,null);assert.equal(restored,2);assert(suspends>30);lifecycle.dispose();lifecycle.dispose();assert.equal(timers.size,0);assert.equal(win.handlers.size+doc.handlers.size+canvas.handlers.size,0);
+});
+
+test('an invalid postprocess draw drops the pipeline and redraws the actual scene directly in the same frame',()=>{
+ let direct=0,released=0;const renderer={xr:{isPresenting:false},getPixelRatio:()=>1,setRenderTarget(){},render(){direct++;},getContext:()=>({getError:()=>1282})},presentation=createArchitecturalPresentation(renderer,{}, {},{pipelineFactory:()=>({resize(){},render(){},dispose(){released++;}})});presentation.render(16);assert.equal(released,1);assert.equal(direct,1);presentation.render(32);assert.equal(direct,2);presentation.dispose();assert.equal(released,1);
 });

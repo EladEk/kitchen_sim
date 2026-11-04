@@ -1,0 +1,25 @@
+{
+  "backend": "Dawn null validation",
+  "checks": [
+    "stone",
+    "floor",
+    "plaster-skirting-normal",
+    "wood-bump-roughness",
+    "ordered-photo",
+    "paving",
+    "grass",
+    "desktop-glass",
+    "mobile-glass",
+    "unlit",
+    "batched-native-compile-first-draw",
+    "AO-bloom-FXAA",
+    "GI-SSR-denoise-bloom-FXAA",
+    "native-planar-mirror",
+    "native-PMREM",
+    "native-room-probe",
+    "failed-effects-restore-renderer-state"
+  ],
+  "errors": [],
+  "pixelsVerified": false,
+  "deviceFPSVerified": false
+}

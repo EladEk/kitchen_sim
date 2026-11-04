@@ -26,7 +26,7 @@ test('adaptive quality ignores suspension/XR, degrades gradually and recovers on
 
 test('interior exposure and shared floor/wall bounce ease in and out while preserving solar night',()=>{
  const scene=new THREE.Scene(),renderer={toneMappingExposure:.98},lighting=createInteriorLighting(scene,renderer);
- assert.equal(scene.children.length,4);
+ assert.equal(scene.children.length,5);
  const first=lighting.update({inside:true,walking:true,solar:{daylight:.8},dt:.016});assert(first.exposure>.98&&first.exposure<1.01);
  let state;for(let i=0;i<480;i++)state=lighting.update({inside:true,walking:true,solar:{daylight:.8},dt:.016});assert(state.exposure>1.18&&state.bounce>0&&state.walls>0);
  state=lighting.update({inside:true,walking:true,solar:{daylight:0},dt:.016});assert.equal(state.bounce,0);assert.equal(state.walls,0);

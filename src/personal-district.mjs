@@ -11,7 +11,7 @@ import {extractFloorMap} from '../public-view/floor-map-geometry.mjs';
 export function createPersonalDistrictVariant({model,siteData,settings,kitchenSettings,mobile=false,signal,onCollisionChange=()=>{},storage=globalThis.localStorage}){
  if(signal?.aborted)throw new DOMException('Canceled','AbortError');
  const root=model.clone(true),slots=[];root.traverse(o=>{if(o.userData.variantSlot===4)slots.push(o);});
- if(!slots.length)throw Error('נדרש רענון של נתוני R110 לתכנון האישי.');
+ if(!slots.length)throw Error('נדרש רענון של נתוני R115 לתכנון האישי.');
  for(const slot of slots){slot.traverse(o=>{if(o.isInstancedMesh)o.dispose();});slot.removeFromParent();}slots.length=0;
  let current=normalizeHomeSettings({...settings,cutaway:false,showElectrical:false,showWater:false});
  const home=createHomeScene(current,{mode:'walk',kitchenSettings,context:false,daylight:false});

@@ -1,0 +1,18 @@
+✔ packed shading attributes roundtrip through ObjectLoader while positions and tiled UVs remain exact (6.987587ms)
+✔ surface cache is byte bounded and texture ownership is retired exactly once (1190.928721ms)
+✔ surface image abort/deadline settles without waiting for the loader and retires late completions (0.55269ms)
+✔ postprocessing never retains more than one pipeline across resize, suspend, XR and failure (0.730798ms)
+✔ background and BFCache pause one render loop; context recovery is bounded and teardown removes listeners/timers (0.806432ms)
+✔ an invalid postprocess draw drops the pipeline and redraws the actual scene directly in the same frame (0.215334ms)
+✔ warmup uploads shared textures once, compiles real draw types and keeps object ownership (3.860238ms)
+✔ paint precedes texture upload, and a stale shader completion cannot mark a canceled room ready (8.005861ms)
+✔ startup remains pending until a real frame has drawn and its shadow targets exist (1.250213ms)
+✔ a failed GPU draw or missing visible shadow never marks an empty first frame ready (1.986484ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1359.604356

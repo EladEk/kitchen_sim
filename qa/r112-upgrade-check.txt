@@ -1,0 +1,23 @@
+✔ walking between rooms never swaps the sky IBL, renders a cube or changes colour management (1.921309ms)
+✔ interior fill has one neutral local shadow, bounded mobile maps, gentle room transitions and no daylight at night (13.518948ms)
+✔ room identity and ceiling fill use the occupied private polygon without copying it to another building (2.406937ms)
+✔ lowered common rooms use their real floor elevation for the interior shadow (0.237541ms)
+✔ adaptive quality ignores suspension/XR, degrades gradually and recovers only after sustained headroom (2.685979ms)
+✔ interior exposure and shared floor/wall bounce ease in and out while preserving solar night (13.837824ms)
+✔ map zoom is anchored, bounded to the plan and room highlighting follows the actual polygon (0.417407ms)
+✔ saved views reject malformed coordinates and image export restores renderer size even when capture fails (1.48214ms)
+✔ all 103 source wet rooms have separated reachable fixtures outside walls and door sweeps (920.656136ms)
+✔ source-registered lounges including the penthouses now put every corrected media cabinet against a solid wall (225.788029ms)
+✔ personal wet-room fixtures preserve room boundaries and clear the full door-leaf sweep; proposed west vanity point is rejected (6.736112ms)
+✔ canonical furniture angles transform their actual facing through each reflected ground registration (0.680446ms)
+✔ the interior HDR remains neutral and fixed on indoor materials while the sky remains external; night and disposal restore ownership (179.887413ms)
+✔ fallback XYZ normals are unit length with separate roughness and bounded caches; contact shadow geometry is shared (450.248793ms)
+✔ optical shower glass uses refraction only within the desktop budget and returns safely from stereo (1.837526ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2016.98507

@@ -1,8 +1,10 @@
 import * as THREE from 'three';
+import {detailedFurnitureGeometry} from './furniture-mesh-library.mjs';
 
 // A small shared mesh, with real silhouettes rather than displacement in a
 // photograph. The deformation stays inside the measured furniture footprint.
 export function createSoftGeometry(w=1,h=1,d=1,{kind='cushion',radius=Math.min(w,h,d)*.22}={}){
+ const detailed=detailedFurnitureGeometry(kind,w,h,d);if(detailed){detailed.userData.softFurnishing=kind;detailed.computeBoundingBox();detailed.computeBoundingSphere();return detailed;}
  // Regular face subdivisions are essential: RoundedBoxGeometry concentrates
  // its vertices at the corners and leaves a single flat central rectangle.
  const geometry=new THREE.BoxGeometry(w,h,d,8,2,6),r=Math.min(radius,w*.12,h*.45,d*.12),inner=new THREE.Vector3(w/2-r,h/2-r,d/2-r),minimum=inner.clone().negate(),point=new THREE.Vector3(),closest=new THREE.Vector3(),delta=new THREE.Vector3();

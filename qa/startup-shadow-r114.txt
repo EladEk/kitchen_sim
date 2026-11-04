@@ -1,0 +1,14 @@
+✔ the actual Three shadow pass allocates a valid PCF comparison texture before the first outdoor beauty frame (19.635685ms)
+✔ a configured PCF depth sampler produces visible geometry in the native GLES check (95.591042ms)
+✔ warmup uploads shared textures once, compiles real draw types and keeps object ownership (2.476382ms)
+✔ paint precedes texture upload, and a stale shader completion cannot mark a canceled room ready (3.044044ms)
+✔ startup remains pending until a real frame has drawn and its shadow targets exist (0.727251ms)
+✔ a failed GPU draw or missing visible shadow never marks an empty first frame ready (0.924046ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 266.834777

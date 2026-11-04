@@ -1,9 +1,11 @@
 import * as THREE from 'three';
+import {installStoneCourses} from './building-finish-shaders.mjs';
 import {EXTERIOR_LAYOUT as E,HOUSE,WALLS,DOORS,WINDOWS} from './home-model.mjs';
 
 export function buildExteriorDetails({group,box,cylinder,floor,lines,mat,surface=(kind,color,options)=>mat(color,options),resources,settings,mode}){
  const groups=new Map(),full=mode==='walk'||!settings.cutaway,h=full?HOUSE.height:.86;
  const stone=surface('limestone','#d4cbb9'),joint=mat('#b5ac99'),metal=mat('#68716c',{metalness:.45}),dark=mat('#414a46'),body=mat('#e0e1d5');
+ installStoneCourses(stone);
  const node=(id,view)=>{const p=new THREE.Group();p.userData={buildingId:id,source:'exterior-details',dimensionsInferred:true,inspectionView:view};group.add(p);groups.set(id,p);return p;};
  const P=E.porch,C=E.court,pc=(P.minX+P.maxX)/2,cc=(C.minX+C.maxX)/2;
  const porch=node(P.id,{from:[pc,HOUSE.eyeHeight,P.maxZ+1.8],target:[pc,1.2,P.minZ]}),court=node(C.id,{from:[cc,HOUSE.eyeHeight,C.maxZ+1.1],target:[cc,1.6,C.minZ]});
@@ -16,7 +18,6 @@ export function buildExteriorDetails({group,box,cylinder,floor,lines,mat,surface
   const w=WALLS.find(w=>w.id===wallId),v=Math.abs(w.a[0]-w.b[0])<.001,lo=w.a[v?1:0],hi=w.b[v?1:0],normal=w.a[v?0:1]+side*(w.thickness/2+.007),holes=[...DOORS.filter(d=>!d.hostDoorId),...WINDOWS].filter(o=>o.wallId===wallId).sort((a,b)=>a.start-b.start);
   function panel(a,b,bottom,top){if(b-a<.001||top-bottom<.001)return;const data={...tag(id),part:'exterior-stone-cladding',wallId,span:[a,b,bottom,top]};
    v?box(normal,(top+bottom)/2,(a+b)/2,.014,top-bottom,b-a,stone,parent,data):box((a+b)/2,(top+bottom)/2,normal,b-a,top-bottom,.014,stone,parent,data);
-   const pts=[],at=(q,y)=>v?[normal+side*.009,y,q]:[q,y,normal+side*.009];for(let y=Math.ceil((bottom+.001)/.5)*.5;y<top;y+=.5)pts.push(at(a,y),at(b,y));for(let q=Math.ceil(a/.85)*.85;q<b;q+=.85)pts.push(at(q,bottom),at(q,top));lines(pts,'#aaa18f',.5,parent);
   }
   let at=lo;for(const o of holes){panel(at,o.start,0,h);panel(o.start,o.end,0,Math.min(o.sill,h));panel(o.start,o.end,o.sill+o.height,h);at=o.end;}panel(at,hi,0,h);
  }

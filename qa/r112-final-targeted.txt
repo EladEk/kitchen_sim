@@ -1,0 +1,40 @@
+✔ walking between rooms never swaps the sky IBL, renders a cube or changes colour management (1.993568ms)
+✔ interior fill has one neutral local shadow, bounded mobile maps, gentle room transitions and no daylight at night (17.996232ms)
+✔ room identity and ceiling fill use the occupied private polygon without copying it to another building (4.373533ms)
+✔ lowered common rooms use their real floor elevation for the interior shadow (0.351149ms)
+✔ adaptive quality ignores suspension/XR, degrades gradually and recovers only after sustained headroom (4.266299ms)
+✔ interior exposure and shared floor/wall bounce ease in and out while preserving solar night (21.250286ms)
+✔ map zoom is anchored, bounded to the plan and room highlighting follows the actual polygon (0.619626ms)
+✔ saved views reject malformed coordinates and image export restores renderer size even when capture fails (2.101788ms)
+✔ all 103 source wet rooms have separated reachable fixtures outside walls and door sweeps (1369.789024ms)
+✔ source-registered lounges including the penthouses now put every corrected media cabinet against a solid wall (212.563315ms)
+✔ personal wet-room fixtures preserve room boundaries and clear the full door-leaf sweep; proposed west vanity point is rejected (8.824129ms)
+✔ canonical furniture angles transform their actual facing through each reflected ground registration (0.519448ms)
+✔ the interior HDR remains neutral and fixed on indoor materials while the sky remains external; night and disposal restore ownership (199.028926ms)
+✔ fallback XYZ normals are unit length with separate roughness and bounded caches; contact shadow geometry is shared (502.458619ms)
+✔ optical shower glass uses refraction only within the desktop budget and returns safely from stereo (4.057791ms)
+✔ the full attached catalogue and every extracted source asset retain verifiable bytes and bounded page evidence (31.931481ms)
+✔ matched material maps retain real catalogue RGB, horizontal decor and long-axis plank grain without replacing the owner floor (301.799158ms)
+✔ catalogue fixture sizes change toward the room without moving back-wall plumbing anchors or claiming unknown axes (0.570374ms)
+✔ Wrangler drawers open independently, Gabriel doors remain hinged, legacy state migrates and Close all clears both (1750.594903ms)
+✔ the actual bath and basins have open recessed bowls, Sky uses a slim lid and all tiled walls use the catalogue image (543.213112ms)
+✔ both kitchen scenes use the same exact-SKU pull-out tap silhouette and keep the Casablanca sink (268.623868ms)
+✔ all 153 neighbour beds have a real wall behind the headboard and a free standing approach in actual walking collision (1608.153896ms)
+✔ all 42 other apartments have a sofa, coffee table and TV cabinet with matching render and walking records (297.583844ms)
+✔ cloth, timber, stone and plaster use real detail/roughness maps shared across storeys at physical scale (269.87962ms)
+✔ live location follows the actual apartment, landing, garden and changed floor instead of a stale destination (3.188375ms)
+✔ solar position follows civil Israel time, seasons and the independently published NREL reference (7.896297ms)
+✔ the plan north arrow supplies the default bearing and invalid imports cannot corrupt the sun (2.097021ms)
+✔ dark mode and time after sunset remove the sun, sky and environment, and daylight restores them (3.61156ms)
+✔ both real scenes have only fixture illumination in dark mode and no illumination with lamps switched off (2681.393749ms)
+✔ the moving sun updates in place in both coordinate systems and glass admits sunlight (285.147769ms)
+✔ temporary lights fill only undocumented rooms, never claim photo evidence and remain physical in clean view (160.651933ms)
+✔ both save formats retain time, dark mode and temporary lamp choices with 4000K defaults (1.788825ms)
+ℹ tests 32
+ℹ suites 0
+ℹ pass 32
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3524.630702

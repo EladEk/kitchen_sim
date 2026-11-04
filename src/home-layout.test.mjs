@@ -10,18 +10,19 @@ function meshBoxes(group){
  const boxes=[];group.traverse(o=>{if(o.isMesh){o.geometry.computeBoundingBox();boxes.push(new OBB().fromBox3(o.geometry.boundingBox).applyMatrix4(o.matrixWorld));}});return boxes;
 }
 
-test('master bed follows the annotated lower-left map position, puts the headboard against the lower wall and leaves the side route accessible',()=>{
+test('master bed returns to the pre-annotation position with the headboard on the inner wall and door circulation clear',()=>{
  const scene=createHomeScene(normalizeHomeSettings(),{mode:'walk',context:false,daylight:false});
  try{scene.group.updateMatrixWorld(true);const bed=getFurniture('master-bed'),group=scene.furnitureGroups.get(bed.id),bounds=new THREE.Box3().setFromObject(group),tv=scene.furnitureGroups.get('master-tv'),tvBounds=new THREE.Box3().setFromObject(tv),wardrobe=scene.furnitureGroups.get('master-wardrobe');
-  assert.equal(bed.rotation,Math.PI);assert.equal(bed.w,1.8);assert.equal(bed.d,2);assert(Math.abs(bed.position[1]-14.38)<.002);assert(Math.abs(bed.position[0]-1.7)<.002);const footGap=polygonBounds(getRoom('master').polygon).maxZ-bounds.max.z;assert(footGap>.02&&footGap<.06);assert(tvBounds.min.z>point(606,743.02)[1]);assert(tvBounds.max.x<point(719.4,743.02)[0]);assert(bounds.min.z-tvBounds.max.z>.9);assert(new THREE.Vector3(0,0,1).transformDirection(tv.matrixWorld).z>.99);assert(!bounds.intersectsBox(new THREE.Box3().setFromObject(wardrobe)));
+  assert.equal(bed.rotation,0);assert.equal(bed.w,1.8);assert.equal(bed.d,2);assert.deepEqual(bed.position,point(680,803.11));const headGap=bounds.min.z-point(680,743.02)[1];assert(headGap>=0&&headGap<.1);assert(tvBounds.min.z>bounds.max.z+.5);assert(new THREE.Vector3(0,0,1).transformDirection(tv.matrixWorld).z<-.99);assert(!bounds.intersectsBox(new THREE.Box3().setFromObject(wardrobe)));
   const door=scene.motions.find(m=>m.id==='door:master'),boxes=meshBoxes(group);for(let i=0;i<=48;i++){door.object.rotation.y=door.openTarget*i/48;scene.group.updateMatrixWorld(true);for(const leaf of meshBoxes(door.object))assert(!boxes.some(box=>leaf.intersectsOBB(box)),'entrance door clears the rotated bed');}
   const path=findWalkPath(getRoom('hall').walk,getRoom('master').walk);assert(path?.length,'walking destination remains accessible after turning the bed');
  }finally{scene.dispose();}
  const old={position:point(680,862.88),rotation:Math.PI};assert.deepEqual(normalizeFurnitureLayout({'master-bed':old}),{});const custom={position:[getFurniture('master-bed').position[0]+.04,getFurniture('master-bed').position[1]],rotation:0};assert(normalizeFurnitureLayout({'master-bed':custom})['master-bed'],'intentional layouts survive');
 });
 
-test('the R105 master-bed facing migrates once while dimensions and subsequent deliberate facing edits survive',()=>{
- const bed=getFurniture('master-bed'),dimensions={w:1.8,d:2,h:.5},input={'master-bed':{position:bed.position,rotation:0,dimensions}},migrated=normalizeFurnitureLayout(input)['master-bed'];assert.equal(migrated.rotation,Math.PI);assert.deepEqual(migrated.dimensions,dimensions);assert.equal(migrated.placementRevision,106);const chosen={'master-bed':{...migrated,rotation:0}};assert.equal(normalizeFurnitureLayout(chosen)['master-bed'].rotation,0,'an intentional new edit is not repeatedly migrated');assert.equal(input['master-bed'].rotation,0,'normalization does not mutate the saved input');
+test('only shipped old poses migrate; custom sizes and deliberate edits survive',()=>{
+ const old=point(702.38,860.94);for(const rotation of [0,Math.PI])assert.deepEqual(normalizeFurnitureLayout({'master-bed':{position:old,rotation,placementRevision:106}}),{});
+ const bed=getFurniture('master-bed'),dimensions={w:1.8,d:2,h:.5},input={'master-bed':{position:bed.position,rotation:0,dimensions}},saved=normalizeFurnitureLayout(input)['master-bed'];assert.equal(saved.rotation,0);assert.deepEqual(saved.dimensions,dimensions);assert.equal(saved.placementRevision,113);assert.deepEqual(input['master-bed'].dimensions,dimensions);assert.equal(normalizeFurnitureLayout({'master-bed':{position:old,rotation:Math.PI,placementRevision:113}})['master-bed'].rotation,Math.PI);
 });
 
 test('safe-room wardrobe side meets the bed wall, with its doors and drawers clear of the bed and protected window',()=>{

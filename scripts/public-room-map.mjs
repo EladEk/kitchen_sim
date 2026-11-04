@@ -1,6 +1,7 @@
 import clipping from 'polygon-clipping';
 import {BUILDING_FLOORS} from '../src/building-layout.mjs';
 import {BUILDING_INTERIORS} from '../src/building-interiors.mjs';
+import {APARTMENT_BATHROOMS} from '../src/apartment-bathroom-layout.mjs';
 import {APARTMENT_FURNITURE} from '../src/apartment-furniture-layout.mjs';
 import {groundBaseProfile,groundPoint} from '../src/ground-apartments.mjs';
 import {connectedWallRuns,wallFootprint} from '../src/building-geometry.mjs';
@@ -36,9 +37,9 @@ export function createPublicRoomMaps(){
    const source=BUILDING_INTERIORS.floors[f.level],walls=connectedWallRuns(source,f).map(wallFootprint),sliders=f.envelope.flatMap(p=>p.openings.filter(o=>o.kind==='slider'));
    for(const unit of f.units){
     const ctx=furnitureContext({polygon:unit.polygon,walls,doors:source.doors,sliders}),groups=new Map();
-    for(const p of APARTMENT_FURNITURE.filter(p=>p.floor===f.level&&p.unit===unit.number&&['bed','kitchen','sofa'].includes(p.kind))){
+    for(const p of [...APARTMENT_FURNITURE,...APARTMENT_BATHROOMS].filter(p=>p.floor===f.level&&p.unit===unit.number&&['bed','kitchen','sofa','basin'].includes(p.kind))){
      const point=p.kind==='bed'?p.seed:[p.x,p.z],room=ctx.room(point),key=room.cells[0];if(!groups.has(key))groups.set(key,{room,entries:[]});
-     const kind=p.kind==='bed'?'bedroom':p.kind==='sofa'?'living':'kitchen',he=p.kind==='bed'?(p.master?'חדר הורים':'חדר שינה'):p.kind==='sofa'?'סלון':'מטבח';
+     const kind=p.kind==='bed'?'bedroom':p.kind==='sofa'?'living':p.kind==='basin'?'bathroom':'kitchen',he=p.kind==='bed'?(p.master?'חדר הורים':'חדר שינה'):p.kind==='sofa'?'סלון':p.kind==='basin'?'חדר רחצה':'מטבח';
      if(!groups.get(key).entries.some(e=>e.kind===kind))groups.get(key).entries.push({id:p.id,unit:unit.number,kind,he,label:point});
     }
     for(const {room,entries} of groups.values()){
