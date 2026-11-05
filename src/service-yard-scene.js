@@ -24,7 +24,7 @@ export function buildServiceYard({group,box,cylinder,floor,lines,mat,surface=(ki
  for(const [a,b] of [[s.minX,left],[right,s.maxX]])box((a+b)/2,h/2,s.minZ+s.wall/2,b-a,h,s.wall,wall,shed,{...shedTag,part:'shed-wall'});
  if(h>door.height)box(door.x,(h+door.height)/2,s.minZ+s.wall/2,door.width,h-door.height,s.wall,wall,shed,shedTag);
  for(const x of [left,right])box(x,Math.min(h,door.height)/2,s.minZ,.04,Math.min(h,door.height),.075,trim,shed,shedTag);
- const sign=door.hinge==='end'?-1:1,pivot=new THREE.Group();pivot.position.set(sign===1?left:right,0,s.minZ+.006);pivot.rotation.y=open.has(door.id)?door.swing*Math.PI*.49:0;shed.add(pivot);motions.push({id:door.id,object:pivot,property:'y',axis:'rotation',target:pivot.rotation.y});
+ const sign=door.hinge==='end'?-1:1,pivot=new THREE.Group();pivot.position.set(sign===1?left:right,0,s.minZ+.006);pivot.rotation.y=open.has(door.id)?door.swing*Math.PI*.49:0;shed.add(pivot);motions.push({id:door.id,object:pivot,property:'y',axis:'rotation',target:pivot.rotation.y,closedTarget:0,openTarget:door.swing*Math.PI*.49});
  const doorTag={action:'part',partId:door.id};
  box(sign*door.width/2,Math.min(h,door.height)/2,0,door.width-.025,Math.min(h,door.height)-.015,.04,trim,pivot,{...doorTag,part:'shed-door'});
  box(sign*(door.width-.08),Math.min(1.02,h*.65),-.035,.07,.02,.035,steel,pivot,doorTag);
@@ -45,7 +45,7 @@ export function buildServiceYard({group,box,cylinder,floor,lines,mat,surface=(ki
   box(0,a.h/2,-a.d/2+.015,a.w,a.h,.03,white,p,data);
   for(const y of [.025,a.h-.025])box(0,y,0,a.w,.05,a.d,white,p,data);
   for(const y of [.28,.62,.98,1.34,1.66]){box(0,y,0,a.w-.065,.015,a.d-.08,inside,p,data);if(i)box(0,y+.08,.08,a.w-.08,.12,a.d-.26,mat('#b7c7c5',{transparent:true,opacity:.5}),p,data);}
-  const partId=`${a.id}:door`,leaf=new THREE.Group();leaf.position.set(-a.w/2,0,a.d/2);leaf.rotation.y=open.has(partId)?-Math.PI*.49:0;p.add(leaf);motions.push({id:partId,object:leaf,property:'y',axis:'rotation',target:leaf.rotation.y});
+  const partId=`${a.id}:door`,leaf=new THREE.Group();leaf.position.set(-a.w/2,0,a.d/2);leaf.rotation.y=open.has(partId)?-Math.PI*.49:0;p.add(leaf);motions.push({id:partId,object:leaf,property:'y',axis:'rotation',target:leaf.rotation.y,closedTarget:0,openTarget:-Math.PI*.49});
   const part={action:'part',partId};box(a.w/2,a.h/2,0,a.w-.01,a.h-.02,.035,white,leaf,part,.01);box(a.w-.07,1.05,.037,.022,.34,.025,steel,leaf,part);
   box(0,.07,a.d/2+.019,a.w-.06,.08,.015,trim,p,data);
  }

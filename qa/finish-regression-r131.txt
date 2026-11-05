@@ -1,0 +1,34 @@
+✔ convex exterior wall returns receive stone while jambs that lead into a room retain paint (1.554104ms)
+✔ the real return geometry splits a window jamb into outside stone and inside paint without moving its bounds (5.490185ms)
+✔ the private and public facade share the actual albedo grain and every building shell keeps the same colour (2689.089425ms)
+✔ door frames have separate deep jambs, stops and casing steps on both wall faces without a bottom obstruction (0.405524ms)
+✔ room-corner occlusion stays a transparent visual layer above the skirting and never participates in collision (1.412715ms)
+✔ all 103 source wet rooms have separated reachable fixtures outside walls and door sweeps (1806.695679ms)
+✔ source-registered lounges including the penthouses keep opposing TVs on supported floor consoles (492.4586ms)
+✔ personal wet-room fixtures preserve room boundaries and clear the full door-leaf sweep; proposed west vanity point is rejected (9.528011ms)
+✔ canonical furniture angles transform their actual facing through each reflected ground registration (0.971181ms)
+✔ the interior HDR remains neutral and fixed on indoor materials while the sky remains external; night and disposal restore ownership (305.689493ms)
+✔ fallback XYZ normals are unit length with separate roughness and bounded caches; contact shadow geometry is shared (573.763583ms)
+✔ optical shower glass uses refraction only within the desktop budget and returns safely from stereo (1.733065ms)
+✔ the PDF-confirmed floor6/unit39 corner is solid in both the rendered wall and walking collision without altering the source runs (1840.453761ms)
+✔ junction reconstruction is bounded by wall widths and cannot bridge a documented door or parallel opening (1.810172ms)
+✔ partly exposed balcony returns receive visible rail segments and matching walking guards on every floor (517.52055ms)
+✔ dry interior walls start white, migrate the legacy ivory default once, and preserve subsequent chosen colours (3.588896ms)
+✔ neighbouring ground-storey veneers never protrude into the kitchen or living room (2618.496621ms)
+✔ every cabinet leaf and drawer uses the same opening pose in the editable scene and the batched walking display (563.939283ms)
+✔ all 153 neighbour beds have a real wall behind the headboard and a free standing approach in actual walking collision (2161.293426ms)
+✔ all 42 other apartments have a sofa, coffee table and TV cabinet with matching render and walking records (509.689904ms)
+✔ cloth, timber, stone and plaster use real detail/roughness maps shared across storeys at physical scale (375.081609ms)
+✔ live location follows the actual apartment, landing, garden and changed floor instead of a stale destination (3.433811ms)
+✔ opposite broad faces have independent finishes and cut ends never inherit the stone material (2.069344ms)
+✔ ground base and personal external walls expose plaster to rooms in walking and building views (1686.918539ms)
+✔ upper facade batches keep their inward-facing broad surfaces plaster, with unchanged physical wall bounds (1241.362209ms)
+✔ photo snapshots retain the same per-face interior/exterior assignment as the walking renderer (41.061724ms)
+ℹ tests 26
+ℹ suites 0
+ℹ pass 26
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3547.702843

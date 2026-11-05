@@ -1,0 +1,90 @@
+{
+  "revision": "R128",
+  "backend": "Dawn null",
+  "mobile": false,
+  "personal": true,
+  "enhanced": false,
+  "expectedFailure": false,
+  "steps": [
+    {
+      "phase": "initial",
+      "elapsedMs": 40211,
+      "maps": [
+        {
+          "light": "DirectionalLight",
+          "sameIdentity": true,
+          "size": [
+            4096,
+            4096
+          ],
+          "actual": [
+            4096,
+            4096
+          ],
+          "depth": true
+        },
+        {
+          "light": "tour-interior-shadow",
+          "sameIdentity": true,
+          "size": [
+            1024,
+            1024
+          ],
+          "actual": [
+            1024,
+            1024
+          ],
+          "depth": true
+        }
+      ]
+    }
+  ],
+  "roomSteps": [
+    {
+      "phase": "room-0:living",
+      "referenceLighting": true,
+      "inside": true,
+      "region": "4102:0:4:living",
+      "probes": 0
+    },
+    {
+      "phase": "room-1:outside",
+      "referenceLighting": false,
+      "inside": false,
+      "region": null,
+      "probes": 0
+    },
+    {
+      "phase": "room-2:living",
+      "referenceLighting": true,
+      "inside": true,
+      "region": "4102:0:4:living",
+      "probes": 0
+    },
+    {
+      "phase": "room-3:bathroom",
+      "referenceLighting": false,
+      "inside": true,
+      "region": "4102:0:4:bathroom",
+      "probes": 1
+    },
+    {
+      "phase": "room-4:outside",
+      "referenceLighting": true,
+      "inside": false,
+      "region": null,
+      "probes": 1
+    },
+    {
+      "phase": "room-5:living",
+      "referenceLighting": false,
+      "inside": true,
+      "region": "4102:0:4:living",
+      "probes": 2
+    }
+  ],
+  "errors": [],
+  "failure": null,
+  "pixelsVerified": false,
+  "physicalDeviceVerified": false
+}

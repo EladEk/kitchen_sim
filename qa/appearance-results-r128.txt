@@ -1,0 +1,16 @@
+✔ convex exterior wall returns receive stone while jambs that lead into a room retain paint (1.277045ms)
+✔ the real return geometry splits a window jamb into outside stone and inside paint without moving its bounds (3.084088ms)
+✔ the private and public facade share the actual albedo grain and every building shell keeps the same colour (1654.636313ms)
+✔ door frames have separate deep jambs, stops and casing steps on both wall faces without a bottom obstruction (0.298179ms)
+✔ room-corner occlusion stays a transparent visual layer above the skirting and never participates in collision (1.01548ms)
+✔ dry interior walls start white, migrate the legacy ivory default once, and preserve subsequent chosen colours (2.413288ms)
+✔ neighbouring ground-storey veneers never protrude into the kitchen or living room (1502.266967ms)
+✔ every cabinet leaf and drawer uses the same opening pose in the editable scene and the batched walking display (416.386846ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2230.884008

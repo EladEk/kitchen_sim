@@ -4,6 +4,11 @@ import {HOME_STORAGE,KITCHEN_STORAGE} from './studio-state.mjs';
 import {normalizeHomeSettings} from './home-model.mjs';
 import {normalizeKitchenDesign} from './planning-pair.mjs';
 class Store{constructor(){this.data=new Map();}getItem(k){return this.data.get(k)||null;}setItem(k,v){this.data.set(k,v);}}
+test('a later detailed kitchen save wins over an older home draft without changing the selected floor or colour',()=>{
+ const storage=new Store();storage.setItem(HOME_STORAGE,JSON.stringify({schema:2,kitchenDraft:{base:'chalk',upper:'chalk'}}));storage.setItem(KITCHEN_STORAGE,JSON.stringify({settings:{base:'linen',upper:'sage',stone:'taj',floor:'harash'}}));
+ const design=readPersonalDistrictDesign(storage);assert.equal(design.kitchen.base,'linen');assert.equal(design.kitchen.upper,'sage');assert.equal(design.kitchen.floor,'harash');
+ storage.data.delete(KITCHEN_STORAGE);assert.equal(readPersonalDistrictDesign(storage).kitchen.base,'chalk');
+});
 test('opening the district preserves saved home, yard and kitchen choices and starts at noon',()=>{
  const storage=new Store(),home=normalizeHomeSettings({openDoors:['entry'],openParts:['garden-shed:door'],rooms:{living:{wall:'sage'}}}),kitchen=normalizeKitchenDesign({base:'cream'});saveBeforeDistrictTour(storage,home,kitchen);const before=storage.getItem(HOME_STORAGE),design=readPersonalDistrictDesign(storage);assert.deepEqual(design.home.openDoors,home.openDoors);assert.deepEqual(design.home.yardDesign,home.yardDesign);assert.deepEqual(design.home.furnitureLayout,home.furnitureLayout);assert.deepEqual(design.kitchen,normalizeKitchenDesign(kitchen));assert.equal(design.home.solar.minutes,720);assert.equal(design.home.solar.live,false);assert.equal(storage.getItem(HOME_STORAGE),before);assert(storage.getItem(KITCHEN_STORAGE));
 });

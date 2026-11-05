@@ -4,3 +4,5 @@ await import('./apply-three-instance-capacity.mjs');
 await import('./apply-three-compilation.mjs');
 await import('./apply-three-shader-cache.mjs');
 await import('./apply-three-transparent-preparation.mjs');
+await import('./apply-three-shadow-bindings.mjs');
+await import('./apply-three-target-bindings.mjs');

@@ -1,3 +1,5 @@
+import {FACADE_COLOR,FACADE_ROUGHNESS} from './facade-finish.mjs';
+import {installStoneCourses} from './building-finish-shaders.mjs';
 import {CEILING_COLOR,CEILING_MATERIAL} from './ceiling-finish.mjs';
 import * as THREE from 'three';
 import {RESIDENTS_CLUB as C} from './residents-club.mjs';
@@ -10,8 +12,9 @@ export function buildResidentsClub({parent,resources,settings,cut=false,ceilingV
  const material=(color,extra={})=>{const m=new THREE.MeshStandardMaterial({color,roughness:.8,...extra});resources.push(m);return m;};
  const white=material('#f2f0e9'),trim=material('#c9c3b6'),dark=material('#333b3d'),steel=material('#929995',{metalness:.55,roughness:.38}),floor=material('#c9c3b6',{roughness:.66}),grout=material('#b6b1a7');
  const surface=createSurfacePalette(resources),plaster=surface('plaster','#f2f0e9'),doorFinish=surface('door','#d8d0c3');for(const m of [plaster,doorFinish])installBuildingSurfaceUVs(m);
+ const facade=surface('limestone',FACADE_COLOR,{roughness:FACADE_ROUGHNESS});installStoneCourses(facade);installBuildingSurfaceUVs(facade);
  const cube=new THREE.BoxGeometry(1,1,1);resources.push(cube);
- function box(name,x,y,z,w,h,d,mat=white){if(mat===white&&/plaster|wall|reveal|service-jamb|service-head/.test(name))mat=plaster;if(name==='club-service-access-door')mat=doorFinish;const m=new THREE.Mesh(cube,mat);m.name=name;m.position.set(x,y,z);m.scale.set(w,h,d);m.castShadow=m.receiveShadow=true;m.userData={part:name,source:'residents-club-video',dimensionsInferred:true};root.add(m);return m;}
+ function box(name,x,y,z,w,h,d,mat=white){if(mat===white&&/plaster|wall|reveal|service-jamb|service-head/.test(name))mat=plaster;if(name==='club-window-inner-reveal')mat=[plaster,facade,plaster,plaster,plaster,plaster];if(name==='club-service-access-door')mat=doorFinish;const m=new THREE.Mesh(cube,mat);m.name=name;m.position.set(x,y,z);m.scale.set(w,h,d);m.castShadow=m.receiveShadow=true;m.userData={part:name,source:'residents-club-video',dimensionsInferred:true};root.add(m);return m;}
  function disk(name,x,y,z,r,h,mat){const g=new THREE.CylinderGeometry(r,r,h,24);resources.push(g);const m=new THREE.Mesh(g,mat);m.name=name;m.position.set(x,y,z);m.castShadow=m.receiveShadow=true;m.userData={part:name,source:'residents-club-video',dimensionsInferred:true};root.add(m);return m;}
  // Thin finish layer on the exact room polygon, never over the lobby/doorway.
  const shape=new THREE.Shape();C.polygon.forEach(([x,z],i)=>i?shape.lineTo(x,z):shape.moveTo(x,z));shape.closePath();

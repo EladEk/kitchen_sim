@@ -1,0 +1,4 @@
+{"phase":"initial","elapsedMs":20464,"maps":[{"light":"DirectionalLight","sameIdentity":true,"size":[4096,4096],"actual":[4096,4096],"depth":true},{"light":"tour-interior-shadow","sameIdentity":true,"size":[1024,1024],"actual":[1024,1024],"depth":true}]}
+Destroyed texture [Texture "ShadowDepthTexture"] used in a submit.
+ - While calling [Queue].Submit([[CommandBuffer from CommandEncoder "renderContext_2"]])
+

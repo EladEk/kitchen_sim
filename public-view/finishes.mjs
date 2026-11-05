@@ -17,5 +17,5 @@ export function restorePublicFinishes(root,{mobile=false,stoneUrl=null,signal}={
  }});
  const used=new Set();root.traverse(o=>{for(const mat of [o.material].flat().filter(Boolean))for(const value of Object.values(mat))if(value?.isTexture)used.add(value);});
  for(const t of previous)if(!used.has(t))t.dispose();
- return {ready:details.loadStone(stoneUrl,{signal}),dispose:()=>details.dispose(),get textures(){return details.textures;}};
+ return {ready:Promise.resolve(),dispose:()=>details.dispose(),get textures(){return details.textures;}};
 }

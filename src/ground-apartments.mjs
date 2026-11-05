@@ -1,4 +1,5 @@
-import {HOUSE,ROOMS,WALLS,CONSTRUCTION_WALLS,WINDOWS,DOORS,ELECTRICAL_LAYOUT,WATER_LAYOUT,LIGHTING_LAYOUT,point,openingPoint} from './home-model.mjs';
+import {HOUSE,HOUSE_OUTLINE,insidePolygon,ROOMS,WALLS,CONSTRUCTION_WALLS,WINDOWS,DOORS,ELECTRICAL_LAYOUT,WATER_LAYOUT,LIGHTING_LAYOUT,point,openingPoint} from './home-model.mjs';
+import {BUILDING_FLOORS} from './building-layout.mjs';
 import {GROUND_BASE_SOURCE} from './ground-base-source.mjs';
 
 // Base interior only. These records deliberately do not read owner furniture,
@@ -14,6 +15,12 @@ export const groundTransform=unit=>GROUND_REGISTRATION[unit];
 export function groundPoint(unit,p){const t=groundTransform(unit),[a,b,c,d]=t.matrix;return [a*p[0]+b*p[1]+t.offset[0],c*p[0]+d*p[1]+t.offset[1]];}
 export function groundInverse(unit,p){const t=groundTransform(unit),[a,b,c,d]=t.matrix,x=p[0]-t.offset[0],z=p[1]-t.offset[1],det=a*d-b*c;return [(d*x-b*z)/det,(-c*x+a*z)/det];}
 export function groundDirection(unit,p){const [a,b,c,d]=groundTransform(unit).matrix;return [a*p[0]+b*p[1],c*p[0]+d*p[1]];}
+
+// A neighbour's outward-facing wall can be a party wall of the next unit.
+// Test the whole ground storey, not just the repeated apartment template.
+export function groundBuildingContains(p){
+ return insidePolygon(p,BUILDING_FLOORS[0].core)||[1,2,3,4].some(unit=>insidePolygon(groundInverse(unit,p),HOUSE_OUTLINE));
+}
 
 export function groundAngle(unit,angle){const v=groundDirection(unit,[Math.sin(angle),Math.cos(angle)]);return Math.atan2(v[0],v[1]);}
 

@@ -3,7 +3,7 @@ import {Color,Vector2} from 'three';
 // Optical values are rendering estimates, not manufacturer PBR data or
 // measured grout specifications. Tile dimensions always come from the order.
 export const FLOOR_RENDERING=Object.freeze({
- 'dry-floor':Object.freeze({joint:.002,recess:.0004,bevel:.0006,grout:'#918a81',ior:1.48,specularIntensity:.7}),
+ 'dry-floor':Object.freeze({joint:.002,recess:.0004,bevel:.0006,grout:'#918a81',ior:1.48,specularIntensity:.42}),
  'wet-floor':Object.freeze({joint:.002,recess:.0004,bevel:.0005,grout:'#96918a',ior:1.48,specularIntensity:.55}),
  'shower-floor':Object.freeze({joint:.002,recess:.0004,bevel:.0005,grout:'#96918a',ior:1.48,specularIntensity:.45}),
  'terrace-floor':Object.freeze({joint:.003,recess:.0006,bevel:.0007,grout:'#88705b',ior:1.48,specularIntensity:.5})
@@ -80,10 +80,20 @@ export function installFloorMaterial(material,product){
   Object.assign(shader.uniforms,uniforms);
   shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\n'+FLOOR_SHADER_COMMON)
    .replace('#include <map_fragment>',FLOOR_MAP_FRAGMENT)
-   .replace('#include <roughnessmap_fragment>','#include <roughnessmap_fragment>\n#ifdef USE_MAP\nroughnessFactor=mix(roughnessFactor,.98,floorJoint);\n#endif')
+   .replace('#include <roughnessmap_fragment>',`float roughnessFactor=roughness;
+#ifdef USE_ROUGHNESSMAP
+ #ifdef USE_MAP
+  roughnessFactor*=textureGrad(roughnessMap,floorSourceUV,floorDx,floorDy).g;
+ #else
+  roughnessFactor*=texture2D(roughnessMap,vRoughnessMapUv).g;
+ #endif
+#endif
+#ifdef USE_MAP
+roughnessFactor=mix(roughnessFactor,.98,floorJoint);
+#endif`)
    .replace('#include <normal_fragment_maps>',FLOOR_NORMAL_FRAGMENT);
  };
- material.customProgramCacheKey=()=>`photographed-floor-r27:${product.productId}`;
+ material.customProgramCacheKey=()=>`photographed-floor-r127:${product.productId}`;
  material.userData.floorRendering={revision:27,jointMetres:profile.joint,recessMetres:profile.recess,rotation:uniforms.floorQuarterTurns.value===4?'quarter-turns':'half-turns',mirrored:false,parametersInferred:true};
  return material;
 }

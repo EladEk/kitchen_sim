@@ -1,6 +1,7 @@
 import * as THREE from 'three';
+import {facadePixels,FACADE_ROUGHNESS} from '../src/facade-finish.mjs';
 
-const profiles={limestone:[.87,.0018,1],porcelain:[.58,.00035,1],cement:[.91,.0015,1],plaster:[.96,.00085,3],paint:[.65,.00015,3],door:[.5,.00025,1],wood:[.69,.0007,1],fabric:[.99,.0012,8],paving:[.9,.0022,1],asphalt:[.96,.0015,1],grass:[1,.008,1]};
+const profiles={stone:[.46,.0002,1],limestone:[FACADE_ROUGHNESS,.00018,1],porcelain:[.58,.00035,1],cement:[.91,.0015,1],plaster:[.96,.00085,3],paint:[.65,.00015,3],door:[.5,.00025,1],wood:[.69,.0007,1],fabric:[.99,.0012,8],paving:[.9,.0022,1],asphalt:[.96,.0015,1],grass:[1,.008,1]};
 const fract=x=>x-Math.floor(x),mix=(a,b,t)=>a+(b-a)*t;
 const hash=(x,y,s=0)=>fract(Math.sin(x*127.1+y*311.7+s*74.7)*43758.5453);
 const smooth=t=>t*t*(3-2*t);
@@ -12,6 +13,7 @@ export function clearSurfacePixelCache(){dataCache.clear();cacheBytes=0;}
 export function surfacePixels(kind,size=256){
  if(!profiles[kind]||!Number.isInteger(size)||size<16||size>1024)throw new RangeError('Invalid surface profile or size');
  const key=kind+':'+size;if(dataCache.has(key)){const cached=dataCache.get(key);dataCache.delete(key);dataCache.set(key,cached);return cached;}
+ if(kind==='limestone'){const p=facadePixels(size),value={color:p.color,detail:p.detail,height:p.detail,roughness:p.detail,size,normal:surfaceNormalPixels(p.detail,size)},cost=p.color.byteLength+p.detail.byteLength+value.normal.byteLength;while(cacheBytes+cost>CACHE_BYTES&&dataCache.size){const [k,old]=dataCache.entries().next().value;cacheBytes-=old.color.byteLength+old.detail.byteLength+old.normal.byteLength;dataCache.delete(k);}if(cost<=CACHE_BYTES){dataCache.set(key,value);cacheBytes+=cost;}return value;}
  const color=new Uint8Array(size*size*4),detail=new Uint8Array(size*size*2);
  for(let y=0;y<size;y++)for(let x=0;x<size;x++){
   const u=x/size,v=y/size,n=noise(u,v,12,4),cloud=noise(u,v,4,9),fine=hash(x,y,3);let c=246+(cloud-.5)*9+(fine-.5)*7,h=128+(n-.5)*24+(fine-.5)*20,r=238,green=0;
@@ -43,11 +45,11 @@ export function createSurfaceDetails({mobile=false}={}){
  function get(kind){
   if(disposed)throw new Error('Surface details disposed');
   if(maps.has(kind))return maps.get(kind);
-  const data=surfacePixels(kind,mobile?256:['limestone','porcelain'].includes(kind)?1024:512),out={};
+  const data=surfacePixels(kind,kind==='limestone'?256:mobile?256:kind==='porcelain'?1024:512),out={};
   for(const channel of ['color','detail','normal']){const t=new THREE.DataTexture(data[channel],data.size,data.size,channel==='detail'?THREE.RGFormat:THREE.RGBAFormat);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.magFilter=THREE.LinearFilter;t.minFilter=THREE.LinearMipmapLinearFilter;t.generateMipmaps=true;t.anisotropy=mobile?4:8;t.colorSpace=channel==='color'?THREE.SRGBColorSpace:THREE.NoColorSpace;t.repeat.setScalar(profiles[kind]?.[2]||1);t.needsUpdate=true;out[channel]=t;owned.add(t);}
   out.height=out.roughness=out.detail;maps.set(kind,out);return out;
  }
- function apply(material,kind){const p=profiles[kind];if(!p)return material;const m=get(kind);Object.assign(material,{map:m.color,bumpMap:null,normalMap:m.normal,roughnessMap:m.roughness,roughness:p[0],bumpScale:p[1]});material.normalScale.setScalar(kind==='plaster'?.12:kind==='fabric'?.4:.25);material.needsUpdate=true;return material;}
+ function apply(material,kind){const p=profiles[kind];if(!p)return material;const m=get(kind);Object.assign(material,{map:m.color,bumpMap:null,normalMap:m.normal,roughnessMap:m.roughness,roughness:p[0],bumpScale:p[1]});material.normalScale.setScalar(kind==='limestone'?.035:kind==='plaster'?.12:kind==='fabric'?.4:.25);if(kind==='limestone'){material.metalness=0;material.envMapIntensity=.3;}material.needsUpdate=true;return material;}
  // Bump uses R and roughness uses G: one RG texture preserves both channels.
  async function loadStone(url,{signal}={}){
   if(!url||typeof document==='undefined'||disposed)return;

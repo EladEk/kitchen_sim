@@ -1,4 +1,6 @@
 import * as T from 'three';
+import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
+import {applyFurnitureColours,FURNITURE_COLOURS} from './furniture-colours.mjs';
 // Runtime templates are loaded once from the shared GLB. These keys are public
 // asset identities; owner IDs, positions and plan dimensions are never stored here.
 export const COMPLETE_FURNITURE_KINDS=Object.freeze(['bed-double','bed-single','sofa','armchair','coffee','dining','desk','dining-chair','office-chair','barstool','nightstand','plant','faucet','kitchen-faucet','media','tv']);
@@ -23,11 +25,16 @@ export function applyCompleteFurniture(root,templates){
  }return replacements;
 }
 export function furnitureTemplatesFromGLTF(gltf){
- const templates=new Map(),components=new Map();gltf.scene.updateMatrixWorld(true);
+ applyFurnitureColours(gltf.scene);const templates=new Map(),components=new Map();gltf.scene.updateMatrixWorld(true);
  for(const root of gltf.scene.children){const name=root.name,parts=[];root.traverse(o=>{if(!o.isMesh)return;const geometry=o.geometry.clone().applyMatrix4(o.matrixWorld),materials=[o.material].flat();for(const material of materials){material.userData={...material.userData,furnitureMaterial:true,architecturalInterior:true};if(material.map)material.map.anisotropy=4;}
   // GLTF multi-primitives may arrive as children or as material groups. Keep
   // their PBR materials/UVs and share each geometry across every instance.
   parts.push({geometry,material:o.material});
  });if(['cushion','duvet'].includes(name)){if(parts[0])components.set(name,parts[0].geometry);}else if(COMPLETE_FURNITURE_KINDS.includes(name))templates.set(name,parts);
- }for(const kind of COMPLETE_FURNITURE_KINDS)if(!templates.get(kind)?.length)throw Error('Incomplete furniture library: '+kind);return {templates,components};
+ }for(const kind of COMPLETE_FURNITURE_KINDS)if(!templates.get(kind)?.length)throw Error('Incomplete furniture library: '+kind);
+ // Keep the scanned seat/back and add the omitted loose accent pillows as
+ // one shared cloth part. The existing red bedding material owns its maps.
+ const cloth=components.get('cushion'),red=templates.get('bed-double').flatMap(p=>[p.material].flat()).find(m=>m.userData.furnitureColourRole==='bedding');
+ if(cloth&&red){const accent=red.clone();accent.color.set(FURNITURE_COLOURS.accent);accent.userData={...red.userData,furnitureColourRole:'accent'};if(accent.sheenColor)accent.sheenColor.copy(accent.color);const pieces=[-1,1].map(side=>cloth.clone().applyMatrix4(new T.Matrix4().compose(new T.Vector3(side*.35,.70,.12),new T.Quaternion().setFromEuler(new T.Euler(-.20,0,-side*.18)),new T.Vector3(.135,.35,.15)))),geometry=mergeGeometries(pieces);pieces.forEach(g=>g.dispose());geometry.userData.furnitureColourRole='sofa-accent';templates.get('sofa').push({geometry,material:accent});}
+ return {templates,components};
 }

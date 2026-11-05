@@ -1,0 +1,12 @@
+Three.js r185 instance-capacity fix applied.
+Three.js r185 bounded compilation applied.
+Three.js r185 shader-cache fixes applied.
+Three.js r185 transparent preparation applied.
+Three.js r185 shadow binding observer applied.
+Three.js r185 output binding observer applied.
+Three.js r185 instance-capacity fix ready.
+Three.js r185 bounded compilation ready.
+Three.js r185 shader-cache fixes ready.
+Three.js r185 transparent preparation ready.
+Three.js r185 shadow binding observer ready.
+Three.js r185 output binding observer ready.

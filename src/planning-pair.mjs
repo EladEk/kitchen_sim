@@ -13,6 +13,6 @@ export function normalizeKitchenDesign(input={}){
  if(Number.isFinite(s.intensity))result.intensity=Math.max(0,Math.min(100,s.intensity));
  return {...result,openParts:normalizeOpenParts(s.openParts),lightControls:normalizeLightControls(s.lightControls),solar:normalizeSolar(s.solar),...kitchenVisibilitySettings(s),selected:null};
 }
-export function readHomeDesign(storage){try{return normalizeHomeSettings(migrateHomeFloorSchedule(JSON.parse(storage.getItem(HOME_STORAGE)||'{}')));}catch{return normalizeHomeSettings();}}
+export function readHomeDesign(storage){try{const raw=JSON.parse(storage.getItem(HOME_STORAGE)||'{}'),home=normalizeHomeSettings(migrateHomeFloorSchedule(raw));return raw.kitchenDraft?{...home,kitchenDraft:normalizeKitchenDesign(raw.kitchenDraft)}:home;}catch{return normalizeHomeSettings();}}
 export function readKitchenDesign(storage){try{return normalizeKitchenDesign(JSON.parse(storage.getItem(KITCHEN_STORAGE)||'{}').settings||{});}catch{return normalizeKitchenDesign();}}
 export const cleanDesignPair=(home,kitchen)=>({home:normalizeHomeSettings(home),kitchen:normalizeKitchenDesign(kitchen)});

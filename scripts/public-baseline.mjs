@@ -1,3 +1,6 @@
+import {APP_REVISION,BASELINE_REVISION} from '../public-view/revision.mjs';
+import {buildGardenTerraces} from '../src/garden-terraces-scene.js';
+import {addRoomCornerOcclusion} from '../src/room-corner-occlusion.mjs';
 // Build-time only: publish approved baseline geometry, never owner modules/data.
 import * as THREE from 'three';
 import {compactRenderAttributes} from '../public-view/compact-attributes.mjs';
@@ -25,9 +28,10 @@ export async function createPublicBaseline(directory){
  const resources=[],picks=[],root=new THREE.Group(),settings={...normalizeHomeSettings(),openDoors:[],openParts:[],closedBuildingDoors:[],cutaway:false,furniture:true,showLighting:true,buildingLevel:9,tourDestination:'unit:1:0'};
  buildBuildingContext({group:root,resources,settings,mode:'walk',picks,interactiveDoors:true});
  // Identity placement of the SAME base-plan template used for the neighbours.
- const temp=new THREE.Group(),bases=buildGroundApartments({root:temp,resources,picks:[],settings,mode:'walk',interactiveDoors:true}),own=bases.get(1).clone(true);
+ const temp=new THREE.Group(),bases=buildGroundApartments({root:temp,resources,picks:[],settings,mode:'walk',interactiveDoors:true,units:[4]}),own=bases.get(4).clone(true);
  own.traverse(o=>{if(o.userData.doorId?.startsWith('ground:1:')){o.userData.doorId=o.userData.doorId.replace('ground:1:','ground:4:');if(o.userData.tourDoor){o.userData.tourDoor.id=o.userData.doorId;o.userData.tourMotionId='public:'+o.userData.doorId;}}});
  own.matrix.identity();own.name='public-base-apartment-4';own.userData={level:0,variantSlot:4};root.add(own);
+ buildGardenTerraces({parent:root,resources,units:[4],variantSlot:4});
  // Replicate generic neighbour furnishing, never FURNITURE or owner layouts.
  const furniture=new THREE.Group();buildApartmentFurniture({parent:furniture,resources,level:0,base:0,settings});
  const t=groundTransform(1),[a,b,c,d]=t.matrix,inverse=new THREE.Matrix4().set(a,0,b,t.offset[0],0,1,0,0,c,0,d,t.offset[1],0,0,0,1).invert(),m=new THREE.Matrix4();
@@ -39,6 +43,8 @@ export async function createPublicBaseline(directory){
  const siteParts=new Set(['building-garden-ground','building-garden-fence','building-site-base','site-drive-lane','site-sidewalk','site-parking-bay','site-parking-number','site-raised-curb','site-illustrative-cars','site-car-glass','site-car-tyres','site-illustrative-planting','site-main-meter-cabinet']);
  const obsolete=[];root.traverse(o=>{if(siteParts.has(o.userData.part))obsolete.push(o);});obsolete.forEach(o=>o.removeFromParent());
  refinePublicFacade(root,resources);
+ const roomMaps=createPublicRoomMaps();
+ for(const floor of BUILDING_FLOORS){const rooms=roomMaps.get(floor.level)||[];if(floor.level===0){for(const unit of floor.units){const ao=addRoomCornerOcclusion(root,rooms.filter(r=>r.unit===unit.number),resources,{level:0,height:2.75});if(ao&&unit.number===4)ao.userData.variantSlot=4;}}else addRoomCornerOcclusion(root,rooms,resources,{level:floor.level,base:floor.elevation,height:BUILDING.storey});}
  // Export the actual wall openings and furnishing footprints as compact 2D
  // data. No plan images, inspection notes or owner layouts enter the public map.
  const maps=new Map(BUILDING_FLOORS.map(f=>[f.level,extractFloorMap(root,{elevation:f.elevation})]));
@@ -46,7 +52,7 @@ export async function createPublicBaseline(directory){
  function clean(o,inherited=0,doorId=null){
   const data=o.userData,f=data.level??data.buildingFloor??inherited,part=data.part||o.name||'',ceiling=/ceiling/.test(part)||(o.geometry?.type==='ShapeGeometry'&&Math.abs(o.position.y-2.75)<.01),roof=/roof|lift-stair-head/.test(part),exterior=f===0||f===9||ceiling||roof||/building-(facade|window|glazing|rail|laundry|balcony|stone-sill|floor-slab|unit-finish|fascia)|public-curtain/.test(part),motion=data.tourDoor;
   const id=motion?.id||(data.action==='district-door'?data.doorId:doorId);
-  o.userData={level:f,ceiling,roof,exterior,...(data.mirrorSurface?{mirrorSurface:true}:{}),...(data.furnitureAsset?{furnitureAsset:data.furnitureAsset}:{}),...(o.geometry?.userData.softFurnishing?{furnitureMesh:o.geometry.userData.softFurnishing}:{}),...(data.tourNonPhysical?{tourNonPhysical:true}:{}),...(data.visualOnly?{visualOnly:true}:{}),...(data.variantSlot===4?{variantSlot:4}:{}),...(id?{action:'district-door',doorId:id}:{}),...(motion?{tourMotionId:'public:'+motion.id,tourDoor:{id:motion.id,axis:motion.axis,property:motion.property,closed:motion.closed,open:motion.open,defaultOpen:motion.defaultOpen,kind:motion.kind}}:{})};
+  o.userData={level:f,ceiling,roof,exterior,...(data.mirrorSurface?{mirrorSurface:true}:{}),...(data.furnitureAsset?{furnitureAsset:data.furnitureAsset}:{}),...(o.geometry?.userData.softFurnishing?{furnitureMesh:o.geometry.userData.softFurnishing}:{}),...(data.tourNonPhysical?{tourNonPhysical:true}:{}),...(data.visualOnly?{visualOnly:true}:{}),...(data.variantSlot===4?{variantSlot:4}:{}),...(id?{action:'district-door',doorId:id}:{}),...(/^elevator-(call|controls|ride)$/.test(data.action)?{action:data.action,elevatorId:data.elevatorId,...(Number.isInteger(data.landing)?{landing:data.landing}:{}),...(Number.isInteger(data.target)?{target:data.target}:{})}:{}),...(motion?{tourMotionId:'public:'+motion.id,tourDoor:{id:motion.id,axis:motion.axis,property:motion.property,closed:motion.closed,open:motion.open,defaultOpen:motion.defaultOpen,kind:motion.kind}}:{})};
   o.name='';for(const child of o.children)clean(child,f,id);
  }
  clean(root);root.updateMatrixWorld(true);
@@ -71,7 +77,7 @@ export async function createPublicBaseline(directory){
   if(o.isMesh&&!o.isInstancedMesh)o.type='Mesh';
   if(o.material?.isShaderMaterial)o.material=new THREE.MeshStandardMaterial({color:'#9daaa7',metalness:.75,roughness:.16});
  });
- const seen=new Set(),textureCache=new Map();root.traverse(o=>{if(o.geometry)o.geometry.userData={};for(const mat of [o.material].flat().filter(Boolean)){if(seen.has(mat))continue;seen.add(mat);mat.userData={...(mat.userData.architecturalGlass?{architecturalGlass:true}:{}),...(mat.userData.architecturalInterior?{architecturalInterior:true}:{}),...(mat.userData.floorCourses?{floorCourses:{...mat.userData.floorCourses}}:{}),...(mat.userData.wallCavity?{wallCavity:{...mat.userData.wallCavity}}:{}),...(mat.userData.metricInstancedUVs?{metricInstancedUVs:true}:{}),...(['limestone','cement','porcelain','plaster','paint','door','wood','fabric','ceramic'].includes(mat.userData.surfaceKind)?{surfaceKind:mat.userData.surfaceKind}:{}),...(["stone","floor"].includes(mat.userData.publicFinish)?{publicFinish:mat.userData.publicFinish}:{})};mat.name='';for(const [key,value] of Object.entries(mat))if(value?.isTexture&&!value.image?.data)mat[key]=null;for(const key of ['map','bumpMap','roughnessMap','normalMap']){const tex=mat[key];if(tex){
+ const seen=new Set(),textureCache=new Map();root.traverse(o=>{if(o.geometry)o.geometry.userData={};for(const mat of [o.material].flat().filter(Boolean)){if(seen.has(mat))continue;seen.add(mat);mat.userData={...(mat.userData.architecturalGlass?{architecturalGlass:true}:{}),...(mat.userData.architecturalInterior?{architecturalInterior:true}:{}),...(mat.userData.floorCourses?{floorCourses:{...mat.userData.floorCourses}}:{}),...(mat.userData.wallCavity?{wallCavity:{...mat.userData.wallCavity}}:{}),...(mat.userData.metricInstancedUVs?{metricInstancedUVs:true}:{}),...(['limestone','cement','porcelain','plaster','paint','door','wood','fabric','ceramic','stone'].includes(mat.userData.surfaceKind)?{surfaceKind:mat.userData.surfaceKind}:{}),...(["stone","floor"].includes(mat.userData.publicFinish)?{publicFinish:mat.userData.publicFinish}:{})};mat.name='';for(const [key,value] of Object.entries(mat))if(value?.isTexture&&!value.image?.data)mat[key]=null;for(const key of ['map','bumpMap','roughnessMap','normalMap']){const tex=mat[key];if(tex){
      // Compact procedural colours; external images and render-target mirrors
      // are never copied into the public snapshot.
      if(!tex.image?.data||!['map','bumpMap','roughnessMap'].includes(key)){mat[key]=null;continue;}
@@ -86,14 +92,13 @@ export async function createPublicBaseline(directory){
  const materialCache=new Map(),canonicalMaterials=new Map();
  root.traverse(o=>{if(!o.material)return;const canonical=mat=>{if(canonicalMaterials.has(mat))return canonicalMaterials.get(mat);const json=mat.toJSON();delete json.uuid;delete json.metadata;delete json.name;const key=JSON.stringify(json);if(!materialCache.has(key))materialCache.set(key,mat);const shared=materialCache.get(key);canonicalMaterials.set(mat,shared);return shared;};o.material=Array.isArray(o.material)?o.material.map(canonical):canonical(o.material);});
  const display=new Map(BUILDING_FLOORS.map(f=>[f.level,unitDisplayPolygons(f)]));
- const roomMaps=createPublicRoomMaps();
- const floors=BUILDING_FLOORS.map(f=>({level:f.level,elevation:f.elevation,label:f.he,map:{...maps.get(f.level),rooms:roomMaps.get(f.level)},units:f.units.map(u=>({number:u.number,polygon:u.polygon,displayPolygons:display.get(f.level).get(u.number),displayTriangles:displayTriangles(display.get(f.level).get(u.number))})),core:f.core}));
+ const floors=BUILDING_FLOORS.map(f=>({level:f.level,elevation:f.elevation,label:f.he,elevators:BUILDING_INTERIORS.floors[f.level].lifts.map(l=>({id:l.id,position:[l.doorCenter[0]+.95,l.doorCenter[1]]})),map:{...maps.get(f.level),rooms:roomMaps.get(f.level)},units:f.units.map(u=>({number:u.number,polygon:u.polygon,displayPolygons:display.get(f.level).get(u.number),displayTriangles:displayTriangles(display.get(f.level).get(u.number))})),core:f.core}));
  const destinations=[];
  for(const f of BUILDING_FLOORS)for(const u of f.units){const duplex=duplexForUnit(u.number,f.level);if(duplex&&f.level!==duplex.entryFloor)continue;const source=BUILDING_INTERIORS.floors[f.level],entry=source.entries.find(e=>e.unit===u.number),door=source.doors.find(d=>d.id===entry?.doorId);let position,yaw=0;if(u.number===4){position=[6.1,2.8];yaw=Math.PI;}else if(door){const normal=door.opened.map((n,i)=>(n-door.hinge[i])/(Math.hypot(...door.opened.map((x,k)=>x-door.hinge[k]))||1));position=door.hinge.map((n,i)=>(n+door.closed[i])/2+normal[i]*.85);yaw=Math.atan2(-normal[0],-normal[1]);}else{position=[...u.polygon[0]];}destinations.push({id:`unit:${u.number}:${f.level}`,label:`דירה ${u.number}`,floor:f.level,unit:u.number,position,yaw,polygon:u.polygon});}
  for(const c of COMMON_SPACES)destinations.push({id:c.id,label:c.he||c.nameHe||c.id,floor:0,position:c.walk,elevation:serviceFloorHeight(c.walk,0)??0,yaw:c.yaw||0,polygon:c.polygon});
- const assets={'building.json':JSON.stringify(root.toJSON()),'site.json':JSON.stringify(publicSiteData()),'navigation.json':JSON.stringify({revision:125,center:BUILDING_CENTER,storey:BUILDING.storey,floors,destinations})};
+ const assets={'building.json':JSON.stringify(root.toJSON()),'site.json':JSON.stringify(publicSiteData()),'navigation.json':JSON.stringify({revision:BASELINE_REVISION,center:BUILDING_CENTER,storey:BUILDING.storey,floors,destinations})};
  await mkdir(directory,{recursive:true});for(const [name,body] of Object.entries(assets))await writeFile(directory+'/'+name,body);
- await writeFile(directory+'/loading.json',JSON.stringify({revision:'R125',bytes:Object.fromEntries(Object.entries(assets).map(([name,body])=>[name,Buffer.byteLength(body)]))}));
+ await writeFile(directory+'/loading.json',JSON.stringify({revision:APP_REVISION,bytes:Object.fromEntries(Object.entries(assets).map(([name,body])=>[name,Buffer.byteLength(body)]))}));
  console.log('Public baseline: 43 apartments; original unit-4 kitchen and standard garden; owner geometry excluded.');
  return {root,floors,destinations};
 }

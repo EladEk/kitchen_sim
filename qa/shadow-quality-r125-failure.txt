@@ -1,0 +1,49 @@
+{
+  "revision": "R125",
+  "backend": "Dawn null",
+  "mobile": false,
+  "enhanced": false,
+  "expectedFailure": true,
+  "steps": [
+    {
+      "phase": "initial",
+      "elapsedMs": 1613,
+      "maps": [
+        {
+          "light": "DirectionalLight",
+          "sameIdentity": true,
+          "size": [
+            4096,
+            4096
+          ],
+          "actual": [
+            4096,
+            4096
+          ],
+          "depth": true
+        },
+        {
+          "light": "tour-interior-shadow",
+          "sameIdentity": true,
+          "size": [
+            1024,
+            1024
+          ],
+          "actual": [
+            1024,
+            1024
+          ],
+          "depth": true
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "failure": {
+    "phase": "auto-tier-1",
+    "code": "SHADOW_OWNER_DETACHED",
+    "message": "Quality update detached a live native shadow target"
+  },
+  "pixelsVerified": false,
+  "physicalDeviceVerified": false
+}

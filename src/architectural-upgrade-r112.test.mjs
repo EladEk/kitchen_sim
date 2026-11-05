@@ -17,8 +17,8 @@ test('all 103 source wet rooms have separated reachable fixtures outside walls a
   assert(row.room.routesClear([...fixed,...set.map(f=>f.box)]));
  }
 });
-test('source-registered lounges including the penthouses now put every corrected media cabinet against a solid wall',()=>{
- for(const guide of registeredLivingGuides()){const media=APARTMENT_FURNITURE.find(r=>r.floor===guide.floor&&r.unit===guide.unit&&r.kind==='media'),room=upperLivingContext(guide);assert(media.wallBacked,media.id);assert(Number.isFinite(backing(media.box,media.angle,media.w,room.walls)),media.id);}
+test('source-registered lounges including the penthouses keep opposing TVs on supported floor consoles',()=>{
+ for(const guide of registeredLivingGuides()){const media=APARTMENT_FURNITURE.find(r=>r.floor===guide.floor&&r.unit===guide.unit&&r.kind==='media'),room=upperLivingContext(guide);assert.equal(media.support,'floor-console');assert(room.valid(media.box,[]),media.id);if(media.wallBacked)assert(Number.isFinite(backing(media.box,media.angle,media.w,room.walls)),media.id);}
 });
 test('personal wet-room fixtures preserve room boundaries and clear the full door-leaf sweep; proposed west vanity point is rejected',()=>{
  const wet=FURNITURE.filter(f=>['bathroom','ensuite','powder'].includes(f.roomId));
@@ -34,7 +34,8 @@ test('the interior HDR remains neutral and fixed on indoor materials while the s
  const pixels=interiorProbePixels();assert.equal(pixels.width,1024);assert(pixels.data.every(Number.isFinite));assert(pixels.data.some(v=>v>1));
  const scene=new THREE.Scene(),sky=new THREE.Texture(),interior=new THREE.MeshStandardMaterial(),outdoor=new THREE.MeshStandardMaterial();interior.userData.architecturalInterior=true;scene.environment=sky;scene.add(new THREE.Mesh(new THREE.BoxGeometry(),interior),new THREE.Mesh(new THREE.BoxGeometry(),outdoor));let disposed=0;
  const probe=createInteriorProbe({}, {mobile:true,environmentFactory:()=>({texture:new THREE.Texture(),dispose(){disposed++;}})});probe.bind(scene);probe.bind(scene);assert.equal(probe.stats.materials,1);assert.equal(interior.envMap,probe.texture);assert.equal(outdoor.envMap,null);assert.equal(scene.environment,sky);const texture=interior.envMap;
- for(const amount of [1,.5,0,1]){probe.update(amount);assert.equal(interior.envMap,texture);assert.equal(interior.envMapIntensity,amount*.58);assert.equal(scene.environment,sky);}probe.dispose();probe.dispose();assert.equal(disposed,1);assert.equal(interior.envMap,null);assert.equal(interior.envMapIntensity,1);scene.children.forEach(o=>{o.geometry.dispose();o.material.dispose();});sky.dispose();
+ probe.update(1);const dayIntensity=interior.envMapIntensity;assert(dayIntensity>=.8&&dayIntensity<=1.1);
+ for(const amount of [1,.5,0,1]){probe.update(amount);assert.equal(interior.envMap,texture);assert.equal(interior.envMapIntensity,amount*dayIntensity);assert.equal(scene.environment,sky);}probe.dispose();probe.dispose();assert.equal(disposed,1);assert.equal(interior.envMap,null);assert.equal(interior.envMapIntensity,1);scene.children.forEach(o=>{o.geometry.dispose();o.material.dispose();});sky.dispose();
 });
 test('fallback XYZ normals are unit length with separate roughness and bounded caches; contact shadow geometry is shared',()=>{
  const p=surfacePixels('porcelain',1024);assert.equal(p.normal.length,1024*1024*4);for(let i=0;i<p.normal.length;i+=4096){const n=[0,1,2].map(c=>p.normal[i+c]/255*2-1);assert(Math.abs(Math.hypot(...n)-1)<.015);assert(p.normal[i+2]>220);}assert(surfaceCacheStats().bytes<=surfaceCacheStats().limit);clearSurfacePixelCache();

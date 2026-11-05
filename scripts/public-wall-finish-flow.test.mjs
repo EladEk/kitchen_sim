@@ -6,8 +6,18 @@ import {createDistrict,DISTRICT,buildingTransform} from '../public-view/district
 import {restorePublicFinishes} from '../public-view/finishes.mjs';
 import {createPhotoScene} from '../src/photoreal-scene.mjs';
 import {disposeObjectResources} from '../src/photo-resources.mjs';
+import {createWalkingDisplay} from '../public-view/walking-display.mjs';
 
 function hit(root,point,direction){root.updateMatrixWorld(true);const ray=new THREE.Raycaster(point,direction,0,5),hit=ray.intersectObject(root,true).find(h=>h.object.isMesh);assert(hit);return {object:hit.object,material:[hit.object.material].flat()[hit.face.materialIndex]};}
+test('the actual exported kitchen party wall is white plaster in the source, walking batch and every registered building',async()=>{
+ const model=await new THREE.ObjectLoader().parseAsync(JSON.parse(await readFile('dist/client/baseline/building.json','utf8'))),site=JSON.parse(await readFile('dist/client/baseline/site.json','utf8')),point=new THREE.Vector3(9.4,2.35,3.5),direction=new THREE.Vector3(1,0,0),finish=restorePublicFinishes(model,{mobile:true});await finish.ready;
+ let district,walking;const check=(root,p,d)=>{const material=hit(root,p,d).material;assert.equal(material.userData.surfaceKind,'plaster');assert.equal(material.color.getHexString(),'f5f5f3');};
+ try{
+  const corner=hit(model,new THREE.Vector3(.798,1.375,-.15),new THREE.Vector3(1,0,0)).material;assert.equal(corner.userData.surfaceKind,'limestone');assert.equal(corner.color.getHexString(),'d9d2c5');
+  check(model,point,direction);walking=createWalkingDisplay(model);walking.update(0);check(walking.group,point,direction);
+  district=createDistrict(model,site,{mobile:true});district.setActiveBuilding(null,{includeActive:true});for(const building of DISTRICT){const matrix=buildingTransform(building);check(district.group,point.clone().applyMatrix4(matrix),direction.clone().transformDirection(matrix));}
+ }finally{walking?.dispose();district?.dispose();const owned=new Set(finish.textures);finish.dispose();disposeObjectResources(model,{skipTextures:owned});}
+});
 test('the real master-room facade stays stone outside and plaster inside after export, district batching, mirrors and photo conversion',async()=>{
  const json=JSON.parse(await readFile('dist/client/baseline/building.json','utf8')),site=JSON.parse(await readFile('dist/client/baseline/site.json','utf8')),model=await new THREE.ObjectLoader().parseAsync(json),finish=restorePublicFinishes(model,{mobile:true});await finish.ready;let district;
  try{

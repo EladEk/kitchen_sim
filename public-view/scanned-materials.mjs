@@ -33,11 +33,11 @@ import {createScanMaterialController} from './scanned-material-core.mjs';
 // Owner-ordered floors/stone and their photographed samples stay authoritative.
 const scans={
  plaster:{normal:wallNormal,roughness:wallRough,metres:3,strength:.12,rough:.95,environment:.55},
- paint:{normal:wallNormal,roughness:wallRough,metres:3,strength:.08,rough:.9,environment:.5},
- door:{normal:woodNormal,roughness:woodRough,metres:1.8,strength:.15,rough:.88,environment:.55},
+ paint:{normal:wallNormal,roughness:wallRough,metres:3,strength:.08,rough:.62,environment:.5},
+ door:{normal:woodNormal,roughness:woodRough,metres:1.8,strength:.18,rough:.64,environment:.55},
  grass:{color:grassColor,normal:grassNormal,roughness:grassRough,metres:1.4,strength:.32,rough:1,environment:.35,naturalColor:true,source:'ambientCG',technique:'procedural'},
- fabric:{color:clothColor,normal:clothNormal,roughness:clothRough,metres:.3,strength:.38,rough:.97,environment:.38},
- wood:{color:woodColor,normal:woodNormal,roughness:woodRough,metres:1.8,strength:.32,rough:.76,environment:.65},
+ fabric:{colorMean:[.540361,.405250,.337280],color:clothColor,normal:clothNormal,roughness:clothRough,metres:.3,strength:.38,rough:.97,environment:.38},
+ wood:{colorMean:[.359834,.211142,.098359],color:woodColor,normal:woodNormal,roughness:woodRough,metres:1.8,strength:.32,rough:.76,environment:.65},
  asphalt:{color:roadColor,normal:roadNormal,roughness:roadRough,metres:2,strength:.7,rough:.97,environment:.4}
 };
 

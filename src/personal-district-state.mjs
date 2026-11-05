@@ -5,7 +5,10 @@ import {parseDestination} from './building-navigation.mjs';
 import {openingSolar} from './solar-lighting.mjs';
 import {snapshot} from './model.mjs';
 export function readPersonalDistrictDesign(storage){
- const home=readHomeDesign(storage),kitchen=home.kitchenDraft?normalizeKitchenDesign(home.kitchenDraft):readKitchenDesign(storage);
+ const home=readHomeDesign(storage);
+ // The detailed editor writes its own save. A home draft may predate it.
+ let hasKitchenSave=false;try{const saved=JSON.parse(storage.getItem(KITCHEN_STORAGE)||'null');hasKitchenSave=!!saved?.settings&&typeof saved.settings==='object'&&!Array.isArray(saved.settings);}catch{}
+ const kitchen=hasKitchenSave?readKitchenDesign(storage):home.kitchenDraft?normalizeKitchenDesign(home.kitchenDraft):readKitchenDesign(storage);
  return {home:{...home,solar:openingSolar(home.solar)},kitchen};
 }
 export function personalSelectionUrl(destination='building'){return destination==='building'?'/_personal/district.html':'/_personal/district.html?tour=0&target='+encodeURIComponent(normalizeTourDestination(destination));}

@@ -1,0 +1,60 @@
+{
+  "backend": "Dawn null",
+  "expectedFailure": false,
+  "steps": [
+    {
+      "phase": "outside",
+      "newPipelines": 10,
+      "newNodeBuilds": 13
+    },
+    {
+      "phase": "interior",
+      "newPipelines": 13,
+      "newNodeBuilds": 16
+    },
+    {
+      "phase": "outside-again",
+      "newPipelines": 9,
+      "newNodeBuilds": 13
+    },
+    {
+      "phase": "interior-again",
+      "newPipelines": 12,
+      "newNodeBuilds": 16
+    },
+    {
+      "phase": "resume",
+      "newPipelines": 12,
+      "newNodeBuilds": 16
+    },
+    {
+      "phase": "smaller",
+      "newPipelines": 4,
+      "newNodeBuilds": 4
+    },
+    {
+      "phase": "original",
+      "newPipelines": 0,
+      "newNodeBuilds": 0
+    },
+    {
+      "phase": "effects-off",
+      "newPipelines": 1,
+      "newNodeBuilds": 4
+    },
+    {
+      "phase": "effects-return",
+      "newPipelines": 12,
+      "newNodeBuilds": 16
+    },
+    {
+      "phase": "repeat",
+      "newPipelines": 4,
+      "newNodeBuilds": 4
+    }
+  ],
+  "errors": [],
+  "failure": null,
+  "pixelsVerified": false,
+  "physicalDeviceVerified": false
+}

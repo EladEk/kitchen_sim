@@ -48,6 +48,7 @@ export function createPhotoScene(source,{maxTriangles=2500000,maxMeshes=60000,ma
  scene.environment=source.userData.photoEnvironment||null;scene.environmentIntensity=source.environment?source.environmentIntensity:0;scene.environmentRotation.copy(source.environmentRotation);
  const convert=(m,o)=>{m=traditionalMaterial(m);if(!m||m.visible===false||m.colorWrite===false||m.opacity===0)return null;const glass=!!o.userData.glazing||/glaz|glass/.test(o.userData.part||'');const key=m.uuid+(glass?':glass':'');if(materials.has(key))return materials.get(key);
   let out=m.isMeshStandardMaterial?m.clone():new THREE.MeshStandardMaterial({color:m.color||'#ffffff',map:m.map||null,side:m.side,transparent:m.transparent,opacity:m.opacity,emissive:m.color||'#000000',emissiveIntensity:m.isMeshBasicMaterial?.3:0});
+  if(m.userData.scanAlbedoGain)out.color.multiply(new THREE.Color(...m.userData.scanAlbedoGain));
   out.envMap=null;out.onBeforeCompile=()=>{};out.customProgramCacheKey=()=>'';
   if(glass){const physical=new THREE.MeshPhysicalMaterial({color:'#edf4f2',roughness:.07,metalness:0,transmission:.97,thickness:.008,ior:1.5,transparent:false,opacity:1,side:THREE.DoubleSide});out.dispose();out=physical;}
   if(m.userData.publicFinish==='stone'){

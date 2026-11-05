@@ -1,0 +1,13 @@
+✔ public build contains no owner application, drafts or unsealed source documents (492.609782ms)
+✔ unauthenticated visitors see the public app but cannot fetch ANY private asset, including direct or encoded paths (27.360386ms)
+✔ correct password opens preserved app and scripts with no-store, wrong password fails, logout clears access cookie (43.554548ms)
+✔ public scene is self-contained, parsable, contains 43 base apartments, and strips all private metadata (155.021285ms)
+✔ the personal district entry and every referenced asset stay behind the password gate (40.810363ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 926.159047

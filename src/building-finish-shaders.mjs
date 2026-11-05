@@ -9,10 +9,10 @@ float finishGridCoverage(float distanceMetres,float footprint,float halfJoint,fl
 export function installStoneCourses(limestone){
   limestone.userData.publicFinish='stone';
   limestone.onBeforeCompile=shader=>{
-   shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vBuildingWorld;').replace('#include <worldpos_vertex>','#include <worldpos_vertex>\nvec4 bw=vec4(transformed,1.0);\n#ifdef USE_INSTANCING\nbw=instanceMatrix*bw;\n#endif\nvBuildingWorld=(modelMatrix*bw).xyz;');
-   shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nvarying vec3 vBuildingWorld;\n'+FINISH_GRID_GLSL).replace('#include <color_fragment>',`#include <color_fragment>
+   shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vBuildingWorld;\nvarying vec3 vBuildingSurfaceNormal;').replace('#include <worldpos_vertex>','#include <worldpos_vertex>\nvec4 bw=vec4(transformed,1.0);\n#ifdef USE_INSTANCING\nbw=instanceMatrix*bw;\n#endif\nvBuildingWorld=(modelMatrix*bw).xyz;\nvBuildingSurfaceNormal=inverseTransformDirection(transformedNormal,viewMatrix);');
+   shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nvarying vec3 vBuildingWorld;\nvarying vec3 vBuildingSurfaceNormal;\n'+FINISH_GRID_GLSL).replace('#include <color_fragment>',`#include <color_fragment>
     float course=floor(vBuildingWorld.y/.48);
-    vec3 n=normalize(cross(dFdx(vBuildingWorld),dFdy(vBuildingWorld)));
+    vec3 n=normalize(vBuildingSurfaceNormal);
     float horizontal=abs(n.x)>abs(n.z)?vBuildingWorld.z:vBuildingWorld.x;
     float row=abs(fract(vBuildingWorld.y/.48+.5)-.5)*.48;
     float col=abs(fract((horizontal+mod(course,2.0)*.46)/.94+.5)-.5)*.94;
@@ -21,18 +21,20 @@ export function installStoneCourses(limestone){
     float colCoverage=finishGridCoverage(col,fwidth(horizontal),.002,.94);
     float joint=1.0-(1.0-rowCoverage)*(1.0-colCoverage);
     vec2 stoneId=vec2(floor((horizontal+mod(course,2.0)*.46)/.94),course);
-    float variation=fract(sin(dot(stoneId,vec2(127.1,311.7)))*43758.5453);
+    vec3 stoneHash=fract(vec3(stoneId.xyx)*.1031);
+    stoneHash+=dot(stoneHash,stoneHash.yzx+33.33);
+    float variation=fract((stoneHash.x+stoneHash.y)*stoneHash.z);
     float grain=sin(horizontal*41.0+sin(vBuildingWorld.y*27.0))*sin(vBuildingWorld.y*57.0)*.004;
-    float base=mix(.9875,.945+variation*.085,1.0-smoothstep(.12,.8,aa));
-    diffuseColor.rgb*=mix(base+grain*(1.0-smoothstep(.003,.03,aa)),.63,joint*.90);
-    float stoneRelief=-.0025*joint*(1.0-smoothstep(.003,.04,aa));
+    float base=mix(1.,.9875+variation*.025,1.0-smoothstep(.12,.8,aa));
+    diffuseColor.rgb*=mix(base+grain*(1.0-smoothstep(.003,.03,aa)),.82,joint*.90);
+    float stoneRelief=-.00045*joint*(1.0-smoothstep(.003,.04,aa));
    `).replace('#include <normal_fragment_maps>',`#include <normal_fragment_maps>
     vec3 stoneDx=dFdx(-vViewPosition),stoneDy=dFdy(-vViewPosition);
     vec3 stoneR1=cross(stoneDy,normal),stoneR2=cross(normal,stoneDx);
     float stoneDet=dot(stoneDx,stoneR1);
     if(abs(stoneDet)>1.e-12)normal=normalize(abs(stoneDet)*normal-sign(stoneDet)*(dFdx(stoneRelief)*stoneR1+dFdy(stoneRelief)*stoneR2));
    `);
-  };limestone.customProgramCacheKey=()=> 'building-stone-courses-r113';
+  };limestone.customProgramCacheKey=()=> 'building-stone-courses-r132';
 
 }
 export function installFloorCourses(interiorFloor,{tile=[.8,.8],joint=.004}={}){

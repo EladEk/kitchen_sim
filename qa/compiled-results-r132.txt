@@ -1,0 +1,32 @@
+Personal entrance movement median: 0.350ms; index: 5160088 bytes
+✔ personal district keeps all eight public transforms, roads and bays; private geometry occurs only at 4102 (21505.974954ms)
+✔ the exported sanitary fixtures have free real standing approaches in all eight reflected/rotated buildings and wet rooms appear on the map (6745.9984ms)
+✔ public build contains no owner application, drafts or unsealed source documents (2213.415731ms)
+✔ unauthenticated visitors see the public app but cannot fetch ANY private asset, including direct or encoded paths (127.276779ms)
+✔ correct password opens preserved app and scripts with no-store, wrong password fails, logout clears access cookie (197.369029ms)
+✔ public scene is self-contained, parsable, contains 43 base apartments, and strips all private metadata (796.215391ms)
+✔ the personal district entry and every referenced asset stay behind the password gate (327.063028ms)
+✔ the actual scene contains one shared water fixture and supports a walk across the south street around the education buildings (10560.987428ms)
+✔ the actual rendered district permits a continuous walk along both planted axes and every court connector (9196.915788ms)
+✔ both elevator panels survive public export and every floor has a safe exit in all eight building registrations (7169.629593ms)
+✔ compiled parks preserve the measured parking, leave the pocket garden free of road and permit a real walk to the three shade pavilions and amphitheatre (8569.162261ms)
+✔ all 43 actual apartment destinations in eight buildings produce the matching interior plan and registered live marker (1093.300507ms)
+✔ the compiled public master-bed footprint returns to the pre-annotation sleeping zone (827.716844ms)
+✔ the public loading manifest records exact decoded UTF-8 sizes for all three actual scene downloads (87.834693ms)
+✔ actual exported facade preserves the same dry finish and outward surfaces in all eight rotated and mirrored district copies (19827.550886ms)
+✔ the real district floor rays descend, reach both service rooms and climb back in all eight buildings (8535.536503ms)
+✔ the exported district permits continuous common-stair ascent and descent through all nine floors in every rotated and reflected building (10015.861703ms)
+✔ the production startup loader accepts the actual current app, loading manifest and navigation together (475.823623ms)
+✔ a genuinely stale navigation file is rejected with expected and received versions in diagnostics (616.273483ms)
+✔ all four contractor terraces survive actual public export, walking batches and every rotated/reflected building (11270.056686ms)
+✔ actual district repeatedly enters 4103 with one collision model, bounded buffers and correct building/floor handoff (8855.182916ms)
+✔ the actual exported kitchen party wall is white plaster in the source, walking batch and every registered building (8169.759921ms)
+✔ the real master-room facade stays stone outside and plaster inside after export, district batching, mirrors and photo conversion (2082.727765ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 22908.473148

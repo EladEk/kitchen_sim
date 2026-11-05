@@ -1,0 +1,35 @@
+✔ walking between rooms never swaps the sky IBL, renders a cube or changes colour management (1.998071ms)
+✔ interior fill has one neutral local shadow, bounded mobile maps, gentle room transitions and no daylight at night (16.140853ms)
+✔ room identity and ceiling fill use the occupied private polygon without copying it to another building (1.419729ms)
+✔ lowered common rooms use their real floor elevation for the interior shadow (0.287704ms)
+✔ the actual Three shadow pass allocates a valid PCF comparison texture before the first outdoor beauty frame (25.827394ms)
+✔ a configured PCF depth sampler produces visible geometry in the native GLES check (160.914219ms)
+✔ adaptive quality ignores suspension/XR, degrades gradually and recovers only after sustained headroom (3.292221ms)
+✔ interior exposure and shared floor/wall bounce ease in and out while preserving solar night (17.677879ms)
+✔ map zoom is anchored, bounded to the plan and room highlighting follows the actual polygon (0.427203ms)
+✔ saved views reject malformed coordinates and image export restores renderer size even when capture fails (0.845995ms)
+✔ live Israel time handles local date rollover and DST repeated hours without shifting the UTC instant (27.279377ms)
+✔ moon phases agree with US Naval Observatory primary phases and the Sun/Moon align near the NASA 2024 eclipse (5.371965ms)
+✔ celestial directions use plan north and the kitchen rotation, and a daylight Moon remains possible (3.852535ms)
+✔ HDR sky includes finite night illumination and the phase renderer makes a full disk brighter than a new one (122.279118ms)
+✔ the same infinite sky drives the raster and photo renderers, updates once per minute, and respects lamp-only mode (235.2786ms)
+✔ Sun disk pixels match Three equirectUv coordinates, so north and the horizon are not mirrored (160.448776ms)
+✔ noon diffuse illumination is useful indoors and fades with the Sun without brightening lamps-only mode (1.767333ms)
+✔ district ceilings receive warm daylight bounce from below without adding lights or changing celestial direction (149.21919ms)
+✔ indoor daylight warms smoothly without swapping or rebuilding the sky environment at room boundaries (56.424677ms)
+✔ opening defaults to noon and old saved live settings cannot turn on the clock implicitly (1.13482ms)
+✔ screen-resolution celestial disks keep direction, phase and horizon visibility and do not enter the photo BVH (3.239942ms)
+✔ manual noon sky does not regenerate each minute and toggling live time resumes the clock (174.868126ms)
+✔ wide district shadow coverage keeps astronomical directions and snaps sub-texel camera motion (42.418672ms)
+✔ sun shadow anchor stays fixed during short steps; movement, solar changes, and occluders invalidate it (2.029208ms)
+✔ interior shadows render for a new room or moving door, not repeatedly while walking within the room (19.917814ms)
+✔ native desktop quality changes keep the sun and interior shadow owners attached (24.93162ms)
+✔ native mobile quality changes keep the sun and interior shadow owners attached (4.32054ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 27
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1164.037523

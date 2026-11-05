@@ -18,6 +18,7 @@ test('the actual Three shadow pass allocates a valid PCF comparison texture befo
   // Reproduce R113's bad state with the actual renderer shadow and uniform code.
   spot.shadow.needsUpdate=false;scene.updateMatrixWorld(true);pass.render([spot],scene,camera);assert.equal(spot.shadow.map,null);const fallback=fallbackTexture();assert.equal(fallback.compareFunction,null);assert.equal(fallback.version,0,'the missing shadow would bind an uninitialized fallback');
   lighting.update({inside:false,walking:false,solar:{daylight:1}});assert.equal(spot.shadow.needsUpdate,true);pass.render([spot],scene,camera);assert(spot.shadow.map.depthTexture?.isDepthTexture);assert.equal(spot.shadow.map.depthTexture.compareFunction,THREE.LessEqualCompare);assert.equal(spot.shadow.needsUpdate,false);assert.equal(spot.shadow.map.width,mobile?512:1024);assert(spot.shadow.matrix.elements.every(Number.isFinite));
+  for(const tier of [3,0]){const old=spot.shadow.map;let disposed=0;old.addEventListener('dispose',()=>disposed++);lighting.setQuality({tier});assert.equal(disposed,1);assert.equal(spot.shadow.map,null);assert(spot.shadow.needsUpdate);pass.render([spot],scene,camera);assert.notEqual(spot.shadow.map,old);assert.equal(spot.shadow.map.width,mobile?(tier>=2?256:512):(tier>=2?512:1024));assert.equal(spot.shadow.map.depthTexture.compareFunction,THREE.LessEqualCompare);}
   lighting.trim();assert.equal(spot.shadow.needsUpdate,true);pass.render([spot],scene,camera);assert.equal(spot.shadow.map.depthTexture.compareFunction,THREE.LessEqualCompare);lighting.dispose();
  }
 });

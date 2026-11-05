@@ -4,6 +4,16 @@ import * as THREE from 'three';
 import {createScanMaterialController} from './scanned-material-core.mjs';
 
 const scans={fabric:{color:'color',normal:'normal',roughness:'roughness',metres:.3,strength:.38,rough:.97,environment:.38}};
+test('compressed and uncompressed scans retain the selected mean linear albedo rather than tinting a finish brown',async()=>{
+ const {createFinishNodeMaterial}=await import('./webgpu-finishes.mjs');
+ for(const compressed of [false,true]){
+  const root=new THREE.Group(),material=new THREE.MeshStandardMaterial({color:'#c9c2b5'}),color=material.color.clone(),mean=[.359834,.211142,.098359];material.userData.surfaceKind='wood';root.add(new THREE.Mesh(new THREE.BoxGeometry(),material));
+  const controller=createScanMaterialController({scans:{wood:{color:'wood',colorMean:mean,metres:1.8,strength:.3,rough:.76,environment:.65}},loader:async()=>{const texture=new THREE.Texture({width:1024,height:1024});if(compressed)texture.isCompressedTexture=true;return texture;}});
+  await controller.apply(root);assert(material.color.equals(color));for(let i=0;i<3;i++)assert(Math.abs(material.userData.scanAlbedoGain[i]*mean[i]-1)<1e-10);
+  const shader={vertexShader:'#include <uv_vertex>',fragmentShader:'#include <map_fragment>'};material.onBeforeCompile(shader);assert(shader.fragmentShader.includes('diffuseColor.rgb*=vec3('));
+  const node=createFinishNodeMaterial(material);assert.deepEqual(node.userData.scanAlbedoGain,material.userData.scanAlbedoGain);assert(node.colorNode);node.dispose();controller.dispose();root.children[0].geometry.dispose();material.dispose();
+ }
+});
 test('scans retain chosen colours and product floors, use real metre UVs and linear data maps, and release all owned textures once',async()=>{
  const scene=new THREE.Group(),cloth=new THREE.MeshPhysicalMaterial({color:'#a7ad95'}),ordered=new THREE.MeshPhysicalMaterial(),textures=[];cloth.userData.surfaceKind='fabric';ordered.userData={surfaceKind:'fabric',productId:'ordered-floor'};scene.add(new THREE.Mesh(new THREE.BoxGeometry(),cloth),new THREE.Mesh(new THREE.BoxGeometry(),ordered));const color=cloth.color.clone();let disposed=0,calls=0;
  const controller=createScanMaterialController({scans,loader:async()=>{calls++;const t=new THREE.Texture({width:1024,height:1024});t.addEventListener('dispose',()=>disposed++);textures.push(t);return t;}});

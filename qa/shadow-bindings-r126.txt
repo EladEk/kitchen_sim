@@ -1,0 +1,12 @@
+✔ every static mesh sharing an ordinary material refreshes shadow bindings on resize, then becomes stable again (4.746624ms)
+✔ equal-size output replacement and resize refresh every shared static draw before the cache early-out (0.828617ms)
+✔ native desktop quality changes keep the sun and interior shadow owners attached (15.21002ms)
+✔ native mobile quality changes keep the sun and interior shadow owners attached (4.521444ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 171.135451

@@ -1,0 +1,32 @@
+{"phase":"outside","newPipelines":10,"newNodeBuilds":13}
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+{"phase":"interior","newPipelines":13,"newNodeBuilds":16}
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+{"phase":"outside-again","newPipelines":9,"newNodeBuilds":13}
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+{"phase":"interior-again","newPipelines":12,"newNodeBuilds":16}
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+{"phase":"resume","newPipelines":12,"newNodeBuilds":16}
+{"phase":"smaller","newPipelines":4,"newNodeBuilds":4}
+{"phase":"original","newPipelines":0,"newNodeBuilds":0}
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+{"phase":"effects-off","newPipelines":1,"newNodeBuilds":4}
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+{"phase":"effects-return","newPipelines":12,"newNodeBuilds":16}
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+{"phase":"repeat","newPipelines":4,"newNodeBuilds":4}

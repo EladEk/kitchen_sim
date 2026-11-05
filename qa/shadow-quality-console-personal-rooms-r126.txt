@@ -1,0 +1,15 @@
+{"phase":"initial","elapsedMs":33574,"maps":[{"light":"DirectionalLight","sameIdentity":true,"size":[4096,4096],"actual":[4096,4096],"depth":true},{"light":"tour-interior-shadow","sameIdentity":true,"size":[1024,1024],"actual":[1024,1024],"depth":true}]}
+{"phase":"room-0:living","inside":true,"region":"4102:0:4:living","probes":1}
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+{"phase":"room-1:outside","inside":false,"region":null,"probes":1}
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+{"phase":"room-2:living","inside":true,"region":"4102:0:4:living","probes":1}
+{"phase":"room-3:bathroom","inside":true,"region":"4102:0:4:bathroom","probes":2}
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+{"phase":"room-4:outside","inside":false,"region":null,"probes":2}
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+{"phase":"room-5:living","inside":true,"region":"4102:0:4:living","probes":2}

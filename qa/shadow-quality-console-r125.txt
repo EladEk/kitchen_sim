@@ -1,0 +1,2 @@
+{"phase":"initial","elapsedMs":1613,"maps":[{"light":"DirectionalLight","sameIdentity":true,"size":[4096,4096],"actual":[4096,4096],"depth":true},{"light":"tour-interior-shadow","sameIdentity":true,"size":[1024,1024],"actual":[1024,1024],"depth":true}]}
+Confirmed R125 shadow ownership regression: Quality update detached a live native shadow target

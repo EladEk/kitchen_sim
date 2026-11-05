@@ -1,6 +1,7 @@
 import {AmbientLight,HemisphereLight,SpotLight,Object3D} from 'three';
 import {setArchitecturalGlassQuality} from '../src/architectural-glass.mjs';
 import {createInteriorProbe} from '../src/interior-probe.mjs';
+import {refreshShadowTarget,resizeShadowTarget} from '../src/shadow-target.mjs';
 import {RectAreaLight,Vector3} from 'three';
 import {RectAreaLightUniformsLib} from 'three/addons/lights/RectAreaLightUniformsLib.js';
 import {inside} from './navigation.mjs';
@@ -31,10 +32,10 @@ export function createInteriorLighting(scene,renderer,{mobile=false,environmentF
  let amount=0,exposure=.98,room=null,wanted=null,shadowAmount=0,disposed=false;
  return {
   bind:root=>{probe??=createInteriorProbe(renderer,{mobile,environmentFactory});probe.bind(root);root.traverse(o=>{for(const m of [o.material].flat().filter(Boolean))if(m.userData.architecturalGlass)glass.add(m);});updateGlass();},
-  update({inside=false,walking=false,solar,dt=.016,region=null,xr=false}={}){
+  update({inside=false,walking=false,solar,dt=.016,region=null,xr=false,neutral=false}={}){
    if(disposed)return {amount:0,exposure,bounce:0,walls:0,shadow:0};
    if(lastXR!==xr){lastXR=xr;updateGlass();}
-   const daylight=solar?.dark?0:Math.max(0,solar?.daylight||0),weight=1-Math.exp(-Math.min(.1,dt)/(inside?1.15:.8));
+   const daylight=neutral?1:solar?.dark?0:Math.max(0,solar?.daylight||0),weight=1-Math.exp(-Math.min(.1,dt)/(inside?1.15:.8));
    amount+=((walking&&inside?1:0)-amount)*weight;probe?.update(daylight);
    const areaOn=walking&&inside&&region&&room===region.key&&['kitchen','bathroom','wc'].includes(region.kind);area.intensity=areaOn?amount*shadowAmount*Math.sqrt(daylight)*1.4:0;area.visible=true;if(areaOn){area.position.fromArray(region.position);area.position.y-=.12;area.lookAt(areaTarget.fromArray(region.target));}
    bounce.intensity=amount*Math.sqrt(daylight)*.3;walls.intensity=amount*Math.sqrt(daylight)*.08;
@@ -49,8 +50,8 @@ export function createInteriorLighting(scene,renderer,{mobile=false,environmentF
    return {amount,exposure,bounce:bounce.intensity,walls:walls.intensity,shadow:ceiling.intensity};
   },
   invalidateShadows(){ceiling.shadow.needsUpdate=true;},
-  setQuality({tier=0}={}){glassTier=tier;updateGlass();const size=mobile?(tier>=2?256:512):(tier>=2?512:1024);if(ceiling.shadow.mapSize.x!==size){ceiling.shadow.map?.dispose();ceiling.shadow.map=null;ceiling.shadow.mapSize.set(size,size);ceiling.shadow.needsUpdate=true;}},
-  trim(){ceiling.shadow.map?.dispose();ceiling.shadow.map=null;ceiling.shadow.needsUpdate=true;},
+  setQuality({tier=0}={}){if(glassTier!==tier){glassTier=tier;updateGlass();}const size=mobile?(tier>=2?256:512):(tier>=2?512:1024);resizeShadowTarget(renderer,ceiling.shadow,size);},
+  trim(){refreshShadowTarget(renderer,ceiling.shadow);},
   dispose(){if(disposed)return;disposed=true;probe?.dispose();glass.clear();area.removeFromParent();ceiling.shadow.map?.dispose();for(const light of [bounce,walls,ceiling,target])light.removeFromParent();renderer.toneMappingExposure=.98;}
  };
 }

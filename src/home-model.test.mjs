@@ -41,7 +41,7 @@ test('home imports validate independent door, drawer and finish states',()=>{
  const a=ALL_HOME_PARTS[0].id,b=ALL_HOME_PARTS[1].id;
  assert.equal(new Set(ALL_HOME_PARTS.map(p=>p.id)).size,ALL_HOME_PARTS.length);
  const s=normalizeHomeSettings({lang:'bad',openDoors:['bed-a','bed-a','bad'],openParts:[a,a,'bad'],rooms:{master:{wall:'sage',floor:'oak',wood:'dark'},living:{wall:'bad',floor:'bad',wood:'bad'}}});
- assert.deepEqual(s.openDoors,['bed-a']);assert.deepEqual(s.openParts,[a]);assert(!s.openParts.includes(b));assert.equal(s.lang,'he');assert.equal(s.rooms.master.wall,'sage');assert.equal(s.rooms.living.wall,'ivory');
+ assert.deepEqual(s.openDoors,['bed-a']);assert.deepEqual(s.openParts,[a]);assert(!s.openParts.includes(b));assert.equal(s.lang,'he');assert.equal(s.rooms.master.wall,'sage');assert.equal(s.rooms.living.wall,'white');
  assert.doesNotThrow(()=>normalizeHomeSettings(null));assert.equal(normalizeHomeSettings().openDoors.includes('patio'),true);
  assert(FURNITURE.every(f=>f.illustrative));
 });

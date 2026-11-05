@@ -1,0 +1,12 @@
+✔ progress follows completed phases, never regresses or fabricates 100, and retires callbacks across resets (1.640052ms)
+✔ streamed bytes use decoded asset sizes rather than compressed Content-Length and decode split UTF-8 correctly (12.624807ms)
+✔ unknown-length downloads finish on actual receipt, and abort/HTTP failure cannot report completion (3.337142ms)
+✔ baseline downloads validate their revision, weight actual files, and retain the existing three-result contract (5.27853ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 116.315271

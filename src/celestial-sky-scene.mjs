@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import {createShadowRefresh} from './shadow-refresh.mjs';
+import {refreshShadowTarget,resizeShadowTarget} from './shadow-target.mjs';
 import {createCelestialDisks} from './celestial-disks.mjs';
 import {celestialState,skyPixels} from './celestial-sky.mjs';
 // Background is an infinite equirectangular sky: identical celestial direction
@@ -47,5 +48,5 @@ export function installCelestialSky({renderer,scene,camera,getSettings=()=>({}),
   if(sun){const distance=Math.max(100,shadowRadius*2+60);sun.intensity=state.sunIntensity;sun.visible=sun.intensity>0;sun.color.set(state.sun.elevation<15?'#ffcf95':'#fff4e1');sun.position.copy(anchor).addScaledVector(sunDirection,distance);Object.assign(sun.shadow.camera,{left:-shadowRadius,right:shadowRadius,top:shadowRadius,bottom:-shadowRadius,near:.1,far:Math.max(220,distance+shadowRadius*2+80)});sun.shadow.camera.updateProjectionMatrix();if(shadowChanged||!sun.shadow.map)sun.shadow.needsUpdate=true;}
   return state;
  }
- return {update,invalidateShadows:()=>shadowRefresh.invalidate(),setQuality({shadowSize,shadowInterval:interval=0}={}){if(!sun)return;shadowInterval=interval;sun.shadow.autoUpdate=false;if(shadowSize&&sun.shadow.mapSize.x!==shadowSize){sun.shadow.map?.dispose();sun.shadow.map=null;sun.shadow.mapSize.set(shadowSize,shadowSize);}sun.shadow.needsUpdate=true;shadowRefresh.invalidate();},trim(){if(sun){sun.shadow.map?.dispose();sun.shadow.map=null;sun.shadow.mapSize.set(mobile?1024:2048,mobile?1024:2048);shadowRefresh.invalidate();}},get state(){return state;},dispose(){if(disposed)return;disposed=true;scene.remove(disks.mesh);disks.dispose();source?.dispose();if(source?.source)source.source.data=null;filtered?.dispose();source=filtered=null;sun?.shadow.map?.dispose();scene.remove(lightRig);scene.background=original.background;scene.environment=original.environment;scene.userData.photoEnvironment=original.photo;}};
+ return {update,invalidateShadows:()=>shadowRefresh.invalidate(),setQuality({shadowSize,shadowInterval:interval=0}={}){if(!sun)return;shadowInterval=interval;sun.shadow.autoUpdate=false;if(shadowSize&&resizeShadowTarget(renderer,sun.shadow,shadowSize))shadowRefresh.invalidate();},trim(){if(sun){resizeShadowTarget(renderer,sun.shadow,mobile?1024:2048);refreshShadowTarget(renderer,sun.shadow);shadowRefresh.invalidate();}},get state(){return state;},dispose(){if(disposed)return;disposed=true;scene.remove(disks.mesh);disks.dispose();source?.dispose();if(source?.source)source.source.data=null;filtered?.dispose();source=filtered=null;sun?.shadow.map?.dispose();scene.remove(lightRig);scene.background=original.background;scene.environment=original.environment;scene.userData.photoEnvironment=original.photo;}};
 }

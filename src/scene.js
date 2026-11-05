@@ -7,6 +7,7 @@ import {KITCHEN_ANCHOR} from './home-model.mjs';
 import {lightColour} from './lighting-controls.mjs';
 import {KITCHEN_LIGHTING_POINTS} from './kitchen-lighting.mjs';
 import * as THREE from 'three';
+import {INTERIOR_WHITE} from './interior-finish.mjs';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { ROOM,LONG,SHORT,UPPERS,ISLAND,ISLAND_UNITS,WINDOW,MATERIALS,STONES } from './model.mjs';
 import {ORDER} from './specifications.mjs';
@@ -30,7 +31,7 @@ export function createKitchen(settings){
  const mat=(color,opts={})=>{const m=new THREE.MeshStandardMaterial({color,roughness:.72,...opts});resources.push(m);return m;};
  const b=MATERIALS.find(x=>x.id===settings.base)||MATERIALS[0],u=MATERIALS.find(x=>x.id===settings.upper)||MATERIALS[0],s=STONES.find(x=>x.id===settings.stone)||STONES[0];
  const surface=createSurfacePalette(resources);
- const base=surface(b.wood?'wood':'paint',b.color),upper=surface(u.wood?'wood':'paint',u.color),stone=surface(settings.stone==='basalt'?'basalt':'stone',s.color),carcass=surface('paint',ORDER.interiorPreview),interior=surface('paint',ORDER.interiorPreview),plinth=mat('#a1a6a1',{metalness:.55,roughness:.42}),recess=mat('#716e65'),wall=surface('plaster','#e6e3dc'),metal=mat(settings.hardware==='brass'?'#a58a59':settings.hardware==='steel'?'#a9adab':'#303731',{metalness:.75,roughness:.3}),black=mat('#202522',{roughness:.24,metalness:.25}),glass=mat('#343c3c',{metalness:.4,roughness:.12}),steel=mat('#b5b7b0',{metalness:.75,roughness:.26}),selection=mat('#698878',{transparent:true,opacity:.17,depthWrite:false});
+ const base=surface(b.wood?'wood':'paint',b.color,{interior:true}),upper=surface(u.wood?'wood':'paint',u.color,{interior:true}),stone=surface(settings.stone==='basalt'?'basalt':'stone',s.color),carcass=surface('paint',ORDER.interiorPreview),interior=surface('paint',ORDER.interiorPreview),plinth=mat('#a1a6a1',{metalness:.55,roughness:.42}),recess=mat('#716e65'),wall=surface('plaster',INTERIOR_WHITE),metal=mat(settings.hardware==='brass'?'#a58a59':settings.hardware==='steel'?'#a9adab':'#303731',{metalness:.75,roughness:.3}),black=mat('#202522',{roughness:.24,metalness:.25}),glass=mat('#343c3c',{metalness:.4,roughness:.12}),steel=mat('#b5b7b0',{metalness:.75,roughness:.26}),selection=mat('#698878',{transparent:true,opacity:.17,depthWrite:false});
  function box(x,y,z,w,h,d,material,id,parent=group,rounded=false){
   const geo=rounded?new RoundedBoxGeometry(w*M,h*M,d*M,2,Math.min(.004,w*M/10,h*M/10,d*M/4)):new THREE.BoxGeometry(w*M,h*M,d*M);metricSurfaceUVs(geo,[x*M,y*M,z*M]);resources.push(geo);
   const mesh=new THREE.Mesh(geo,material);mesh.position.set(x*M,y*M,z*M);mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);if(id){mesh.userData.id=id;picks.push(mesh);}return mesh;

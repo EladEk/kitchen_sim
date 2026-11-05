@@ -1,0 +1,2196 @@
+{
+  "revision": 131,
+  "upper": [
+    {
+      "floor": 1,
+      "unit": 8,
+      "sofa": {
+        "kind": "sofa",
+        "x": 3.5,
+        "z": -9.136,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": 0,
+        "box": {
+          "minX": 2.4,
+          "maxX": 4.6,
+          "minZ": -9.596,
+          "maxZ": -8.676
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f1-unit-8-sofa",
+        "floor": 1,
+        "unit": 8,
+        "sourcePage": 4,
+        "seed": [
+          5.616662,
+          -7.978253
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 3.5,
+        "z": -6.262,
+        "w": 1.5,
+        "d": 0.34,
+        "angle": 3.141593,
+        "box": {
+          "minX": 2.75,
+          "maxX": 4.25,
+          "minZ": -6.432,
+          "maxZ": -6.092
+        },
+        "wallBacked": true,
+        "backGap": 0.0375,
+        "support": "floor-console",
+        "id": "f1-unit-8-media",
+        "floor": 1,
+        "unit": 8,
+        "sourcePage": 4,
+        "seed": [
+          5.616662,
+          -7.978253
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 1,
+      "unit": 7,
+      "sofa": {
+        "kind": "sofa",
+        "x": 19.898,
+        "z": -2.7755,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": 3.141593,
+        "box": {
+          "minX": 18.798,
+          "maxX": 20.998,
+          "minZ": -3.2355,
+          "maxZ": -2.3155
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f1-unit-7-sofa",
+        "floor": 1,
+        "unit": 7,
+        "sourcePage": 4,
+        "seed": [
+          17.752561,
+          -3.920436
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 19.898,
+        "z": -5.624,
+        "w": 1.5,
+        "d": 0.34,
+        "angle": 6.283185,
+        "box": {
+          "minX": 19.148,
+          "maxX": 20.648,
+          "minZ": -5.794,
+          "maxZ": -5.454
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "support": "floor-console",
+        "id": "f1-unit-7-media",
+        "floor": 1,
+        "unit": 7,
+        "sourcePage": 4,
+        "seed": [
+          17.752561,
+          -3.920436
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 1,
+      "unit": 10,
+      "sofa": {
+        "kind": "sofa",
+        "x": 6.8465,
+        "z": 0.514,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": 0,
+        "box": {
+          "minX": 5.7465,
+          "maxX": 7.9465,
+          "minZ": 0.054,
+          "maxZ": 0.974
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f1-unit-10-sofa",
+        "floor": 1,
+        "unit": 10,
+        "sourcePage": 4,
+        "seed": [
+          6.031674,
+          3.543994
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 6.8465,
+        "z": 5.2635,
+        "w": 1.5,
+        "d": 0.34,
+        "angle": 3.141593,
+        "box": {
+          "minX": 6.0965,
+          "maxX": 7.5965,
+          "minZ": 5.0935,
+          "maxZ": 5.4335
+        },
+        "wallBacked": true,
+        "backGap": 0.062,
+        "support": "floor-console",
+        "id": "f1-unit-10-media",
+        "floor": 1,
+        "unit": 10,
+        "sourcePage": 4,
+        "seed": [
+          6.031674,
+          3.543994
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 1,
+      "unit": 9,
+      "sofa": {
+        "kind": "sofa",
+        "x": 16.5515,
+        "z": 0.514,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": 0,
+        "box": {
+          "minX": 15.4515,
+          "maxX": 17.6515,
+          "minZ": 0.054,
+          "maxZ": 0.974
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f1-unit-9-sofa",
+        "floor": 1,
+        "unit": 9,
+        "sourcePage": 4,
+        "seed": [
+          17.392389,
+          3.537964
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 16.5515,
+        "z": 5.2635,
+        "w": 1.5,
+        "d": 0.34,
+        "angle": 3.141593,
+        "box": {
+          "minX": 15.8015,
+          "maxX": 17.3015,
+          "minZ": 5.0935,
+          "maxZ": 5.4335
+        },
+        "wallBacked": true,
+        "backGap": 0.062,
+        "support": "floor-console",
+        "id": "f1-unit-9-media",
+        "floor": 1,
+        "unit": 9,
+        "sourcePage": 4,
+        "seed": [
+          17.392389,
+          3.537964
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 2,
+      "unit": 14,
+      "sofa": {
+        "kind": "sofa",
+        "x": 3.5,
+        "z": -9.1335,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": 0,
+        "box": {
+          "minX": 2.4,
+          "maxX": 4.6,
+          "minZ": -9.5935,
+          "maxZ": -8.6735
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f2-unit-14-sofa",
+        "floor": 2,
+        "unit": 14,
+        "sourcePage": 5,
+        "seed": [
+          5.616419,
+          -7.978253
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 3.5,
+        "z": -6.26,
+        "w": 1.5,
+        "d": 0.34,
+        "angle": 3.141593,
+        "box": {
+          "minX": 2.75,
+          "maxX": 4.25,
+          "minZ": -6.43,
+          "maxZ": -6.09
+        },
+        "wallBacked": true,
+        "backGap": 0.0375,
+        "support": "floor-console",
+        "id": "f2-unit-14-media",
+        "floor": 2,
+        "unit": 14,
+        "sourcePage": 5,
+        "seed": [
+          5.616419,
+          -7.978253
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 2,
+      "unit": 13,
+      "sofa": {
+        "kind": "sofa",
+        "x": 19.9,
+        "z": -2.7735,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": 3.141593,
+        "box": {
+          "minX": 18.8,
+          "maxX": 21,
+          "minZ": -3.2335,
+          "maxZ": -2.3135
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f2-unit-13-sofa",
+        "floor": 2,
+        "unit": 13,
+        "sourcePage": 5,
+        "seed": [
+          17.783581,
+          -3.921747
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 19.9,
+        "z": -5.6245,
+        "w": 1.5,
+        "d": 0.34,
+        "angle": 6.283185,
+        "box": {
+          "minX": 19.15,
+          "maxX": 20.65,
+          "minZ": -5.7945,
+          "maxZ": -5.4545
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "support": "floor-console",
+        "id": "f2-unit-13-media",
+        "floor": 2,
+        "unit": 13,
+        "sourcePage": 5,
+        "seed": [
+          17.783581,
+          -3.921747
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 2,
+      "unit": 16,
+      "sofa": {
+        "kind": "sofa",
+        "x": 6.8465,
+        "z": 0.5165,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": 0,
+        "box": {
+          "minX": 5.7465,
+          "maxX": 7.9465,
+          "minZ": 0.0565,
+          "maxZ": 0.9765
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f2-unit-16-sofa",
+        "floor": 2,
+        "unit": 16,
+        "sourcePage": 5,
+        "seed": [
+          6.615998,
+          3.742804
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 6.8465,
+        "z": 5.263,
+        "w": 1.5,
+        "d": 0.34,
+        "angle": 3.141593,
+        "box": {
+          "minX": 6.0965,
+          "maxX": 7.5965,
+          "minZ": 5.093,
+          "maxZ": 5.433
+        },
+        "wallBacked": true,
+        "backGap": 0.0625,
+        "support": "floor-console",
+        "id": "f2-unit-16-media",
+        "floor": 2,
+        "unit": 16,
+        "sourcePage": 5,
+        "seed": [
+          6.615998,
+          3.742804
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 2,
+      "unit": 15,
+      "sofa": {
+        "kind": "sofa",
+        "x": 16.551,
+        "z": 0.5165,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": 0,
+        "box": {
+          "minX": 15.451,
+          "maxX": 17.651,
+          "minZ": 0.0565,
+          "maxZ": 0.9765
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f2-unit-15-sofa",
+        "floor": 2,
+        "unit": 15,
+        "sourcePage": 5,
+        "seed": [
+          16.784188,
+          3.742804
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 16.551,
+        "z": 5.263,
+        "w": 1.5,
+        "d": 0.34,
+        "angle": 3.141593,
+        "box": {
+          "minX": 15.801,
+          "maxX": 17.301,
+          "minZ": 5.093,
+          "maxZ": 5.433
+        },
+        "wallBacked": true,
+        "backGap": 0.0625,
+        "support": "floor-console",
+        "id": "f2-unit-15-media",
+        "floor": 2,
+        "unit": 15,
+        "sourcePage": 5,
+        "seed": [
+          16.784188,
+          3.742804
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 3,
+      "unit": 20,
+      "sofa": {
+        "kind": "sofa",
+        "x": 3.5,
+        "z": -9.136,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": 0,
+        "box": {
+          "minX": 2.4,
+          "maxX": 4.6,
+          "minZ": -9.596,
+          "maxZ": -8.676
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f3-unit-20-sofa",
+        "floor": 3,
+        "unit": 20,
+        "sourcePage": 6,
+        "seed": [
+          5.616419,
+          -7.978253
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 3.5,
+        "z": -6.262,
+        "w": 1.5,
+        "d": 0.34,
+        "angle": 3.141593,
+        "box": {
+          "minX": 2.75,
+          "maxX": 4.25,
+          "minZ": -6.432,
+          "maxZ": -6.092
+        },
+        "wallBacked": true,
+        "backGap": 0.0375,
+        "support": "floor-console",
+        "id": "f3-unit-20-media",
+        "floor": 3,
+        "unit": 20,
+        "sourcePage": 6,
+        "seed": [
+          5.616419,
+          -7.978253
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 3,
+      "unit": 19,
+      "sofa": {
+        "kind": "sofa",
+        "x": 19.898,
+        "z": -2.7755,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": 3.141593,
+        "box": {
+          "minX": 18.798,
+          "maxX": 20.998,
+          "minZ": -3.2355,
+          "maxZ": -2.3155
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f3-unit-19-sofa",
+        "floor": 3,
+        "unit": 19,
+        "sourcePage": 6,
+        "seed": [
+          17.783581,
+          -3.921747
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 19.898,
+        "z": -5.624,
+        "w": 1.5,
+        "d": 0.34,
+        "angle": 6.283185,
+        "box": {
+          "minX": 19.148,
+          "maxX": 20.648,
+          "minZ": -5.794,
+          "maxZ": -5.454
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "support": "floor-console",
+        "id": "f3-unit-19-media",
+        "floor": 3,
+        "unit": 19,
+        "sourcePage": 6,
+        "seed": [
+          17.783581,
+          -3.921747
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 3,
+      "unit": 22,
+      "sofa": {
+        "kind": "sofa",
+        "x": 6.8465,
+        "z": 0.514,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": 0,
+        "box": {
+          "minX": 5.7465,
+          "maxX": 7.9465,
+          "minZ": 0.054,
+          "maxZ": 0.974
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f3-unit-22-sofa",
+        "floor": 3,
+        "unit": 22,
+        "sourcePage": 6,
+        "seed": [
+          6.586694,
+          3.760673
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 6.8465,
+        "z": 5.2635,
+        "w": 1.5,
+        "d": 0.34,
+        "angle": 3.141593,
+        "box": {
+          "minX": 6.0965,
+          "maxX": 7.5965,
+          "minZ": 5.0935,
+          "maxZ": 5.4335
+        },
+        "wallBacked": true,
+        "backGap": 0.062,
+        "support": "floor-console",
+        "id": "f3-unit-22-media",
+        "floor": 3,
+        "unit": 22,
+        "sourcePage": 6,
+        "seed": [
+          6.586694,
+          3.760673
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 3,
+      "unit": 21,
+      "sofa": {
+        "kind": "sofa",
+        "x": 16.5515,
+        "z": 0.514,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": 0,
+        "box": {
+          "minX": 15.4515,
+          "maxX": 17.6515,
+          "minZ": 0.054,
+          "maxZ": 0.974
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f3-unit-21-sofa",
+        "floor": 3,
+        "unit": 21,
+        "sourcePage": 6,
+        "seed": [
+          16.835336,
+          3.752669
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 16.5515,
+        "z": 5.2635,
+        "w": 1.5,
+        "d": 0.34,
+        "angle": 3.141593,
+        "box": {
+          "minX": 15.8015,
+          "maxX": 17.3015,
+          "minZ": 5.0935,
+          "maxZ": 5.4335
+        },
+        "wallBacked": true,
+        "backGap": 0.062,
+        "support": "floor-console",
+        "id": "f3-unit-21-media",
+        "floor": 3,
+        "unit": 21,
+        "sourcePage": 6,
+        "seed": [
+          16.835336,
+          3.752669
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 4,
+      "unit": 26,
+      "sofa": {
+        "kind": "sofa",
+        "x": 3.5,
+        "z": -9.136,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": 0,
+        "box": {
+          "minX": 2.4,
+          "maxX": 4.6,
+          "minZ": -9.596,
+          "maxZ": -8.676
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f4-unit-26-sofa",
+        "floor": 4,
+        "unit": 26,
+        "sourcePage": 6,
+        "seed": [
+          5.616419,
+          -7.978253
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 3.5,
+        "z": -6.262,
+        "w": 1.5,
+        "d": 0.34,
+        "angle": 3.141593,
+        "box": {
+          "minX": 2.75,
+          "maxX": 4.25,
+          "minZ": -6.432,
+          "maxZ": -6.092
+        },
+        "wallBacked": true,
+        "backGap": 0.0375,
+        "support": "floor-console",
+        "id": "f4-unit-26-media",
+        "floor": 4,
+        "unit": 26,
+        "sourcePage": 6,
+        "seed": [
+          5.616419,
+          -7.978253
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 4,
+      "unit": 25,
+      "sofa": {
+        "kind": "sofa",
+        "x": 19.898,
+        "z": -2.7755,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": 3.141593,
+        "box": {
+          "minX": 18.798,
+          "maxX": 20.998,
+          "minZ": -3.2355,
+          "maxZ": -2.3155
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f4-unit-25-sofa",
+        "floor": 4,
+        "unit": 25,
+        "sourcePage": 6,
+        "seed": [
+          17.783581,
+          -3.921747
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 19.898,
+        "z": -5.624,
+        "w": 1.5,
+        "d": 0.34,
+        "angle": 6.283185,
+        "box": {
+          "minX": 19.148,
+          "maxX": 20.648,
+          "minZ": -5.794,
+          "maxZ": -5.454
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "support": "floor-console",
+        "id": "f4-unit-25-media",
+        "floor": 4,
+        "unit": 25,
+        "sourcePage": 6,
+        "seed": [
+          17.783581,
+          -3.921747
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 4,
+      "unit": 28,
+      "sofa": {
+        "kind": "sofa",
+        "x": 6.8465,
+        "z": 0.514,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": 0,
+        "box": {
+          "minX": 5.7465,
+          "maxX": 7.9465,
+          "minZ": 0.054,
+          "maxZ": 0.974
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f4-unit-28-sofa",
+        "floor": 4,
+        "unit": 28,
+        "sourcePage": 6,
+        "seed": [
+          6.586694,
+          3.760673
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 6.8465,
+        "z": 5.2635,
+        "w": 1.5,
+        "d": 0.34,
+        "angle": 3.141593,
+        "box": {
+          "minX": 6.0965,
+          "maxX": 7.5965,
+          "minZ": 5.0935,
+          "maxZ": 5.4335
+        },
+        "wallBacked": true,
+        "backGap": 0.062,
+        "support": "floor-console",
+        "id": "f4-unit-28-media",
+        "floor": 4,
+        "unit": 28,
+        "sourcePage": 6,
+        "seed": [
+          6.586694,
+          3.760673
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 4,
+      "unit": 27,
+      "sofa": {
+        "kind": "sofa",
+        "x": 16.5515,
+        "z": 0.514,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": 0,
+        "box": {
+          "minX": 15.4515,
+          "maxX": 17.6515,
+          "minZ": 0.054,
+          "maxZ": 0.974
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f4-unit-27-sofa",
+        "floor": 4,
+        "unit": 27,
+        "sourcePage": 6,
+        "seed": [
+          16.835336,
+          3.752669
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 16.5515,
+        "z": 5.2635,
+        "w": 1.5,
+        "d": 0.34,
+        "angle": 3.141593,
+        "box": {
+          "minX": 15.8015,
+          "maxX": 17.3015,
+          "minZ": 5.0935,
+          "maxZ": 5.4335
+        },
+        "wallBacked": true,
+        "backGap": 0.062,
+        "support": "floor-console",
+        "id": "f4-unit-27-media",
+        "floor": 4,
+        "unit": 27,
+        "sourcePage": 6,
+        "seed": [
+          16.835336,
+          3.752669
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 5,
+      "unit": 32,
+      "sofa": {
+        "kind": "sofa",
+        "x": 5.731,
+        "z": -4.8,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": -1.570796,
+        "box": {
+          "minX": 5.271,
+          "maxX": 6.191,
+          "minZ": -5.9,
+          "maxZ": -3.7
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f5-unit-32-sofa",
+        "floor": 5,
+        "unit": 32,
+        "sourcePage": 7,
+        "seed": [
+          4.978515,
+          -6.784636
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 0.2305,
+        "z": -4.8,
+        "w": 1.2,
+        "d": 0.34,
+        "angle": 1.570796,
+        "box": {
+          "minX": 0.0605,
+          "maxX": 0.4005,
+          "minZ": -5.4,
+          "maxZ": -4.2
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "support": "floor-console",
+        "id": "f5-unit-32-media",
+        "floor": 5,
+        "unit": 32,
+        "sourcePage": 7,
+        "seed": [
+          4.978515,
+          -6.784636
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 5,
+      "unit": 31,
+      "sofa": {
+        "kind": "sofa",
+        "x": 19.9,
+        "z": -2.7735,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": 3.141593,
+        "box": {
+          "minX": 18.8,
+          "maxX": 21,
+          "minZ": -3.2335,
+          "maxZ": -2.3135
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f5-unit-31-sofa",
+        "floor": 5,
+        "unit": 31,
+        "sourcePage": 7,
+        "seed": [
+          17.783581,
+          -3.921747
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 19.9,
+        "z": -5.6245,
+        "w": 1.5,
+        "d": 0.34,
+        "angle": 6.283185,
+        "box": {
+          "minX": 19.15,
+          "maxX": 20.65,
+          "minZ": -5.7945,
+          "maxZ": -5.4545
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "support": "floor-console",
+        "id": "f5-unit-31-media",
+        "floor": 5,
+        "unit": 31,
+        "sourcePage": 7,
+        "seed": [
+          17.783581,
+          -3.921747
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 5,
+      "unit": 34,
+      "sofa": {
+        "kind": "sofa",
+        "x": 6.8465,
+        "z": 0.5165,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": 0,
+        "box": {
+          "minX": 5.7465,
+          "maxX": 7.9465,
+          "minZ": 0.0565,
+          "maxZ": 0.9765
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f5-unit-34-sofa",
+        "floor": 5,
+        "unit": 34,
+        "sourcePage": 7,
+        "seed": [
+          6.586694,
+          3.760673
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 6.8465,
+        "z": 5.263,
+        "w": 1.5,
+        "d": 0.34,
+        "angle": 3.141593,
+        "box": {
+          "minX": 6.0965,
+          "maxX": 7.5965,
+          "minZ": 5.093,
+          "maxZ": 5.433
+        },
+        "wallBacked": true,
+        "backGap": 0.0625,
+        "support": "floor-console",
+        "id": "f5-unit-34-media",
+        "floor": 5,
+        "unit": 34,
+        "sourcePage": 7,
+        "seed": [
+          6.586694,
+          3.760673
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 5,
+      "unit": 33,
+      "sofa": {
+        "kind": "sofa",
+        "x": 16.551,
+        "z": 0.5165,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": 0,
+        "box": {
+          "minX": 15.451,
+          "maxX": 17.651,
+          "minZ": 0.0565,
+          "maxZ": 0.9765
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f5-unit-33-sofa",
+        "floor": 5,
+        "unit": 33,
+        "sourcePage": 7,
+        "seed": [
+          16.835336,
+          3.752669
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 16.551,
+        "z": 5.263,
+        "w": 1.5,
+        "d": 0.34,
+        "angle": 3.141593,
+        "box": {
+          "minX": 15.801,
+          "maxX": 17.301,
+          "minZ": 5.093,
+          "maxZ": 5.433
+        },
+        "wallBacked": true,
+        "backGap": 0.0625,
+        "support": "floor-console",
+        "id": "f5-unit-33-media",
+        "floor": 5,
+        "unit": 33,
+        "sourcePage": 7,
+        "seed": [
+          16.835336,
+          3.752669
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 6,
+      "unit": 37,
+      "sofa": {
+        "kind": "sofa",
+        "x": 19.9,
+        "z": -2.7735,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": 3.141593,
+        "box": {
+          "minX": 18.8,
+          "maxX": 21,
+          "minZ": -3.2335,
+          "maxZ": -2.3135
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f6-unit-37-sofa",
+        "floor": 6,
+        "unit": 37,
+        "sourcePage": 8,
+        "seed": [
+          17.783581,
+          -3.921747
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 19.9,
+        "z": -5.6245,
+        "w": 1.5,
+        "d": 0.34,
+        "angle": 6.283185,
+        "box": {
+          "minX": 19.15,
+          "maxX": 20.65,
+          "minZ": -5.7945,
+          "maxZ": -5.4545
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "support": "floor-console",
+        "id": "f6-unit-37-media",
+        "floor": 6,
+        "unit": 37,
+        "sourcePage": 8,
+        "seed": [
+          17.783581,
+          -3.921747
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 6,
+      "unit": 39,
+      "sofa": {
+        "kind": "sofa",
+        "x": 6.8465,
+        "z": 0.5165,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": 0,
+        "box": {
+          "minX": 5.7465,
+          "maxX": 7.9465,
+          "minZ": 0.0565,
+          "maxZ": 0.9765
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f6-unit-39-sofa",
+        "floor": 6,
+        "unit": 39,
+        "sourcePage": 8,
+        "seed": [
+          6.810399,
+          3.239175
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 6.8465,
+        "z": 5.2635,
+        "w": 1.5,
+        "d": 0.34,
+        "angle": 3.141593,
+        "box": {
+          "minX": 6.0965,
+          "maxX": 7.5965,
+          "minZ": 5.0935,
+          "maxZ": 5.4335
+        },
+        "wallBacked": true,
+        "backGap": 0.062,
+        "support": "floor-console",
+        "id": "f6-unit-39-media",
+        "floor": 6,
+        "unit": 39,
+        "sourcePage": 8,
+        "seed": [
+          6.810399,
+          3.239175
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 6,
+      "unit": 38,
+      "sofa": {
+        "kind": "sofa",
+        "x": 16.5515,
+        "z": 0.5165,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": 0,
+        "box": {
+          "minX": 15.4515,
+          "maxX": 17.6515,
+          "minZ": 0.0565,
+          "maxZ": 0.9765
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f6-unit-38-sofa",
+        "floor": 6,
+        "unit": 38,
+        "sourcePage": 8,
+        "seed": [
+          16.589803,
+          3.239175
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 16.5515,
+        "z": 5.2635,
+        "w": 1.5,
+        "d": 0.34,
+        "angle": 3.141593,
+        "box": {
+          "minX": 15.8015,
+          "maxX": 17.3015,
+          "minZ": 5.0935,
+          "maxZ": 5.4335
+        },
+        "wallBacked": true,
+        "backGap": 0.062,
+        "support": "floor-console",
+        "id": "f6-unit-38-media",
+        "floor": 6,
+        "unit": 38,
+        "sourcePage": 8,
+        "seed": [
+          16.589803,
+          3.239175
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 1,
+      "unit": 5,
+      "sofa": {
+        "kind": "sofa",
+        "x": 11.0285,
+        "z": -20.1,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": -1.570796,
+        "box": {
+          "minX": 10.5685,
+          "maxX": 11.4885,
+          "minZ": -21.2,
+          "maxZ": -19
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f1-unit-5-sofa",
+        "floor": 1,
+        "unit": 5,
+        "sourcePage": 4,
+        "seed": [
+          9.393824,
+          -20.127434
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 7.2805,
+        "z": -20.1,
+        "w": 0.9,
+        "d": 0.34,
+        "angle": 1.570796,
+        "box": {
+          "minX": 7.1105,
+          "maxX": 7.4505,
+          "minZ": -20.55,
+          "maxZ": -19.65
+        },
+        "wallBacked": true,
+        "backGap": 0.062,
+        "support": "floor-console",
+        "id": "f1-unit-5-media",
+        "floor": 1,
+        "unit": 5,
+        "sourcePage": 4,
+        "seed": [
+          9.393824,
+          -20.127434
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 1,
+      "unit": 6,
+      "sofa": {
+        "kind": "sofa",
+        "x": 12.3695,
+        "z": -20.1,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": 1.570796,
+        "box": {
+          "minX": 11.9095,
+          "maxX": 12.8295,
+          "minZ": -21.2,
+          "maxZ": -19
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f1-unit-6-sofa",
+        "floor": 1,
+        "unit": 6,
+        "sourcePage": 4,
+        "seed": [
+          13.872559,
+          -20.127434
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 16.1175,
+        "z": -20.1,
+        "w": 0.9,
+        "d": 0.34,
+        "angle": 4.712389,
+        "box": {
+          "minX": 15.9475,
+          "maxX": 16.2875,
+          "minZ": -20.55,
+          "maxZ": -19.65
+        },
+        "wallBacked": true,
+        "backGap": 0.062,
+        "support": "floor-console",
+        "id": "f1-unit-6-media",
+        "floor": 1,
+        "unit": 6,
+        "sourcePage": 4,
+        "seed": [
+          13.872559,
+          -20.127434
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 2,
+      "unit": 11,
+      "sofa": {
+        "kind": "sofa",
+        "x": 11.0285,
+        "z": -18.6,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": -1.570796,
+        "box": {
+          "minX": 10.5685,
+          "maxX": 11.4885,
+          "minZ": -19.7,
+          "maxZ": -17.5
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f2-unit-11-sofa",
+        "floor": 2,
+        "unit": 11,
+        "sourcePage": 5,
+        "seed": [
+          9.368026,
+          -18.814041
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 7.2805,
+        "z": -18.6,
+        "w": 0.9,
+        "d": 0.34,
+        "angle": 1.570796,
+        "box": {
+          "minX": 7.1105,
+          "maxX": 7.4505,
+          "minZ": -19.05,
+          "maxZ": -18.15
+        },
+        "wallBacked": true,
+        "backGap": 0.062,
+        "support": "floor-console",
+        "id": "f2-unit-11-media",
+        "floor": 2,
+        "unit": 11,
+        "sourcePage": 5,
+        "seed": [
+          9.368026,
+          -18.814041
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 2,
+      "unit": 12,
+      "sofa": {
+        "kind": "sofa",
+        "x": 12.3695,
+        "z": -18.6,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": 1.570796,
+        "box": {
+          "minX": 11.9095,
+          "maxX": 12.8295,
+          "minZ": -19.7,
+          "maxZ": -17.5
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f2-unit-12-sofa",
+        "floor": 2,
+        "unit": 12,
+        "sourcePage": 5,
+        "seed": [
+          14.037658,
+          -18.814041
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 16.1175,
+        "z": -18.6,
+        "w": 0.9,
+        "d": 0.34,
+        "angle": 4.712389,
+        "box": {
+          "minX": 15.9475,
+          "maxX": 16.2875,
+          "minZ": -19.05,
+          "maxZ": -18.15
+        },
+        "wallBacked": true,
+        "backGap": 0.062,
+        "support": "floor-console",
+        "id": "f2-unit-12-media",
+        "floor": 2,
+        "unit": 12,
+        "sourcePage": 5,
+        "seed": [
+          14.037658,
+          -18.814041
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 3,
+      "unit": 17,
+      "sofa": {
+        "kind": "sofa",
+        "x": 11.0285,
+        "z": -18.6,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": -1.570796,
+        "box": {
+          "minX": 10.5685,
+          "maxX": 11.4885,
+          "minZ": -19.7,
+          "maxZ": -17.5
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f3-unit-17-sofa",
+        "floor": 3,
+        "unit": 17,
+        "sourcePage": 6,
+        "seed": [
+          9.349639,
+          -18.786526
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 7.331,
+        "z": -18.6,
+        "w": 0.9,
+        "d": 0.34,
+        "angle": 1.570796,
+        "box": {
+          "minX": 7.161,
+          "maxX": 7.501,
+          "minZ": -19.05,
+          "maxZ": -18.15
+        },
+        "wallBacked": true,
+        "backGap": 0.1125,
+        "support": "floor-console",
+        "id": "f3-unit-17-media",
+        "floor": 3,
+        "unit": 17,
+        "sourcePage": 6,
+        "seed": [
+          9.349639,
+          -18.786526
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 3,
+      "unit": 18,
+      "sofa": {
+        "kind": "sofa",
+        "x": 12.3695,
+        "z": -18.6,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": 1.570796,
+        "box": {
+          "minX": 11.9095,
+          "maxX": 12.8295,
+          "minZ": -19.7,
+          "maxZ": -17.5
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f3-unit-18-sofa",
+        "floor": 3,
+        "unit": 18,
+        "sourcePage": 6,
+        "seed": [
+          14.136745,
+          -18.786526
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 16.068,
+        "z": -18.6,
+        "w": 0.9,
+        "d": 0.34,
+        "angle": 4.712389,
+        "box": {
+          "minX": 15.898,
+          "maxX": 16.238,
+          "minZ": -19.05,
+          "maxZ": -18.15
+        },
+        "wallBacked": true,
+        "backGap": 0.1115,
+        "support": "floor-console",
+        "id": "f3-unit-18-media",
+        "floor": 3,
+        "unit": 18,
+        "sourcePage": 6,
+        "seed": [
+          14.136745,
+          -18.786526
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 4,
+      "unit": 23,
+      "sofa": {
+        "kind": "sofa",
+        "x": 11.0285,
+        "z": -18.6,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": -1.570796,
+        "box": {
+          "minX": 10.5685,
+          "maxX": 11.4885,
+          "minZ": -19.7,
+          "maxZ": -17.5
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f4-unit-23-sofa",
+        "floor": 4,
+        "unit": 23,
+        "sourcePage": 6,
+        "seed": [
+          9.349639,
+          -18.786526
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 7.331,
+        "z": -18.6,
+        "w": 0.9,
+        "d": 0.34,
+        "angle": 1.570796,
+        "box": {
+          "minX": 7.161,
+          "maxX": 7.501,
+          "minZ": -19.05,
+          "maxZ": -18.15
+        },
+        "wallBacked": true,
+        "backGap": 0.1125,
+        "support": "floor-console",
+        "id": "f4-unit-23-media",
+        "floor": 4,
+        "unit": 23,
+        "sourcePage": 6,
+        "seed": [
+          9.349639,
+          -18.786526
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 4,
+      "unit": 24,
+      "sofa": {
+        "kind": "sofa",
+        "x": 12.3695,
+        "z": -18.6,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": 1.570796,
+        "box": {
+          "minX": 11.9095,
+          "maxX": 12.8295,
+          "minZ": -19.7,
+          "maxZ": -17.5
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f4-unit-24-sofa",
+        "floor": 4,
+        "unit": 24,
+        "sourcePage": 6,
+        "seed": [
+          14.136745,
+          -18.786526
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 16.068,
+        "z": -18.6,
+        "w": 0.9,
+        "d": 0.34,
+        "angle": 4.712389,
+        "box": {
+          "minX": 15.898,
+          "maxX": 16.238,
+          "minZ": -19.05,
+          "maxZ": -18.15
+        },
+        "wallBacked": true,
+        "backGap": 0.1115,
+        "support": "floor-console",
+        "id": "f4-unit-24-media",
+        "floor": 4,
+        "unit": 24,
+        "sourcePage": 6,
+        "seed": [
+          14.136745,
+          -18.786526
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 5,
+      "unit": 29,
+      "sofa": {
+        "kind": "sofa",
+        "x": 11.0285,
+        "z": -18.6,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": -1.570796,
+        "box": {
+          "minX": 10.5685,
+          "maxX": 11.4885,
+          "minZ": -19.7,
+          "maxZ": -17.5
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f5-unit-29-sofa",
+        "floor": 5,
+        "unit": 29,
+        "sourcePage": 7,
+        "seed": [
+          9.25624,
+          -18.763375
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 7.331,
+        "z": -18.6,
+        "w": 0.9,
+        "d": 0.34,
+        "angle": 1.570796,
+        "box": {
+          "minX": 7.161,
+          "maxX": 7.501,
+          "minZ": -19.05,
+          "maxZ": -18.15
+        },
+        "wallBacked": true,
+        "backGap": 0.1105,
+        "support": "floor-console",
+        "id": "f5-unit-29-media",
+        "floor": 5,
+        "unit": 29,
+        "sourcePage": 7,
+        "seed": [
+          9.25624,
+          -18.763375
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 5,
+      "unit": 30,
+      "sofa": {
+        "kind": "sofa",
+        "x": 12.3695,
+        "z": -18.6,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": 1.570796,
+        "box": {
+          "minX": 11.9095,
+          "maxX": 12.8295,
+          "minZ": -19.7,
+          "maxZ": -17.5
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f5-unit-30-sofa",
+        "floor": 5,
+        "unit": 30,
+        "sourcePage": 7,
+        "seed": [
+          14.043346,
+          -18.763375
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 16.068,
+        "z": -18.6,
+        "w": 0.9,
+        "d": 0.34,
+        "angle": 4.712389,
+        "box": {
+          "minX": 15.898,
+          "maxX": 16.238,
+          "minZ": -19.05,
+          "maxZ": -18.15
+        },
+        "wallBacked": true,
+        "backGap": 0.1115,
+        "support": "floor-console",
+        "id": "f5-unit-30-media",
+        "floor": 5,
+        "unit": 30,
+        "sourcePage": 7,
+        "seed": [
+          14.043346,
+          -18.763375
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 6,
+      "unit": 35,
+      "sofa": {
+        "kind": "sofa",
+        "x": 11.0285,
+        "z": -18.6,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": -1.570796,
+        "box": {
+          "minX": 10.5685,
+          "maxX": 11.4885,
+          "minZ": -19.7,
+          "maxZ": -17.5
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f6-unit-35-sofa",
+        "floor": 6,
+        "unit": 35,
+        "sourcePage": 8,
+        "seed": [
+          9.32781,
+          -18.723555
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 7.2805,
+        "z": -18.6,
+        "w": 0.9,
+        "d": 0.34,
+        "angle": 1.570796,
+        "box": {
+          "minX": 7.1105,
+          "maxX": 7.4505,
+          "minZ": -19.05,
+          "maxZ": -18.15
+        },
+        "wallBacked": true,
+        "backGap": 0.062,
+        "support": "floor-console",
+        "id": "f6-unit-35-media",
+        "floor": 6,
+        "unit": 35,
+        "sourcePage": 8,
+        "seed": [
+          9.32781,
+          -18.723555
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 6,
+      "unit": 36,
+      "sofa": {
+        "kind": "sofa",
+        "x": 12.3695,
+        "z": -18.6,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": 1.570796,
+        "box": {
+          "minX": 11.9095,
+          "maxX": 12.8295,
+          "minZ": -19.7,
+          "maxZ": -17.5
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f6-unit-36-sofa",
+        "floor": 6,
+        "unit": 36,
+        "sourcePage": 8,
+        "seed": [
+          14.203022,
+          -18.723555
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 16.1175,
+        "z": -18.6,
+        "w": 0.9,
+        "d": 0.34,
+        "angle": 4.712389,
+        "box": {
+          "minX": 15.9475,
+          "maxX": 16.2875,
+          "minZ": -19.05,
+          "maxZ": -18.15
+        },
+        "wallBacked": true,
+        "backGap": 0.062,
+        "support": "floor-console",
+        "id": "f6-unit-36-media",
+        "floor": 6,
+        "unit": 36,
+        "sourcePage": 8,
+        "seed": [
+          14.203022,
+          -18.723555
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 7,
+      "unit": 40,
+      "sofa": {
+        "kind": "sofa",
+        "x": 18.3775,
+        "z": -17.5,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": -1.570796,
+        "box": {
+          "minX": 17.9175,
+          "maxX": 18.8375,
+          "minZ": -18.6,
+          "maxZ": -16.4
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f7-unit-40-sofa",
+        "floor": 7,
+        "unit": 40,
+        "sourcePage": 9,
+        "seed": [
+          15.88154,
+          -16.343098
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 15.3775,
+        "z": -17.5,
+        "w": 1.5,
+        "d": 0.34,
+        "angle": 1.570796,
+        "box": {
+          "minX": 15.2075,
+          "maxX": 15.5475,
+          "minZ": -18.25,
+          "maxZ": -16.75
+        },
+        "wallBacked": false,
+        "support": "floor-console",
+        "id": "f7-unit-40-media",
+        "floor": 7,
+        "unit": 40,
+        "sourcePage": 9,
+        "seed": [
+          15.88154,
+          -16.343098
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 7,
+      "unit": 41,
+      "sofa": {
+        "kind": "sofa",
+        "x": 9.448,
+        "z": 7.526,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": 3.141593,
+        "box": {
+          "minX": 8.348,
+          "maxX": 10.548,
+          "minZ": 7.066,
+          "maxZ": 7.986
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f7-unit-41-sofa",
+        "floor": 7,
+        "unit": 41,
+        "sourcePage": 9,
+        "seed": [
+          8.583405,
+          4.773033
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 9.448,
+        "z": 4.526,
+        "w": 1.5,
+        "d": 0.34,
+        "angle": 6.283186,
+        "box": {
+          "minX": 8.698,
+          "maxX": 10.198,
+          "minZ": 4.356,
+          "maxZ": 4.696
+        },
+        "wallBacked": false,
+        "support": "floor-console",
+        "id": "f7-unit-41-media",
+        "floor": 7,
+        "unit": 41,
+        "sourcePage": 9,
+        "seed": [
+          8.583405,
+          4.773033
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 8,
+      "unit": 42,
+      "sofa": {
+        "kind": "sofa",
+        "x": 16.8285,
+        "z": -16.9,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": -1.570796,
+        "box": {
+          "minX": 16.3685,
+          "maxX": 17.2885,
+          "minZ": -18,
+          "maxZ": -15.8
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f8-unit-42-sofa",
+        "floor": 8,
+        "unit": 42,
+        "sourcePage": 10,
+        "seed": [
+          14.873212,
+          -15.774773
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 13.8285,
+        "z": -16.9,
+        "w": 1.2,
+        "d": 0.34,
+        "angle": 1.570796,
+        "box": {
+          "minX": 13.6585,
+          "maxX": 13.9985,
+          "minZ": -17.5,
+          "maxZ": -16.3
+        },
+        "wallBacked": false,
+        "support": "floor-console",
+        "id": "f8-unit-42-media",
+        "floor": 8,
+        "unit": 42,
+        "sourcePage": 10,
+        "seed": [
+          14.873212,
+          -15.774773
+        ],
+        "layoutRevision": 131
+      }
+    },
+    {
+      "floor": 8,
+      "unit": 43,
+      "sofa": {
+        "kind": "sofa",
+        "x": 12.397,
+        "z": 2.667,
+        "w": 2.2,
+        "d": 0.92,
+        "angle": 0,
+        "box": {
+          "minX": 11.297,
+          "maxX": 13.497,
+          "minZ": 2.207,
+          "maxZ": 3.127
+        },
+        "wallBacked": true,
+        "backGap": 0.06,
+        "id": "f8-unit-43-sofa",
+        "floor": 8,
+        "unit": 43,
+        "sourcePage": 10,
+        "seed": [
+          10.291687,
+          4.107871
+        ],
+        "layoutRevision": 131
+      },
+      "media": {
+        "kind": "media",
+        "x": 12.397,
+        "z": 5.667,
+        "w": 1.5,
+        "d": 0.34,
+        "angle": 3.141593,
+        "box": {
+          "minX": 11.647,
+          "maxX": 13.147,
+          "minZ": 5.497,
+          "maxZ": 5.837
+        },
+        "wallBacked": false,
+        "support": "floor-console",
+        "id": "f8-unit-43-media",
+        "floor": 8,
+        "unit": 43,
+        "sourcePage": 10,
+        "seed": [
+          10.291687,
+          4.107871
+        ],
+        "layoutRevision": 131
+      }
+    }
+  ],
+  "ground": [
+    {
+      "kind": "sofa",
+      "x": 3.4,
+      "z": 3.9797749999999996,
+      "w": 2.2,
+      "d": 0.92,
+      "angle": 3.141592653589793,
+      "box": {
+        "minX": 2.3,
+        "maxX": 4.5,
+        "minZ": 3.5197749999999997,
+        "maxZ": 4.439775
+      },
+      "wallBacked": true,
+      "backGap": 0.05999999999999961
+    },
+    {
+      "kind": "coffee",
+      "x": 3.4,
+      "z": 2.8497749999999997,
+      "w": 0.85,
+      "d": 0.5,
+      "angle": 3.141592653589793,
+      "box": {
+        "minX": 2.9749999999999996,
+        "maxX": 3.825,
+        "minZ": 2.5997749999999997,
+        "maxZ": 3.0997749999999997
+      }
+    },
+    {
+      "kind": "media",
+      "x": 3.4,
+      "z": 0.23006944444444447,
+      "w": 1.5,
+      "d": 0.34,
+      "angle": 6.283185307179586,
+      "box": {
+        "minX": 2.65,
+        "maxX": 4.15,
+        "minZ": 0.06006944444444426,
+        "maxZ": 0.4000694444444447
+      },
+      "wallBacked": true,
+      "backGap": 0.059999999999999803,
+      "support": "floor-console"
+    }
+  ],
+  "unchangedBedroomsAndKitchens": true
+}

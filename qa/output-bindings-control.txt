@@ -1,0 +1,33 @@
+✔ every static mesh sharing an ordinary material refreshes shadow bindings on resize, then becomes stable again (4.108884ms)
+✖ equal-size output replacement and resize refresh every shared static draw before the cache early-out (1.381649ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 1
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 132.196631
+
+✖ failing tests:
+
+test at src/native-shadow-bindings.test.mjs:19:1
+✖ equal-size output replacement and resize refresh every shared static draw before the cache early-out (1.381649ms)
+  AssertionError [ERR_ASSERTION]: each draw updates its object bindings for the new output
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/9d294e932994/homestudio-r126/src/native-shadow-bindings.test.mjs:25:36)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

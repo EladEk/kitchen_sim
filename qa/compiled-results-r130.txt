@@ -1,0 +1,20 @@
+Personal entrance movement median: 0.279ms; index: 5160044 bytes
+✔ personal district keeps all eight public transforms, roads and bays; private geometry occurs only at 4102 (9138.164726ms)
+✔ public build contains no owner application, drafts or unsealed source documents (578.425267ms)
+✔ unauthenticated visitors see the public app but cannot fetch ANY private asset, including direct or encoded paths (31.819502ms)
+✔ correct password opens preserved app and scripts with no-store, wrong password fails, logout clears access cookie (52.806758ms)
+✔ public scene is self-contained, parsable, contains 43 base apartments, and strips all private metadata (153.76736ms)
+✔ the personal district entry and every referenced asset stay behind the password gate (46.241142ms)
+✔ all 43 actual apartment destinations in eight buildings produce the matching interior plan and registered live marker (302.417161ms)
+✔ the compiled public master-bed footprint returns to the pre-annotation sleeping zone (189.729892ms)
+✔ the public loading manifest records exact decoded UTF-8 sizes for all three actual scene downloads (21.487288ms)
+✔ the production startup loader accepts the actual current app, loading manifest and navigation together (127.958648ms)
+✔ a genuinely stale navigation file is rejected with expected and received versions in diagnostics (142.956622ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9496.990888

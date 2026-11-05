@@ -1,0 +1,270 @@
+{
+  "revision": "R126",
+  "backend": "Dawn null",
+  "mobile": false,
+  "personal": true,
+  "enhanced": false,
+  "expectedFailure": false,
+  "steps": [
+    {
+      "phase": "initial",
+      "elapsedMs": 33971,
+      "maps": [
+        {
+          "light": "DirectionalLight",
+          "sameIdentity": true,
+          "size": [
+            4096,
+            4096
+          ],
+          "actual": [
+            4096,
+            4096
+          ],
+          "depth": true
+        },
+        {
+          "light": "tour-interior-shadow",
+          "sameIdentity": true,
+          "size": [
+            1024,
+            1024
+          ],
+          "actual": [
+            1024,
+            1024
+          ],
+          "depth": true
+        }
+      ]
+    },
+    {
+      "phase": "auto-tier-1",
+      "elapsedMs": 554,
+      "maps": [
+        {
+          "light": "DirectionalLight",
+          "sameIdentity": true,
+          "size": [
+            2048,
+            2048
+          ],
+          "actual": [
+            2048,
+            2048
+          ],
+          "depth": true
+        },
+        {
+          "light": "tour-interior-shadow",
+          "sameIdentity": true,
+          "size": [
+            1024,
+            1024
+          ],
+          "actual": [
+            1024,
+            1024
+          ],
+          "depth": true
+        }
+      ]
+    },
+    {
+      "phase": "auto-tier-2",
+      "elapsedMs": 18224,
+      "maps": [
+        {
+          "light": "DirectionalLight",
+          "sameIdentity": true,
+          "size": [
+            1024,
+            1024
+          ],
+          "actual": [
+            1024,
+            1024
+          ],
+          "depth": true
+        },
+        {
+          "light": "tour-interior-shadow",
+          "sameIdentity": true,
+          "size": [
+            512,
+            512
+          ],
+          "actual": [
+            512,
+            512
+          ],
+          "depth": true
+        }
+      ]
+    },
+    {
+      "phase": "performance",
+      "elapsedMs": 406,
+      "maps": [
+        {
+          "light": "DirectionalLight",
+          "sameIdentity": true,
+          "size": [
+            512,
+            512
+          ],
+          "actual": [
+            512,
+            512
+          ],
+          "depth": true
+        },
+        {
+          "light": "tour-interior-shadow",
+          "sameIdentity": true,
+          "size": [
+            512,
+            512
+          ],
+          "actual": [
+            512,
+            512
+          ],
+          "depth": true
+        }
+      ]
+    },
+    {
+      "phase": "recovery",
+      "elapsedMs": 17855,
+      "maps": [
+        {
+          "light": "DirectionalLight",
+          "sameIdentity": true,
+          "size": [
+            4096,
+            4096
+          ],
+          "actual": [
+            4096,
+            4096
+          ],
+          "depth": true
+        },
+        {
+          "light": "tour-interior-shadow",
+          "sameIdentity": true,
+          "size": [
+            1024,
+            1024
+          ],
+          "actual": [
+            1024,
+            1024
+          ],
+          "depth": true
+        }
+      ]
+    },
+    {
+      "phase": "repeat-same-size",
+      "elapsedMs": 116,
+      "maps": [
+        {
+          "light": "DirectionalLight",
+          "sameIdentity": true,
+          "size": [
+            4096,
+            4096
+          ],
+          "actual": [
+            4096,
+            4096
+          ],
+          "depth": true
+        },
+        {
+          "light": "tour-interior-shadow",
+          "sameIdentity": true,
+          "size": [
+            1024,
+            1024
+          ],
+          "actual": [
+            1024,
+            1024
+          ],
+          "depth": true
+        }
+      ]
+    },
+    {
+      "phase": "trim",
+      "elapsedMs": 157,
+      "maps": [
+        {
+          "light": "DirectionalLight",
+          "sameIdentity": true,
+          "size": [
+            2048,
+            2048
+          ],
+          "actual": [
+            2048,
+            2048
+          ],
+          "depth": true
+        },
+        {
+          "light": "tour-interior-shadow",
+          "sameIdentity": true,
+          "size": [
+            1024,
+            1024
+          ],
+          "actual": [
+            1024,
+            1024
+          ],
+          "depth": true
+        }
+      ]
+    },
+    {
+      "phase": "after-trim",
+      "elapsedMs": 150,
+      "maps": [
+        {
+          "light": "DirectionalLight",
+          "sameIdentity": true,
+          "size": [
+            4096,
+            4096
+          ],
+          "actual": [
+            4096,
+            4096
+          ],
+          "depth": true
+        },
+        {
+          "light": "tour-interior-shadow",
+          "sameIdentity": true,
+          "size": [
+            1024,
+            1024
+          ],
+          "actual": [
+            1024,
+            1024
+          ],
+          "depth": true
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "failure": null,
+  "pixelsVerified": false,
+  "physicalDeviceVerified": false
+}

@@ -1,3 +1,4 @@
+import {GARDEN_TERRACES} from '../src/garden-terraces.mjs';
 import clipping from 'polygon-clipping';
 import {rectanglePolygon} from '../public-view/site-layout.mjs';
 import {DISTRICT,districtPoint} from '../public-view/district-layout.mjs';
@@ -10,6 +11,7 @@ import {contextPolygon} from '../public-view/context-scene.mjs';
 export function publicGroundCover(layout){
  const hardscape=clipping.union(...[
   ...layout.roadSurfaces.map(rectanglePolygon),
+  ...DISTRICT.flatMap(b=>GARDEN_TERRACES.map(t=>t.polygon.map(p=>districtPoint(p,b)))),
   ...layout.parking.map(b=>b.polygon),
   ...layout.context.parkingCourts.map(contextPolygon),
   ...layout.context.buildings.map(b=>contextPolygon(b.bounds))

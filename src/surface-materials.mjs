@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {facadePixels,FACADE_ROUGHNESS} from './facade-finish.mjs';
 import {photographicSurfaceData,PHOTO_MATERIALS} from './material-photographs.mjs';
 import {orderedSurface} from './ordered-flooring.mjs';
 import {orderedFloorPhotoData} from './ordered-floor-photo.mjs';
@@ -14,6 +15,7 @@ function noise(x,y,period,seed){
  return lerp(lerp(h(ix,iy),h(ix+1,iy),u),lerp(h(ix,iy+1),h(ix+1,iy+1),u),v);
 }
 function surfaceData(kind,size=256,product=null){
+ if(kind==='limestone'&&!product){const {color,height,roughness}=facadePixels(size);return {color,height,roughness,size};}
  const color=new Uint8Array(size*size*4),height=new Uint8Array(size*size*4),roughness=new Uint8Array(size*size*4);
  for(let y=0;y<size;y++)for(let x=0;x<size;x++){
   if(product?.photo){const i=(y*size+x)*4;color.set([...product.photo.previewRgb,255],i);height.set([128,128,128,255],i);roughness.set([245,245,245,255],i);continue;}
@@ -41,12 +43,12 @@ function surfaceData(kind,size=256,product=null){
 const dataCache=new Map();let dataBytes=0;const DATA_LIMIT=16*1024*1024;
 export function clearHomeSurfaceCache(){dataCache.clear();dataBytes=0;}
 export const homeSurfaceCacheStats=()=>({bytes:dataBytes,entries:dataCache.size,limit:DATA_LIMIT});
-const PROFILES={plaster:[.94,.00085],paint:[.57,.00016],door:[.5,.00025],porcelain:[.6,.00028],cement:[.9,.0012],limestone:[.88,.0018],stone:[.38,.0002],basalt:[.62,.00045],wood:[.66,.001],terrace:[.86,.001],fabric:[.98,.0017],grass:[1,.012],soil:[1,.006]};
+const PROFILES={plaster:[.94,.00085],paint:[.57,.00016],door:[.5,.00025],porcelain:[.6,.00028],cement:[.9,.0012],limestone:[FACADE_ROUGHNESS,.00018],stone:[.38,.0002],basalt:[.62,.00045],wood:[.66,.001],terrace:[.86,.001],fabric:[.98,.0017],grass:[1,.012],soil:[1,.006]};
 export function createSurfacePalette(resources){
- const textures=new Map(),materials=new Map();
+ const textures=new Map(),materials=new Map(),pending=[];
  function surface(kind,color,options={}){
   const key=JSON.stringify([kind,color,options]);if(materials.has(key))return materials.get(key);
-  const {productId,...materialOptions}=options,product=orderedSurface(productId),textureKey=product?`ordered:${product.sku}`:kind;
+  const {productId,interior=false,...materialOptions}=options,product=orderedSurface(productId),textureKey=product?`ordered:${product.sku}`:kind;
   if(!textures.has(textureKey)){
    if(!dataCache.has(textureKey)){const value=surfaceData(kind,256,product),bytes=value.color.byteLength+value.height.byteLength+value.roughness.byteLength;while(dataBytes+bytes>DATA_LIMIT&&dataCache.size){const [key,old]=dataCache.entries().next().value;dataBytes-=old.color.byteLength+old.height.byteLength+old.roughness.byteLength;dataCache.delete(key);}dataCache.set(textureKey,value);dataBytes+=bytes;}
    const data=dataCache.get(textureKey),maps={};
@@ -54,13 +56,13 @@ export function createSurfacePalette(resources){
    for(const channel of ['color','height','roughness']){const texture=new THREE.DataTexture(data[channel],data.size,data.size,THREE.RGBAFormat);texture.wrapS=texture.wrapT=FLOOR_RENDERING[productId]?THREE.ClampToEdgeWrapping:THREE.RepeatWrapping;texture.repeat.set(product?1/product.tile[0]:density,product?1/product.tile[1]:density);texture.magFilter=THREE.LinearFilter;texture.minFilter=THREE.LinearMipmapLinearFilter;texture.generateMipmaps=true;texture.anisotropy=FLOOR_RENDERING[productId]?16:4;texture.colorSpace=channel==='color'?THREE.SRGBColorSpace:THREE.NoColorSpace;texture.needsUpdate=true;maps[channel]=texture;resources.push(texture);}
    textures.set(textureKey,maps);
    const photo=product?.photo?orderedFloorPhotoData(productId):product?null:photographicSurfaceData(kind);
-   if(photo){let disposed=false;maps.color.addEventListener('dispose',()=>{disposed=true;});photo.then(data=>{if(disposed)return;for(const channel of ['color','height','roughness']){maps[channel].image={data:data[channel],width:data.size,height:data.size};if(!product)maps[channel].repeat.setScalar(PHOTO_MATERIALS[kind].repeat);maps[channel].wrapS=maps[channel].wrapT=FLOOR_RENDERING[productId]?THREE.ClampToEdgeWrapping:THREE.MirroredRepeatWrapping;maps[channel].needsUpdate=true;}},()=>{});}
+   if(photo){let disposed=false;maps.color.addEventListener('dispose',()=>{disposed=true;});const ready=photo.then(data=>{if(disposed)return;for(const channel of ['color','height','roughness']){maps[channel].image={data:data[channel],width:data.size,height:data.size};if(!product)maps[channel].repeat.setScalar(PHOTO_MATERIALS[kind].repeat);maps[channel].wrapS=maps[channel].wrapT=FLOOR_RENDERING[productId]?THREE.ClampToEdgeWrapping:THREE.MirroredRepeatWrapping;maps[channel].needsUpdate=true;}});pending.push(product?.photo?ready:ready.catch(()=>{}));ready.catch(()=>{});}
   }
   const maps=textures.get(textureKey),[roughness,bumpScale]=PROFILES[kind]||PROFILES.porcelain;
   const physical=FLOOR_RENDERING[productId],Material=physical||kind==='fabric'?THREE.MeshPhysicalMaterial:THREE.MeshStandardMaterial;
-  const material=new Material({color:product?.photo?'#ffffff':product?.color||color,map:maps.color,bumpMap:maps.height,bumpScale:product?.bumpScale??bumpScale,roughnessMap:maps.roughness,roughness:product?.roughness??roughness,...(physical?{ior:physical.ior,specularIntensity:physical.specularIntensity,clearcoat:0}:{}),...(kind==='fabric'?{sheen:.85,sheenColor:color,sheenRoughness:.85,specularIntensity:.22}:{}),...materialOptions});material.userData={surfaceKind:kind,...(product?{productId:product.productId,sku:product.sku,tile:product.tile,textureBasis:product.textureBasis,manufacturerScan:product.manufacturerScan,...(product.photo?{photoSource:product.photo.image,photoSample:product.photo.sample}:{} )}:{} )};if(physical)installFloorMaterial(material,product);resources.push(material);materials.set(key,material);return material;
+  const material=new Material({color:product?.photo?'#ffffff':product?.color||color,map:maps.color,bumpMap:maps.height,bumpScale:product?.bumpScale??bumpScale,roughnessMap:maps.roughness,roughness:product?.roughness??roughness,...(physical?{ior:physical.ior,specularIntensity:physical.specularIntensity,clearcoat:0}:{}),...(kind==='fabric'?{sheen:.85,sheenColor:color,sheenRoughness:.85,specularIntensity:.22}:{}),...materialOptions});material.userData={surfaceKind:kind,...(interior?{architecturalInterior:true,selectedFinishColor:color}:{}),...(product?{productId:product.productId,sku:product.sku,tile:product.tile,textureBasis:product.textureBasis,manufacturerScan:product.manufacturerScan,...(product.photo?{photoSource:product.photo.image,photoSample:product.photo.sample}:{} )}:{} )};if(physical)installFloorMaterial(material,product);resources.push(material);materials.set(key,material);return material;
  }
- return surface;
+ surface.ready=()=>Promise.all(pending);return surface;
 }
 
 // Box UVs use physical metres on each face, so a 20 cm panel and an 8 m wall

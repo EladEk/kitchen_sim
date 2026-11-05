@@ -1,8 +1,13 @@
+import {splitWallReturnGeometry} from './wall-return-geometry.mjs';
+import {buildBaseKitchenDetail} from './base-kitchen-detail.mjs';
+import {FACADE_COLOR,FACADE_ROUGHNESS} from './facade-finish.mjs';
+import {doorFrameGeometry} from './door-frame.mjs';
 import * as THREE from 'three';
 import {facadeSkinRows,appendFacadeVeneers} from './facade-veneers.mjs';
 import {createArchitecturalGlass} from './architectural-glass.mjs';
 import {installWallCavity,installStoneCourses,installFloorCourses} from './building-finish-shaders.mjs';
-import {groundBaseProfile,groundTransform,groundBaseServices,baseOpeningPosition,GROUND_KITCHEN} from './ground-apartments.mjs';
+import {groundBaseProfile,groundTransform,groundPoint,groundBuildingContains,groundBaseServices,baseOpeningPosition,GROUND_KITCHEN} from './ground-apartments.mjs';
+import {INTERIOR_WHITE} from './interior-finish.mjs';
 import {point,DOORS,HOUSE_OUTLINE,insidePolygon} from './home-model.mjs';
 import {wallExteriorFaces,wallFaceMaterials} from './wall-face-finishes.mjs';
 import {markPublicDoor} from './public-door-motion.mjs';
@@ -16,14 +21,14 @@ import {CEILING_COLOR,CEILING_MATERIAL} from './ceiling-finish.mjs';
 
 // One shared base geometry, three rigid placements. Gardens, ordered products,
 // movable owner furniture and the owner's kitchen never enter this builder.
-export function buildGroundApartments({root,resources,picks,settings,cut=false,mode='building',floorMaterial=null,interactiveDoors=false}){
+export function buildGroundApartments({root,resources,picks,settings,cut=false,mode='building',floorMaterial=null,interactiveDoors=false,units=[1,2,3]}){
  const profile=groundBaseProfile(),template=new THREE.Group(),h=cut?.85:profile.height,mat=(color,extra={})=>{const m=new THREE.MeshStandardMaterial({color,roughness:.72,...extra});resources.push(m);return m;},surface=createSurfacePalette(resources);
- const paint=surface('plaster','#eeece5'),ceilingFinish=surface('plaster',CEILING_COLOR,CEILING_MATERIAL),stone=surface('limestone','#d9d2c5'),neutralFloor=floorMaterial||surface('porcelain','#d0cdc5'),wetFloor=surface('cement','#c4c3bd'),white=mat('#f0f0e9'),metal=mat('#343e3d',{metalness:.35,roughness:.4}),glass=mat('#acc2ca',{transparent:true,opacity:.28,depthWrite:false,roughness:.18}),wood=surface('paint','#dedbd1');
+ const paint=surface('plaster',INTERIOR_WHITE),ceilingFinish=surface('plaster',CEILING_COLOR,CEILING_MATERIAL),stone=surface('limestone',FACADE_COLOR,{roughness:FACADE_ROUGHNESS}),neutralFloor=floorMaterial||surface('porcelain','#d0cdc5'),wetFloor=surface('cement','#c4c3bd'),white=mat('#f0f0e9'),metal=mat('#343e3d',{metalness:.35,roughness:.4}),glass=mat('#acc2ca',{transparent:true,opacity:.28,depthWrite:false,roughness:.18}),wood=surface('paint','#dedbd1');
  installWallCavity(paint,{height:profile.height});installStoneCourses(stone);if(!floorMaterial)installFloorCourses(neutralFloor);installFloorCourses(wetFloor,{tile:[.3,.3],joint:.003});
  const showerGlass=createArchitecturalGlass(resources,{mobile:settings.xr===true||globalThis.matchMedia?.('(pointer: coarse)').matches===true});
  const innerDoor=surface('door','#d8d0c3'),entryDoor=surface('door','#536c66');for(const material of [innerDoor,entryDoor])installBuildingSurfaceUVs(material);
  for(const material of [paint,ceilingFinish,stone,neutralFloor,wetFloor,wood])installBuildingSurfaceUVs(material);
- const cube=new THREE.BoxGeometry(1,1,1);resources.push(cube);let interactive=false;
+ const cube=new THREE.BoxGeometry(1,1,1);resources.push(cube);const facadeCube=splitWallReturnGeometry(cube);resources.push(facadeCube);const verticalFacadeCube=splitWallReturnGeometry(cube,{vertical:true});resources.push(verticalFacadeCube);let interactive=false;
  const box=(x,y,z,w,hh,d,m,parent=template,data=null)=>{const mesh=new THREE.Mesh(cube,m);mesh.position.set(x,y,z);mesh.scale.set(w,hh,d);mesh.castShadow=mesh.receiveShadow=true;mesh.userData={...(data||{}),baseline:true};parent.add(mesh);if(interactive&&data?.action)picks.push(mesh);return mesh;};
  const cylinder=(x,y,z,r,hh,m,parent=template,data=null)=>{const g=new THREE.CylinderGeometry(r,r,hh,20);resources.push(g);const mesh=new THREE.Mesh(g,m);mesh.position.set(x,y,z);mesh.userData={...(data||{}),baseline:true};mesh.castShadow=true;parent.add(mesh);if(interactive&&data?.action)picks.push(mesh);return mesh;};
  const polygon=(poly,y,m,parent=template,depth=0)=>{const shape=new THREE.Shape();poly.forEach(([x,z],i)=>i?shape.lineTo(x,z):shape.moveTo(x,z));shape.closePath();const geo=depth?new THREE.ExtrudeGeometry(shape,{depth,bevelEnabled:false}):new THREE.ShapeGeometry(shape);geo.rotateX(Math.PI/2);metricSurfaceUVs(geo);if(!depth)m.side=THREE.DoubleSide;resources.push(geo);const mesh=new THREE.Mesh(geo,m);mesh.position.y=y;mesh.receiveShadow=true;mesh.castShadow=!!depth;parent.add(mesh);return mesh;};
@@ -31,17 +36,17 @@ export function buildGroundApartments({root,resources,picks,settings,cut=false,m
  const claddingRows=[],beltRows=[],beltMaterial=surface('cement','#b1aba1',{roughness:.95});
  for(const wall of profile.walls){
   const vertical=Math.abs(wall.a[0]-wall.b[0])<.001,lo=wall.a[vertical?1:0],hi=wall.b[vertical?1:0],holes=[...profile.doors,...profile.windows].filter(o=>o.wallId===wall.id).sort((a,b)=>a.start-b.start);
-  const segment=(a,b,bottom,hh)=>{if(b-a<.002||hh<.002)return;const centre=vertical?[wall.a[0],(a+b)/2]:[(a+b)/2,wall.a[1]],faces=wall.external?wallExteriorFaces({centre,normal:vertical?[1,0]:[0,1],thickness:wall.thickness,inside:p=>insidePolygon(p,HOUSE_OUTLINE),positiveFace:vertical?0:4,negativeFace:vertical?1:5}):null,material=faces?wallFaceMaterials(paint,stone,faces):paint;const m=box(centre[0],bottom+hh/2,centre[1],vertical?wall.thickness:b-a,hh,vertical?b-a:wall.thickness,material);m.userData={part:'ground-base-wall',baseWallId:wall.id,blockPick:true,baseline:true};if(faces){const skin=facadeSkinRows([centre[0],bottom+hh/2,centre[1],vertical?wall.thickness:b-a,hh,vertical?b-a:wall.thickness],faces,{vertical,positiveFace:vertical?0:4,negativeFace:vertical?1:5});claddingRows.push(...skin.skin);beltRows.push(...skin.belt);}};
+  const segment=(a,b,bottom,hh)=>{if(b-a<.002||hh<.002)return;const centre=vertical?[wall.a[0],(a+b)/2]:[(a+b)/2,wall.a[1]],faces=wallExteriorFaces({margin:.24,centre,normal:vertical?[1,0]:[0,1],thickness:wall.thickness,inside:p=>insidePolygon(p,HOUSE_OUTLINE),positiveFace:vertical?0:4,negativeFace:vertical?1:5}),material=faces?wallFaceMaterials(paint,stone,faces):paint;const m=box(centre[0],bottom+hh/2,centre[1],vertical?wall.thickness:b-a,hh,vertical?b-a:wall.thickness,material);m.geometry=vertical?verticalFacadeCube:facadeCube;m.userData={part:'ground-base-wall',baseWallId:wall.id,facadeWall:true,blockPick:true,baseline:true};if(faces){const skin=facadeSkinRows([centre[0],bottom+hh/2,centre[1],vertical?wall.thickness:b-a,hh,vertical?b-a:wall.thickness],faces,{vertical,positiveFace:vertical?0:4,negativeFace:vertical?1:5});claddingRows.push(...skin.skin);beltRows.push(...skin.belt);}};
   let cursor=lo;for(const o of holes){segment(cursor,o.start,0,h);if(o.sill)segment(o.start,o.end,0,Math.min(h,o.sill));if(h>o.sill+o.height)segment(o.start,o.end,o.sill+o.height,h-o.sill-o.height);cursor=o.end;}segment(cursor,hi,0,h);
   if(!cut&&wall.external)segment(lo,hi,profile.height,3.1-profile.height);
  }
- appendFacadeVeneers(template,claddingRows,stone,resources,{geometry:cube,part:'ground-exterior-cladding'});appendFacadeVeneers(template,beltRows,beltMaterial,resources,{geometry:cube,part:'garden-storey-separation'});
+
  for(const o of [...profile.windows,...profile.doors,...(interactiveDoors?DOORS.filter(d=>d.hostDoorId):[])]){
   const y=o.sill||0,hh=Math.min(o.height,h-y);if(hh<=0)continue;const [x,z]=baseOpeningPosition(o),p=new THREE.Group();p.position.set(x,y,z);p.rotation.y=o.vertical?Math.PI/2:0;template.add(p);p.userData={part:'ground-base-opening',baseOpeningId:o.id};
   if(interactiveDoors&&o.type!=='window'){
    p.rotation.y=o.vertical?-Math.PI/2:0;p.position.x+=o.vertical?(o.faceOffset||0):0;p.position.z+=o.vertical?0:(o.faceOffset||0);
    const id='base:'+o.id,kind=o.id==='entry'?'entry':o.type==='slider'?'glazed':'interior',data={action:'district-door',doorId:id};
-   if(!o.hostDoorId){for(const xx of [-o.width/2,o.width/2])box(xx,hh/2,0,.052,hh,.105,wood,p);if(!cut)box(0,hh,0,o.width,.052,.105,wood,p);}
+   if(!o.hostDoorId){const geometry=doorFrameGeometry({width:o.width,height:hh,depth:profile.walls.find(w=>w.id===o.wallId)?.thickness||.12,cut});resources.push(geometry);const frame=new THREE.Mesh(geometry,wood);frame.castShadow=frame.receiveShadow=true;frame.userData={part:'door-frame',frameProfile:'stepped',tourNonPhysical:true,baseline:true};p.add(frame);}
    if(o.type==='slider'){
     for(let i=0;i<2;i++){const leaf=new THREE.Group();leaf.position.x=o.width/4;p.add(leaf);const pane=box(0,hh/2,(i?1:-1)*.012,o.width/2-.035,hh-.035,.008,glass,leaf,data);pane.castShadow=false;for(const xx of [-o.width/4,o.width/4])box(xx,hh/2,0,.027,hh,.045,metal,leaf,data);for(const yy of [.015,hh-.015])box(0,yy,0,o.width/2,.027,.045,metal,leaf,data);box(-o.width/4+.06,hh*.48,.035,.02,.18,.025,metal,leaf,data);if(!i)markPublicDoor(leaf,{id,axis:'position',property:'x',closed:-o.width/4,open:o.width/4,kind});}
    }else{
@@ -75,16 +80,23 @@ export function buildGroundApartments({root,resources,picks,settings,cut=false,m
  }
  if(settings.furniture!==false){
   const p=new THREE.Group();p.userData={part:'ground-base-kitchen',source:'house-plan',page:1,proposed:true};template.add(p);
-  const counter=GROUND_KITCHEN.counterPdf.map(p=>point(...p));polygon(counter,.87,wood,p,.85);polygon(counter,.91,white,p,.035);
-  const hob=point(1103.16,340.60),sink=point(1185.30,341.20);box(hob[0],.92,hob[1],.54,.015,.54,metal,p);for(const x of [-.14,.14])for(const z of [-.14,.14])cylinder(hob[0]+x,.932,hob[1]+z,.075,.005,wetFloor,p);box(sink[0],.922,sink[1],.40,.014,.35,wetFloor,p);cylinder(sink[0],.933,sink[1],.026,.008,metal,p);box(sink[0],1.03,sink[1]+.2,.025,.23,.025,metal,p);
-  const fridge=GROUND_KITCHEN.fridgePdf.map(p=>point(...p)),xs=fridge.map(p=>p[0]),zs=fridge.map(p=>p[1]);box((Math.min(...xs)+Math.max(...xs))/2,.95,(Math.min(...zs)+Math.max(...zs))/2,Math.max(...xs)-Math.min(...xs),1.9,Math.max(...zs)-Math.min(...zs),wood,p);
+  buildBaseKitchenDetail({parent:p,box,polygon,cylinder,surface,mat,point});
  }
  buildObservedArchitecture({group:template,box,cylinder,mat,resources,wallHeight:h});
  const groups=new Map();
- for(const unit of [1,2,3]){
+ for(const unit of units){
   const node=template.clone(true),t=groundTransform(unit),[a,b,c,d]=t.matrix;
   node.matrixAutoUpdate=false;node.matrix.set(a,0,b,t.offset[0],0,1,0,0,c,0,d,t.offset[1],0,0,0,1);node.name=`garden-apartment-${unit}-base`;node.userData={part:'ground-base-apartment',unit,derived:true,reflected:t.reflected,source:'building-plan',page:3};root.add(node);groups.set(unit,node);
   node.traverse(o=>{o.userData={...o.userData,unit,derived:true,buildingFloor:0};if(o.userData.action==='district-door'){o.userData.doorId=o.userData.doorId.replace('base:',`ground:${unit}:`);if(o.userData.tourDoor){o.userData.tourDoor.id=o.userData.doorId;o.userData.tourMotionId='public:'+o.userData.doorId;}}else delete o.userData.action;delete o.userData.buildingId;delete o.userData.pickMeshes;if(o.userData.blockPick)picks.push(o);});
+  // Recompute each placed shell: party walls have plaster on both sides and
+  // never receive a stone veneer protruding into the adjacent apartment.
+  const skins=[],belts=[];node.traverse(o=>{
+   if(!o.userData.facadeWall)return;
+   const vertical=o.scale.x<o.scale.z,centre=[o.position.x,o.position.z],row=[o.position.x,o.position.y,o.position.z,o.scale.x,o.scale.y,o.scale.z];
+   const faces=wallExteriorFaces({margin:.24,centre,normal:vertical?[1,0]:[0,1],thickness:vertical?o.scale.x:o.scale.z,length:vertical?o.scale.z:o.scale.x,splitReturns:true,inside:p=>groundBuildingContains(groundPoint(unit,p)),positiveFace:vertical?0:4,negativeFace:vertical?1:5});
+   o.material=wallFaceMaterials(paint,stone,faces);const rows=facadeSkinRows(row,faces,{vertical,positiveFace:vertical?0:4,negativeFace:vertical?1:5});skins.push(...rows.skin);belts.push(...rows.belt);
+  });
+  appendFacadeVeneers(node,skins,stone,resources,{geometry:cube,part:'ground-exterior-cladding'});appendFacadeVeneers(node,belts,beltMaterial,resources,{geometry:cube,part:'garden-storey-separation'});
   const services=groundBaseServices(unit),worldGroup=new THREE.Group();worldGroup.name=`garden-apartment-${unit}-services`;root.add(worldGroup);interactive=true;
   const flags={...settings,selectedElectricalId:null,electricalPresentation:'fixtures'};
   const electric=services.filter(p=>p.serviceKind==='electrical'),water=services.filter(p=>p.serviceKind==='water');

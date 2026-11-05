@@ -57,6 +57,17 @@ def program(vertex,fragment):
 
 payload=json.load(sys.stdin)
 for pair in payload['programs']:program(pair['vertex'],pair['fragment'])
+if payload.get('probes'):
+    use=gl('glUseProgram',None,C.c_uint)
+    draw=gl('glDrawArrays',None,C.c_uint,C.c_int,C.c_int)
+    read=gl('glReadPixels',None,C.c_int,C.c_int,C.c_int,C.c_int,C.c_uint,C.c_uint,C.c_void_p)
+    gl('glViewport',None,C.c_int,C.c_int,C.c_int,C.c_int)(0,0,16,16)
+    results=[]
+    for pair in payload['probes']:
+        use(program(pair['vertex'],pair['fragment']));draw(4,0,3)
+        pixels=(C.c_ubyte*(16*16*4))();read(0,0,16,16,0x1908,0x1401,pixels)
+        values=list(pixels)[::4];results.append({'min':min(values),'max':max(values)})
+    print(json.dumps({'linked':len(payload['programs']),'probes':results}));sys.exit(0)
 if payload.get('compileOnly'):
     print(json.dumps({'linked':len(payload['programs'])}));sys.exit(0)
 vertex='#version 300 es\nvoid main(){vec2 p=vec2(float((gl_VertexID<<1)&2),float(gl_VertexID&2));gl_Position=vec4(p*2.-1.,0.,1.);}'

@@ -1,0 +1,27 @@
+Personal entrance movement median: 0.302ms; index: 5159572 bytes
+✔ personal district keeps all eight public transforms, roads and bays; private geometry occurs only at 4102 (11269.573522ms)
+✔ the exported sanitary fixtures have free real standing approaches in all eight reflected/rotated buildings and wet rooms appear on the map (4125.614007ms)
+✔ public build contains no owner application, drafts or unsealed source documents (805.592669ms)
+✔ unauthenticated visitors see the public app but cannot fetch ANY private asset, including direct or encoded paths (48.279467ms)
+✔ correct password opens preserved app and scripts with no-store, wrong password fails, logout clears access cookie (91.355782ms)
+✔ public scene is self-contained, parsable, contains 43 base apartments, and strips all private metadata (298.512652ms)
+✔ the personal district entry and every referenced asset stay behind the password gate (230.159038ms)
+✔ the actual scene contains one shared water fixture and supports a walk across the south street around the education buildings (4214.549925ms)
+✔ the actual rendered district permits a continuous walk along both planted axes and every court connector (4597.5695ms)
+✔ compiled parks preserve the measured parking, leave the pocket garden free of road and permit a real walk to the three shade pavilions and amphitheatre (4035.66846ms)
+✔ all 43 actual apartment destinations in eight buildings produce the matching interior plan and registered live marker (500.119188ms)
+✔ the compiled public master-bed footprint returns to the pre-annotation sleeping zone (420.767009ms)
+✔ the public loading manifest records exact decoded UTF-8 sizes for all three actual scene downloads (55.861967ms)
+✔ the real district floor rays descend, reach both service rooms and climb back in all eight buildings (3597.287642ms)
+✔ the exported district permits continuous common-stair ascent and descent through all nine floors in every rotated and reflected building (4526.036817ms)
+✔ actual district repeatedly enters 4103 with one collision model, bounded buffers and correct building/floor handoff (5659.063527ms)
+✔ the actual exported kitchen party wall is white plaster in the source, walking batch and every registered building (4076.473243ms)
+✔ the real master-room facade stays stone outside and plaster inside after export, district batching, mirrors and photo conversion (1498.056442ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11694.761546

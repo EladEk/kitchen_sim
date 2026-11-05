@@ -1,0 +1,11 @@
+{"phase":"initial","elapsedMs":25366,"maps":[{"light":"DirectionalLight","sameIdentity":true,"size":[4096,4096],"actual":[4096,4096],"depth":true},{"light":"tour-interior-shadow","sameIdentity":true,"size":[1024,1024],"actual":[1024,1024],"depth":true}]}
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+{"phase":"room-0:living","referenceLighting":true,"inside":true,"region":"4102:0:4:living","probes":0}
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+{"phase":"room-1:outside","referenceLighting":false,"inside":false,"region":null,"probes":0}
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+THREE.WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match. rgba16float bgra8unorm
+{"phase":"room-2:living","referenceLighting":true,"inside":true,"region":"4102:0:4:living","probes":0}
+{"phase":"room-3:bathroom","referenceLighting":false,"inside":true,"region":"4102:0:4:bathroom","probes":1}

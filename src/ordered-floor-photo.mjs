@@ -20,7 +20,7 @@ export function orderedFloorPhotoData(productId){
     const pixels=context.getImageData(0,0,size,size).data,prepared=productId==='dry-floor'?prepareFloorPhoto(pixels,size):{color:new Uint8Array(pixels)},height=new Uint8Array(pixels.length),roughness=new Uint8Array(pixels.length);
     // Actual flecks/mottling with bounded broad-lighting correction for the
     // owner's photo only. Catalogue RGB and the flat height remain unchanged.
-    for(let i=0;i<pixels.length;i+=4){height.set([128,128,128,255],i);roughness.set([245,245,245,255],i);}
+    for(let i=0;i<pixels.length;i+=4){height.set([128,128,128,255],i);const grain=(prepared.color[i]*.2126+prepared.color[i+1]*.7152+prepared.color[i+2]*.0722)-(prepared.color[Math.max(0,i-4)]*.2126+prepared.color[Math.max(0,i-4)+1]*.7152+prepared.color[Math.max(0,i-4)+2]*.0722),r=Math.round(Math.max(222,Math.min(250,240-grain*.65)));roughness.set([r,r,r,255],i);}
     resolve({size,...prepared,height,roughness,textureBasis:photo.textureBasis});
    }catch(error){tasks.delete(key);reject(error);}
   };
