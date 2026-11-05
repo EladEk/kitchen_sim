@@ -1,0 +1,294 @@
+{
+  "revision": 116,
+  "format": "glTF 2.0 / GLB",
+  "compression": "EXT_meshopt_compression; EXT_texture_webp",
+  "bytes": 2913560,
+  "sha256": "d78d459e65b4dae83a4109f7eb60ce96c830cec225555f464db9c77f7c253921",
+  "textureBytes": 1086194,
+  "coordinates": {
+    "units": "normalised envelope, dimensions applied from existing plan",
+    "up": "+Y",
+    "front": "+Z",
+    "headboard": "-Z",
+    "support": 0
+  },
+  "models": [
+    {
+      "id": "bed-double",
+      "type": "authored complete furniture",
+      "author": "HomeStudio",
+      "source": "scripts/furniture-model-authoring.mjs",
+      "trianglesBeforeCompression": 42912,
+      "nativeDimensions": [
+        1.8049999997019768,
+        0.9925933721661568,
+        2.1515000002980234
+      ],
+      "front": "+Z",
+      "supportY": 0
+    },
+    {
+      "id": "bed-single",
+      "type": "authored complete furniture",
+      "author": "HomeStudio",
+      "source": "scripts/furniture-model-authoring.mjs",
+      "trianglesBeforeCompression": 38696,
+      "nativeDimensions": [
+        1.0049999997019767,
+        0.9925933721661568,
+        2.1515000002980234
+      ],
+      "front": "+Z",
+      "supportY": 0
+    },
+    {
+      "id": "sofa",
+      "type": "authored complete furniture",
+      "author": "HomeStudio",
+      "source": "scripts/furniture-model-authoring.mjs",
+      "trianglesBeforeCompression": 12968,
+      "nativeDimensions": [
+        2.380000114440918,
+        0.957398594132928,
+        0.940000011920929
+      ],
+      "front": "+Z",
+      "supportY": 0,
+      "upholsterySource": "https://polyhaven.com/a/modern_arm_chair_01",
+      "upholsteryAuthor": "Vibrant Nordic",
+      "upholsteryLicense": "CC0-1.0",
+      "adaptation": "Three complete creased seat/back modules, neutral linen retint, new continuous base and arms"
+    },
+    {
+      "id": "office-chair",
+      "type": "authored complete furniture",
+      "author": "HomeStudio",
+      "source": "scripts/furniture-model-authoring.mjs",
+      "trianglesBeforeCompression": 9208,
+      "nativeDimensions": [
+        0.5949999997019768,
+        1.0033167232833136,
+        0.5568303419049119
+      ],
+      "front": "+Z",
+      "supportY": 0
+    },
+    {
+      "id": "coffee",
+      "type": "authored complete furniture",
+      "author": "HomeStudio",
+      "source": "scripts/furniture-model-authoring.mjs",
+      "trianglesBeforeCompression": 1816,
+      "nativeDimensions": [
+        1.100000023841858,
+        0.40421016000211235,
+        0.800000011920929
+      ],
+      "front": "+Z",
+      "supportY": 0
+    },
+    {
+      "id": "dining",
+      "type": "authored complete furniture",
+      "author": "HomeStudio",
+      "source": "scripts/furniture-model-authoring.mjs",
+      "trianglesBeforeCompression": 1816,
+      "nativeDimensions": [
+        1.600000023841858,
+        0.7436851138621569,
+        0.800000011920929
+      ],
+      "front": "+Z",
+      "supportY": 0
+    },
+    {
+      "id": "desk",
+      "type": "authored complete furniture",
+      "author": "HomeStudio",
+      "source": "scripts/furniture-model-authoring.mjs",
+      "trianglesBeforeCompression": 1816,
+      "nativeDimensions": [
+        1.600000023841858,
+        0.7436353924125433,
+        0.6499999761581421
+      ],
+      "front": "+Z",
+      "supportY": 0
+    },
+    {
+      "id": "faucet",
+      "type": "authored complete furniture",
+      "author": "HomeStudio",
+      "source": "scripts/furniture-model-authoring.mjs",
+      "trianglesBeforeCompression": 730,
+      "nativeDimensions": [
+        0.07591730542480946,
+        0.3378115002140403,
+        0.20299999970942736
+      ],
+      "front": "+Z",
+      "supportY": 0
+    },
+    {
+      "id": "tv",
+      "type": "authored complete furniture",
+      "author": "HomeStudio",
+      "source": "scripts/furniture-model-authoring.mjs",
+      "trianglesBeforeCompression": 2352,
+      "nativeDimensions": [
+        1.25,
+        0.8599999889358878,
+        0.2199999988079071
+      ],
+      "front": "+Z",
+      "supportY": 0
+    },
+    {
+      "id": "media",
+      "type": "authored complete furniture",
+      "author": "HomeStudio",
+      "source": "scripts/furniture-model-authoring.mjs",
+      "trianglesBeforeCompression": 6788,
+      "nativeDimensions": [
+        1.600000023841858,
+        1.399999989569187,
+        0.46949999864026903
+      ],
+      "front": "+Z",
+      "supportY": 0
+    },
+    {
+      "id": "cushion",
+      "type": "authored complete furniture",
+      "author": "HomeStudio",
+      "source": "scripts/furniture-model-authoring.mjs",
+      "trianglesBeforeCompression": 3216,
+      "nativeDimensions": [
+        1,
+        1.002416729927063,
+        1
+      ],
+      "front": "+Z",
+      "supportY": 0
+    },
+    {
+      "id": "duvet",
+      "type": "authored complete furniture",
+      "author": "HomeStudio",
+      "source": "scripts/furniture-model-authoring.mjs",
+      "trianglesBeforeCompression": 3216,
+      "nativeDimensions": [
+        1,
+        1.002416729927063,
+        1
+      ],
+      "front": "+Z",
+      "supportY": 0
+    },
+    {
+      "id": "kitchen-faucet",
+      "type": "authored complete furniture",
+      "author": "HomeStudio",
+      "source": "scripts/furniture-model-authoring.mjs",
+      "trianglesBeforeCompression": 1920,
+      "nativeDimensions": [
+        0.08699999935925007,
+        0.39622485618293285,
+        0.2666030397569228
+      ],
+      "front": "+Z",
+      "supportY": 0
+    },
+    {
+      "id": "armchair",
+      "type": "licensed complete model",
+      "originalId": "modern_arm_chair_01",
+      "author": "Vibrant Nordic",
+      "source": "https://polyhaven.com/a/modern_arm_chair_01",
+      "license": "CC0-1.0",
+      "licenseURL": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "originalSHA256": "2c02cde1c1a10f14bd4730f8ef8500cd2a7f23ef41f6f3c06cd42044ee2d6a58",
+      "nativeDimensions": [
+        0.8203444182872772,
+        1.0228520567470696,
+        0.9865616858005524
+      ],
+      "front": "+Z",
+      "supportY": 0,
+      "simplificationRatio": 0.75
+    },
+    {
+      "id": "dining-chair",
+      "type": "licensed complete model",
+      "originalId": "dining_chair_02",
+      "author": "James Ray Cock",
+      "source": "https://polyhaven.com/a/dining_chair_02",
+      "license": "CC0-1.0",
+      "licenseURL": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "originalSHA256": "63f22f21a65010d3f3ac66eeef90a12e2ff98ea3f991f526b13159dc5a44daba",
+      "nativeDimensions": [
+        0.4335707724094391,
+        0.9733776897192001,
+        0.5764201134443283
+      ],
+      "front": "+Z",
+      "supportY": 0,
+      "simplificationRatio": 0.75
+    },
+    {
+      "id": "plant",
+      "type": "licensed complete model",
+      "originalId": "potted_plant_01",
+      "author": "Rico Cilliers",
+      "source": "https://polyhaven.com/a/potted_plant_01",
+      "license": "CC0-1.0",
+      "licenseURL": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "originalSHA256": "796a9e374206f354c94e69e50d24731b609fecd1e8abce8af6af882fec32db10",
+      "nativeDimensions": [
+        0.5870751887559891,
+        1.335848034810624,
+        0.6335648000240326
+      ],
+      "front": "+Z",
+      "supportY": 0,
+      "simplificationRatio": 0.12
+    },
+    {
+      "id": "nightstand",
+      "type": "licensed complete model",
+      "originalId": "side_table_01",
+      "author": "James Ray Cock",
+      "source": "https://polyhaven.com/a/side_table_01",
+      "license": "CC0-1.0",
+      "licenseURL": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "originalSHA256": "106a04b45e6338a5e0026618d3fc0003e2c784095674bfa60a0974e7b7e354fe",
+      "nativeDimensions": [
+        0.5500000715255737,
+        0.5506622816901654,
+        0.45000001788139343
+      ],
+      "front": "+Z",
+      "supportY": 0,
+      "simplificationRatio": 0.75
+    },
+    {
+      "id": "barstool",
+      "type": "licensed complete model",
+      "originalId": "bar_chair_round_01",
+      "author": "Dairon Sanchez",
+      "source": "https://polyhaven.com/a/bar_chair_round_01",
+      "license": "CC0-1.0",
+      "licenseURL": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "originalSHA256": "fc5aa51641e802d7023a0e8dcf91b1c15f969e68377ccfb4fd0dddcf9457c51c",
+      "nativeDimensions": [
+        0.483150263971177,
+        0.7505484623070515,
+        0.48599577519391374
+      ],
+      "front": "+Z",
+      "supportY": 0,
+      "simplificationRatio": 0.75
+    }
+  ],
+  "limitations": "Models are visual representations, not scans of the owner’s purchased furniture. Architectural cabinetry, sanitary products, engineering dimensions and navigation envelopes remain authoritative."
+}

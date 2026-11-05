@@ -8,7 +8,7 @@ export function batchPersonalTour(home){
  home.group.updateWorldMatrix(true,true);const inverse=home.group.matrixWorld.clone().invert();
  const movable=o=>{for(let p=o;p&&p!==home.group;p=p.parent)if(dynamic.has(p))return true;return false;};
  home.group.traverse(o=>{
-  if(!o.visible||o.userData.tourNonPhysical||o.userData.mirrorSurface||!o.isMesh||o.isInstancedMesh||movable(o)||o.userData.securityOverlay||o.userData.action==='security-camera')return;
+  if(!o.visible||o.userData.furnitureCollisionProxy||o.userData.tourNonPhysical||o.userData.mirrorSurface||!o.isMesh||o.isInstancedMesh||movable(o)||o.userData.securityOverlay||o.userData.action==='security-camera')return;
   const mats=Array.isArray(o.material)?o.material:[o.material],ranges=mats.length>1?o.geometry.groups:[{start:0,count:o.geometry.index?.count??o.geometry.attributes.position.count,materialIndex:0}],matrix=inverse.clone().multiply(o.matrixWorld),ceiling=!!o.userData.ceiling,flags=JSON.stringify([ceiling,o.castShadow,o.receiveShadow,o.userData.exterior!==false]);
   for(const range of ranges){const mat=mats[range.materialIndex];if(!mat||mat.opacity===0||mat.colorWrite===false)continue;let byFlag=buckets.get(mat);if(!byFlag){byFlag=new Map();buckets.set(mat,byFlag);}if(!byFlag.has(flags))byFlag.set(flags,[]);byFlag.get(flags).push({geometry:o.geometry,matrix,start:range.start,count:range.count});}
   removed.push(o);

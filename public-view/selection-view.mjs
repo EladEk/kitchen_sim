@@ -2,10 +2,11 @@ import * as THREE from 'three';
 import {DISTRICT,buildingTransform,districtLocation} from './district.mjs';
 import {PLAN_CENTER} from './district-layout.mjs';
 import {createSelection} from './selection.mjs';
+import {createWalkingDisplay} from './walking-display.mjs';
 
 export function createSelectionController({root,model,district,nav,variants=new Map(),doorController=null}){
  let section,key,current,walkBuilding,visibilityKey,activeModel=model;
- const interiorsByModel=new Map();for(const source of new Set([model,...variants.values()])){const interiors=[];source.traverse(o=>{if(o.isMesh&&o.userData.exterior===false)interiors.push({object:o,visible:o.visible});});interiorsByModel.set(source,interiors);}
+ const displays=new Map(),interiorsByModel=new Map();for(const source of new Set([model,...variants.values()])){const interiors=[];source.traverse(o=>{if(o.isMesh&&o.userData.exterior===false)interiors.push({object:o,visible:o.visible});});interiorsByModel.set(source,interiors);}
  if(model.parent!==root)root.add(model);
  return {
   update(state,{walking=false,position=null}={}){
@@ -17,19 +18,29 @@ export function createSelectionController({root,model,district,nav,variants=new 
     b=walkBuilding;
    }else if(!walking)walkBuilding=null;
    const source=variants.get(b.id)||model,doorsChanged=doorController?.activate(b.id,source);
-   if(source!==activeModel){if(section){section.dispose();section=null;key=null;}root.clear();activeModel=source;root.add(source);visibilityKey=null;}
+   if(source!==activeModel){if(section){section.dispose();section=null;key=null;}root.clear();activeModel=source;root.add(source);if(displays.has(source))root.add(displays.get(source).group);visibilityKey=null;}
    const interiors=interiorsByModel.get(source);
    const floor=position?Math.max(0,Math.floor((position.y-1.62+.35)/nav.storey)):0,nextVisibility=walking&&position?'walk:'+floor:'all';
    if(visibilityKey!==nextVisibility){for(const {object,visible} of interiors)object.visible=visible&&(!walking||!position||Math.abs((object.userData.level??0)-floor)<=1);visibilityKey=nextVisibility;}
    const focused=!walking&&(Number(state.level)!==9||!!state.target);
-   root.visible=true;root.matrixAutoUpdate=false;root.matrix.copy(buildingTransform(b));root.matrixWorldNeedsUpdate=true;root.updateMatrixWorld(true);
-   doorController?.setSourceVisibility(source,focused);district.setActiveBuilding(b.id,{walking,floor});district.group.visible=!focused;source.visible=!focused;
+   // Whole-building views use the same accurately merged display batches as
+   // the other seven buildings. Keep the original for bounds/collisions and
+   // restore it for walking and sections, where moving parts stay individual.
+   const overview=!walking&&!focused;
+   root.visible=!overview;root.matrixAutoUpdate=false;root.matrix.copy(buildingTransform(b));root.matrixWorldNeedsUpdate=true;root.updateMatrixWorld(true);
+   doorController?.setSourceVisibility(source,focused);district.setActiveBuilding(b.id,{walking,floor,includeActive:overview});district.group.visible=!focused;
+   let display=displays.get(source);if(walking&&!display){
+    // Build from the complete source once, before the floor visibility mask.
+    for(const {object,visible}of interiors)object.visible=visible;
+    source.visible=true;display=createWalkingDisplay(source);displays.set(source,display);root.add(display.group);visibilityKey=null;
+   }
+   if(display){display.group.visible=walking;if(walking)display.update(floor);}source.visible=!focused&&!walking;
    if(focused){const next=state.level+'|'+state.target;if(next!==key){if(section){root.remove(section.group);section.dispose();}section=createSelection(source,nav,{...state,level:Number(state.level)});if(!section.group.children.length)throw Error('Empty selected building section');root.add(section.group);key=next;}if(doorsChanged)section.sync();section.group.visible=true;}else if(section){root.remove(section.group);section.dispose();section=null;key=null;}
-   root.updateMatrixWorld(true);current={content:focused?section.group:source,building:b,focused};return current;
+   root.updateMatrixWorld(true);current={content:focused?section.group:walking?display.group:source,building:b,focused};return current;
   },
   get current(){return current;},
-  sync(){section?.sync();root.updateMatrixWorld(true);},
-  dispose(){if(section){root.remove(section.group);section.dispose();section=null;}interiorsByModel.clear();}
+  sync(){section?.sync();displays.get(activeModel)?.sync();root.updateMatrixWorld(true);},
+  dispose(){if(section){root.remove(section.group);section.dispose();section=null;}for(const display of displays.values())display.dispose();displays.clear();interiorsByModel.clear();}
  };
 }
 export function selectionBounds(content){

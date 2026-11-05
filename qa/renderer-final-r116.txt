@@ -1,0 +1,13 @@
+✔ tour taps work without walking and cannot fire after a drag, multitouch, cancel or right click (1.197989ms)
+✔ selected doors retain actions and live hinge transforms without recropping, and walls occlude them (8.564318ms)
+✔ one real Meshopt GLB contains every complete model with PBR, licensed maps and normalised metre envelopes (151.410291ms)
+✔ the production Three loader retains full model PBR/UVs; replacement preserves every instance pose and cheap collision envelope (169.954513ms)
+✔ district furniture reuses source geometry with positive instance determinants in both reflected and ordinary buildings (2.691358ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 676.358846

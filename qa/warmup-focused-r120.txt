@@ -1,0 +1,30 @@
+✔ door states are independent across all eight buildings and survive reload; switching the shared model restores the right pose (6.180745ms)
+✔ context doors share geometry, retain positive instance determinants for mirrors, and update only the chosen building (5.185956ms)
+✔ closed doors update the actual collision query in one building while other copies and cropped hinges stay independent (14.9611ms)
+✔ overview batches include all eight buildings, hide empty groups and restore detailed walking without double drawing (7.798922ms)
+✔ floor sections show only that floor and remove its ceiling (0.870005ms)
+✔ concave apartment crops geometry, including instances, without changing the full building (5.266012ms)
+✔ the selected detailed building and section follow all eight rotations and mirrors (7.710911ms)
+✔ switching the detailed model removes exactly its context copy and restores4102 elsewhere (2.402254ms)
+✔ duplex selection includes both public floors of the same apartment only (0.367161ms)
+✔ context batching retains source geometry outside the old balcony limits, including reflected faces (1.847062ms)
+✔ native view preparation skips hidden branches, zero instances, proxies and off-camera work (7.996544ms)
+✔ native bindings are reused across regions but material, lighting and context changes invalidate preparation (4.19886ms)
+✔ cancelled room preparation finishes before another native compile can use shared renderer state (0.914963ms)
+✔ the native cache retains material/layout normalization performed by compilation and its first real draw (0.556054ms)
+✔ warmup uploads shared textures once, compiles real draw types and keeps object ownership (5.062486ms)
+✔ paint precedes texture upload, and a stale shader completion cannot mark a canceled room ready (6.869037ms)
+✔ startup remains pending until a real frame has drawn and its shadow targets exist (1.158719ms)
+✔ a failed GPU draw or missing visible shadow never marks an empty first frame ready (1.408073ms)
+✔ native batches preserve instancing identity, parent pointers and first shadow flags (2.767282ms)
+✔ a native device budget failure restores shadows and never marks a pending view ready (1.305523ms)
+✔ preparation percentage counts real uploads/compile batches and reaches one only after successful drawing (2.003526ms)
+✔ a failed preparation reports its exact phase and measured budget for the user-visible diagnostic log (1.125058ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 22
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 197.318496

@@ -1,0 +1,10 @@
+✔ the reported 1023x1024 Basis allocation is rejected before GPU upload with the asset and dimensions (4.75922ms)
+✔ all shipped Basis maps match the manifest and fit mobile WebGPU 4x4 base blocks (15.737124ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 111.934795

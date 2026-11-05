@@ -21,8 +21,7 @@ test('assumed dimensions are never presented as documented measurements',()=>{
 test('safe-room double bed fits below the window and leaves a usable indoor route',()=>{
  assert(!FURNITURE.some(f=>f.roomId==='safe-room'&&f.kind==='sofa'));
  const room=getRoom('safe-room'),path=findWalkPath(getRoom('living').walk,room.walk);assert(path?.length);assert(canStand(room.walk,collisionBoxes(DOORS.map(d=>d.id))));
- const scene=createHomeScene(normalizeHomeSettings());scene.group.updateMatrixWorld(true);const bed=scene.furnitureGroups.get('safe-bed');let mattress;bed.traverse(o=>{if(o.userData.part==='mattress')mattress=o;});
- const size=new THREE.Box3().setFromObject(mattress).getSize(new THREE.Vector3());assert(Math.abs(size.x-1.4)<.001);assert(Math.abs(size.z-1.9)<.001);const bounds=new THREE.Box3().setFromObject(bed);assert(bounds.max.y<WINDOWS.find(w=>w.id==='safe-window').sill);scene.dispose();
+ const scene=createHomeScene(normalizeHomeSettings());scene.group.updateMatrixWorld(true);const bed=scene.furnitureGroups.get('safe-bed');const body=bed.children.find(o=>o.userData.furnitureAsset==='bed-double');assert(body);assert.deepEqual(body.userData.mattressDimensions,[1.4,1.9]);const size=new THREE.Box3().setFromObject(body).getSize(new THREE.Vector3());assert(Math.abs(size.x-1.48)<.001);assert(Math.abs(size.z-1.965)<.001);const bounds=new THREE.Box3().setFromObject(bed);assert(bounds.max.y<WINDOWS.find(w=>w.id==='safe-window').sill);scene.dispose();
 });
 
 test('only the outdoor-kitchen-side tree is removed and every furniture mesh supports item inspection',()=>{

@@ -1,3 +1,4 @@
+import './apply-three-fixes.mjs';
 import {build,loadEnv} from 'vite';
 import react from '@vitejs/plugin-react';
 import {createPublicBaseline} from './public-baseline.mjs';

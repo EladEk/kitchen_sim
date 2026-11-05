@@ -1,3 +1,4 @@
+import {instantiateCompleteFurniture} from './complete-furniture.mjs';
 import {RectAreaLightUniformsLib} from 'three/addons/lights/RectAreaLightUniformsLib.js';
 import {buildLightingPoints} from './home-lighting-scene.js';
 import {buildDaylight} from './daylight-scene.js';
@@ -269,13 +270,7 @@ export function createKitchen(settings){
  box(ISLAND.x+1220,60,ISLAND.z+280,2400,120,510,plinth);
  box(ISLAND.x+1220,497,ISLAND.z+610,2400,754,18,base,'island-1');
  for(const x of [ISLAND.x+20,ISLAND.x+ISLAND.width-20])box(x,497,ISLAND.z+300,18,754,620,base,'island-1');
- for(let i=0;i<4;i++){
-  const x=ISLAND.x+340+i*585,z=ISLAND.z+1160;const stoolmat=mat('#7b786a',{roughness:.9});
-  const seat=cylinder(x,660,z,175,50,stoolmat);seat.scale.z=.85;
-  cylinder(x,340,z,18,600,metal);cylinder(x,22,z,185,28,metal);
-  const ring=new THREE.TorusGeometry(.115,.009,8,32);resources.push(ring);const foot=new THREE.Mesh(ring,metal);foot.rotation.x=Math.PI/2;foot.position.set(x*M,.285,z*M);group.add(foot);
-  box(x,770,z+120,305,170,30,stoolmat,null,group,true);
- }
+ for(let i=0;i<4;i++){const model=instantiateCompleteFurniture('barstool',{w:.35,h:.685,d:.35});model.position.set((ISLAND.x+340+i*585)*M,0,(ISLAND.z+1160)*M);group.add(model);}
  // Subtle countertop objects keep the working surfaces legible.
  const cutting=box(3000,925,280,340,22,260,surface('wood','#b08e60'),null,group,true);cutting.rotation.y=.1;
  cylinder(2900,980,200,52,80,mat('#ddd8c9'));cylinder(2900,1026,200,50,9,mat('#a98d65'));

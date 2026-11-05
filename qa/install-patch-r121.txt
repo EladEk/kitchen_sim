@@ -1,0 +1,19 @@
+Three.js r185 instance-capacity fix applied.
+Three.js r185 instance-capacity fix ready.
+{
+  "freshOfficialPackage": "three@0.185.0",
+  "firstApplication": "passed",
+  "idempotence": "passed",
+  "stalePrebundleRemoved": true,
+  "deployedBytesMatch": true,
+  "files": [
+    {
+      "file": "src/nodes/accessors/Instance.js",
+      "sha256": "b261da79989682362dff394c128055bbf066ee1e9efb800dfe6b2f6546a05c0f"
+    },
+    {
+      "file": "build/three.webgpu.js",
+      "sha256": "442e88141782f6db66a2c4db1252c8c2eb85b6e238d9c9f95136b5c6b349f1e0"
+    }
+  ]
+}

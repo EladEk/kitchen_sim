@@ -1,0 +1,818 @@
+{
+  "baseline": true,
+  "backend": "Dawn null",
+  "maxUniformBufferBindingSize": 65536,
+  "results": [
+    {
+      "key": "overview",
+      "preparedMs": 14122,
+      "compile": {
+        "sceneBuilds": 237,
+        "sceneSyncPipelines": 0,
+        "sceneAsyncPipelines": 233
+      },
+      "firstDraw": {
+        "sceneBuilds": 557,
+        "sceneSyncPipelines": 540,
+        "sceneAsyncPipelines": 0
+      },
+      "frames": [
+        {
+          "index": 0,
+          "elapsedMs": 16,
+          "sceneBuilds": 0,
+          "sceneSyncPipelines": 0,
+          "sceneAsyncPipelines": 0
+        },
+        {
+          "index": 1,
+          "elapsedMs": 55,
+          "sceneBuilds": 0,
+          "sceneSyncPipelines": 0,
+          "sceneAsyncPipelines": 0
+        },
+        {
+          "index": 2,
+          "elapsedMs": 33,
+          "sceneBuilds": 0,
+          "sceneSyncPipelines": 0,
+          "sceneAsyncPipelines": 0
+        }
+      ]
+    },
+    {
+      "key": "lobby",
+      "preparedMs": 53031,
+      "compile": {
+        "sceneBuilds": 423,
+        "sceneSyncPipelines": 0,
+        "sceneAsyncPipelines": 413
+      },
+      "firstDraw": {
+        "sceneBuilds": 1490,
+        "sceneSyncPipelines": 1432,
+        "sceneAsyncPipelines": 0
+      },
+      "frames": [
+        {
+          "index": 0,
+          "elapsedMs": 163,
+          "sceneBuilds": 0,
+          "sceneSyncPipelines": 0,
+          "sceneAsyncPipelines": 0
+        },
+        {
+          "index": 1,
+          "elapsedMs": 2693,
+          "sceneBuilds": 189,
+          "sceneSyncPipelines": 189,
+          "sceneAsyncPipelines": 0
+        },
+        {
+          "index": 2,
+          "elapsedMs": 207,
+          "sceneBuilds": 0,
+          "sceneSyncPipelines": 0,
+          "sceneAsyncPipelines": 0
+        }
+      ]
+    },
+    {
+      "key": "lobby-cached",
+      "preparedMs": 2385,
+      "compile": {
+        "sceneBuilds": 37,
+        "sceneSyncPipelines": 0,
+        "sceneAsyncPipelines": 37
+      },
+      "frames": [
+        {
+          "index": 0,
+          "elapsedMs": 1,
+          "sceneBuilds": 0,
+          "sceneSyncPipelines": 0,
+          "sceneAsyncPipelines": 0
+        },
+        {
+          "index": 1,
+          "elapsedMs": 216,
+          "sceneBuilds": 0,
+          "sceneSyncPipelines": 0,
+          "sceneAsyncPipelines": 0
+        },
+        {
+          "index": 2,
+          "elapsedMs": 198,
+          "sceneBuilds": 0,
+          "sceneSyncPipelines": 0,
+          "sceneAsyncPipelines": 0
+        }
+      ]
+    }
+  ],
+  "traces": [
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    },
+    {
+      "phase": "compile:overview",
+      "kind": "build",
+      "object": "Mesh",
+      "part": null,
+      "depth": -1
+    }
+  ],
+  "errors": [],
+  "pixelsVerified": false,
+  "physicalARMDeviceVerified": false
+}

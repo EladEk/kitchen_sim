@@ -44,12 +44,12 @@ export function installPhotorealRenderer({renderer,scene,camera,host,lang=()=> '
    sceneKey=photoSceneSignature(scene);buildKey=sceneKey;
    const limits={maxTriangles:mobile()?900000:2500000,maxBytes:(mobile()?128:384)*1024*1024,textureSize:mobile()?512:1024};estimatePhotoScene(scene,limits);
    if(!tracer){const result=await (backendFactory||createBackend)();if(disposed||current!==token){retirePhotoResources({tracer:result.tracer,worker:result.worker,renderer:result.renderer});return;}tracer=result.tracer;photoRenderer=result.renderer;worker=result.worker||null;backend=result.backend;
-    photoRenderer.toneMapping=renderer.toneMapping;photoRenderer.toneMappingExposure=renderer.toneMappingExposure;photoRenderer.outputColorSpace=THREE.SRGBColorSpace;canvas=photoRenderer.domElement;canvas.className='photo-canvas';canvas.style.visibility='hidden';host.append(canvas);lastWidth=lastHeight=0;size();
+    loading.setProgress(35);photoRenderer.toneMapping=renderer.toneMapping;photoRenderer.toneMappingExposure=renderer.toneMappingExposure;photoRenderer.outputColorSpace=THREE.SRGBColorSpace;canvas=photoRenderer.domElement;canvas.className='photo-canvas';canvas.style.visibility='hidden';host.append(canvas);lastWidth=lastHeight=0;size();
    }
-   loading.show(he()?'מכין את הסצנה לצילום…':'Preparing the photo scene…',he()?'אפשר לחזור לסיור בכל רגע':'You can return to the live tour at any time');await waitForScenePaint();if(disposed||current!==token)return;
+   loading.show(he()?'מכין את הסצנה לצילום…':'Preparing the photo scene…',he()?'אפשר לחזור לסיור בכל רגע':'You can return to the live tour at any time',45);await waitForScenePaint();if(disposed||current!==token)return;
    snapshot=createPhotoScene(scene,limits);
    if(backend==='WebGL2')await tracer.setSceneAsync(snapshot.scene,camera);else tracer.setScene(snapshot.scene,camera);
-   if(disposed||current!==token)return;dirty=sceneKey!==buildKey;steps=0;say('התמונה מתנקה בהדרגה…','Image refining progressively…');loading.show(he()?'מרנדר את התמונה הראשונה…':'Rendering the first image…',he()?'התמונה תמשיך להשתפר בהדרגה':'The image will continue to refine progressively');
+   if(disposed||current!==token)return;dirty=sceneKey!==buildKey;steps=0;say('התמונה מתנקה בהדרגה…','Image refining progressively…');loading.show(he()?'מרנדר את התמונה הראשונה…':'Rendering the first image…',he()?'התמונה תמשיך להשתפר בהדרגה':'The image will continue to refine progressively',80);
   }catch(error){if(disposed||current!==token)return;lastError=error instanceof PhotoSceneLimit?'complex':'unsupported';enabled=false;cleanup();updateButton();say(lastError==='complex'?'הסצנה גדולה לצילום במכשיר הזה; נסה קומה או דירה':'צילום לא זמין במכשיר הזה — הסיור ו־VR נשארו זמינים',lastError==='complex'?'Select a floor or apartment for photo mode':'Photo mode unavailable; live tour and VR remain available');}
   finally{if(current===token)busy=false;}
  }
@@ -62,7 +62,7 @@ export function installPhotorealRenderer({renderer,scene,camera,host,lang=()=> '
    if(now-stableAt<1100||busy)return false;
    if(dirty||!tracer){void prepare();return false;}
    if(now-lastCheck>1200){lastCheck=now;const key=photoSceneSignature(scene);if(key!==sceneKey){sceneKey=key;dirty=true;stableAt=now;hide();return false;}}
-   try{size();controls.setAttribute('aria-busy','true');tracer.renderSample();steps++;if(steps>1){canvas.style.visibility='visible';loading.hide();}
+   try{size();controls.setAttribute('aria-busy','true');tracer.renderSample();steps++;loading.setProgress(steps>1?100:90);if(steps>1){canvas.style.visibility='visible';loading.hide();}
     if(now-lastStatus>1200){lastStatus=now;say('איכות צילום · מעדן תאורה והשתקפויות…','Photo quality · refining lighting and reflections…');}
     return true;
    }catch{lastError='unsupported';off();say('חזרנו לסיור בזמן אמת','Returned to live rendering');return false;}

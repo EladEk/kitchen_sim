@@ -1,0 +1,80 @@
+{
+  "backend": "Dawn null validation",
+  "maxUniformBufferBindingSize": 65536,
+  "maxStorageBufferBindingSize": 134217728,
+  "overviewCounts": {
+    "all": 5594,
+    "visible": 276,
+    "meaningful": 276,
+    "allCompile": 1890,
+    "visibleCompile": 276,
+    "meaningfulCompile": 276,
+    "zeroInstances": 0
+  },
+  "results": [
+    {
+      "key": "actual-opening",
+      "elapsedMs": 7100,
+      "textures": 33,
+      "drawObjects": 203,
+      "compileObjects": 203,
+      "cachedObjects": 0,
+      "compileBatches": 9,
+      "viewOnly": true
+    },
+    {
+      "key": "phone-canvas-aspect",
+      "elapsedMs": 899,
+      "textures": 0,
+      "drawObjects": 234,
+      "compileObjects": 31,
+      "cachedObjects": 203,
+      "compileBatches": 2,
+      "viewOnly": true
+    },
+    {
+      "key": "wide-canvas-aspect",
+      "elapsedMs": 1429,
+      "textures": 0,
+      "drawObjects": 268,
+      "compileObjects": 35,
+      "cachedObjects": 233,
+      "compileBatches": 2,
+      "viewOnly": true
+    },
+    {
+      "key": "actual-lobby-walk",
+      "elapsedMs": 36793,
+      "textures": 9,
+      "drawObjects": 1038,
+      "compileObjects": 552,
+      "cachedObjects": 0,
+      "compileBatches": 23,
+      "viewOnly": true
+    },
+    {
+      "key": "same-view-reused",
+      "elapsedMs": 247,
+      "textures": 0,
+      "drawObjects": 1038,
+      "compileObjects": 0,
+      "cachedObjects": 552,
+      "compileBatches": 0,
+      "viewOnly": true
+    },
+    {
+      "key": "actual-ground-apartment-section",
+      "elapsedMs": 1127,
+      "textures": 0,
+      "drawObjects": 98,
+      "compileObjects": 60,
+      "cachedObjects": 0,
+      "compileBatches": 3,
+      "viewOnly": true
+    }
+  ],
+  "errors": [],
+  "pixelsVerified": false,
+  "physicalARMDeviceVerified": false,
+  "phoneFPSVerified": false
+}

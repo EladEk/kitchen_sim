@@ -1,0 +1,7 @@
+{
+  "negativeControl": true,
+  "capacity": 1758,
+  "drawCount": 128,
+  "limit": 65536,
+  "error": "Binding size (112512) of [Buffer \"bindingBufferundefined_UniformBuffer_0_(vertex)\"] is larger than the maximum uniform buffer binding size (65536).\n - While validating entries[3] against { binding: 3, visibility: ShaderStage::Vertex, buffer: {type: BufferBindingType::Uniform, minBindingSize: 0, hasDynamicOffset: 0} }.\n - While validating [BindGroupDescriptor \"\"bindGroup_object\"\"] against [BindGroupLayout (unlabeled)]\n - While calling [Device].CreateBindGroup([BindGroupDescriptor \"\"bindGroup_object\"\"]).\n"
+}

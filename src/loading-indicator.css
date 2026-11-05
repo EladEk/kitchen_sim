@@ -10,3 +10,8 @@
 .studio-loader--transition{position:absolute;z-index:90;inset:auto 50% 24px auto;transform:translateX(50%);min-height:0;max-width:calc(100% - 32px);width:max-content;padding:12px 18px;gap:10px;flex-direction:row;border:1px solid #ccd5c5;border-radius:14px;box-shadow:0 5px 22px #1d302a30;background:#f7f8f1f5;pointer-events:none}
 .studio-loader--transition .studio-loader-ring{width:22px;height:22px;border-width:2px}
 .studio-loader--transition strong{font-size:14px}
+.studio-loader-progress{display:flex;flex-direction:column;align-items:center;gap:6px;width:min(260px,100%)}
+.studio-loader-percent{font-size:20px;font-weight:650;font-variant-numeric:tabular-nums;color:#354e3c}
+.studio-loader-progress progress{display:block;width:100%;height:7px;border:0;border-radius:8px;overflow:hidden;background:#dce3d6;accent-color:#48664b;direction:ltr}
+.studio-loader-progress progress::-webkit-progress-bar{background:#dce3d6;border-radius:8px}.studio-loader-progress progress::-webkit-progress-value{background:#48664b;border-radius:8px}.studio-loader-progress progress::-moz-progress-bar{background:#48664b;border-radius:8px}
+.studio-loader--transition .studio-loader-progress{width:68px;min-width:58px;flex-shrink:0;gap:4px}.studio-loader--transition .studio-loader-percent{font-size:15px}.studio-loader--transition strong{min-width:0}

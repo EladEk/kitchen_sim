@@ -1,0 +1,31 @@
+✔ asynchronous transmission updates read the framebuffer being compiled and restore all target state on failure (2.819834ms)
+✔ an existing postprocessing target is preserved rather than replaced by the canvas target (0.321525ms)
+✔ mobile native preparation and first room display use the same postprocessing pipeline (7.286912ms)
+✔ the first interactive frame separates postprocessing time and late shader compilation from other scene work (2.14786ms)
+✔ a failed phase preserves elapsed evidence and propagates the original renderer failure (0.594287ms)
+✔ a mobile viewport resize is coalesced until asynchronous GPU preparation finishes (1.518822ms)
+✔ the latest selection cannot move the camera while a cancelled compile still owns it (1.242214ms)
+✔ a failed preparation releases ownership; disposing does not apply a queued resize (1.691031ms)
+✔ a destination continuation cannot reset 96 percent or accept an older phase completion (0.370689ms)
+✔ native view preparation skips hidden branches, zero instances, proxies and off-camera work (13.606396ms)
+✔ native bindings are reused across regions but material, lighting and context changes invalidate preparation (8.067695ms)
+✔ cancelled room preparation finishes before another native compile can use shared renderer state (1.229315ms)
+✔ the native cache retains material/layout normalization performed by compilation and its first real draw (1.175844ms)
+✔ a completed region still recompiles a changed material when its region key is reused (0.761088ms)
+✔ healthy per-batch progress continues beyond the old total-time guard while an over-budget batch is still rejected (3.503ms)
+✔ warmup uploads shared textures once, compiles real draw types and keeps object ownership (9.169352ms)
+✔ paint precedes texture upload, and a stale shader completion cannot mark a canceled room ready (13.104964ms)
+✔ startup remains pending until a real frame has drawn and its shadow targets exist (1.616809ms)
+✔ a failed GPU draw or missing visible shadow never marks an empty first frame ready (2.169283ms)
+✔ native batches preserve instancing identity, parent pointers and first shadow flags (3.317295ms)
+✔ a native device budget failure restores shadows and never marks a pending view ready (1.202975ms)
+✔ preparation percentage counts real uploads/compile batches and reaches one only after successful drawing (5.24609ms)
+✔ a failed preparation reports its exact phase and measured budget for the user-visible diagnostic log (10.298025ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 266.436321

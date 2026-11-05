@@ -1,0 +1,32 @@
+✔ mobile native preparation and first room display use the same postprocessing pipeline (2.374291ms)
+✔ all rooms of an apartment and all common lobby/stair polygons share one preparation, with units/floors/buildings isolated (1.172599ms)
+✔ zero-opacity service markers are absent from the display without changing their original source (3.225325ms)
+✔ walking batches keep exact transformed surfaces, material UVs, shadows and original collision identities (6.594926ms)
+✔ GLB primitives stay instanced, floor masks restore, and moved branches sync without rebuilding buffers (2.881296ms)
+✔ entering walking from a focused section restores the complete source before building once (2.372167ms)
+✔ a failed neighborhood shadow draw restores camera culling and the existing render hook (6.987504ms)
+✔ walking neighborhood precompiles objects behind the camera without compiling remote hidden floors (2.155141ms)
+✔ native view preparation skips hidden branches, zero instances, proxies and off-camera work (2.715515ms)
+✔ native bindings are reused across regions but material, lighting and context changes invalidate preparation (1.709218ms)
+✔ cancelled room preparation finishes before another native compile can use shared renderer state (0.560846ms)
+✔ the native cache retains material/layout normalization performed by compilation and its first real draw (0.499373ms)
+✔ a completed region still recompiles a changed material when its region key is reused (0.465182ms)
+✔ healthy per-batch progress continues beyond the old total-time guard while an over-budget batch is still rejected (0.973629ms)
+✔ warmup uploads shared textures once, compiles real draw types and keeps object ownership (4.751707ms)
+✔ paint precedes texture upload, and a stale shader completion cannot mark a canceled room ready (6.857061ms)
+✔ startup remains pending until a real frame has drawn and its shadow targets exist (0.901069ms)
+✔ a failed GPU draw or missing visible shadow never marks an empty first frame ready (1.249164ms)
+✔ native batches preserve instancing identity, parent pointers and first shadow flags (3.257402ms)
+✔ a native device budget failure restores shadows and never marks a pending view ready (1.403516ms)
+✔ preparation percentage counts real uploads/compile batches and reaches one only after successful drawing (2.663166ms)
+✔ a failed preparation reports its exact phase and measured budget for the user-visible diagnostic log (1.194521ms)
+✔ sun shadow anchor stays fixed during short steps; movement, solar changes, and occluders invalidate it (2.079476ms)
+✔ interior shadows render for a new room or moving door, not repeatedly while walking within the room (15.328493ms)
+ℹ tests 24
+ℹ suites 0
+ℹ pass 24
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 221.68888

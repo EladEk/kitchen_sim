@@ -9,6 +9,7 @@ import {denoise} from 'three/addons/tsl/display/DenoiseNode.js';
 import {bloom} from 'three/addons/tsl/display/BloomNode.js';
 import {fxaa} from 'three/addons/tsl/display/FXAANode.js';
 import {createFinishAdapter} from './webgpu-finishes.mjs';
+import {installNativePreparation} from './native-preparation.mjs';
 export function createNodeCelestialDisks(){
  const u={sunDirection:uniform(new Vector3(0,1,0)),moonDirection:uniform(new Vector3(0,1,0)),moonRadius:uniform(.0045),moonFraction:uniform(0),limbAngle:uniform(0),sunVisible:uniform(0),moonVisible:uniform(0),daylight:uniform(0)},material=new MeshBasicNodeMaterial({side:BackSide,transparent:true,depthWrite:false,depthTest:true,fog:false});
  const clip=cameraProjectionMatrix.mul(vec4(cameraViewMatrix.mul(vec4(positionGeometry,0)).xyz,1));material.vertexNode=vec4(clip.xy,clip.w,clip.w);
@@ -29,17 +30,32 @@ export function createNodePresentation(renderer,scene,camera,{mobile=false,enhan
   const parameters=scenePass.getTextureNode('surface'),reflection=ssr(beauty,depth,normal,{camera,roughnessNode:parameters.r,metalnessNode:parameters.g,reflectNonMetals:true});reflection.resolutionScale=.5;reflection.quality.value=.35;reflection.intensity.value=.12;owned.push(reflection);colour=colour.add(reflection.rgb);
  }else{const cavity=ao(depth,normal,camera);cavity.resolutionScale=.5;cavity.radius.value=.8;cavity.scale.value=.65;owned.push(cavity);colour=colour.mul(mix(1,cavity.r,.55));}
  const glow=bloom(vec4(colour,beauty.a),.08,.25,1.4);glow.setResolutionScale(.25);owned.push(glow);const antialias=fxaa(renderOutput(vec4(colour.add(glow.rgb),beauty.a)));owned.push(antialias);pipeline.outputColorTransform=false;pipeline.outputNode=antialias;
- return {resize(w,h){scenePass.setResolutionScale(Math.min(1,w/(renderer.domElement.width||w),h/(renderer.domElement.height||h)));},render(){const tone=renderer.toneMapping,space=renderer.outputColorSpace,xr=renderer.xr.enabled;try{pipeline.render();}finally{renderer.toneMapping=tone;renderer.outputColorSpace=space;renderer.xr.enabled=xr;renderer.setMRT(null);renderer.setRenderTarget(null);}},dispose(){pipeline.dispose();for(const n of owned)n.dispose?.();}};
+ const render=()=>{const tone=renderer.toneMapping,space=renderer.outputColorSpace,xr=renderer.xr.enabled;try{pipeline.render();}finally{renderer.toneMapping=tone;renderer.outputColorSpace=space;renderer.xr.enabled=xr;renderer.setMRT(null);renderer.setRenderTarget(null);}};
+ return {
+  resize(w,h){scenePass.setResolutionScale(Math.min(1,w/(renderer.domElement.width||w),h/(renderer.domElement.height||h)));},
+  async prepare(key,warmup,{draw=false,onProgress=()=>{},...options}={}){
+   const target=renderer.getRenderTarget(),mrt=renderer.getMRT();
+   scenePass.setup({renderer});scenePass.setSize(renderer.domElement.width,renderer.domElement.height);
+   // Output quad (depth 0) → FXAA input texture quad (depth 1) → scene pass (depth 2).
+   // Keep this matched to both mobile and enhanced graph regressions.
+   renderer.setRenderTarget(scenePass.renderTarget);renderer.setMRT(scenePass.getMRT());
+   try{return await warmup.prepare(key,{...options,draw,onProgress,renderDepth:2,renderFrame:()=>{renderer.setMRT(mrt);renderer.setRenderTarget(target);render();}});}
+   finally{renderer.setMRT(mrt);renderer.setRenderTarget(target);}
+  },
+  render,dispose(){pipeline.dispose();for(const n of owned)n.dispose?.();}
+ };
 }
 export async function createWebGPUTourRenderer(parameters={}){
- const renderer=new WebGPURenderer({antialias:true,powerPreference:'high-performance',...parameters}),finishes=createFinishAdapter();let disposed=false;
+ const {onDiagnostic=()=>{},...options}=parameters,emit=(event,error=null,details={})=>{try{onDiagnostic({event,error,details});}catch{}};const renderer=new WebGPURenderer({antialias:true,powerPreference:'high-performance',...options}),finishes=createFinishAdapter();let disposed=false;
  const dispose=()=>{if(disposed)return;disposed=true;finishes.dispose();renderer.dispose();renderer.domElement?.remove?.();};
- try{await renderer.init();if(!renderer.backend.isWebGPUBackend)throw Error('Native WebGPU unavailable');RectAreaLightNode.setLTC(RectAreaLightTexturesLib.init());}catch(e){dispose();throw e;}
+ const originalError=renderer.onError.bind(renderer),originalLoss=renderer.onDeviceLost.bind(renderer);renderer.onError=info=>{emit('gpu-uncaptured-error',info);originalError(info);};renderer.onDeviceLost=info=>{emit('gpu-device-lost',info);originalLoss(info);};
+ try{emit('gpu-adapter-device-initialization');await renderer.init();if(!renderer.backend.isWebGPUBackend)throw Object.assign(Error('Native WebGPU unavailable: renderer initialized a compatibility backend'),{code:'WEBGPU_NATIVE_BACKEND_UNAVAILABLE'});emit('gpu-lighting-initialization');RectAreaLightNode.setLTC(RectAreaLightTexturesLib.init());}catch(e){dispose();throw e;}
  // r185 can report a scoped pipeline failure and still resolve compileAsync.
  // Refuse that draw so the viewer can rebuild using its compatibility path.
- const backend=renderer.backend,draw=backend.draw.bind(backend);backend.draw=(o,info)=>{if(backend.get(o.pipeline).error)throw Object.assign(Error('WebGPU shader pipeline failed'),{name:'SceneDrawError'});return draw(o,info);};
+ const compilation={nodeBuilds:0,syncPipelines:0,asyncPipelines:0},backend=renderer.backend,createBuilder=backend.createNodeBuilder.bind(backend),createPipeline=backend.createRenderPipeline.bind(backend),draw=backend.draw.bind(backend);backend.createNodeBuilder=(...args)=>{compilation.nodeBuilds++;return createBuilder(...args);};backend.createRenderPipeline=(object,promises,...args)=>{compilation[promises?'asyncPipelines':'syncPipelines']++;return createPipeline(object,promises,...args);};backend.draw=(o,info)=>{if(backend.get(o.pipeline).error)throw Object.assign(Error('WebGPU shader pipeline failed'),{name:'SceneDrawError',code:'WEBGPU_PIPELINE_ERROR',details:{objectType:o.object?.type||'unknown',materialType:o.material?.type||'unknown'}});return draw(o,info);};
+ installNativePreparation(renderer);
  const environmentFactory=source=>{const g=new PMREMGenerator(renderer);try{return g.fromEquirectangular(source);}finally{g.dispose();}};
  const probeFactory=(scene,position,mobile)=>{const cube=new CubeRenderTarget(mobile?128:256,{type:HalfFloatType,generateMipmaps:false}),capture=new CubeCamera(.08,24,cube),g=new PMREMGenerator(renderer),old=renderer.shadowMap.autoUpdate,xr=renderer.xr.enabled;capture.position.copy(position);renderer.shadowMap.autoUpdate=false;renderer.xr.enabled=false;try{capture.update(renderer,scene);return g.fromCubemap(cube.texture);}finally{renderer.shadowMap.autoUpdate=old;renderer.xr.enabled=xr;g.dispose();cube.dispose();}};
  const mirrorFactory=geometry=>{const node=reflector({resolutionScale:.35,bounces:false}),material=new MeshBasicNodeMaterial();material.colorNode=node.mul(vec3(.95));const mesh=new Mesh(geometry,material);mesh.add(node.target);const update=node.reflector.updateBefore.bind(node.reflector);let last=-Infinity;node.reflector.updateBefore=frame=>{const now=performance.now();if(renderer.xr.isPresenting||frame.scene.overrideMaterial||now-last<100)return;last=now;return update(frame);};mesh.dispose=()=>{node.dispose();material.dispose();};return mesh;};
- return {renderer,native:true,backend:'webgpu',reason:'supported',environmentFactory,disksFactory:createNodeCelestialDisks,pipelineFactory:createNodePresentation,probeFactory,mirrorFactory,adapt:root=>finishes.apply(root),restoreMaterials:()=>finishes.dispose(),dispose};
+ return {renderer,compilationStats:()=>({...compilation}),native:true,backend:'webgpu',reason:'supported',environmentFactory,disksFactory:createNodeCelestialDisks,pipelineFactory:createNodePresentation,probeFactory,mirrorFactory,adapt:root=>finishes.apply(root),restoreMaterials:()=>finishes.dispose(),dispose};
 }

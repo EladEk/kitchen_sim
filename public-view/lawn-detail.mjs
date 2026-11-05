@@ -23,7 +23,7 @@ function blades(){
 // Visual blades never enter collision, floor support, picking or shadow maps.
 export function createLawnDetail(layers,{mobile=false}={}){
  const regions=lawnRegions(layers),capacity=mobile?1500:4200,geometry=blades(),material=new THREE.MeshStandardMaterial({color:'#ffffff',vertexColors:true,roughness:1,metalness:0,side:THREE.DoubleSide}),mesh=new THREE.InstancedMesh(geometry,material,capacity);
- mesh.name='nearby-short-lawn';mesh.userData={tourNonPhysical:true,lawnDetail:true};mesh.count=0;mesh.visible=false;mesh.castShadow=false;mesh.receiveShadow=true;mesh.raycast=()=>{};
+ mesh.setColorAt(0,new THREE.Color('#ffffff'));mesh.name='nearby-short-lawn';mesh.userData={tourNonPhysical:true,lawnDetail:true};mesh.count=0;mesh.visible=false;mesh.castShadow=false;mesh.receiveShadow=true;mesh.raycast=()=>{};
  const matrix=new THREE.Matrix4(),q=new THREE.Quaternion(),point=new THREE.Vector3(),scale=new THREE.Vector3(),colour=new THREE.Color(),up=new THREE.Vector3(0,1,0);let last=-Infinity,lastX=Infinity,lastZ=Infinity,lastScale=null,disposed=false;
  return {mesh,update(position,now=0,{walking=false,detailScale=1}={}){
   if(disposed)return;mesh.visible=walking&&regions.length>0&&position.y<3.5;if(!mesh.visible)return;

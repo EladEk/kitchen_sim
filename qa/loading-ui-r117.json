@@ -1,0 +1,12 @@
+{
+  "revision": "R117",
+  "review": "Actual LoadingIndicator React component in cloud Chrome",
+  "fixture": "qa/loading-preview-r117.html",
+  "sampleWidthCSSPixels": 360,
+  "overlayPercentageObserved": 37,
+  "roomTransitionPercentageObserved": 84,
+  "accessibleProgressValuesObserved": [37, 84],
+  "bootProgressObserved": 0,
+  "visualOverflowObserved": false,
+  "physicalPhoneOrVRPerformanceVerified": false
+}

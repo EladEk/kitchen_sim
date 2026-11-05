@@ -1,0 +1,58 @@
+{
+  "backend": "Dawn null validation",
+  "overviewCounts": {
+    "all": 5594,
+    "visible": 276,
+    "meaningful": 276,
+    "allCompile": 1890,
+    "visibleCompile": 276,
+    "meaningfulCompile": 276,
+    "zeroInstances": 0
+  },
+  "results": [
+    {
+      "key": "actual-opening",
+      "elapsedMs": 6956,
+      "textures": 33,
+      "drawObjects": 203,
+      "compileObjects": 203,
+      "cachedObjects": 0,
+      "compileBatches": 9,
+      "viewOnly": true
+    },
+    {
+      "key": "actual-lobby-walk",
+      "elapsedMs": 32497,
+      "textures": 9,
+      "drawObjects": 586,
+      "compileObjects": 439,
+      "cachedObjects": 0,
+      "compileBatches": 19,
+      "viewOnly": true
+    },
+    {
+      "key": "same-view-reused",
+      "elapsedMs": 263,
+      "textures": 0,
+      "drawObjects": 586,
+      "compileObjects": 0,
+      "cachedObjects": 439,
+      "compileBatches": 0,
+      "viewOnly": true
+    },
+    {
+      "key": "actual-ground-apartment-section",
+      "elapsedMs": 1454,
+      "textures": 0,
+      "drawObjects": 98,
+      "compileObjects": 60,
+      "cachedObjects": 0,
+      "compileBatches": 3,
+      "viewOnly": true
+    }
+  ],
+  "errors": [],
+  "pixelsVerified": false,
+  "physicalARMDeviceVerified": false,
+  "phoneFPSVerified": false
+}

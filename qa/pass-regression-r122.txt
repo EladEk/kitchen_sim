@@ -1,0 +1,27 @@
+✔ room reflections use a bounded cache and material-local maps without ever swapping the sky or allocating in XR (4.730012ms)
+✔ only one nearby mirror exists and it is suppressed in stereo and during AO passes (2.003798ms)
+✔ unsupported offscreen reflection targets fall back to live rendering without a repeated loading loop (0.39931ms)
+✔ mobile native preparation keeps the indoor IBL and live mirror without six room-capture renders (0.723486ms)
+✔ mobile native preparation and first room display use the same postprocessing pipeline (2.55139ms)
+✔ native view preparation skips hidden branches, zero instances, proxies and off-camera work (7.987102ms)
+✔ native bindings are reused across regions but material, lighting and context changes invalidate preparation (3.831672ms)
+✔ cancelled room preparation finishes before another native compile can use shared renderer state (1.104478ms)
+✔ the native cache retains material/layout normalization performed by compilation and its first real draw (0.773531ms)
+✔ a completed region still recompiles a changed material when its region key is reused (0.671228ms)
+✔ healthy per-batch progress continues beyond the old total-time guard while an over-budget batch is still rejected (1.350869ms)
+✔ warmup uploads shared textures once, compiles real draw types and keeps object ownership (4.930683ms)
+✔ paint precedes texture upload, and a stale shader completion cannot mark a canceled room ready (5.942022ms)
+✔ startup remains pending until a real frame has drawn and its shadow targets exist (0.824678ms)
+✔ a failed GPU draw or missing visible shadow never marks an empty first frame ready (1.044408ms)
+✔ native batches preserve instancing identity, parent pointers and first shadow flags (2.283068ms)
+✔ a native device budget failure restores shadows and never marks a pending view ready (0.791237ms)
+✔ preparation percentage counts real uploads/compile batches and reaches one only after successful drawing (1.339671ms)
+✔ a failed preparation reports its exact phase and measured budget for the user-visible diagnostic log (0.870186ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 19
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 216.736192

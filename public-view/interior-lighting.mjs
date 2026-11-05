@@ -28,7 +28,7 @@ export function createInteriorLighting(scene,renderer,{mobile=false,environmentF
  // FIRST outdoor frame, even while its light intensity is zero.
  ceiling.position.set(0,2.55,0);target.position.set(0,0,0);
  bounce.name='tour-floor-bounce';walls.name='tour-wall-bounce';scene.add(bounce,walls,ceiling,target);
- let amount=0,exposure=.98,room=null,wanted=null,shadowAmount=0,elapsed=0,interval=80,disposed=false;
+ let amount=0,exposure=.98,room=null,wanted=null,shadowAmount=0,disposed=false;
  return {
   bind:root=>{probe??=createInteriorProbe(renderer,{mobile,environmentFactory});probe.bind(root);root.traverse(o=>{for(const m of [o.material].flat().filter(Boolean))if(m.userData.architecturalGlass)glass.add(m);});updateGlass();},
   update({inside=false,walking=false,solar,dt=.016,region=null,xr=false}={}){
@@ -42,13 +42,14 @@ export function createInteriorLighting(scene,renderer,{mobile=false,environmentF
    wanted=walking&&inside?region:null;
    const same=wanted&&room===wanted.key;shadowAmount+=((same?1:0)-shadowAmount)*(1-Math.exp(-Math.min(.1,dt)/(same?.5:.14)));
    if(!same&&shadowAmount<.015){room=wanted?.key||null;if(wanted){ceiling.position.fromArray(wanted.position);target.position.fromArray(wanted.target);ceiling.shadow.needsUpdate=true;}}
-   ceiling.intensity=9*shadowAmount*Math.sqrt(daylight);ceiling.visible=true;elapsed+=dt*1000;
-   if(!ceiling.shadow.map||ceiling.intensity>.001&&elapsed>=interval){ceiling.shadow.needsUpdate=true;elapsed=0;}
+   ceiling.intensity=9*shadowAmount*Math.sqrt(daylight);ceiling.visible=true;
+   if(!ceiling.shadow.map)ceiling.shadow.needsUpdate=true;
    const exposureTarget=.98+(daylight>.02?.22:0)*amount;
    exposure+=(exposureTarget-exposure)*weight;renderer.toneMappingExposure=exposure;
    return {amount,exposure,bounce:bounce.intensity,walls:walls.intensity,shadow:ceiling.intensity};
   },
-  setQuality({tier=0,shadowInterval=0}={}){glassTier=tier;updateGlass();interval=Math.max(80,shadowInterval);const size=mobile?(tier>=2?256:512):(tier>=2?512:1024);if(ceiling.shadow.mapSize.x!==size){ceiling.shadow.map?.dispose();ceiling.shadow.map=null;ceiling.shadow.mapSize.set(size,size);ceiling.shadow.needsUpdate=true;}},
+  invalidateShadows(){ceiling.shadow.needsUpdate=true;},
+  setQuality({tier=0}={}){glassTier=tier;updateGlass();const size=mobile?(tier>=2?256:512):(tier>=2?512:1024);if(ceiling.shadow.mapSize.x!==size){ceiling.shadow.map?.dispose();ceiling.shadow.map=null;ceiling.shadow.mapSize.set(size,size);ceiling.shadow.needsUpdate=true;}},
   trim(){ceiling.shadow.map?.dispose();ceiling.shadow.map=null;ceiling.shadow.needsUpdate=true;},
   dispose(){if(disposed)return;disposed=true;probe?.dispose();glass.clear();area.removeFromParent();ceiling.shadow.map?.dispose();for(const light of [bounce,walls,ceiling,target])light.removeFromParent();renderer.toneMappingExposure=.98;}
  };

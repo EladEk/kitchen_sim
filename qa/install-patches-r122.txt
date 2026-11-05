@@ -1,0 +1,17 @@
+{
+  "officialPackage": "three-0.185.0.tgz",
+  "freshInstallation": "/workspace/scratch/bb76198bcf5e/review/clean-three-r122-bc6l6h84",
+  "runs": [
+    "Three.js r185 instance-capacity fix applied.\nThree.js r185 bounded compilation applied.",
+    "Three.js r185 bounded compilation ready.\nThree.js r185 instance-capacity fix applied."
+  ],
+  "allFreshHashesMatchBuild": true,
+  "hashes": {
+    "src/nodes/accessors/Instance.js": "b261da79989682362dff394c128055bbf066ee1e9efb800dfe6b2f6546a05c0f",
+    "src/nodes/core/NodeBuilder.js": "418cd2cd2c10ada7b76a517d90602adbef5b738fcaf6627baf4b17f023015cac",
+    "src/renderers/common/nodes/NodeManager.js": "007d15a0462d21a5a6bfef0b48cd643b80e056223ed370577d62d26e3764385a",
+    "src/renderers/common/Renderer.js": "7f7ede717b1bba75756621597dcd8b625a27ccbe73b9fb14ebd809c973fc42fc",
+    "src/renderers/webgpu/utils/WebGPUPipelineUtils.js": "f0b25280227e64051d07e81ca73e6db6c2641ad05e26e6b8884e6fea2ea0719c",
+    "build/three.webgpu.js": "ef9ca6008cd437fee284ab6d542cd46c3e69613c61fc044f9c00ac08fcdf30a0"
+  }
+}

@@ -7,6 +7,10 @@ const pose=new THREE.Vector3(),matrix=new THREE.Matrix4(),color=new THREE.Color(
 const assets=()=>({trees:[[0,0],[18,12],[100,0]],cars:[{x:8,z:0,angle:0,length:4.1},{x:12,z:8,angle:Math.PI/2,length:3.2},{x:-10,z:12,angle:.73,length:3.8}]});
 const close=(a,b,eps=1e-6)=>assert(Math.abs(a-b)<eps,`${a} != ${b}`);
 
+test('inactive foliage tiers already own their colour binding and valid placement matrices before walking',()=>{
+ const props=createRealisticProps({trees:[[100,20],[120,30]],mobile:true}),near=props.group.children.find(o=>o.name==='tree-near-foliage');assert.equal(near.count,0);assert(!near.visible);assert(near.instanceColor);assert.equal(near.instanceColor.count,2);near.getMatrixAt(0,matrix);assert.equal(matrix.elements[12],100);assert.equal(matrix.elements[14],20);assert(matrix.determinant()>0);const colors=near.instanceColor;props.update(new THREE.Vector3(100,1.7,20),1000);assert.equal(near.instanceColor,colors);assert(near.count>0);props.dispose();
+});
+
 test('all assets are present on the first frame and stay batched at district scale',()=>{
  const input={trees:Array.from({length:240},(_,i)=>[i%20*11,Math.floor(i/20)*12]),cars:Array.from({length:80},(_,i)=>({x:i%20*2.6,z:80+Math.floor(i/20)*12,angle:Math.PI/2,length:4.1}))},before=JSON.stringify(input),props=createRealisticProps(input);
  try{

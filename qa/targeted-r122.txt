@@ -1,0 +1,38 @@
+✔ the first GPU validation cause survives a cascade, session reload and a later engine attempt (53.715807ms)
+✔ the report preserves the exact initialization cause and stage and survives retry/reload (2.270179ms)
+✔ logs retain lost-device reasons and budget details while omitting secrets and URL queries (0.636837ms)
+✔ console collection forwards original warnings, captures GPU compiler details only, and restores shared hooks (1.057849ms)
+✔ bounded local logs tolerate cyclic errors, corrupt/full storage, subscriptions and clearing (160.864263ms)
+✔ automatic fallback records its original reason without changing forced-backend behavior (1.051149ms)
+✔ asynchronous transmission updates read the framebuffer being compiled and restore all target state on failure (2.874326ms)
+✔ an existing postprocessing target is preserved rather than replaced by the canvas target (0.301903ms)
+✔ progress follows completed phases, never regresses or fabricates 100, and retires callbacks across resets (2.560756ms)
+✔ streamed bytes use decoded asset sizes rather than compressed Content-Length and decode split UTF-8 correctly (16.158194ms)
+✔ unknown-length downloads finish on actual receipt, and abort/HTTP failure cannot report completion (5.851086ms)
+✔ baseline downloads validate their revision, weight actual files, and retain the existing three-result contract (2.172572ms)
+✔ a mobile viewport resize is coalesced until asynchronous GPU preparation finishes (1.77184ms)
+✔ the latest selection cannot move the camera while a cancelled compile still owns it (1.482807ms)
+✔ a failed preparation releases ownership; disposing does not apply a queued resize (0.697718ms)
+✔ a destination continuation cannot reset 96 percent or accept an older phase completion (0.49283ms)
+✔ native view preparation skips hidden branches, zero instances, proxies and off-camera work (8.220385ms)
+✔ native bindings are reused across regions but material, lighting and context changes invalidate preparation (3.684543ms)
+✔ cancelled room preparation finishes before another native compile can use shared renderer state (0.703416ms)
+✔ the native cache retains material/layout normalization performed by compilation and its first real draw (0.694783ms)
+✔ a completed region still recompiles a changed material when its region key is reused (0.808394ms)
+✔ healthy per-batch progress continues beyond the old total-time guard while an over-budget batch is still rejected (1.524089ms)
+✔ warmup uploads shared textures once, compiles real draw types and keeps object ownership (5.098476ms)
+✔ paint precedes texture upload, and a stale shader completion cannot mark a canceled room ready (6.839566ms)
+✔ startup remains pending until a real frame has drawn and its shadow targets exist (1.170407ms)
+✔ a failed GPU draw or missing visible shadow never marks an empty first frame ready (1.123657ms)
+✔ native batches preserve instancing identity, parent pointers and first shadow flags (2.573855ms)
+✔ a native device budget failure restores shadows and never marks a pending view ready (0.868865ms)
+✔ preparation percentage counts real uploads/compile batches and reaches one only after successful drawing (2.475968ms)
+✔ a failed preparation reports its exact phase and measured budget for the user-visible diagnostic log (0.886631ms)
+ℹ tests 30
+ℹ suites 0
+ℹ pass 30
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 426.31488

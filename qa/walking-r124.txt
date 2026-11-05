@@ -1,0 +1,2199 @@
+{
+  "revision": "R124",
+  "backend": "Dawn null",
+  "maxUniformBufferBindingSize": 65536,
+  "results": [
+    {
+      "label": "lobby",
+      "key": "walk:4102:0:common",
+      "preparation": {
+        "elapsedMs": 18826,
+        "textures": 45,
+        "drawObjects": 1516,
+        "compileObjects": 623,
+        "cachedObjects": 0,
+        "compileBatches": 26,
+        "viewOnly": true,
+        "neighborhood": true
+      },
+      "frames": [
+        {
+          "elapsedMs": 132,
+          "drawCalls": 2192,
+          "triangles": 7693491,
+          "nodeBuilds": 1,
+          "syncPipelines": 1,
+          "sceneSyncPipelines": 0
+        },
+        {
+          "elapsedMs": 42,
+          "drawCalls": 462,
+          "triangles": 2321391,
+          "nodeBuilds": 0,
+          "syncPipelines": 0,
+          "sceneSyncPipelines": 0
+        },
+        {
+          "elapsedMs": 40,
+          "drawCalls": 462,
+          "triangles": 2321391,
+          "nodeBuilds": 0,
+          "syncPipelines": 0,
+          "sceneSyncPipelines": 0
+        },
+        {
+          "elapsedMs": 40,
+          "drawCalls": 462,
+          "triangles": 2321391,
+          "nodeBuilds": 0,
+          "syncPipelines": 0,
+          "sceneSyncPipelines": 0
+        },
+        {
+          "elapsedMs": 40,
+          "drawCalls": 462,
+          "triangles": 2321391,
+          "nodeBuilds": 0,
+          "syncPipelines": 0,
+          "sceneSyncPipelines": 0
+        },
+        {
+          "elapsedMs": 39,
+          "drawCalls": 462,
+          "triangles": 2321391,
+          "nodeBuilds": 0,
+          "syncPipelines": 0,
+          "sceneSyncPipelines": 0
+        }
+      ]
+    },
+    {
+      "label": "apartment",
+      "key": "walk:4102:0:4",
+      "preparation": {
+        "elapsedMs": 3345,
+        "textures": 0,
+        "drawObjects": 1590,
+        "compileObjects": 115,
+        "cachedObjects": 609,
+        "compileBatches": 5,
+        "viewOnly": true,
+        "neighborhood": true
+      },
+      "frames": [
+        {
+          "elapsedMs": 51,
+          "drawCalls": 461,
+          "triangles": 3173841,
+          "nodeBuilds": 0,
+          "syncPipelines": 0,
+          "sceneSyncPipelines": 0
+        },
+        {
+          "elapsedMs": 49,
+          "drawCalls": 461,
+          "triangles": 3173841,
+          "nodeBuilds": 0,
+          "syncPipelines": 0,
+          "sceneSyncPipelines": 0
+        },
+        {
+          "elapsedMs": 50,
+          "drawCalls": 461,
+          "triangles": 3173841,
+          "nodeBuilds": 0,
+          "syncPipelines": 0,
+          "sceneSyncPipelines": 0
+        },
+        {
+          "elapsedMs": 47,
+          "drawCalls": 461,
+          "triangles": 3173841,
+          "nodeBuilds": 0,
+          "syncPipelines": 0,
+          "sceneSyncPipelines": 0
+        },
+        {
+          "elapsedMs": 55,
+          "drawCalls": 461,
+          "triangles": 3173841,
+          "nodeBuilds": 0,
+          "syncPipelines": 0,
+          "sceneSyncPipelines": 0
+        },
+        {
+          "elapsedMs": 60,
+          "drawCalls": 461,
+          "triangles": 3173841,
+          "nodeBuilds": 0,
+          "syncPipelines": 0,
+          "sceneSyncPipelines": 0
+        }
+      ]
+    }
+  ],
+  "apartmentRoomFrames": [
+    {
+      "room": "living",
+      "key": "walk:4102:0:4",
+      "drawCalls": 534,
+      "newPipelines": 0
+    },
+    {
+      "room": "kitchen",
+      "key": "walk:4102:0:4",
+      "drawCalls": 2259,
+      "newPipelines": 0
+    },
+    {
+      "room": "bedroom",
+      "key": "walk:4102:0:4",
+      "drawCalls": 1867,
+      "newPipelines": 0
+    },
+    {
+      "room": "bedroom",
+      "key": "walk:4102:0:4",
+      "drawCalls": 1911,
+      "newPipelines": 0
+    },
+    {
+      "room": "bedroom",
+      "key": "walk:4102:0:4",
+      "drawCalls": 1779,
+      "newPipelines": 0
+    },
+    {
+      "room": "bedroom",
+      "key": "walk:4102:0:4",
+      "drawCalls": 2337,
+      "newPipelines": 0
+    },
+    {
+      "room": "safe-room",
+      "key": "walk:4102:0:4",
+      "drawCalls": 1687,
+      "newPipelines": 0
+    },
+    {
+      "room": "bathroom",
+      "key": "walk:4102:0:4",
+      "drawCalls": 1908,
+      "newPipelines": 0
+    },
+    {
+      "room": "bathroom",
+      "key": "walk:4102:0:4",
+      "drawCalls": 1940,
+      "newPipelines": 0
+    },
+    {
+      "room": "wc",
+      "key": "walk:4102:0:4",
+      "drawCalls": 2435,
+      "newPipelines": 0
+    },
+    {
+      "room": "utility",
+      "key": "walk:4102:0:4",
+      "drawCalls": 1816,
+      "newPipelines": 0
+    },
+    {
+      "room": "hall",
+      "key": "walk:4102:0:4",
+      "drawCalls": 1869,
+      "newPipelines": 0
+    }
+  ],
+  "apartmentPreparationKeys": 1,
+  "pipelines": [
+    {
+      "phase": "setup",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": false,
+      "side": 0,
+      "transparent": false,
+      "shadow": false,
+      "data": {},
+      "opacity": 1,
+      "count": 1,
+      "instanced": false
+    },
+    {
+      "phase": "setup",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": false,
+      "side": 0,
+      "transparent": false,
+      "shadow": false,
+      "data": {},
+      "opacity": 1,
+      "count": 1,
+      "instanced": false
+    },
+    {
+      "phase": "setup",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": false,
+      "side": 0,
+      "transparent": false,
+      "shadow": false,
+      "data": {},
+      "opacity": 1,
+      "count": 1,
+      "instanced": false
+    },
+    {
+      "phase": "setup",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": false,
+      "side": 0,
+      "transparent": false,
+      "shadow": false,
+      "data": {},
+      "opacity": 1,
+      "count": 1,
+      "instanced": false
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": false,
+      "side": 1,
+      "transparent": false,
+      "shadow": false,
+      "data": {},
+      "opacity": 1,
+      "count": 1,
+      "instanced": false
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "data": {
+        "level": 6,
+        "ceiling": false,
+        "roof": false,
+        "exterior": true,
+        "walkingBatch": true
+      },
+      "opacity": 1,
+      "count": 1,
+      "instanced": false
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "transparent": null,
+      "shadow": true,
+      "data": {
+        "level": 6,
+        "ceiling": false,
+        "roof": false,
+        "exterior": true,
+        "walkingBatch": true
+      },
+      "opacity": 1,
+      "count": 1,
+      "instanced": false
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "transparent": null,
+      "shadow": true,
+      "data": {
+        "level": 6,
+        "ceiling": false,
+        "roof": false,
+        "exterior": true,
+        "walkingBatch": true
+      },
+      "opacity": 1,
+      "count": 1,
+      "instanced": false
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 2,
+      "transparent": null,
+      "shadow": true,
+      "data": {
+        "level": 5,
+        "ceiling": false,
+        "roof": false,
+        "exterior": true,
+        "walkingBatch": true
+      },
+      "opacity": 1,
+      "count": 1,
+      "instanced": false
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "transparent": null,
+      "shadow": true,
+      "data": {
+        "level": 5,
+        "ceiling": false,
+        "roof": false,
+        "exterior": true,
+        "walkingBatch": true
+      },
+      "opacity": 1,
+      "count": 1,
+      "instanced": false
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "transparent": null,
+      "shadow": true,
+      "data": {
+        "level": 5,
+        "ceiling": false,
+        "roof": false,
+        "exterior": true,
+        "walkingBatch": true
+      },
+      "opacity": 1,
+      "count": 1,
+      "instanced": false
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 2,
+      "transparent": null,
+      "shadow": true,
+      "data": {
+        "level": 6,
+        "ceiling": false,
+        "roof": false,
+        "exterior": true,
+        "walkingBatch": true
+      },
+      "opacity": 1,
+      "count": 1,
+      "instanced": false
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "transparent": null,
+      "shadow": true,
+      "detail": "exterior",
+      "data": {
+        "district": true,
+        "detail": "exterior"
+      },
+      "opacity": 1,
+      "count": 5,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "transparent": null,
+      "shadow": true,
+      "detail": "exterior",
+      "data": {
+        "district": true,
+        "detail": "exterior"
+      },
+      "opacity": 1,
+      "count": 2,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "part": "public-park-amphitheatre",
+      "data": {
+        "part": "public-park-amphitheatre",
+        "landscape": true,
+        "dimensionsInferred": true
+      },
+      "opacity": 1,
+      "count": 1,
+      "instanced": false
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "transparent": null,
+      "shadow": true,
+      "data": {
+        "level": 0,
+        "ceiling": false,
+        "roof": false,
+        "exterior": true,
+        "walkingBatch": true
+      },
+      "opacity": 1,
+      "count": 1,
+      "instanced": false
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 2,
+      "transparent": null,
+      "shadow": true,
+      "data": {
+        "level": 0,
+        "ceiling": false,
+        "roof": false,
+        "exterior": true,
+        "walkingBatch": true
+      },
+      "opacity": 1,
+      "count": 1,
+      "instanced": false
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "data": {
+        "level": 1,
+        "ceiling": false,
+        "roof": false,
+        "exterior": false,
+        "walkingBatch": true
+      },
+      "opacity": 1,
+      "count": 1,
+      "instanced": false
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 2,
+      "shadow": true,
+      "data": {
+        "level": 0,
+        "ceiling": false,
+        "roof": false,
+        "exterior": true,
+        "walkingBatch": true
+      },
+      "opacity": 1,
+      "count": 1,
+      "instanced": false
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 2,
+      "shadow": true,
+      "data": {
+        "level": 0,
+        "ceiling": false,
+        "roof": false,
+        "exterior": true,
+        "walkingBatch": true
+      },
+      "opacity": 1,
+      "count": 1,
+      "instanced": false
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "detail": "exterior",
+      "data": {
+        "district": true,
+        "detail": "exterior"
+      },
+      "opacity": 1,
+      "count": 5,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 2,
+      "transparent": null,
+      "shadow": true,
+      "detail": "exterior",
+      "data": {
+        "district": true,
+        "detail": "exterior"
+      },
+      "opacity": 1,
+      "count": 5,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "detail": "exterior",
+      "data": {
+        "district": true,
+        "detail": "exterior"
+      },
+      "opacity": 1,
+      "count": 2,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 2,
+      "transparent": null,
+      "shadow": true,
+      "detail": "exterior",
+      "data": {
+        "district": true,
+        "detail": "exterior"
+      },
+      "opacity": 1,
+      "count": 2,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "transparent": null,
+      "shadow": true,
+      "detail": "exterior",
+      "data": {
+        "district": true,
+        "detail": "exterior"
+      },
+      "opacity": 1,
+      "count": 5,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "transparent": null,
+      "shadow": true,
+      "detail": "exterior",
+      "data": {
+        "district": true,
+        "detail": "exterior"
+      },
+      "opacity": 1,
+      "count": 2,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "transparent": null,
+      "shadow": true,
+      "detail": "exterior",
+      "data": {
+        "district": true,
+        "detail": "exterior"
+      },
+      "opacity": 1,
+      "count": 2,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "transparent": null,
+      "shadow": true,
+      "detail": "exterior",
+      "data": {
+        "district": true,
+        "detail": "exterior"
+      },
+      "opacity": 1,
+      "count": 5,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "transparent": null,
+      "shadow": true,
+      "detail": "exterior",
+      "data": {
+        "district": true,
+        "detail": "exterior"
+      },
+      "opacity": 1,
+      "count": 5,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "transparent": null,
+      "shadow": true,
+      "detail": "exterior",
+      "data": {
+        "district": true,
+        "detail": "exterior"
+      },
+      "opacity": 1,
+      "count": 2,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 2,
+      "transparent": null,
+      "shadow": true,
+      "detail": "exterior",
+      "data": {
+        "district": true,
+        "detail": "exterior"
+      },
+      "opacity": 1,
+      "count": 2,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 2,
+      "transparent": null,
+      "shadow": true,
+      "detail": "exterior",
+      "data": {
+        "district": true,
+        "detail": "exterior"
+      },
+      "opacity": 1,
+      "count": 5,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 2,
+      "shadow": true,
+      "part": "public-park-shade",
+      "data": {
+        "part": "public-park-shade",
+        "landscape": true,
+        "dimensionsInferred": true
+      },
+      "opacity": 1,
+      "count": 1,
+      "instanced": false
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 2,
+      "transparent": null,
+      "shadow": true,
+      "detail": "exterior",
+      "data": {
+        "district": true,
+        "detail": "exterior"
+      },
+      "opacity": 1,
+      "count": 5,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "part": "public-park-shade-support",
+      "data": {
+        "part": "public-park-shade-support",
+        "landscape": true,
+        "dimensionsInferred": true
+      },
+      "opacity": 1,
+      "count": 1,
+      "instanced": false
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "tree-far-foliage",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "data": {
+        "propType": "tree",
+        "detailTier": 2,
+        "propPart": "foliage"
+      },
+      "opacity": 1,
+      "count": 204,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "car-suv-near-tail-lights",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "data": {
+        "propType": "car",
+        "detailTier": 0,
+        "propPart": "tail-lights",
+        "propModel": "suv"
+      },
+      "opacity": 1,
+      "count": 2,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "car-hatchback-near-tail-lights",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "data": {
+        "propType": "car",
+        "detailTier": 0,
+        "propPart": "tail-lights",
+        "propModel": "hatchback"
+      },
+      "opacity": 1,
+      "count": 2,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "tree-middle-branches",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "data": {
+        "propType": "tree",
+        "detailTier": 1,
+        "propPart": "branches"
+      },
+      "opacity": 1,
+      "count": 16,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 2,
+      "shadow": true,
+      "detail": "exterior",
+      "data": {
+        "district": true,
+        "detail": "exterior"
+      },
+      "opacity": 1,
+      "count": 2,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "car-suv-near-body",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "data": {
+        "propType": "car",
+        "detailTier": 0,
+        "propPart": "body",
+        "propModel": "suv"
+      },
+      "opacity": 1,
+      "count": 2,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "car-hatchback-near-body",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "data": {
+        "propType": "car",
+        "detailTier": 0,
+        "propPart": "body",
+        "propModel": "hatchback"
+      },
+      "opacity": 1,
+      "count": 2,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "car-suv-middle-headlights",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "data": {
+        "propType": "car",
+        "detailTier": 1,
+        "propPart": "headlights",
+        "propModel": "suv"
+      },
+      "opacity": 1,
+      "count": 5,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "car-hatchback-middle-headlights",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "data": {
+        "propType": "car",
+        "detailTier": 1,
+        "propPart": "headlights",
+        "propModel": "hatchback"
+      },
+      "opacity": 1,
+      "count": 7,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "part": "courtyard-green-canopy",
+      "data": {
+        "part": "courtyard-green-canopy",
+        "landscape": true,
+        "dimensionsInferred": true
+      },
+      "opacity": 1,
+      "count": 710,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "part": "courtyard-green-canopy",
+      "data": {
+        "part": "courtyard-green-canopy",
+        "landscape": true,
+        "dimensionsInferred": true
+      },
+      "opacity": 1,
+      "count": 1108,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "part": "courtyard-green-canopy",
+      "data": {
+        "part": "courtyard-green-canopy",
+        "landscape": true,
+        "dimensionsInferred": true
+      },
+      "opacity": 1,
+      "count": 436,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "part": "courtyard-burgundy-canopy",
+      "data": {
+        "part": "courtyard-burgundy-canopy",
+        "landscape": true,
+        "dimensionsInferred": true
+      },
+      "opacity": 1,
+      "count": 234,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "part": "courtyard-burgundy-canopy",
+      "data": {
+        "part": "courtyard-burgundy-canopy",
+        "landscape": true,
+        "dimensionsInferred": true
+      },
+      "opacity": 1,
+      "count": 829,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "part": "courtyard-burgundy-canopy",
+      "data": {
+        "part": "courtyard-burgundy-canopy",
+        "landscape": true,
+        "dimensionsInferred": true
+      },
+      "opacity": 1,
+      "count": 145,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "transparent": null,
+      "shadow": true,
+      "data": {},
+      "opacity": 1,
+      "count": 649,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "transparent": null,
+      "shadow": true,
+      "data": {},
+      "opacity": 1,
+      "count": 240,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "transparent": null,
+      "shadow": true,
+      "data": {},
+      "opacity": 1,
+      "count": 13280,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "transparent": null,
+      "shadow": true,
+      "data": {},
+      "opacity": 1,
+      "count": 704,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "transparent": null,
+      "shadow": true,
+      "data": {},
+      "opacity": 1,
+      "count": 61,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "part": "courtyard-bed-edging",
+      "data": {
+        "part": "courtyard-bed-edging",
+        "landscape": true
+      },
+      "opacity": 1,
+      "count": 218,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "part": "public-park-furniture",
+      "data": {
+        "part": "public-park-furniture",
+        "landscape": true,
+        "dimensionsInferred": true
+      },
+      "opacity": 1,
+      "count": 72,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "part": "public-park-furniture",
+      "data": {
+        "part": "public-park-furniture",
+        "landscape": true,
+        "dimensionsInferred": true
+      },
+      "opacity": 1,
+      "count": 36,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "part": "public-park-furniture",
+      "data": {
+        "part": "public-park-furniture",
+        "landscape": true,
+        "dimensionsInferred": true
+      },
+      "opacity": 1,
+      "count": 10,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "part": "district-context-batch",
+      "data": {
+        "part": "district-context-batch",
+        "context": true,
+        "exterior": true
+      },
+      "opacity": 1,
+      "count": 30,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "part": "district-context-batch",
+      "data": {
+        "part": "district-context-batch",
+        "context": true,
+        "exterior": true
+      },
+      "opacity": 1,
+      "count": 12,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "part": "district-context-batch",
+      "data": {
+        "part": "district-context-batch",
+        "context": true,
+        "exterior": true
+      },
+      "opacity": 1,
+      "count": 648,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "part": "district-context-batch",
+      "data": {
+        "part": "district-context-batch",
+        "context": true,
+        "exterior": true
+      },
+      "opacity": 1,
+      "count": 646,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "part": "district-context-batch",
+      "data": {
+        "part": "district-context-batch",
+        "context": true,
+        "exterior": true
+      },
+      "opacity": 1,
+      "count": 19,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "part": "district-context-batch",
+      "data": {
+        "part": "district-context-batch",
+        "context": true,
+        "exterior": true
+      },
+      "opacity": 1,
+      "count": 1,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "part": "district-context-batch",
+      "data": {
+        "part": "district-context-batch",
+        "context": true,
+        "exterior": true
+      },
+      "opacity": 1,
+      "count": 88,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "part": "district-context-batch",
+      "data": {
+        "part": "district-context-batch",
+        "context": true,
+        "exterior": true
+      },
+      "opacity": 1,
+      "count": 4,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "detail": "exterior",
+      "data": {
+        "district": true,
+        "detail": "exterior"
+      },
+      "opacity": 1,
+      "count": 5,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "detail": "exterior",
+      "data": {
+        "district": true,
+        "detail": "exterior"
+      },
+      "opacity": 1,
+      "count": 2,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 2,
+      "shadow": true,
+      "detail": "exterior",
+      "data": {
+        "district": true,
+        "detail": "exterior"
+      },
+      "opacity": 1,
+      "count": 5,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 2,
+      "shadow": true,
+      "detail": "exterior",
+      "data": {
+        "district": true,
+        "detail": "exterior"
+      },
+      "opacity": 1,
+      "count": 2,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 2,
+      "transparent": null,
+      "shadow": true,
+      "detail": "exterior",
+      "data": {
+        "district": true,
+        "detail": "exterior"
+      },
+      "opacity": 1,
+      "count": 5,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 2,
+      "transparent": null,
+      "shadow": true,
+      "detail": "exterior",
+      "data": {
+        "district": true,
+        "detail": "exterior"
+      },
+      "opacity": 1,
+      "count": 2,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 2,
+      "shadow": true,
+      "detail": "exterior",
+      "data": {
+        "district": true,
+        "detail": "exterior"
+      },
+      "opacity": 1,
+      "count": 5,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "transparent": null,
+      "shadow": true,
+      "detail": "exterior",
+      "data": {
+        "district": true,
+        "detail": "exterior"
+      },
+      "opacity": 1,
+      "count": 5,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "transparent": null,
+      "shadow": true,
+      "detail": "exterior",
+      "data": {
+        "district": true,
+        "detail": "exterior"
+      },
+      "opacity": 1,
+      "count": 2,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 2,
+      "transparent": null,
+      "shadow": true,
+      "detail": "exterior",
+      "data": {
+        "district": true,
+        "detail": "exterior"
+      },
+      "opacity": 1,
+      "count": 2,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 2,
+      "transparent": null,
+      "shadow": true,
+      "data": {
+        "level": 0,
+        "ceiling": true,
+        "roof": false,
+        "exterior": true,
+        "walkingBatch": true
+      },
+      "opacity": 1,
+      "count": 1,
+      "instanced": false
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 2,
+      "shadow": true,
+      "furniture": "sofa",
+      "data": {
+        "level": 0,
+        "ceiling": false,
+        "roof": false,
+        "exterior": true,
+        "furnitureRender": "sofa",
+        "tourNonPhysical": true,
+        "renderFixture": true,
+        "walkingBatch": true
+      },
+      "opacity": 1,
+      "count": 2,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 2,
+      "shadow": true,
+      "furniture": "sofa",
+      "data": {
+        "level": 0,
+        "ceiling": false,
+        "roof": false,
+        "exterior": true,
+        "furnitureRender": "sofa",
+        "tourNonPhysical": true,
+        "renderFixture": true,
+        "walkingBatch": true
+      },
+      "opacity": 1,
+      "count": 1,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "furniture": "media",
+      "data": {
+        "level": 0,
+        "ceiling": false,
+        "roof": false,
+        "exterior": true,
+        "furnitureRender": "media",
+        "tourNonPhysical": true,
+        "renderFixture": true,
+        "walkingBatch": true
+      },
+      "opacity": 1,
+      "count": 2,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "furniture": "media",
+      "data": {
+        "level": 0,
+        "ceiling": false,
+        "roof": false,
+        "exterior": true,
+        "furnitureRender": "media",
+        "tourNonPhysical": true,
+        "renderFixture": true,
+        "walkingBatch": true
+      },
+      "opacity": 1,
+      "count": 1,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "transparent": null,
+      "shadow": true,
+      "furniture": "bed-single",
+      "data": {
+        "level": 0,
+        "ceiling": false,
+        "roof": false,
+        "exterior": true,
+        "furnitureRender": "bed-single",
+        "tourNonPhysical": true,
+        "renderFixture": true,
+        "walkingBatch": true
+      },
+      "opacity": 1,
+      "count": 3,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "transparent": null,
+      "shadow": true,
+      "furniture": "bed-single",
+      "data": {
+        "level": 0,
+        "ceiling": false,
+        "roof": false,
+        "exterior": true,
+        "furnitureRender": "bed-single",
+        "tourNonPhysical": true,
+        "renderFixture": true,
+        "walkingBatch": true
+      },
+      "opacity": 1,
+      "count": 2,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "transparent": null,
+      "shadow": true,
+      "furniture": "bed-single",
+      "data": {
+        "level": 0,
+        "ceiling": false,
+        "roof": false,
+        "exterior": true,
+        "furnitureRender": "bed-single",
+        "tourNonPhysical": true,
+        "renderFixture": true,
+        "walkingBatch": true
+      },
+      "opacity": 1,
+      "count": 1,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "transparent": null,
+      "shadow": true,
+      "furniture": "bed-single",
+      "data": {
+        "level": 0,
+        "ceiling": false,
+        "roof": false,
+        "exterior": true,
+        "furnitureRender": "bed-single",
+        "tourNonPhysical": true,
+        "renderFixture": true,
+        "walkingBatch": true
+      },
+      "opacity": 1,
+      "count": 4,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "transparent": null,
+      "shadow": true,
+      "furniture": "coffee",
+      "data": {
+        "level": 0,
+        "ceiling": false,
+        "roof": false,
+        "exterior": true,
+        "furnitureRender": "coffee",
+        "tourNonPhysical": true,
+        "renderFixture": true,
+        "walkingBatch": true
+      },
+      "opacity": 1,
+      "count": 2,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "transparent": null,
+      "shadow": true,
+      "furniture": "coffee",
+      "data": {
+        "level": 0,
+        "ceiling": false,
+        "roof": false,
+        "exterior": true,
+        "furnitureRender": "coffee",
+        "tourNonPhysical": true,
+        "renderFixture": true,
+        "walkingBatch": true
+      },
+      "opacity": 1,
+      "count": 1,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "furniture": "faucet",
+      "data": {
+        "level": 1,
+        "ceiling": false,
+        "roof": false,
+        "exterior": false,
+        "furnitureRender": "faucet",
+        "tourNonPhysical": true,
+        "renderFixture": true,
+        "walkingBatch": true
+      },
+      "opacity": 1,
+      "count": 3,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "data": {
+        "level": 1,
+        "ceiling": false,
+        "roof": false,
+        "exterior": false,
+        "mirrorSurface": true,
+        "tourNonPhysical": true,
+        "walkingBatch": true
+      },
+      "opacity": 1,
+      "count": 1,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "shadow": true,
+      "data": {
+        "level": 1,
+        "ceiling": false,
+        "roof": false,
+        "exterior": false,
+        "mirrorSurface": true,
+        "tourNonPhysical": true,
+        "walkingBatch": true
+      },
+      "opacity": 1,
+      "count": 3,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "transparent": true,
+      "shadow": true,
+      "data": {
+        "level": 0,
+        "ceiling": false,
+        "roof": false,
+        "exterior": true,
+        "walkingBatch": true
+      },
+      "opacity": 1,
+      "count": 3,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "transparent": true,
+      "shadow": true,
+      "data": {
+        "level": 0,
+        "ceiling": false,
+        "roof": false,
+        "exterior": true,
+        "walkingBatch": true
+      },
+      "opacity": 1,
+      "count": 2,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "transparent": true,
+      "shadow": true,
+      "data": {
+        "level": 0,
+        "ceiling": false,
+        "roof": false,
+        "exterior": true,
+        "walkingBatch": true
+      },
+      "opacity": 1,
+      "count": 1,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 0,
+      "transparent": true,
+      "shadow": true,
+      "data": {
+        "level": 0,
+        "ceiling": false,
+        "roof": false,
+        "exterior": true,
+        "walkingBatch": true
+      },
+      "opacity": 1,
+      "count": 1,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "transparent": true,
+      "shadow": true,
+      "data": {
+        "level": 0,
+        "ceiling": false,
+        "roof": false,
+        "exterior": true,
+        "walkingBatch": true
+      },
+      "opacity": 1,
+      "count": 4,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 1,
+      "transparent": true,
+      "shadow": true,
+      "detail": "exterior",
+      "data": {
+        "district": true,
+        "detail": "exterior"
+      },
+      "opacity": 1,
+      "count": 5,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 0,
+      "transparent": true,
+      "shadow": true,
+      "detail": "exterior",
+      "data": {
+        "district": true,
+        "detail": "exterior"
+      },
+      "opacity": 1,
+      "count": 2,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "",
+      "material": "NodeMaterial",
+      "sceneObject": true,
+      "side": 0,
+      "transparent": true,
+      "shadow": true,
+      "detail": "exterior",
+      "data": {
+        "district": true,
+        "detail": "exterior"
+      },
+      "opacity": 1,
+      "count": 5,
+      "instanced": true
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "AO",
+      "material": "NodeMaterial",
+      "sceneObject": false,
+      "side": 0,
+      "transparent": false,
+      "shadow": false,
+      "data": {},
+      "opacity": 1,
+      "count": 1,
+      "instanced": false
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "Bloom [ High Pass ]",
+      "material": "NodeMaterial",
+      "sceneObject": false,
+      "side": 0,
+      "transparent": false,
+      "shadow": false,
+      "data": {},
+      "opacity": 1,
+      "count": 1,
+      "instanced": false
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "Bloom [ Blur Horizontal - 0 ]",
+      "material": "NodeMaterial",
+      "sceneObject": false,
+      "side": 0,
+      "transparent": false,
+      "shadow": false,
+      "data": {},
+      "opacity": 1,
+      "count": 1,
+      "instanced": false
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "Bloom [ Blur Horizontal - 1 ]",
+      "material": "NodeMaterial",
+      "sceneObject": false,
+      "side": 0,
+      "transparent": false,
+      "shadow": false,
+      "data": {},
+      "opacity": 1,
+      "count": 1,
+      "instanced": false
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "Bloom [ Blur Horizontal - 2 ]",
+      "material": "NodeMaterial",
+      "sceneObject": false,
+      "side": 0,
+      "transparent": false,
+      "shadow": false,
+      "data": {},
+      "opacity": 1,
+      "count": 1,
+      "instanced": false
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "Bloom [ Blur Horizontal - 3 ]",
+      "material": "NodeMaterial",
+      "sceneObject": false,
+      "side": 0,
+      "transparent": false,
+      "shadow": false,
+      "data": {},
+      "opacity": 1,
+      "count": 1,
+      "instanced": false
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "Bloom [ Blur Horizontal - 4 ]",
+      "material": "NodeMaterial",
+      "sceneObject": false,
+      "side": 0,
+      "transparent": false,
+      "shadow": false,
+      "data": {},
+      "opacity": 1,
+      "count": 1,
+      "instanced": false
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "Bloom [ Composite ]",
+      "material": "NodeMaterial",
+      "sceneObject": false,
+      "side": 0,
+      "transparent": false,
+      "shadow": false,
+      "data": {},
+      "opacity": 1,
+      "count": 1,
+      "instanced": false
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "RTT",
+      "material": "NodeMaterial",
+      "sceneObject": false,
+      "side": 0,
+      "transparent": false,
+      "shadow": false,
+      "data": {},
+      "opacity": 1,
+      "count": 1,
+      "instanced": false
+    },
+    {
+      "phase": "prepare:lobby",
+      "type": "Mesh",
+      "name": "Render Pipeline",
+      "material": "NodeMaterial",
+      "sceneObject": false,
+      "side": 0,
+      "transparent": false,
+      "shadow": false,
+      "data": {},
+      "opacity": 1,
+      "count": 1,
+      "instanced": false
+    },
+    {
+      "phase": "frame:lobby:0",
+      "type": "Mesh",
+      "name": "AO",
+      "material": "NodeMaterial",
+      "sceneObject": false,
+      "side": 0,
+      "transparent": false,
+      "shadow": false,
+      "data": {},
+      "opacity": 1,
+      "count": 1,
+      "instanced": false
+    }
+  ],
+  "errors": [],
+  "pixelsVerified": false,
+  "phoneFPSVerified": false
+}

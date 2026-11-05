@@ -1,0 +1,27 @@
+Personal entrance movement median: 0.301ms; index: 5683064 bytes
+✔ personal district keeps all eight public transforms, roads and bays; private geometry occurs only at 4102 (9265.431905ms)
+✔ the exported sanitary fixtures have free real standing approaches in all eight reflected/rotated buildings and wet rooms appear on the map (2161.366972ms)
+✔ public build contains no owner application, drafts or unsealed source documents (569.333454ms)
+✔ unauthenticated visitors see the public app but cannot fetch ANY private asset, including direct or encoded paths (30.174503ms)
+✔ correct password opens preserved app and scripts with no-store, wrong password fails, logout clears access cookie (58.929196ms)
+✔ public scene is self-contained, parsable, contains 43 base apartments, and strips all private metadata (173.667015ms)
+✔ the personal district entry and every referenced asset stay behind the password gate (47.63376ms)
+✔ the actual scene contains one shared water fixture and supports a walk across the south street around the education buildings (2156.686308ms)
+✔ the actual rendered district permits a continuous walk along both planted axes and every court connector (2233.813168ms)
+✔ compiled parks preserve the measured parking, leave the pocket garden free of road and permit a real walk to the three shade pavilions and amphitheatre (2083.929082ms)
+✔ all 43 actual apartment destinations in eight buildings produce the matching interior plan and registered live marker (302.759148ms)
+✔ the compiled public master-bed footprint returns to the pre-annotation sleeping zone (158.367739ms)
+✔ the public loading manifest records exact decoded UTF-8 sizes for all three actual scene downloads (26.385662ms)
+✔ the real district floor rays descend, reach both service rooms and climb back in all eight buildings (1849.00278ms)
+✔ the exported district permits continuous common-stair ascent and descent through all nine floors in every rotated and reflected building (2997.524164ms)
+✔ actual district repeatedly enters 4103 with one collision model, bounded buffers and correct building/floor handoff (3611.271013ms)
+✔ the real master-room facade stays stone outside and plaster inside after export, district batching, mirrors and photo conversion (2032.980854ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 16082.655739
+{"compiledWorker":"passed","vercelAdapter":"passed","encryptedSources":252,"directUrlDenied":true,"authorizedOriginalHashes":true,"videoRange":true,"clientSecretsAbsent":true,"renderingFloorAvailable":true}

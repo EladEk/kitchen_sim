@@ -1,0 +1,36 @@
+{
+  "backend": "Dawn null validation",
+  "maxUniformBufferBindingSize": 65536,
+  "checks": [
+    {
+      "capacity": 1758,
+      "drawCount": 128,
+      "matrixBytes": 112512
+    },
+    {
+      "capacity": 1758,
+      "drawCount": 1758,
+      "matrixBytes": 112512
+    },
+    {
+      "capacity": 1758,
+      "drawCount": 64,
+      "matrixBytes": 112512
+    },
+    {
+      "capacity": 1758,
+      "drawCount": 1024,
+      "matrixBytes": 112512
+    },
+    {
+      "capacity": 1758,
+      "drawCount": 1758,
+      "matrixBytes": 112512
+    },
+    "MRT-AO-bloom-FXAA-small-draw-large-pool",
+    "new-shadow-variant-small-draw-large-pool"
+  ],
+  "errors": [],
+  "pixelsVerified": false,
+  "physicalARMDeviceVerified": false
+}

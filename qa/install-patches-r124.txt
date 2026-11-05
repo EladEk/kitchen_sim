@@ -1,0 +1,19 @@
+{
+  "officialPackage": "three-0.185.0.tgz",
+  "firstRunContainsEveryFix": true,
+  "idempotent": true,
+  "allFreshHashesMatchBuild": true,
+  "runs": [
+    "Three.js r185 instance-capacity fix applied.\nThree.js r185 bounded compilation applied.\nThree.js r185 shader-cache fixes applied.\nThree.js r185 transparent preparation applied.\n",
+    "Three.js r185 instance-capacity fix ready.\nThree.js r185 bounded compilation ready.\nThree.js r185 shader-cache fixes ready.\nThree.js r185 transparent preparation ready.\n"
+  ],
+  "hashes": {
+    "src/nodes/accessors/Instance.js": "b261da79989682362dff394c128055bbf066ee1e9efb800dfe6b2f6546a05c0f",
+    "src/nodes/core/NodeBuilder.js": "16570814a0f02f93dcfa481b91f362ee944c322ebaf1af89cb4b4d912293bc46",
+    "src/renderers/common/Renderer.js": "59278be7c7518275cf166ceafc85badf34b0b6e4de0141787526c6f042a4da37",
+    "src/renderers/common/nodes/NodeManager.js": "007d15a0462d21a5a6bfef0b48cd643b80e056223ed370577d62d26e3764385a",
+    "src/renderers/webgpu/utils/WebGPUPipelineUtils.js": "f0b25280227e64051d07e81ca73e6db6c2641ad05e26e6b8884e6fea2ea0719c",
+    "src/renderers/webgpu/nodes/WGSLNodeBuilder.js": "87a00e0499ab3278c61b84ed00c984c5f4249f8a1fe891546941fa50acac4fab",
+    "build/three.webgpu.js": "4e12e823a63601fb7491126b0930723a25dc38a5dcf2217bcec02424bf3319c9"
+  }
+}

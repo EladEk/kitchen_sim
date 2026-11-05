@@ -9,7 +9,7 @@ const near=(a,b,epsilon=.001)=>assert(Math.abs(a-b)<epsilon,`${a} ≈ ${b}`);
 test('cancelled furniture is removed and the two bedrooms have real 120 × 190 cm mattresses',()=>{
  assert(!ROOMS.some(r=>r.id==='dining'));assert(!FURNITURE.some(f=>f.id==='dining-table'||f.id==='garden-lounge'||f.id==='bed-c'));assert.equal(ROOMS.find(r=>r.id==='bedroom-c').kind,'office');assert(FURNITURE.some(f=>f.roomId==='bedroom-c'&&f.kind==='desk'));assert(FURNITURE.some(f=>f.roomId==='bedroom-c'&&f.kind==='office-chair'));
  const scene=createHomeScene(normalizeHomeSettings());scene.group.updateMatrixWorld(true);
- for(const id of ['bed-a','bed-b']){const g=scene.furnitureGroups.get(id);let mattress;g.traverse(o=>{if(o.userData.part==='mattress')mattress=o;});assert(mattress);const size=new THREE.Box3().setFromObject(mattress).getSize(new THREE.Vector3());near(size.x,1.2);near(size.z,1.9);}
+ for(const id of ['bed-a','bed-b']){const g=scene.furnitureGroups.get(id),body=g.children.find(o=>o.userData.furnitureAsset==='bed-single');assert(body);assert.deepEqual(body.userData.mattressDimensions,[1.2,1.9]);const size=new THREE.Box3().setFromObject(body).getSize(new THREE.Vector3());near(size.x,1.28);near(size.z,1.965);}
  scene.dispose();
 });
 

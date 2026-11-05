@@ -1,0 +1,16 @@
+{
+  "camera": [
+    -113.56330873670528,
+    128.8837733546901,
+    80.37199242885842
+  ],
+  "counts": {
+    "all": 5594,
+    "visible": 276,
+    "meaningful": 276,
+    "allCompile": 1890,
+    "visibleCompile": 276,
+    "meaningfulCompile": 276,
+    "zeroInstances": 0
+  }
+}

@@ -18,7 +18,7 @@ test('actual district repeatedly enters 4103 with one collision model, bounded b
  const lobby=nav.destinations.find(d=>d.id==='lobby'),state={building:'4102',level:9,target:''};let now=0;
  for(let pass=0;pass<16;pass++)for(const id of ['4102','4103','3461','4103','4102']){
   const building=DISTRICT.find(b=>b.id===id),matrix=buildingTransform(building),p=new THREE.Vector3(lobby.position[0],1.62,lobby.position[1]).applyMatrix4(matrix);
-  const view=controller.update(state,{walking:true,position:p});assert.equal(view.building.id,id);assert.equal(view.content,model);
+  const view=controller.update(state,{walking:true,position:p});assert.equal(view.building.id,id);assert.equal(view.content.name,'walking-batched-building');assert(!model.visible);assert(view.content.visible);
   district.update(p,now+=300,{walking:true});
   const movement=new THREE.Vector3(.025,0,0).transformDirection(matrix).multiplyScalar(.025);
   assert(stepWalker(p,movement.x,movement.z,world,ray),id+' lobby floor must support movement');
@@ -29,9 +29,9 @@ test('actual district repeatedly enters 4103 with one collision model, bounded b
  const cropGeometries=new Set();cropped.traverse(o=>{if(o.geometry&&!geometries.has(o.geometry))cropGeometries.add(o.geometry);});assert(cropGeometries.size>0);for(const geometry of cropGeometries)geometry.addEventListener('dispose',()=>released++);
  const same=controller.update({building:'3461',level:1,target:'unit:5:1'}).content;assert.equal(same,cropped,'equal canonical apartment cuts are reused across building transforms');
  controller.update(state,{walking:true,position:new THREE.Vector3(lobby.position[0],1.62,lobby.position[1]).applyMatrix4(buildingTransform(DISTRICT[4]))});
- assert.equal(released,cropGeometries.size);assert.equal(root.children.length,1);assert(!cropped.parent);
+ assert.equal(released,cropGeometries.size);assert.equal(root.children.length,2);assert(!cropped.parent);
  // Upper exterior meshes survive walking floor culling even under interior groups.
- model.traverse(o=>{if(o.isMesh&&o.userData.exterior&&o.userData.level>2){let parent=o;while(parent){assert(parent.visible,'upper facade must remain visible');parent=parent.parent;}}});
+ controller.current.content.traverse(o=>{if(o.isMesh&&o.userData.exterior&&o.userData.level>2){let parent=o;while(parent){assert(parent.visible,'upper facade must remain visible');parent=parent.parent;}}});
  controller.update(state);model.traverse(o=>{if(o.isMesh&&o.userData.exterior===false)assert(o.visible,'overview restores interiors');});
  const unique=new Set();district.group.traverse(o=>{if(o.isInstancedMesh){let n=0;o.addEventListener('dispose',()=>n++);unique.add(()=>assert.equal(n,1));}});
  controller.dispose();world.dispose();world.dispose();district.dispose();district.dispose();unique.forEach(check=>check());

@@ -1,0 +1,20 @@
+{
+  "baseline": true,
+  "prepared": {
+    "sceneBuilds": 2,
+    "sceneSyncPipelines": 0,
+    "sceneAsyncPipelines": 2
+  },
+  "firstExtra": {
+    "sceneBuilds": 2,
+    "sceneSyncPipelines": 2
+  },
+  "secondExtra": {
+    "sceneBuilds": 0,
+    "sceneSyncPipelines": 0
+  },
+  "independentMatrixBindings": true,
+  "errors": [],
+  "pixelsVerified": false,
+  "physicalARMDeviceVerified": false
+}

@@ -48,11 +48,15 @@ export function createRealisticProps({trees=[],cars=[],mobile=false}={}){
  const contactMap=trees.length||cars.length?texture(alphaTexture('contact',64)):null;
  const shadowMaterial=contactMap?material(new THREE.MeshBasicMaterial({map:contactMap,color:'#000000',transparent:true,opacity:.22,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-2,toneMapped:false})):null;
 
+ const matrix=new THREE.Matrix4(),quaternion=new THREE.Quaternion(),position=new THREE.Vector3(),scale=new THREE.Vector3();
  function family(type,placements,templates,model=null){
   if(!placements.length)return;
   const levels=new Uint8Array(placements.length).fill(255),tiers=templates.map((parts,tier)=>parts.map(part=>{
    const mesh=new THREE.InstancedMesh(part.geometry,part.material,placements.length);mesh.name=`${type}${model?'-'+model:''}-${['near','middle','far'][tier]}-${part.name}`;
-   mesh.count=0;mesh.visible=false;mesh.castShadow=part.shadow!==false;mesh.receiveShadow=true;mesh.userData={propType:type,detailTier:tier,propPart:part.name,...(model?{propModel:model}:{})};group.add(mesh);return {...part,mesh};
+   // Allocate colour bindings and valid transforms before a detail tier is
+   // first shown. Warmup can compile inactive tiers without fake objects.
+   placements.forEach((p,i)=>{quaternion.setFromAxisAngle(THREE.Object3D.DEFAULT_UP,p.angle);position.set(p.x,p.y,p.z);scale.set(...p.scale);matrix.compose(position,quaternion,scale);mesh.setMatrixAt(i,matrix);if(part.colorize)mesh.setColorAt(i,p.color);});
+   mesh.computeBoundingSphere();mesh.computeBoundingBox();mesh.count=0;mesh.visible=false;mesh.castShadow=part.shadow!==false;mesh.receiveShadow=true;mesh.userData={propType:type,detailTier:tier,propPart:part.name,...(model?{propModel:model}:{})};group.add(mesh);return {...part,mesh};
   }));
   families.push({type,placements,levels,tiers,initialized:false});
  }
@@ -120,7 +124,7 @@ export function createRealisticProps({trees=[],cars=[],mobile=false}={}){
   contactShadows('car',placements,1.82,p=>p.length*.95,-.028);
  }
 
- const matrix=new THREE.Matrix4(),quaternion=new THREE.Quaternion(),position=new THREE.Vector3(),scale=new THREE.Vector3();
+
  function chooseTier(previous,distance){
   if(previous===255)return distance<thresholds[0]?0:distance<thresholds[1]?1:2;
   if(previous===0)return distance>thresholds[1]*(1+hysteresis)?2:distance>thresholds[0]*(1+hysteresis)?1:0;

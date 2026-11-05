@@ -1,0 +1,14 @@
+✔ public build contains no owner application, drafts or unsealed source documents (555.391192ms)
+✔ unauthenticated visitors see the public app but cannot fetch ANY private asset, including direct or encoded paths (31.379614ms)
+✔ correct password opens preserved app and scripts with no-store, wrong password fails, logout clears access cookie (51.616611ms)
+✔ public scene is self-contained, parsable, contains 43 base apartments, and strips all private metadata (153.103032ms)
+✔ the personal district entry and every referenced asset stay behind the password gate (44.850879ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 976.368552
+{"compiledWorker":"passed","vercelAdapter":"passed","encryptedSources":252,"directUrlDenied":true,"authorizedOriginalHashes":true,"videoRange":true,"clientSecretsAbsent":true,"renderingFloorAvailable":true}

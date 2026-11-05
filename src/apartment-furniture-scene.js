@@ -1,3 +1,4 @@
+import {createFurnitureAnchor} from './complete-furniture.mjs';
 import * as THREE from 'three';
 import {createArchitecturalGlass} from './architectural-glass.mjs';
 import {createCeramicBowl} from './sanitary-fixtures.js';
@@ -20,6 +21,7 @@ export function buildApartmentFurniture({parent,resources,level,base,settings,su
  function box(r,part,m,x,y,z,w,h,d){const c=Math.cos(r.angle),s=Math.sin(r.angle),key=part;let b=batches.get(key);if(!b)batches.set(key,b={part,m,items:[]});b.items.push([r.x+x*c+z*s,base+y,r.z-x*s+z*c,w,h,d,r.angle,r.id,r.unit]);}
  const bowl=createCeramicBowl(resources,{productId:null,w:1,d:1,top:0,depth:1,innerW:.8,innerD:.7,innerZ:.035,radius:.06,innerRadius:.1,lowerScale:.86,drainZ:.035});
  for(const r of items){
+  if(['bed','sofa','coffee','media'].includes(r.kind)){const kind=r.kind==='bed'?(r.w>1.25?'bed-double':'bed-single'):r.kind,h={bed:.98,sofa:.95,coffee:.435,media:1.40}[r.kind],part={bed:'apartment-bed-frame',sofa:'apartment-sofa-base',coffee:'apartment-coffee-top',media:'apartment-media-cabinet'}[r.kind];box(r,part,palette.wood,0,0,0,r.w,h,r.d);const batch=batches.get(part);batch.geometry=createFurnitureAnchor(kind).geometry;batch.asset=kind;if(r.rug)box(r,'apartment-living-rug',palette.rug,0,.013,0,r.rug.w,.009,r.rug.d);continue;}
   if(r.kind==='wc'){
    box(r,'apartment-wc-body',palette.ceramic,0,.30,0,r.w,.30,r.d-.04);
    box(r,'apartment-wc-seat',palette.ceramic,0,.465,.015,r.w+.005,.038,r.d-.025);
@@ -27,8 +29,7 @@ export function buildApartmentFurniture({parent,resources,level,base,settings,su
   }else if(r.kind==='basin'){
    box(r,'apartment-basin-cabinet',palette.cabinet,0,.59,0,r.w,.38,r.d);
    for(const child of bowl.children){const part='apartment-basin-'+child.userData.part;box(r,part,/drain|waste/.test(part)?palette.steel:palette.ceramic,0,.835,0,r.w,.14,r.d);batches.get(part).geometry=child.geometry;}
-   box(r,'apartment-basin-tap',palette.steel,0,.91,-r.d*.35,.02,.20,.02);
-   box(r,'apartment-basin-spout',palette.steel,0,1.0,-r.d*.2,.02,.025,r.d*.38);
+   box(r,'apartment-basin-tap',palette.steel,0,.835,-r.d*.25,.07,.22,.16);batches.get('apartment-basin-tap').geometry=createFurnitureAnchor('faucet').geometry;batches.get('apartment-basin-tap').asset='faucet';
    box(r,'apartment-bath-mirror',palette.mirror,0,1.38,-r.d/2-.025,r.w,.62,.016);
    for(const x of [-r.w/2,r.w/2])box(r,'apartment-mirror-edge',palette.glow,x,1.38,-r.d/2-.014,.012,.62,.008);
   }else if(r.kind==='shower'){
@@ -36,29 +37,6 @@ export function buildApartmentFurniture({parent,resources,level,base,settings,su
    box(r,'apartment-shower-glass',palette.glass,-r.w/2+.01,1.05,0,.008,2,r.d);
    box(r,'apartment-shower-riser',palette.steel,0,1.45,-r.d/2+.035,.025,1,.025);
    box(r,'apartment-shower-head',palette.steel,0,2,-r.d/2+.17,.18,.025,.22);
-  }else if(r.kind==='bed'){
-   box(r,'apartment-bed-frame',palette.wood,0,.22,0,r.w,.30,r.d);
-   box(r,'apartment-mattress',palette.mattress,0,.44,0,r.w-.04,.22,r.d-.05);
-   box(r,'apartment-duvet',palette.linen,0,.565,.25,r.w-.07,.075,r.d-.64);
-   box(r,'apartment-headboard',palette.wood,0,.54,-r.d/2+.025,r.w,.86,.05);
-   const count=r.w>1.25?2:1;for(let i=0;i<count;i++)box(r,'apartment-pillow',palette.pillow,(i-(count-1)/2)*r.w*.45,.585,-r.d/2+.28,r.w/count-.12,.10,.38);
-  }else if(r.kind==='sofa'){
-   box(r,'apartment-sofa-base',palette.sofa,0,.27,0,r.w,.25,r.d-.035);
-   for(const x of [-r.w/2+.11,r.w/2-.11])for(const z of [-r.d/2+.12,r.d/2-.12])box(r,'apartment-sofa-leg',palette.wood,x,.085,z,.055,.17,.055);
-   for(const x of [-r.w/2+.07,r.w/2-.07])box(r,'apartment-sofa-arm',palette.sofa,x,.49,0,.14,.48,r.d-.04);
-   box(r,'apartment-sofa-back',palette.sofa,0,.69,-r.d/2+.085,r.w-.12,.60,.17);
-   const n=r.w>2.1?3:2,span=r.w-.32;for(let i=0;i<n;i++){const x=-span/2+(i+.5)*span/n;box(r,'apartment-sofa-seat',palette.sofa,x,.47,.07,span/n-.025,.17,.65);box(r,'apartment-sofa-cushion',palette.sofa,x,.74,-.25,span/n-.03,.43,.18);}
-   for(const x of [-r.w*.32,r.w*.32])box(r,'apartment-sofa-pillow',palette.linen,x,.69,-.075,.32,.32,.16);
-  }else if(r.kind==='coffee'){
-   box(r,'apartment-coffee-top',palette.wood,0,.405,0,r.w,.055,r.d);
-   for(const x of [-r.w*.37,r.w*.37])for(const z of [-r.d*.32,r.d*.32])box(r,'apartment-coffee-leg',palette.dark,x,.20,z,.035,.39,.035);
-   if(r.rug)box(r,'apartment-living-rug',palette.rug,0,.013,0,r.rug.w,.009,r.rug.d);
-  }else if(r.kind==='media'){
-   box(r,'apartment-media-cabinet',palette.wood,0,.31,0,r.w,.38,r.d);
-   for(const x of [-r.w*.4,r.w*.4])box(r,'apartment-media-leg',palette.dark,x,.065,0,.035,.13,.035);
-   for(const x of [-r.w/4,r.w/4])box(r,'apartment-media-front',palette.cabinet,x,.31,r.d/2+.006,r.w/2-.012,.32,.012);
-   box(r,'apartment-tv-stand',palette.dark,0,.525,0,.42,.035,.20);box(r,'apartment-tv-stem',palette.dark,0,.62,-.015,.065,.18,.06);
-   const width=Math.min(1.28,r.w-.08);box(r,'apartment-tv-frame',palette.dark,0,1.02,-.015,width,.74,.055);box(r,'apartment-tv-screen',palette.screen,0,1.025,.016,width-.04,.695,.008);
   }else if(r.kind==='kitchen'){
    box(r,'apartment-kitchen-base',palette.cabinet,0,.45,0,r.w,.82,r.d);
    box(r,'apartment-kitchen-plinth',palette.dark,0,.065,0,r.w-.04,.11,r.d-.06);
@@ -68,12 +46,11 @@ export function buildApartmentFurniture({parent,resources,level,base,settings,su
    box(r,'apartment-kitchen-sink',palette.dark,-r.w*.27,.914,0,.47,.008,.40);
    for(const x of [-r.w*.27-.24,-r.w*.27+.24])box(r,'apartment-kitchen-sink-rim',palette.steel,x,.924,0,.018,.015,.42);
    for(const z of [-.205,.205])box(r,'apartment-kitchen-sink-rim',palette.steel,-r.w*.27,.924,z,.49,.015,.018);
-   box(r,'apartment-kitchen-tap',palette.steel,-r.w*.27,1.05,-.20,.025,.28,.025);
-   box(r,'apartment-kitchen-tap-spout',palette.steel,-r.w*.27,1.18,-.12,.025,.025,.18);
+   box(r,'apartment-kitchen-tap',palette.steel,-r.w*.27,.918,-.12,.08,.30,.22);batches.get('apartment-kitchen-tap').geometry=createFurnitureAnchor('faucet').geometry;batches.get('apartment-kitchen-tap').asset='faucet';
    box(r,'apartment-kitchen-hob',palette.dark,r.w*.25,.92,0,.57,.014,.46);
    for(const x of [r.w*.25-.15,r.w*.25+.15])box(r,'apartment-kitchen-hob-zone',palette.steel,x,.929,0,.17,.002,.22);
   }
  }
  const shadows=createContactShadows(resources),contacts=items.filter(r=>!['shower','basin','wc'].includes(r.kind)),contact=new THREE.InstancedMesh(shadows.geometry,shadows.material,contacts.length);for(const [i,r]of contacts.entries()){q.setFromAxisAngle(THREE.Object3D.DEFAULT_UP,r.angle);matrix.compose(new THREE.Vector3(r.x,base+.015,r.z),q,new THREE.Vector3(r.w*1.18,1,r.d*1.18));contact.setMatrixAt(i,matrix);}contact.userData={part:'furniture-contact-shadow',visualOnly:true,tourNonPhysical:true,placements:contacts.map(r=>({id:r.id,unit:r.unit}))};contact.computeBoundingSphere();resources.push(contact);parent.add(contact);
- for(const b of batches.values()){const rounded=/wc-(?:body|seat)|basin-rim|mattress|sofa-(?:base|arm|back)|coffee-top/.test(b.part),geometry=b.geometry||(/duvet/.test(b.part)?duvet:/pillow|sofa-(?:seat|cushion)/.test(b.part)?cushion:rounded?soft:cube),mesh=new THREE.InstancedMesh(geometry,b.m,b.items.length);b.items.forEach(([x,y,z,w,h,d,angle],i)=>{q.setFromAxisAngle(THREE.Object3D.DEFAULT_UP,angle);position.set(x,y,z);scale.set(w,h,d);matrix.compose(position,q,scale);mesh.setMatrixAt(i,matrix);});mesh.name=b.part;mesh.userData={part:b.part,...(b.part==='apartment-bath-mirror'?{mirrorSurface:true}:{}),...(/^apartment-(?:mirror-edge|bath-mirror|wc-flush|basin-(?:ceramic|drain|waste|tap|spout)|shower-(?:riser|head))/.test(b.part)?{tourNonPhysical:true}:{}),buildingFloor:level,proposed:true,dimensionsInferred:true,placements:b.items.map(r=>({id:r[7],unit:r[8]}))};mesh.castShadow=mesh.receiveShadow=true;mesh.computeBoundingSphere();resources.push(mesh);parent.add(mesh);}
+ for(const b of batches.values()){const rounded=/wc-(?:body|seat)|basin-rim|mattress|sofa-(?:base|arm|back)|coffee-top/.test(b.part),geometry=b.geometry||(/duvet/.test(b.part)?duvet:/pillow|sofa-(?:seat|cushion)/.test(b.part)?cushion:rounded?soft:cube),mesh=new THREE.InstancedMesh(geometry,b.m,b.items.length);b.items.forEach(([x,y,z,w,h,d,angle],i)=>{q.setFromAxisAngle(THREE.Object3D.DEFAULT_UP,angle);position.set(x,y,z);scale.set(w,h,d);matrix.compose(position,q,scale);mesh.setMatrixAt(i,matrix);});mesh.name=b.part;mesh.userData={part:b.part,...(b.asset?{furnitureAsset:b.asset}:{}),...(b.part==='apartment-bath-mirror'?{mirrorSurface:true}:{}),...(/^apartment-(?:mirror-edge|bath-mirror|wc-flush|basin-(?:ceramic|drain|waste|tap|spout)|shower-(?:riser|head))/.test(b.part)?{tourNonPhysical:true}:{}),buildingFloor:level,proposed:true,dimensionsInferred:true,placements:b.items.map(r=>({id:r[7],unit:r[8]}))};mesh.castShadow=mesh.receiveShadow=true;mesh.computeBoundingSphere();resources.push(mesh);parent.add(mesh);}
 }

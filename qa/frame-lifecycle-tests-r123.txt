@@ -1,0 +1,20 @@
+✔ packed shading attributes roundtrip through ObjectLoader while positions and tiled UVs remain exact (5.831432ms)
+✔ surface cache is byte bounded and texture ownership is retired exactly once (1200.877545ms)
+✔ surface image abort/deadline settles without waiting for the loader and retires late completions (0.569579ms)
+✔ postprocessing never retains more than one pipeline across resize, suspend, XR and failure (0.74962ms)
+✔ background and BFCache pause one render loop; context recovery is bounded and teardown removes listeners/timers (1.035511ms)
+✔ an invalid postprocess draw drops the pipeline and redraws the actual scene directly in the same frame (0.294814ms)
+✔ the first interactive frame separates postprocessing time and late shader compilation from other scene work (1.939214ms)
+✔ a failed phase preserves elapsed evidence and propagates the original renderer failure (0.63674ms)
+✔ a mobile viewport resize is coalesced until asynchronous GPU preparation finishes (1.335334ms)
+✔ the latest selection cannot move the camera while a cancelled compile still owns it (1.318989ms)
+✔ a failed preparation releases ownership; disposing does not apply a queued resize (0.781248ms)
+✔ a destination continuation cannot reset 96 percent or accept an older phase completion (0.420584ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1377.010708

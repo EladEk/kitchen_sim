@@ -4,6 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "postinstall": "node scripts/apply-three-fixes.mjs",
+    "predev": "node scripts/apply-three-fixes.mjs",
+    "pretest": "node scripts/apply-three-fixes.mjs",
     "dev": "vite --host 0.0.0.0 --port 4173",
     "build": "node scripts/build-secure-site.mjs",
     "test": "node --test src/*.test.mjs"

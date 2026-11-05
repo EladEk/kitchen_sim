@@ -1,9 +1,11 @@
 import * as THREE from 'three';
+import {hasCompleteFurniture,instantiateCompleteFurniture} from './complete-furniture.mjs';
 
 // VR001221 is explicitly labelled in Harash catalogue page 39. Its silhouette
 // and brushed finish follow that image; dimensions are not provided there.
 export const VERED_TAP={productId:'kitchen-tap',sku:'VR001221',cataloguePage:39,height:.39,reach:.205,dimensionsInferred:true};
-export function createVeredKitchenTap(resources){
+export function createVeredKitchenTap(resources,{authoring=false}={}){
+ if(!authoring&&hasCompleteFurniture('kitchen-faucet')){const model=instantiateCompleteFurniture('kitchen-faucet',{w:.087,h:.3962248562,d:.2666030398,data:{id:'sink',...VERED_TAP}});model.position.set(.0165,0,.1063015192);const group=new THREE.Group();group.userData={...VERED_TAP,shapeBasis:'catalog-product-image',completeGLB:true};group.add(model);return group;}
  const group=new THREE.Group();group.userData={...VERED_TAP,shapeBasis:'catalog-product-image'};
  const steel=new THREE.MeshStandardMaterial({color:'#b5bdb7',metalness:.8,roughness:.38}),dark=new THREE.MeshStandardMaterial({color:'#4d5852',roughness:.65});resources.push(steel,dark);
  const add=(g,part,material=steel)=>{resources.push(g);const mesh=new THREE.Mesh(g,material);mesh.castShadow=mesh.receiveShadow=true;mesh.userData={id:'sink',...VERED_TAP,part};group.add(mesh);return mesh;};

@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import {motionAncestor,motionRoots,createMotionCopy} from './model-motions.mjs';
+import {inside} from './navigation.mjs';
 
 // A section contains actual geometry, so live rendering, photo rendering and
 // bounds all agree. Generic navigation polygons are the only selection data.
@@ -42,9 +43,18 @@ export function createSelection(template,nav,state){
   }
  };
  template.traverse(o=>{
-  if(!o.isMesh||motionAncestor(o,template)||o.userData.ceiling||o.userData.roof||o.userData.sceneUi||(o.userData.securityOverlay||o.userData.tourNonPhysical)&&!o.userData.renderFixture)return;
+  if(!o.isMesh||o.userData.furnitureCollisionProxy||motionAncestor(o,template)||o.userData.ceiling||o.userData.roof||o.userData.sceneUi||(o.userData.securityOverlay||o.userData.tourNonPhysical)&&!o.userData.renderFixture)return;
   const region=compiled.find(r=>r.level===(o.userData.level??0));if(!region)return;
   const base=inverse.clone().multiply(o.matrixWorld);
+  if(o.userData.furnitureRender){
+   // Plan-registered furniture already fits its room. Select complete instances
+   // by their anchor, retaining the GLB buffers instead of clipping thousands
+   // of upholstery/leaf triangles whenever an apartment is selected.
+   const matrices=[];
+   for(let i=0;i<(o.isInstancedMesh?o.count:1);i++){const local=new THREE.Matrix4();if(o.isInstancedMesh)o.getMatrixAt(i,local);const world=base.clone().multiply(local);if(!region.polygon||inside([world.elements[12],world.elements[14]],region.polygon))matrices.push(local);}
+   if(!matrices.length)return;
+   const mesh=new THREE.InstancedMesh(o.geometry,o.material,matrices.length);mesh.matrixAutoUpdate=false;mesh.matrix.copy(base);matrices.forEach((m,i)=>mesh.setMatrixAt(i,m));mesh.castShadow=o.castShadow;mesh.receiveShadow=o.receiveShadow;mesh.userData={...o.userData};mesh.computeBoundingSphere();group.add(mesh);instances.push(mesh);return;
+  }
   if(!region.polygon){const mesh=o.clone(false);mesh.matrixAutoUpdate=false;mesh.matrix.copy(base);group.add(mesh);if(mesh.isInstancedMesh)instances.push(mesh);return;}
   const geo=o.geometry,pos=geo.attributes.position,normal=geo.attributes.normal,uv=geo.attributes.uv,idx=geo.index,limit=idx?.count??pos.count;
   if(!geo.boundingBox)geo.computeBoundingBox();
