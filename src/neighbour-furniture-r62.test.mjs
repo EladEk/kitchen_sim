@@ -14,8 +14,8 @@ import {polygonContains} from './building-geometry.mjs';
 const all=[...APARTMENT_FURNITURE,...GROUND_APARTMENT_FURNITURE];
 function model(){const group=new THREE.Group(),resources=[],settings=normalizeHomeSettings({buildingLevel:9,cutaway:false}),m=buildBuildingContext({group,resources,settings,mode:'building'});group.updateMatrixWorld(true);return {...m,settings,dispose:()=>resources.forEach(r=>r.dispose?.())};}
 
-test('all 153 neighbour beds have a real wall behind the headboard and a free standing approach in actual walking collision',()=>{
- const m=model(),cars=createElevators(),beds=all.filter(r=>r.kind==='bed');assert.equal(beds.length,153);
+test('all 154 neighbour beds have a real wall behind the headboard and a free standing approach in actual walking collision',()=>{
+ const m=model(),cars=createElevators(),beds=all.filter(r=>r.kind==='bed');assert.equal(beds.length,154);
  try{for(const floor of BUILDING_FLOORS){const node=m.floors.get(floor.level),boxes=buildingBoxes(floor.level,m.settings,cars),walls=[];node.traverse(o=>{if(o.isMesh&&['building-facade-wall','building-interior-wall','ground-base-wall'].includes(o.userData.part))walls.push(o);});
   for(const bed of beds.filter(r=>r.floor===floor.level)){const n=[Math.sin(bed.angle),Math.cos(bed.angle)],at=[bed.x-n[0]*bed.d/2,bed.z-n[1]*bed.d/2],ray=new THREE.Raycaster(new THREE.Vector3(at[0],floor.elevation+.7,at[1]),new THREE.Vector3(-n[0],0,-n[1]),0,.22);assert(ray.intersectObjects(walls,false).length,bed.id+' has a source-supported headboard');assert(buildingCanStand(bed.footApproach,floor.level,boxes,cars),bed.id+' remains reachable at the foot');}
  }}finally{m.dispose();}

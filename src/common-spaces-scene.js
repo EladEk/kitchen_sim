@@ -1,4 +1,4 @@
-import {SERVICE_ACCESS,SERVICE_ROOM_POLYGONS} from './service-access.mjs';
+import {SERVICE_ACCESS,SERVICE_ROOM_POLYGONS,SERVICE_CONNECTOR,serviceTreads,serviceLowerWallRuns} from './service-access.mjs';
 import {LOBBY_WALL_COLOR,LOBBY_PANEL_COLOR} from './common-finish.mjs';
 import {Reflector} from 'three/addons/objects/Reflector.js';
 import * as THREE from 'three';
@@ -20,7 +20,9 @@ export function buildCommonSpaces({parent,resources,settings,cut=false}){
  const box=(name,x,y,z,w,h,d,m)=>item(cube,m,[x,y,z],[w,h,d],null,name);
  function pipe(name,a,b,r,m){const va=new THREE.Vector3(...a),vb=new THREE.Vector3(...b),dir=vb.clone().sub(va),q=new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,1,0),dir.clone().normalize());item(cylinder,m,va.add(vb).multiplyScalar(.5).toArray(),[r,dir.length(),r],q,name);}
  function floor(poly,m,name,y=.025){const shape=new THREE.Shape();poly.forEach(([x,z],i)=>i?shape.lineTo(x,z):shape.moveTo(x,z));shape.closePath();const g=new THREE.ShapeGeometry(shape);g.rotateX(Math.PI/2);resources.push(g);m.side=THREE.DoubleSide;const mesh=new THREE.Mesh(g,m);mesh.position.y=y;mesh.name=name;mesh.receiveShadow=true;root.add(mesh);}
- floor(LOBBY_POLYGON,stone,'lobby-floor-finish');floor(PUMP_ROOM.polygon,concrete,'pump-floor-finish',-SERVICE_ACCESS.depth+.025);floor(SERVICE_ROOM_POLYGONS.meters,stone,'meter-room-floor-finish',-SERVICE_ACCESS.depth+.025);
+ const serviceTile=mat('#77766f',{roughness:.93}),serviceJoint=mat('#a7a397',{roughness:.98});
+ floor(LOBBY_POLYGON,stone,'lobby-floor-finish');floor(PUMP_ROOM.polygon,serviceTile,'pump-floor-finish',-SERVICE_ACCESS.depth+.025);floor(SERVICE_ROOM_POLYGONS.meters,serviceTile,'meter-room-floor-finish',-SERVICE_ACCESS.depth+.025);
+ floor(SERVICE_CONNECTOR,serviceTile,'service-bottom-landing-finish',-SERVICE_ACCESS.depth+.025);
  // Narrow seams cut to the actual lobby polygon, never long lines through walls.
  function inside([x,z],poly){let v=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++){let a=poly[i],b=poly[j];if((a[1]>z)!=(b[1]>z)&&x<(b[0]-a[0])*(z-a[1])/(b[1]-a[1])+a[0])v=!v;}return v;}
  for(let x=12;x<22;x+=.8)for(let z=-7.7;z<-.4;z+=.05)if(inside([x,z],LOBBY_POLYGON)&&inside([x,z+.05],LOBBY_POLYGON))box('lobby-tile-joints',x,.027,z+.025,.002,.001,.05,grout);
@@ -58,22 +60,45 @@ export function buildCommonSpaces({parent,resources,settings,cut=false}){
   for(const y of [.863,2.037])box('lobby-mirror-frame',12.38,y,-2.05,.028,.025,2.85,frame);
  }
  // Open portal between the two cabinet banks; no cabinet crosses the stair mouth.
- const access=SERVICE_ACCESS,pitch=(access.topZ-access.bottomZ)/access.steps;
- for(let i=0;i<access.steps;i++){const top=-(i+1)*access.depth/access.steps,bot=-access.depth-.12;
-  box('service-descending-step',(access.minX+access.maxX)/2,(top+bot)/2,access.topZ-(i+.5)*pitch,access.maxX-access.minX,top-bot,pitch+.002,stone);
-  box('service-step-nosing',(access.minX+access.maxX)/2,top+.004,access.topZ-i*pitch-.015,access.maxX-access.minX,.012,.035,grout);
+ const access=SERVICE_ACCESS;
+ // The source lobby finish stops at z=-5.70. Complete that short upper
+ // threshold and overlap the stair edge by 5mm: independently serialized
+ // float32 edges otherwise leave a floor-ray crack in rotated copies.
+ box('service-upper-threshold',(access.minX+access.maxX)/2,-.015,(access.topZ-.005-5.70)/2,access.maxX-access.minX,.08,-5.70-access.topZ+.005,stone);
+ for(const tread of serviceTreads()){const top=tread.y,bot=-access.depth-.12;
+  box('service-descending-step',(access.minX+access.maxX)/2,(top+bot)/2,(tread.topZ+tread.bottomZ)/2,access.maxX-access.minX,top-bot,tread.topZ-tread.bottomZ+.004,serviceTile);
+  // A flush, non-physical strip cannot catch a floor or body ray.
+  box('service-step-nosing',(access.minX+access.maxX)/2,top+.001,tread.topZ-.018,access.maxX-access.minX,.002,.03,serviceJoint);
  }
- // The east source portal begins at z=-7.30; the old retaining wall crossed
- // most of its opening. Stop at its upper jamb and bridge both lower thresholds.
- box('service-stair-retaining-wall',18.40,-access.depth/2,-6.76,.09,access.depth,2.2,white);
- box('service-stair-retaining-wall',19.75,-access.depth/2,-6.475,.09,access.depth,1.65,white);
- box('service-bottom-landing',19.075,-access.depth-.06,-8.50,1.75,.12,1.10,stone);
- box('service-meter-threshold',19.80,-access.depth-.06,-7.70,.30,.12,1.0,stone);
- for(const poly of Object.values(SERVICE_ROOM_POLYGONS))for(let i=0;i<poly.length;i++){
-  const a=poly[i],b=poly[(i+1)%poly.length],dx=b[0]-a[0],dz=b[1]-a[1];
-  // Preserve both source door portals at the bottom landing.
-  if((Math.abs(a[0]-18.249)<.02&&Math.abs(b[0]-18.249)<.02)||(Math.abs(a[0]-19.85)<.02&&Math.abs(b[0]-19.85)<.02))continue;
-  const length=Math.hypot(dx,dz),q=new THREE.Quaternion().setFromAxisAngle(THREE.Object3D.DEFAULT_UP,-Math.atan2(dz,dx));item(cube,white,[(a[0]+b[0])/2,-access.depth/2,(a[1]+b[1])/2],[length,access.depth,.08],q,'service-lower-wall');
+ box('service-bottom-landing',19.099,-access.depth-.06,-8.10,1.70,.12,1.80,concrete);
+ for(const w of serviceLowerWallRuns()){
+  const a=w.a,b=w.b,dx=b[0]-a[0],dz=b[1]-a[1],length=Math.hypot(dx,dz),q=new THREE.Quaternion().setFromAxisAngle(THREE.Object3D.DEFAULT_UP,-Math.atan2(dz,dx));
+  item(cube,white,[(a[0]+b[0])/2,-access.depth/2,(a[1]+b[1])/2],[length,access.depth,w.width],q,'service-lower-wall');
+ }
+ // The source calls the adjacent space a meter room with a raised floor.
+ // Show its closed inspection panel; no unseen meter layout is invented.
+ box('meter-room-raised-floor-base',21.724,-access.depth-.075,-7.425,3.55,.15,3.15,concrete);
+ box('meter-room-floor-panel-frame',21.95,-access.depth+.029,-7.40,.94,.008,.94,black);
+ box('meter-room-floor-panel',21.95,-access.depth+.034,-7.40,.88,.004,.88,serviceTile);
+ for(const x of [21.64,22.26])box('meter-room-panel-lift-slot',x,-access.depth+.037,-7.40,.015,.002,.09,black);
+ // As-built lobby video, 17–21s: round landing cover, two short pipe ends,
+ // round wall light and control cabinet. Sizes and positions are estimates.
+ item(cylinder,black,[19.08,-access.depth+.027,-8.45],[.38,.005,.38],null,'service-landing-cover-frame');
+ item(cylinder,cream,[19.08,-access.depth+.031,-8.45],[.35,.004,.35],null,'service-landing-cover');
+ for(const x of [18.78,19.28])pipe('service-landing-pipe',[x,-access.depth+.026,-8.87],[x,-access.depth+.21,-8.87],.045,black);
+ if(!cut){
+  box('service-landing-controller',19.43,-access.depth+1.47,-8.94,.30,.42,.11,white);
+  box('service-controller-display',19.43,-access.depth+1.55,-8.875,.10,.065,.008,black);
+  box('service-controller-isolator',19.50,-access.depth+1.39,-8.875,.075,.075,.012,red);
+  pipe('service-controller-conduit',[19.46,-access.depth+.17,-8.94],[19.46,-access.depth+1.27,-8.94],.016,white);
+  const glow=mat('#f7f4df',{emissive:'#f7f4df',emissiveIntensity:settings.lampsOn!==false?.6:0}),q=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1,0,0),Math.PI/2);
+  item(cylinder,white,[18.84,-access.depth+.95,-8.95],[.09,.025,.09],q,'service-landing-round-light');
+  item(cylinder,glow,[18.84,-access.depth+.95,-8.93],[.075,.008,.075],q,'service-landing-light-diffuser');
+  if(settings.lampsOn!==false){const l=new THREE.PointLight(lightColour(4000),10,4,2);l.position.set(19.1,-access.depth+1,-8.6);l.userData={fixtureLight:true,kelvin:4000,positionInferred:true,source:'simulator-placeholder'};root.add(l);}
+ }
+ for(const poly of [...Object.values(SERVICE_ROOM_POLYGONS),SERVICE_CONNECTOR]){
+  for(let x=14;x<23.5;x+=.6)for(let z=-9;z< -5.35;z+=.1)if(inside([x,z],poly)&&inside([x,z+.1],poly))box('service-floor-joints',x,-access.depth+.027,z+.05,.002,.001,.10,serviceJoint);
+  for(let z=-9;z< -5.35;z+=.6)for(let x=14;x<23.5;x+=.1)if(inside([x,z],poly)&&inside([x+.1,z],poly))box('service-floor-joints',x+.05,-access.depth+.027,z,.10,.001,.002,serviceJoint);
  }
  const equipment=new THREE.Group();equipment.name='pump-equipment';equipment.position.y=-SERVICE_ACCESS.depth;equipment.userData={source:'pump-room-photo',dimensionsInferred:true,orientationInferred:true,pumps:3};root.add(equipment);
  // Along the west wall, outside the source entrance door and access aisle.
@@ -118,6 +143,6 @@ export function buildCommonSpaces({parent,resources,settings,cut=false}){
    item(cylinder,white,[x,2.735,z],[.065,.025,.065],null,'lobby-round-downlight');item(cylinder,diffuser,[x,2.719,z],[.054,.008,.054],null,'lobby-downlight-diffuser');
   }
  }
- for(const b of batches.values()){const mesh=new THREE.InstancedMesh(b.geo,b.m,b.matrices.length);b.matrices.forEach((m,i)=>mesh.setMatrixAt(i,m));mesh.name=b.name;mesh.castShadow=!b.name.includes('joint');mesh.receiveShadow=true;mesh.userData={source:b.name.startsWith('pump-')?'pump-room-photo':b.name.startsWith('lobby-')?'lobby-oct24':'simulator-placeholder',dimensionsInferred:true};(b.name.startsWith('pump-')?equipment:root).add(mesh);}
+ for(const b of batches.values()){const mesh=new THREE.InstancedMesh(b.geo,b.m,b.matrices.length);b.matrices.forEach((m,i)=>mesh.setMatrixAt(i,m));mesh.name=b.name;mesh.castShadow=!b.name.includes('joint');mesh.receiveShadow=true;mesh.userData={source:b.name.startsWith('pump-')?'pump-room-photo':b.name.startsWith('lobby-')||b.name.startsWith('service-landing')||b.name.startsWith('service-controller')?'lobby-oct24':'building-plan',dimensionsInferred:true,...(/joint|step-nosing|lift-slot/.test(b.name)?{tourNonPhysical:true}:{})};(b.name.startsWith('pump-')?equipment:root).add(mesh);}
  return root;
 }

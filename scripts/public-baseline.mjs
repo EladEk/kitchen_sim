@@ -21,11 +21,11 @@ import {unitDisplayPolygons,displayTriangles} from './public-display-polygons.mj
 import {refinePublicFacade} from './public-facade-details.mjs';
 import {extractFloorMap} from '../public-view/floor-map-geometry.mjs';
 import {createPublicRoomMaps} from './public-room-map.mjs';
-import {serviceFloorHeight} from '../src/service-access.mjs';
+import {serviceFloorHeight,SERVICE_DOOR_IDS} from '../src/service-access.mjs';
 import {publicMasterBedAdjustment} from './public-master-bed.mjs';
 
 export async function createPublicBaseline(directory){
- const resources=[],picks=[],root=new THREE.Group(),settings={...normalizeHomeSettings(),openDoors:[],openParts:[],closedBuildingDoors:[],cutaway:false,furniture:true,showLighting:true,buildingLevel:9,tourDestination:'unit:1:0'};
+ const resources=[],picks=[],root=new THREE.Group(),settings={...normalizeHomeSettings(),openDoors:[],openParts:[],closedBuildingDoors:[...SERVICE_DOOR_IDS],cutaway:false,furniture:true,showLighting:true,buildingLevel:9,tourDestination:'unit:1:0'};
  buildBuildingContext({group:root,resources,settings,mode:'walk',picks,interactiveDoors:true});
  // Identity placement of the SAME base-plan template used for the neighbours.
  const temp=new THREE.Group(),bases=buildGroundApartments({root:temp,resources,picks:[],settings,mode:'walk',interactiveDoors:true,units:[4]}),own=bases.get(4).clone(true);

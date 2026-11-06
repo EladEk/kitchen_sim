@@ -3,7 +3,7 @@ import {facadeAccentCollision} from './facade-accents.mjs';
 import {laundryScreens} from './laundry-screens.mjs';
 import {LOBBY_BENCHES} from './lobby-reference.mjs';
 import {COMMON_SPACES,commonSpace,PUMP_OBSTACLES} from './common-spaces.mjs';
-import {serviceFloorHeight} from './service-access.mjs';
+import {serviceFloorHeight,isServiceDoor} from './service-access.mjs';
 import {RESIDENTS_CLUB,clubWindowProfile,isClubDestination,inResidentsClub} from './residents-club.mjs';
 import {connectedWallRuns,exposedBalconySegments,wallFootprint,duplexFlightRails,duplexLandingGuards} from './building-geometry.mjs';
 import {BUILDING,BUILDING_FLOORS,BUILDING_SITE} from './building-layout.mjs';
@@ -28,7 +28,7 @@ export function buildingBoxes(level,settings,cars=[]){
  if(settings.furniture!==false)boxes.push(...apartmentFurnitureBoxes(level));
  for(const w of connectedWallRuns(source,f,level===0?COMMON_ENTRY_DOORS:[])){const ownership=w.sourceWallIndex==null?w:source.walls[w.sourceWallIndex],mid=ownership.a.map((n,i)=>(n+ownership.b[i])/2);if(level===0&&onDetailedGround(mid))continue;boxes.push({...wallFootprint(w),sourceWall:true});}
  for(const path of f.envelope)for(const o of path.openings){const mid=o.a.map((n,i)=>(n+o.b[i])/2);if(level===0&&onDetailedGround(mid)||isDoorOpening(o.a,o.b,source))continue;const edge=path.polygon[o.edge],next=path.polygon[(o.edge+1)%path.polygon.length],projection=p=>(p[0]-edge[0])*(next[0]-edge[0])+(p[1]-edge[1])*(next[1]-edge[1]),start=projection(o.a)<projection(o.b)?o.a:o.b;boxes.push(segmentBox(!clubWindowProfile(level,o)&&o.kind==='slider'?start:o.a,!clubWindowProfile(level,o)&&o.kind==='slider'?mid:o.b,.09,{window:true}));}
- for(const door of source.doors){if(level===0&&['bd-0-4','bd-0-5'].includes(door.id))continue;if(level===0&&onDetailedGround(door.hinge))continue;if(settings.closedBuildingDoors?.includes(door.id))boxes.push(segmentBox(door.hinge,door.closed,.06,{buildingDoorId:door.id}));}
+ for(const door of source.doors){if(level===0&&onDetailedGround(door.hinge))continue;const closed=settings.closedBuildingDoors?.includes(door.id);if(closed||isServiceDoor(level,door.id))boxes.push(segmentBox(door.hinge,closed?door.closed:door.opened,.06,{buildingDoorId:door.id}));}
  // Guard every exposed balcony edge; walking must not step off an upper slab.
  for(const {a,b} of exposedBalconySegments(f))boxes.push(segmentBox(a,b,.06,{guardrail:true}));
  for(const lift of source.lifts){if(!liftIsOpen(cars[lift.id],level)){const [x,z]=lift.doorCenter;boxes.push(segmentBox([x+.01,z-.68],[x+.01,z+.68],.08,{liftDoor:true}));}}
@@ -50,6 +50,7 @@ export function buildingCanStand(p,level,boxes,cars=[],radius=HOUSE.playerRadius
  if(!domains.some(poly=>inPolygon(p,poly)||poly.some((a,i)=>segmentDistance(p,a,poly[(i+1)%poly.length])<.18)))return false;
  for(const lift of interiorsForFloor(level).lifts){if(carContains(lift,p,-.02)&&!liftIsOpen(cars[lift.id],level))return false;}
  for(const b of boxes){
+  if(b.walkableSurface)continue;
   // A guard at the upper landing must not become an invisible wall across
   // the lower flight. Keep both the sloping rail and landing guards physical.
   if(b.minY!=null&&(feetY+HOUSE.eyeHeight+.12<b.minY||feetY>b.maxY+.02))continue;

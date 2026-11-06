@@ -5,8 +5,10 @@ import {groundInverse,groundFurnitureBoxes} from './ground-apartments.mjs';
 import {seatingRoom} from '../scripts/revise-seating-r131.mjs';
 import {groundLivingContext} from '../scripts/revise-living-r102.mjs';
 const kinds=new Set(['sofa','coffee','media']);
+// Apartment 23 uses the owner's L-shaped seating instead of the generic
+// straight sofa/TV axis; its wall/door and approach checks are in R138 tests.
 test('every upper sofa has an opposing TV console, real wall support and connected door/window approaches',()=>{
- const sofas=APARTMENT_FURNITURE.filter(r=>r.kind==='sofa');assert.equal(sofas.length,39);
+ const sofas=APARTMENT_FURNITURE.filter(r=>r.kind==='sofa'&&!(r.floor===4&&r.unit===23));assert.equal(sofas.length,38);
  for(const sofa of sofas){const set=APARTMENT_FURNITURE.filter(r=>r.floor===sofa.floor&&r.unit===sofa.unit&&kinds.has(r.kind)),media=set.find(r=>r.kind==='media'),fixed=APARTMENT_FURNITURE.filter(r=>r.floor===sofa.floor&&r.unit===sofa.unit&&!kinds.has(r.kind)).map(r=>r.box),room=seatingRoom(sofa);assert(media,sofa.id);assert(sofa.wallBacked&&sofa.backGap<.065,sofa.id);assert.equal(media.support,'floor-console');if(media.wallBacked)assert(media.backGap<.2,media.id);const dx=media.x-sofa.x,dz=media.z-sofa.z;assert(dx*Math.sin(sofa.angle)+dz*Math.cos(sofa.angle)>1.8);assert(Math.abs(dx*Math.cos(sofa.angle)-dz*Math.sin(sofa.angle))<.002);assert(Math.cos(sofa.angle-media.angle)<-.99);for(const r of set)assert(room.valid(r.box,fixed),r.id);assert(room.routesClear([...fixed,...set.map(r=>r.box)]),sofa.id);}
 });
 test('all ground seating copies retain wall gaps and facing TV pairs after reflection',()=>{

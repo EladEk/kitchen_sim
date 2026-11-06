@@ -1,4 +1,5 @@
 import {createFurnitureAnchor} from './complete-furniture.mjs';
+import {dimensionedFurnitureParts} from './dimensioned-furniture.mjs';
 import * as THREE from 'three';
 import {createArchitecturalGlass} from './architectural-glass.mjs';
 import {createCeramicBowl} from './sanitary-fixtures.js';
@@ -11,7 +12,7 @@ import {installBuildingSurfaceUVs} from './building-surface-uvs.mjs';
 import {createSoftGeometry} from './soft-furnishings.mjs';
 export function groundProposedBeds(){return GROUND_APARTMENT_FURNITURE.filter(r=>r.kind==='bed');}
 export function neighbourFurniture(level){return level===0?GROUND_APARTMENT_FURNITURE:[...APARTMENT_FURNITURE,...APARTMENT_BATHROOMS].filter(r=>r.floor===level);}
-export function apartmentFurnitureBoxes(level){return neighbourFurniture(level).map(r=>({...r.box,apartmentFurniture:r.id,unit:r.unit}));}
+export function apartmentFurnitureBoxes(level){return neighbourFurniture(level).map(r=>({...r.box,apartmentFurniture:r.id,unit:r.unit,...(r.walkThrough?{walkableSurface:true}:{})}));}
 export function buildApartmentFurniture({parent,resources,level,base,settings,surfaces=null}){
  if(settings.furniture===false)return;
  const items=neighbourFurniture(level);if(!items.length)return;
@@ -21,6 +22,9 @@ export function buildApartmentFurniture({parent,resources,level,base,settings,su
  function box(r,part,m,x,y,z,w,h,d){const c=Math.cos(r.angle),s=Math.sin(r.angle),key=part;let b=batches.get(key);if(!b)batches.set(key,b={part,m,items:[]});b.items.push([r.x+x*c+z*s,base+y,r.z-x*s+z*c,w,h,d,r.angle,r.id,r.unit]);}
  const bowl=createCeramicBowl(resources,{productId:null,w:1,d:1,top:0,depth:1,innerW:.8,innerD:.7,innerZ:.035,radius:.06,innerRadius:.1,lowerScale:.86,drainZ:.035});
  for(const r of items){
+  if(['desk','dining','chair'].includes(r.kind)){const asset=r.kind==='chair'?'dining-chair':r.kind,part=`apartment-${r.kind}-body`;box(r,part,palette.wood,0,0,0,r.w,r.h??(r.kind==='chair'?.9:.75),r.d);const batch=batches.get(part);batch.geometry=createFurnitureAnchor(asset).geometry;batch.asset=asset;continue;}
+  if(r.kind==='wardrobe'){for(const p of dimensionedFurnitureParts({kind:r.kind,w:r.w,d:r.d,h:r.h??2.2})){const [x,y,z,w,h,d]=p.box;box(r,`apartment-wardrobe-${p.part}`,p.material==='metal'?palette.dark:p.material==='paint'?palette.cabinet:palette.wood,x,y,z,w,h,d);}continue;}
+
   if(['bed','sofa','coffee','media'].includes(r.kind)){const kind=r.kind==='bed'?(r.w>1.25?'bed-double':'bed-single'):r.kind,h={bed:.98,sofa:.95,coffee:.435,media:1.40}[r.kind],part={bed:'apartment-bed-frame',sofa:'apartment-sofa-base',coffee:'apartment-coffee-top',media:'apartment-media-cabinet'}[r.kind];box(r,part,palette.wood,0,0,0,r.w,h,r.d);const batch=batches.get(part);batch.geometry=createFurnitureAnchor(kind).geometry;batch.asset=kind;if(r.rug)box(r,'apartment-living-rug',palette.rug,0,.013,0,r.rug.w,.009,r.rug.d);continue;}
   if(r.kind==='wc'){
    box(r,'apartment-wc-body',palette.ceramic,0,.30,0,r.w,.30,r.d-.04);
@@ -33,10 +37,10 @@ export function buildApartmentFurniture({parent,resources,level,base,settings,su
    box(r,'apartment-bath-mirror',palette.mirror,0,1.38,-r.d/2-.025,r.w,.62,.016);
    for(const x of [-r.w/2,r.w/2])box(r,'apartment-mirror-edge',palette.glow,x,1.38,-r.d/2-.014,.012,.62,.008);
   }else if(r.kind==='shower'){
-   box(r,'apartment-shower-tray',palette.ceramic,0,.045,0,r.w,.04,r.d);
-   box(r,'apartment-shower-glass',palette.glass,-r.w/2+.01,1.05,0,.008,2,r.d);
-   box(r,'apartment-shower-riser',palette.steel,0,1.45,-r.d/2+.035,.025,1,.025);
-   box(r,'apartment-shower-head',palette.steel,0,2,-r.d/2+.17,.18,.025,.22);
+   box(r,'apartment-shower-tray',palette.ceramic,0,r.walkThrough?.0175:.045,0,r.w,r.walkThrough?.015:.04,r.d);
+   if(!r.walkThrough)box(r,'apartment-shower-glass',palette.glass,-r.w/2+.01,1.05,0,.008,2,r.d);
+   if(!r.walkThrough){box(r,'apartment-shower-riser',palette.steel,0,1.45,-r.d/2+.035,.025,1,.025);
+   box(r,'apartment-shower-head',palette.steel,0,2,-r.d/2+.17,.18,.025,.22);}
   }else if(r.kind==='bathtub'){
    box(r,'apartment-bathtub-bottom',palette.ceramic,0,.18,0,r.w-.10,.10,r.d-.10);
    for(const x of [-r.w/2+.04,r.w/2-.04])box(r,'apartment-bathtub-end',palette.ceramic,x,.34,0,.08,.43,r.d);
@@ -58,14 +62,18 @@ export function buildApartmentFurniture({parent,resources,level,base,settings,su
    box(r,'apartment-kitchen-plinth',palette.dark,0,.065,0,r.w-.04,.11,r.d-.06);
    box(r,'apartment-kitchen-worktop',palette.stone,0,.885,0,r.w+(r.flushWorktop?0:.015),.05,r.d+(r.flushWorktop?0:.02));
    const n=Math.round(r.w/.6);for(let i=0;i<n;i++){const x=-r.w/2+(i+.5)*r.w/n;box(r,'apartment-kitchen-front',palette.cabinet,x,.48,r.d/2+.006,r.w/n-.006,.71,.022);box(r,'apartment-kitchen-handle',palette.dark,x,.74,r.d/2+.023,.18,.014,.022);}
-   if(r.kind==='kitchen'){
+   if(r.kind==='kitchen'||r.hasSink||r.hasHob){
     const sink=r.sinkOffset??-r.w*.27,hob=r.hobOffset??r.w*.25;
+    if(r.hasSink??r.kind==='kitchen'){
     box(r,'apartment-kitchen-sink',palette.dark,sink,.914,0,.47,.008,.40);
     for(const x of [sink-.24,sink+.24])box(r,'apartment-kitchen-sink-rim',palette.steel,x,.924,0,.018,.015,.42);
     for(const z of [-.205,.205])box(r,'apartment-kitchen-sink-rim',palette.steel,sink,.924,z,.49,.015,.018);
     box(r,'apartment-kitchen-tap',palette.steel,sink,.918,-.12,.08,.30,.22);batches.get('apartment-kitchen-tap').geometry=createFurnitureAnchor('faucet').geometry;batches.get('apartment-kitchen-tap').asset='faucet';
+    }
+    if(r.hasHob??r.kind==='kitchen'){
     box(r,'apartment-kitchen-hob',palette.dark,hob,.92,0,.57,.014,.46);
     for(const x of [hob-.15,hob+.15])box(r,'apartment-kitchen-hob-zone',palette.steel,x,.929,0,.17,.002,.22);
+    }
    }
   }
  }

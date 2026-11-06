@@ -39,7 +39,7 @@ export function createPublicRoomMaps(){
     const ctx=furnitureContext({polygon:unit.polygon,walls,doors:source.doors,sliders}),groups=new Map();
     for(const p of [...APARTMENT_FURNITURE,...APARTMENT_BATHROOMS].filter(p=>p.floor===f.level&&p.unit===unit.number&&(['bed','kitchen','sofa','basin'].includes(p.kind)||p.mapRoom))){
      const point=p.kind==='bed'?p.seed:[p.x,p.z],room=ctx.room(point),key=room.cells[0];if(!groups.has(key))groups.set(key,{room,entries:[]});
-     const kind=p.mapRoom?'utility':p.kind==='bed'?'bedroom':p.kind==='sofa'?'living':p.kind==='basin'?'bathroom':'kitchen',he=p.roomHe||(p.kind==='bed'?(p.master?'חדר הורים':'חדר שינה'):p.kind==='sofa'?'סלון':p.kind==='basin'?'חדר רחצה':'מטבח');
+     const kind=p.mapKind||(p.mapRoom?'utility':p.kind==='bed'?'bedroom':p.kind==='sofa'?'living':p.kind==='basin'?'bathroom':'kitchen'),he=p.roomHe||(p.kind==='bed'?(p.master?'חדר הורים':'חדר שינה'):p.kind==='sofa'?'סלון':p.kind==='basin'?'חדר רחצה':'מטבח');
      if(!groups.get(key).entries.some(e=>e.kind===kind))groups.get(key).entries.push({id:p.id,unit:unit.number,kind,he,label:point});
     }
     for(const {room,entries} of groups.values()){

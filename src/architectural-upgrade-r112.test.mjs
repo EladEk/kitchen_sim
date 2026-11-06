@@ -11,10 +11,11 @@ import {createContactShadows} from './contact-shadows.mjs';
 import {surfacePixels,surfaceCacheStats,clearSurfacePixelCache} from '../public-view/surface-detail.mjs';
 
 test('all 103 source wet rooms have separated reachable fixtures outside walls and door sweeps',()=>{
+ // Open wet floor areas have no enclosure/outlet until its wall position is known.
  const contexts=bathroomContexts();assert.equal(contexts.length,103);assert.equal(new Set(contexts.map(r=>r.floor)).size,8);
  for(const row of contexts){const set=APARTMENT_BATHROOMS.filter(f=>f.floor===row.floor&&f.unit===row.unit&&f.roomId===`wet-${row.index}`),fixed=APARTMENT_FURNITURE.filter(f=>f.floor===row.floor&&f.unit===row.unit).map(f=>f.box);assert(set.some(f=>f.kind==='wc'));assert(set.some(f=>f.kind==='basin'));
-  for(const f of set){const other=[...fixed,...set.filter(o=>o!==f).map(o=>o.box)];assert(row.room.valid(f.box,other),f.id+' clears real wall/door/fixture bounds');assert(row.room.pointClear(f.approach,other,.16),f.id+' has a usable front approach');assert(Number.isFinite(backing(f.box,f.angle,f.w,row.room.walls)),f.id+' backs onto a real wall');}
-  assert(row.room.routesClear([...fixed,...set.map(f=>f.box)]));
+  for(const f of set){const other=[...fixed,...set.filter(o=>o!==f&&!o.walkThrough).map(o=>o.box)];assert(row.room.valid(f.box,other),f.id+' clears real wall/door/fixture bounds');assert(row.room.pointClear(f.approach,other,.16),f.id+' has a usable front approach');if(!f.walkThrough)assert(Number.isFinite(backing(f.box,f.angle,f.w,row.room.walls)),f.id+' backs onto a real wall');}
+  assert(row.room.routesClear([...fixed,...set.filter(f=>!f.walkThrough).map(f=>f.box)]));
  }
 });
 test('source-registered lounges including the penthouses keep opposing TVs on supported floor consoles',()=>{

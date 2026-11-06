@@ -28,13 +28,13 @@ function overlapsRay(ray, far, bounds, offset = 0) {
  * and bounds are packed buffers; no cloned geometry or mesh per instance. */
 export function createSpatialCollisionIndex(root, {trees = new Map(), include = () => true, visibleOnly = true} = {}) {
  root.updateWorldMatrix(true, true);
- const inverseRoot = root.matrixWorld.clone().invert(), sources = [], counts = [];
+ const inverseRoot = root.matrixWorld.clone().invert(), sources = [], counts = [], starts = [];
  let count = 0;
  (visibleOnly?root.traverseVisible:root.traverse).call(root,object => {
   if (!object.isMesh || !object.geometry?.attributes.position || object.userData.tourNonPhysical || !include(object)) return;
   if (![object.material].flat().some(m => m && m.visible !== false && m.opacity !== 0)) return;
   const n = object.isInstancedMesh ? object.count : 1;
-  if (n) { sources.push(object); counts.push(n); count += n; }
+  if (n) { sources.push(object); counts.push(n); starts.push(count); count += n; }
  });
  let matrices = new Float32Array(count * 16), boxes = new Float32Array(count * 6);
  let sourceIds = new Uint32Array(count), visited = new Uint32Array(count), stamp = 0;
@@ -96,7 +96,7 @@ export function createSpatialCollisionIndex(root, {trees = new Map(), include = 
     if (floor) normal.getNormalMatrix(proxy.matrixWorld);
     for (const hit of hits) {
      if (floor && (!hit.face || Math.abs(faceNormal.copy(hit.face.normal).applyNormalMatrix(normal).y) <= .65)) continue;
-     if (!closest || hit.distance < closest.distance) { hit.object = source; closest = hit; }
+     if (!closest || hit.distance < closest.distance) { hit.object = source;if(source.isInstancedMesh)hit.instanceId=id-starts[sourceIds[id]]; closest = hit; }
     }
     return any && !!closest;
    };
@@ -115,7 +115,7 @@ export function createSpatialCollisionIndex(root, {trees = new Map(), include = 
   },
   dispose() {
    if (disposed) return; disposed = true;
-   sources.length = counts.length = hits.length = global.length = 0; grid.clear();
+   sources.length = counts.length = starts.length = hits.length = global.length = 0; grid.clear();
    matrices = boxes = sourceIds = visited = overflow = null; stats.bufferBytes = 0;
    if (proxy) proxy.geometry = proxy.material = null;
   }

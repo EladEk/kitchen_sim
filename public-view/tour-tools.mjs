@@ -9,7 +9,7 @@ export function destinationStandingPose(destination,nav,building,world){
   const position=new Vector3(destination.position[0]+dx,base+1.62,destination.position[1]+dz).applyMatrix4(matrix);
   ray.set(position.clone().add(new Vector3(0,-1.3,0)),new Vector3(0,-1,0));ray.far=.8;
   const floor=world.firstHit(ray,{floor:true});if(!floor||Math.abs(floor.point.y-base)>.28)continue;
-  position.y=floor.point.y+1.62;let clear=true;
+  position.y=floor.point.y+1.62;if(world.canStand&&!world.canStand(position))continue;let clear=true;
   for(const height of [.5,1.2])for(let i=0;i<8;i++){
    direction.set(Math.cos(i*Math.PI/4),0,Math.sin(i*Math.PI/4));ray.set(new Vector3(position.x,position.y-1.62+height,position.z),direction);ray.far=.19;
    if(world.firstHit(ray,{any:true})){clear=false;break;}

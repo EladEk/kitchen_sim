@@ -7,7 +7,7 @@ export function stepWalker(position,dx,dz,meshes,ray){
  const length=Math.hypot(dx,dz);if(!length)return false;
  direction.set(dx/length,0,dz/length);
  const indexed=typeof meshes.firstHit==='function';
- for(const height of [.5,1.2]){
+ for(const height of [.3,.5,1.2]){
   origin.copy(position);origin.y+=height-1.62;ray.set(origin,direction);ray.far=length+.18;
   if(indexed?meshes.firstHit(ray,obstacleQuery):visibleHits(ray,meshes,origin,direction,ray.far).length)return false;
  }

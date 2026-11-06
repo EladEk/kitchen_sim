@@ -1,0 +1,8 @@
+{
+  "revision": "R138",
+  "sourceTests": {"passed": 559, "failed": 0},
+  "productionChecks": ["apartment23-exported-beds-and-room-labels", "all-eight-building-furniture-collisions", "save-export-import-roundtrip", "independent-map-overrides", "apartment42", "all-sanitary-standing-approaches", "service-rooms-and-return-stairs", "elevator-exits", "all-common-stairs", "all-43-entrances", "grey-facades", "no-duplicate-stone-surfaces", "authenticated-private-assets"],
+  "browserChecks": {"component": "actual ApartmentEditor", "navigation": "actual R138 exported data", "mobileViewport": [394,734], "saveNamed": true, "restoreAfterReload": true, "drag": true, "fileExport": true, "fileImport": true, "importedScope": "4091:4:24", "importedDeskMetres": [1.4,0.7,0.76], "fullGpuDistrictCertified": false},
+  "privateSourceFilesEncrypted": 252,
+  "publication": "Tracked separately in the publish status; a built archive does not establish a successful deployment."
+}

@@ -23,7 +23,7 @@ test('the three garden replicas each receive five bedroom beds without crossing 
  for(const p of beds){const room=groundBaseProfile().rooms.find(r=>inPolygon(groundInverse(p.unit,[p.x,p.z]),r.polygon));assert(['bedroom','safe-room'].includes(room?.kind));assert(!boxes.some(b=>intersects(p.box,b)),p.id+' must clear existing construction and equipment');}
 });
 test('every upper independent apartment has one kitchen and each registered bedroom has a bed clear of walls and door swings',()=>{
- assert.equal(APARTMENT_FURNITURE.filter(r=>r.kind==='bed').length,138);
+ assert.equal(APARTMENT_FURNITURE.filter(r=>r.kind==='bed').length,139);
  const kitchens=APARTMENT_FURNITURE.filter(r=>r.kind==='kitchen');assert.equal(kitchens.length,39);assert.equal(new Set(kitchens.map(r=>r.unit)).size,39);
  for(const f of BUILDING_FLOORS.filter(f=>f.level>0)){const source=BUILDING_INTERIORS.floors[f.level],walls=connectedWallRuns(source,f).map(wallFootprint);
   for(const p of APARTMENT_FURNITURE.filter(r=>r.floor===f.level)){
@@ -36,8 +36,8 @@ test('the video-matched stair portal is free of cabinet geometry and permits con
  const root=new THREE.Group(),resources=[],settings=normalizeHomeSettings({buildingLevel:0,cutaway:false}),cars=createElevators();
  try{buildBuildingContext({group:root,resources,settings,mode:'building'});root.updateMatrixWorld(true);const matrix=new THREE.Matrix4(),box=new THREE.Box3();
  root.traverse(o=>{if(o.isInstancedMesh&&['lobby-flush-service-panel','lobby-oak-panelling','lobby-service-handle'].includes(o.name))for(let i=0;i<o.count;i++){o.getMatrixAt(i,matrix);matrix.premultiply(o.matrixWorld);box.setFromCenterAndSize(new THREE.Vector3(),new THREE.Vector3(1,1,1)).applyMatrix4(matrix);assert(!intersects({minX:box.min.x,maxX:box.max.x,minZ:box.min.z,maxZ:box.max.z},serviceApproach),'cabinet crosses service approach');}});
- const boxes=buildingBoxes(0,settings,cars);let p=[19.05,-4];for(let i=0;i<44;i++)p=moveBuildingPlayer(p,[0,-.1],0,boxes,cars);assert(p[1]<-8.3,'walk from lobby into bottom landing');assert.equal(serviceFloorHeight(p),-SERVICE_ACCESS.depth);
- for(const path of [[[17.65,-8.4],[17.65,-6.25],[17.4,-6.25]],[[19.05,-7.7],[21,-7.7],[21,-7]]]){let at=[...p];for(const goal of path){at=moveBuildingPlayer(at,goal.map((v,i)=>v-at[i]),0,boxes,cars);assert(Math.hypot(...goal.map((v,i)=>v-at[i]))<.06,'reach actual service room through its source portal');}assert.equal(serviceFloorHeight(at),-SERVICE_ACCESS.depth);}
+ const boxes=buildingBoxes(0,settings,cars);let p=[19.05,-4];for(const goal of [[19.05,-7.65],[18.63,-7.65],[18.63,-8.45]])p=moveBuildingPlayer(p,goal.map((v,i)=>v-p[i]),0,boxes,cars);assert(p[1]<-8.3,'walk around the open meter leaf to the bottom landing');assert.equal(serviceFloorHeight(p),-SERVICE_ACCESS.depth);
+ for(const path of [[[17.65,-8.45],[17.65,-6.25],[17.4,-6.25]],[[18.63,-7.65],[21,-7.65],[21,-7]]]){let at=[...p];for(const goal of path){at=moveBuildingPlayer(at,goal.map((v,i)=>v-at[i]),0,boxes,cars);assert(Math.hypot(...goal.map((v,i)=>v-at[i]))<.06,'reach actual service room through its source portal');}assert.equal(serviceFloorHeight(at),-SERVICE_ACCESS.depth);}
  const heights=[-5.65,-6,-6.5,-7,-7.5,-7.95].map(z=>serviceFloorHeight([19.05,z]));for(let i=1;i<heights.length;i++)assert(heights[i]<=heights[i-1]);
  const ray=new THREE.Raycaster(new THREE.Vector3(19.05,2,-6.75),new THREE.Vector3(0,-1,0));const hits=ray.intersectObject(root,true).filter(h=>h.object.name==='service-descending-step'||h.object.userData.part==='building-floor-slab'||h.object.userData.part==='building-site-base');assert(hits.length);assert(hits[0].point.y<-.2,'no hidden ground/site sheet covers the descending stair');
  }finally{resources.forEach(r=>r.dispose?.());}

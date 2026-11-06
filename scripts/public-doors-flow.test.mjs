@@ -12,10 +12,10 @@ import {disposeObjectResources} from '../src/photo-resources.mjs';
 
 const load=async name=>JSON.parse(await readFile('dist/client/baseline/'+name+'.json','utf8'));
 test('every standard door has two poses, all 43 apartment entries are dark, and every floor has a separate corridor finish',async()=>{
- const model=await new THREE.ObjectLoader().parseAsync(await load('building')),catalog=publicDoorCatalog(model);assert.equal(catalog.size,400);const entries=[...catalog.values()].filter(r=>r.userData.tourDoor.kind==='entry');assert.equal(entries.length,43);
+ const model=await new THREE.ObjectLoader().parseAsync(await load('building')),catalog=publicDoorCatalog(model);assert.equal(catalog.size,402);const entries=[...catalog.values()].filter(r=>r.userData.tourDoor.kind==='entry');assert.equal(entries.length,43);
  for(const root of entries){let solid=0;root.traverse(o=>{if(o.isMesh&&o.material?.userData.surfaceKind==='door'){assert.equal(o.material.color.getHexString(),'536c66');solid++;}});assert(solid,'each apartment entry has an opaque dark leaf');}
  const corridorFloors=new Set();model.traverse(o=>{if(o.isMesh&&o.material?.color?.getHexString()===LOBBY_WALL_COLOR.slice(1)&&o.material.userData.surfaceKind==='plaster')corridorFloors.add(o.userData.level);});assert.deepEqual([...corridorFloors].sort(),[0,1,2,3,4,5,6,7,8]);
- const c=createDistrictDoorController({model});for(const root of catalog.values()){const d=root.userData.tourDoor;assert(Math.abs(d.open-d.closed)>.1,d.id);assert(c.onSelect({action:'district-door',doorId:d.id},'4102'));assert.equal(root[d.axis][d.property],d.closed);assert(c.onSelect({action:'district-door',doorId:d.id},'4102'));assert.equal(root[d.axis][d.property],d.open);}assert.equal(c.stats.overrides,0);c.dispose();disposeObjectResources(model);
+ const c=createDistrictDoorController({model});for(const root of catalog.values()){const d=root.userData.tourDoor;assert(Math.abs(d.open-d.closed)>.1,d.id);assert(c.onSelect({action:'district-door',doorId:d.id},'4102'));assert.equal(root[d.axis][d.property],d.defaultOpen?d.closed:d.open);assert(c.onSelect({action:'district-door',doorId:d.id},'4102'));assert.equal(root[d.axis][d.property],d.defaultOpen?d.open:d.closed);}assert.equal(c.stats.overrides,0);c.dispose();disposeObjectResources(model);
 });
 
 test('all 43 entries block while closed and release their old collider after opening in every rotated or mirrored building',async()=>{
