@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {mergeWallSurfaces} from './wall-surface-merge.mjs';
 import {inVariantSlot,hasVariantSlot} from './model-variants.mjs';
 import {motionAncestor,motionRoots,createMotionCopy} from './model-motions.mjs';
 import {createDoorContext} from './door-context.mjs';
@@ -23,7 +24,7 @@ export function createDistrict(template,siteData,{mobile=false,variants=new Map(
  const add=(o,matrix)=>{if(o.userData.furnitureRender){const key=JSON.stringify([o.geometry.uuid,[o.material].flat().map(m=>m.uuid)]);if(!furnitureBatches.has(key))furnitureBatches.set(key,{geometry:o.geometry,material:o.material,matrices:[],kind:o.userData.furnitureRender});furnitureBatches.get(key).matrices.push(matrix);return;} // The baseline is already sanitized. Keep all balcony returns and ground slabs.
 
  const mats=[o.material].flat(),total=o.geometry.index?.count??o.geometry.attributes.position.count;const ranges=mats.length>1?o.geometry.groups:[{start:0,count:total,materialIndex:0}];
- for(const range of ranges){const mat=mats[range.materialIndex];if(!mat||mat.opacity===0)continue;if(!buckets.has(mat))buckets.set(mat,new Map());const detail=(o.userData.exterior===false?'interior':'exterior')+'|'+(o.castShadow?'1':'0'),byDetail=buckets.get(mat);if(!byDetail.has(detail))byDetail.set(detail,[]);byDetail.get(detail).push({geometry:o.geometry,matrix,start:range.start,count:range.count});}
+ for(const range of ranges){const mat=mats[range.materialIndex];if(!mat||mat.opacity===0)continue;if(!buckets.has(mat))buckets.set(mat,new Map());const stone=mat.userData.publicFinish==='stone',detail=(!stone&&o.userData.exterior===false?'interior':'exterior')+'|'+(stone||o.castShadow?'1':'0'),byDetail=buckets.get(mat);if(!byDetail.has(detail))byDetail.set(detail,[]);byDetail.get(detail).push({geometry:o.geometry,matrix,start:range.start,count:range.count});}
  };
  const partitioned=variants.size>0&&hasVariantSlot(template)&&[...variants.values()].every(hasVariantSlot);
  const plans=partitioned?[
@@ -35,7 +36,7 @@ export function createDistrict(template,siteData,{mobile=false,variants=new Map(
   if(!members.length)continue;source.updateWorldMatrix(true,true);const inverse=source.matrixWorld.clone().invert();
   for(const motion of motionRoots(source)){if(motion.userData.tourDoor||!include(motion))continue;for(const b of members){const copy=createMotionCopy(motion,source),wrapper=new THREE.Group();wrapper.matrixAutoUpdate=false;wrapper.matrix.copy(buildingTransform(b));wrapper.add(copy.group);group.add(wrapper);moving.push({id:b.id,wrapper,copy});}}
   source.traverseVisible(o=>{if(!o.isMesh||o.userData.furnitureCollisionProxy||motionAncestor(o,source)||!include(o))return;const base=inverse.clone().multiply(o.matrixWorld);if(o.isInstancedMesh){const m=new THREE.Matrix4();for(let i=0;i<o.count;i++){o.getMatrixAt(i,m);add(o,base.clone().multiply(m));}}else add(o,base);});
-  for(const [mat,byDetail] of buckets)for(const [flags,parts] of byDetail){const [detail,cast]=flags.split('|');const geo=mergeDistrictParts(parts);if(!geo)continue;geometries.push(geo);
+  for(const [mat,byDetail] of buckets)for(const [flags,parts] of byDetail){const [detail,cast]=flags.split('|');const geo=mergeDistrictParts(parts,{wallFinish:['stone','render'].includes(mat.userData.publicFinish)});if(!geo)continue;geometries.push(geo);
    for(const mirror of [false,true]){const buildings=members.filter(b=>!!b.mirror===mirror);if(!buildings.length)continue;const geometry=mirror?mirroredGeometry(geo):geo;if(mirror)geometries.push(geometry);const mesh=new THREE.InstancedMesh(geometry,mat,buildings.length);buildings.forEach((b,i)=>mesh.setMatrixAt(i,buildingTransform({...b,mirror:false})));mesh.castShadow=cast==='1';mesh.receiveShadow=true;mesh.userData={district:true,detail};copies.push({mesh,buildings,detail});group.add(mesh);}
   }
   for(const batch of furnitureBatches.values())for(const mirror of [false,true]){const buildings=members.filter(b=>!!b.mirror===mirror);if(!buildings.length)continue;const geometry=mirror?mirroredGeometry(batch.geometry,[0,0]):batch.geometry;if(mirror)geometries.push(geometry);const mesh=new THREE.InstancedMesh(geometry,batch.material,buildings.length*batch.matrices.length);mesh.castShadow=mesh.receiveShadow=true;mesh.userData={district:true,detail:'interior',furnitureRender:batch.kind,tourNonPhysical:true};copies.push({mesh,buildings,detail:'interior',localMatrices:batch.matrices,mirror});group.add(mesh);}
@@ -74,7 +75,8 @@ export function updateBuildingCopies(copies,id,include=()=>true,{includeActive=f
 
 // Allocate the final buffers once. Cloning tens of thousands of small instance
 // geometries before merging them caused high allocation pressure on phones.
-export function mergeDistrictParts(parts){
+export function mergeDistrictParts(parts,{wallFinish=false}={}){
+ if(wallFinish){const geometry=mergeWallSurfaces(parts);return geometry&&compactRenderAttributes(geometry);}
  let vertices=0,indices=0;
  for(const {geometry:g,start=0,count:partCount} of parts){const end=Math.min(g.index?.count??g.attributes.position.count,start+(partCount??Infinity));indices+=Math.max(0,end-start);if(g.index){const used=new Set();for(let i=start;i<end;i++)used.add(g.index.getX(i));vertices+=used.size;}else vertices+=Math.max(0,end-start);}
  // Retain indexed source vertices, including their UV seams and normals. The

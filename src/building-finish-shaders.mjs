@@ -20,21 +20,12 @@ export function installStoneCourses(limestone){
     float rowCoverage=finishGridCoverage(row,fwidth(vBuildingWorld.y),.002,.48);
     float colCoverage=finishGridCoverage(col,fwidth(horizontal),.002,.94);
     float joint=1.0-(1.0-rowCoverage)*(1.0-colCoverage);
-    vec2 stoneId=vec2(floor((horizontal+mod(course,2.0)*.46)/.94),course);
-    vec3 stoneHash=fract(vec3(stoneId.xyx)*.1031);
-    stoneHash+=dot(stoneHash,stoneHash.yzx+33.33);
-    float variation=fract((stoneHash.x+stoneHash.y)*stoneHash.z);
-    float grain=sin(horizontal*41.0+sin(vBuildingWorld.y*27.0))*sin(vBuildingWorld.y*57.0)*.004;
-    float base=mix(1.,.9875+variation*.025,1.0-smoothstep(.12,.8,aa));
-    diffuseColor.rgb*=mix(base+grain*(1.0-smoothstep(.003,.03,aa)),.82,joint*.90);
-    float stoneRelief=-.00045*joint*(1.0-smoothstep(.003,.04,aa));
-   `).replace('#include <normal_fragment_maps>',`#include <normal_fragment_maps>
-    vec3 stoneDx=dFdx(-vViewPosition),stoneDy=dFdy(-vViewPosition);
-    vec3 stoneR1=cross(stoneDy,normal),stoneR2=cross(normal,stoneDx);
-    float stoneDet=dot(stoneDx,stoneR1);
-    if(abs(stoneDet)>1.e-12)normal=normalize(abs(stoneDet)*normal-sign(stoneDet)*(dFdx(stoneRelief)*stoneR1+dFdy(stoneRelief)*stoneR2));
+    // The chosen stone colour is authoritative. Legacy photographs and baked
+    // height/albedo maps cannot tint it into large, repeated patches.
+    float grain=sin(horizontal*89.0)*sin(vBuildingWorld.y*83.0)*.0015*(1.0-smoothstep(.002,.012,aa));
+    diffuseColor.rgb=diffuse*(1.0+grain)*mix(1.0,.96,joint*.90);
    `);
-  };limestone.customProgramCacheKey=()=> 'building-stone-courses-r132';
+  };limestone.customProgramCacheKey=()=> 'building-stone-courses-r134';
 
 }
 export function installFloorCourses(interiorFloor,{tile=[.8,.8],joint=.004}={}){

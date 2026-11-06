@@ -1,6 +1,8 @@
 import {buildGardenTerraces} from './garden-terraces-scene.js';
+import {LOBBY_WALL_COLOR} from './common-finish.mjs';
 import {splitWallReturnGeometry} from './wall-return-geometry.mjs';
 import {FACADE_COLOR,FACADE_ROUGHNESS} from './facade-finish.mjs';
+import {GREY_FACADE_COLOR,GREY_FACADE_ROUGHNESS,facadeAccentRows,isFacadeAccentFront} from './facade-accents.mjs';
 import {doorFrameRows} from './door-frame.mjs';
 import {CEILING_COLOR,CEILING_MATERIAL} from './ceiling-finish.mjs';
 import {installStoneCourses,installFloorCourses,installWallCavity} from './building-finish-shaders.mjs';
@@ -39,18 +41,19 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
  const floors=new Map(),cube=new THREE.BoxGeometry(1,1,1);resources.push(cube);const facadeCube=splitWallReturnGeometry(cube);resources.push(facadeCube);
  function material(color,extra={}){const m=shown?new THREE.MeshStandardMaterial({color,roughness:.8,...extra}):new THREE.MeshBasicMaterial({colorWrite:false,depthWrite:false,transparent:true,opacity:0});resources.push(m);return m;}
  const surface=shown?createSurfacePalette(resources):null,finish=(kind,color,extra={})=>shown?surface(kind,color,extra):material(color,extra);
- const limestone=finish('limestone',FACADE_COLOR,{roughness:FACADE_ROUGHNESS}),concrete=finish('cement','#d5d2ca'),deck=finish('porcelain','#d8d2c5'),metal=material('#303b3e',{roughness:.42,metalness:.45}),glass=shown?new THREE.MeshPhysicalMaterial({color:'#d2e1df',roughness:.075,metalness:0,ior:1.5,specularIntensity:1,envMapIntensity:1.15,transparent:true,opacity:.28,depthWrite:false,side:THREE.DoubleSide}):material('#d2e1df'),voidMat=material('#485052',{roughness:.4}),roofMat=finish('cement','#ddd9cc'),insideWall=finish('plaster',INTERIOR_WHITE,{roughness:.9}),doorMat=finish('door','#d8d0c3',{roughness:.55}),interiorFloor=finish('porcelain','#dcd7ce',{roughness:.56}),soffit=finish('plaster',CEILING_COLOR,CEILING_MATERIAL),fascia=finish('paint','#606665',{roughness:.72}),trimMat=finish('paint','#eeece5',{roughness:.62}),handleMat=material('#a9afad',{metalness:.8,roughness:.27});
+ const limestone=finish('limestone',FACADE_COLOR,{roughness:FACADE_ROUGHNESS}),concrete=finish('cement','#d5d2ca'),deck=finish('porcelain','#d8d2c5'),metal=material('#303b3e',{roughness:.42,metalness:.45}),glass=shown?new THREE.MeshPhysicalMaterial({color:'#d2e1df',roughness:.075,metalness:0,ior:1.5,specularIntensity:1,envMapIntensity:1.15,transparent:true,opacity:.28,depthWrite:false,side:THREE.DoubleSide}):material('#d2e1df'),voidMat=material('#485052',{roughness:.4}),roofMat=finish('cement','#ddd9cc'),insideWall=finish('plaster',INTERIOR_WHITE,{roughness:.9}),doorMat=finish('door','#d8d0c3',{roughness:.55}),interiorFloor=finish('porcelain','#dcd7ce',{roughness:.56}),soffit=finish('plaster',CEILING_COLOR,CEILING_MATERIAL),trimMat=finish('paint','#eeece5',{roughness:.62}),handleMat=material('#a9afad',{metalness:.8,roughness:.27});
  if(shown){
   // Metre-scale stone courses, restrained grain and staggered vertical joints.
   // Colours/profile follow the supplied facade photos; this is no scan claim.
   resources.push(glass);installStoneCourses(limestone);installFloorCourses(interiorFloor);installWallCavity(insideWall,{storey:BUILDING.storey,height:BUILDING.storey});
   limestone.userData.publicFinish="stone";interiorFloor.userData.publicFinish="floor";
   interiorFloor.userData={...interiorFloor.userData,finishInferred:true,tile:[.8,.8],productId:null};
-  for(const mat of [limestone,concrete,deck,roofMat,insideWall,doorMat,interiorFloor,soffit,fascia,trimMat])installBuildingSurfaceUVs(mat);
+  for(const mat of [limestone,concrete,deck,roofMat,insideWall,doorMat,interiorFloor,soffit,trimMat])installBuildingSurfaceUVs(mat);
 
  }
+ const greyRender=material(GREY_FACADE_COLOR,{roughness:GREY_FACADE_ROUGHNESS});if(shown){greyRender.userData.publicFinish='render';installBuildingSurfaceUVs(greyRender);}
  const matrix=new THREE.Matrix4(),rotation=new THREE.Quaternion(),position=new THREE.Vector3(),scale=new THREE.Vector3();
- const entranceFinish=finish('door','#536c66',{roughness:.5}),corridorFinish=finish('plaster','#cddbd2',{roughness:.94});if(shown){installWallCavity(corridorFinish,{storey:BUILDING.storey,height:BUILDING.storey});for(const mat of [entranceFinish,corridorFinish])installBuildingSurfaceUVs(mat);}
+ const entranceFinish=finish('door','#536c66',{roughness:.5}),corridorFinish=finish('plaster',LOBBY_WALL_COLOR,{roughness:.94});if(shown){installWallCavity(corridorFinish,{storey:BUILDING.storey,height:BUILDING.storey});for(const mat of [entranceFinish,corridorFinish])installBuildingSurfaceUVs(mat);}
  function batch(parent,mat,items,part,level,cast=true){
   if(!items.length)return;const mesh=new THREE.InstancedMesh(['building-facade-wall','building-interior-wall'].includes(part)?facadeCube:cube,mat,items.length);mesh.name=part;mesh.userData={part,buildingFloor:level,source:'building-plan',heightInferred:true,...(shown&&level!==null?{action:'building-floor'}:{})};
   items.forEach(([x,y,z,w,h,d,angle=0],i)=>{rotation.setFromAxisAngle(THREE.Object3D.DEFAULT_UP,angle);position.set(x,y,z);scale.set(Math.max(.001,w),Math.max(.001,h),Math.max(.001,d));matrix.compose(position,rotation,scale);mesh.setMatrixAt(i,matrix);});
@@ -136,7 +139,7 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
 
   }
   for(const {a,b} of exposedBalconySegments(def)){
-   const dx=b[0]-a[0],dz=b[1]-a[1],len=Math.hypot(dx,dz);segment(a,b,base-BUILDING.slab,.24,.20,fascias);segment(a,b,base+1.08,.045,.05,rails);
+   const dx=b[0]-a[0],dz=b[1]-a[1],len=Math.hypot(dx,dz);if(!isFacadeAccentFront(def.level,a,b))segment(a,b,base-BUILDING.slab,.24,.20,fascias);segment(a,b,base+1.08,.045,.05,rails);
    if(!cut){segment(a,b,base+.05,1.02,.015,panes);for(let j=0,n=Math.max(1,Math.ceil(len/1.25));j<=n;j++){const t=j/n;rails.push([a[0]+dx*t,base+.55,a[1]+dz*t,.035,1.1,.035]);}}
   }
   // Actual PDF flight footprints and directions; vertical rise is estimated.
@@ -179,7 +182,10 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
    }
   }
   const screenMesh=batch(node,metal,louvres,'building-laundry-screen',def.level);if(screenMesh)screenMesh.userData.screens=laundryScreens(def.level);
-  const trimMesh=batch(node,trimMat,trims,'building-interior-trim',def.level);if(trimMesh)trimMesh.userData.tourNonPhysical=true;batch(node,handleMat,handles,'building-door-hardware',def.level);batch(node,fascia,fascias,'building-balcony-fascia',def.level);
+  const accents=facadeAccentRows(def.level,{height:h});
+  batch(node,greyRender,accents.returns,'building-balcony-grey-returns',def.level);
+  batch(node,greyRender,accents.beams,'building-balcony-grey-beams',def.level);
+  const trimMesh=batch(node,trimMat,trims,'building-interior-trim',def.level);if(trimMesh)trimMesh.userData.tourNonPhysical=true;batch(node,handleMat,handles,'building-door-hardware',def.level);batch(node,greyRender,fascias,'building-balcony-fascia',def.level);
   batch(node,corridorFinish,corridorFaces,'building-corridor-finish',def.level);const facadeCovers=[facadeBatch(node,walls,def),facadeBatch(node,interiorWalls,def,'building-interior-wall')].filter(c=>c?.skinRows);if(facadeCovers.length){appendFacadeVeneers(node,facadeCovers.flatMap(c=>c.skinRows),limestone,resources,{geometry:cube,part:'building-facade-cladding',level:def.level});appendFacadeVeneers(node,facadeCovers.flatMap(c=>c.beltRows),facadeCovers[0].beltMaterial,resources,{geometry:cube,part:'garden-storey-separation',level:def.level});}batch(node,metal,frames,'building-window-frame',def.level);batch(node,glass,panes,'building-glazing',def.level,false);batch(node,voidMat,dark,'building-fascia-and-service-screen',def.level);batch(node,metal,rails,'building-rail-and-louvres',def.level);batch(node,limestone,decks,'building-stone-sill',def.level);
   if(shown)buildApartmentFurniture({parent:node,resources,level:def.level,base,settings,surfaces:surface});
   if(def.level===0&&shown)buildCommonSpaces({parent:node,resources,settings,cut});

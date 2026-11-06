@@ -4,8 +4,14 @@ export const contains=(b,[x,z],pad=0)=>x>=b.minX-pad&&x<=b.maxX+pad&&z>=b.minZ-p
 export function footprint(x,z,w,d,angle=0){const W=Math.abs(Math.cos(angle))*w+Math.abs(Math.sin(angle))*d,D=Math.abs(Math.sin(angle))*w+Math.abs(Math.cos(angle))*d;return {minX:x-W/2,maxX:x+W/2,minZ:z-D/2,maxZ:z+D/2};}
 export function backing(box,angle,w,walls){
  const turned=Math.abs(Math.sin(angle))>.5,normal=turned?Math.sin(angle):Math.cos(angle),back=turned?(normal>0?box.minX:box.maxX):(normal>0?box.minZ:box.maxZ);
- return walls.reduce((best,v)=>{const edge=turned?(normal>0?v.maxX:v.minX):(normal>0?v.maxZ:v.minZ),gap=(back-edge)*normal,span=Math.min(turned?box.maxZ:box.maxX,turned?v.maxZ:v.maxX)-Math.max(turned?box.minZ:box.minX,turned?v.minZ:v.minX),run=turned?v.maxZ-v.minZ:v.maxX-v.minX;
-  return run>w*.7&&span>w*.7&&gap>=.035&&gap<=.19?Math.min(best,gap):best;},Infinity);
+ const groups=[];
+ for(const v of walls){const edge=turned?(normal>0?v.maxX:v.minX):(normal>0?v.maxZ:v.minZ),gap=(back-edge)*normal;if(gap<.035||gap>.19)continue;
+  let group=groups.find(g=>Math.abs(g.edge-edge)<.004);if(!group)groups.push(group={edge,gap,spans:[]});group.spans.push(turned?[v.minZ,v.maxZ]:[v.minX,v.maxX]);
+ }
+ let best=Infinity;
+ for(const group of groups){const merged=[];for(const [a,b]of group.spans.sort((a,b)=>a[0]-b[0])){if(merged.length&&a<=merged.at(-1)[1]+.004)merged.at(-1)[1]=Math.max(merged.at(-1)[1],b);else merged.push([a,b]);}
+  for(const [a,b]of merged){const span=Math.min(turned?box.maxZ:box.maxX,b)-Math.max(turned?box.minZ:box.minX,a);if(b-a>w*.7&&span>w*.7)best=Math.min(best,group.gap);}
+ }return best;
 }
 
 // Build closed room components from the real walls and door thresholds. The

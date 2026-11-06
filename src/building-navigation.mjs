@@ -1,4 +1,5 @@
 import {apartmentFurnitureBoxes} from './apartment-furniture-scene.js';
+import {facadeAccentCollision} from './facade-accents.mjs';
 import {laundryScreens} from './laundry-screens.mjs';
 import {LOBBY_BENCHES} from './lobby-reference.mjs';
 import {COMMON_SPACES,commonSpace,PUMP_OBSTACLES} from './common-spaces.mjs';
@@ -22,7 +23,7 @@ export const buildingDoor=id=>[...BUILDING_INTERIORS.floors.flatMap(f=>f.doors),
 export function isDoorOpening(a,b,source){const mid=a.map((n,i)=>(n+b[i])/2);return [...source.doors,...(source===interiorsForFloor(0)?COMMON_ENTRY_DOORS:[])].some(d=>segmentDistance(mid,d.hinge,d.closed)<.43);}
 export function gardenFenceEdge(a,b,f=BUILDING_FLOORS[0]){const mid=a.map((n,i)=>(n+b[i])/2);return ![...f.units.map(u=>u.polygon),f.core].some(poly=>poly.some((c,j)=>segmentDistance(mid,c,poly[(j+1)%poly.length])<.34));}
 export function buildingBoxes(level,settings,cars=[]){
- const f=BUILDING_FLOORS[level],source=interiorsForFloor(level),boxes=[];
+ const f=BUILDING_FLOORS[level],source=interiorsForFloor(level),boxes=[...facadeAccentCollision(level)];
  for(const s of laundryScreens(level))boxes.push(segmentBox(s.a,s.b,.105,{laundryScreen:s.id}));
  if(settings.furniture!==false)boxes.push(...apartmentFurnitureBoxes(level));
  for(const w of connectedWallRuns(source,f,level===0?COMMON_ENTRY_DOORS:[])){const ownership=w.sourceWallIndex==null?w:source.walls[w.sourceWallIndex],mid=ownership.a.map((n,i)=>(n+ownership.b[i])/2);if(level===0&&onDetailedGround(mid))continue;boxes.push({...wallFootprint(w),sourceWall:true});}

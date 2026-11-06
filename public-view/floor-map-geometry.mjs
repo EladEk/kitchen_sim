@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
-const wallParts=new Set(['building-facade-wall','building-interior-wall','ground-base-wall','architectural-wall']);
-const furnitureParts=new Map([['apartment-bed-frame','bed'],['apartment-sofa-base','sofa'],['apartment-coffee-top','coffee'],['apartment-media-cabinet','media'],['apartment-kitchen-base','kitchen'],['apartment-wc-body','wc'],['apartment-basin-cabinet','basin'],['apartment-shower-tray','shower']]);
+const wallParts=new Set(['building-facade-wall','building-interior-wall','ground-base-wall','architectural-wall','building-balcony-grey-returns']);
+const furnitureParts=new Map([['apartment-bed-frame','bed'],['apartment-sofa-base','sofa'],['apartment-coffee-top','coffee'],['apartment-media-cabinet','media'],['apartment-kitchen-base','kitchen'],['apartment-wc-body','wc'],['apartment-basin-cabinet','basin'],['apartment-shower-tray','shower'],['apartment-fridge-body','fridge'],['apartment-laundry-body','laundry'],['apartment-bathtub-bottom','bathtub'],['apartment-bathtub-end','bathtub'],['apartment-bathtub-side','bathtub']]);
 const round=n=>Math.round(n*1000)/1000;
 export function convexHull(points){
  const sorted=[...new Map(points.map(p=>[p.map(round).join(','),p.map(round)])).values()].sort((a,b)=>a[0]-b[0]||a[1]-b[1]);

@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import {traditionalMaterial} from './traditional-material.mjs';
+import {FACADE_ROUGHNESS} from './facade-finish.mjs';
 import {floorJointMaps} from './floor-joint-maps.mjs';
 import {metricSurfaceUVs} from './metric-surface-geometry.mjs';
 // This is an owned snapshot: tracing can generate attributes/BVHs without
@@ -18,8 +19,8 @@ function stoneMaps(){
  const w=512,h=256,color=new Uint8Array(w*h*4),bump=new Uint8Array(w*h*4),rough=new Uint8Array(w*h*4);
  for(let y=0;y<h;y++)for(let x=0;x<w;x++){
   const u=x/w*1.88,v=y/h*.96,row=Math.floor(v/.48),ux=u+(row%2)*.47,edge=Math.min(ux%.94,.94-ux%.94,v%.48,.48-v%.48),joint=edge<.002;
-  const noise=(Math.sin(x*12.9898+y*78.233)*43758.5453)%1,shade=joint?172:Math.round(244+noise*3+Math.sin(Math.floor(ux/.94)*39+row*27)*3),i=(y*w+x)*4;
-  color.set([shade,shade,shade,255],i);const b=joint?90:128+Math.round(noise*8);bump.set([b,b,b,255],i);rough.set([239,239,239,255],i);
+  const shade=joint?245:255,i=(y*w+x)*4;
+  color.set([shade,shade,shade,255],i);bump.set([128,128,128,255],i);rough.set([255,255,255,255],i);
  }
  const make=(data,srgb=false)=>{const t=new THREE.DataTexture(data,w,h,THREE.RGBAFormat);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(1/1.88,1/.96);t.magFilter=THREE.LinearFilter;t.minFilter=THREE.LinearMipmapLinearFilter;t.generateMipmaps=true;t.colorSpace=srgb?THREE.SRGBColorSpace:THREE.NoColorSpace;t.needsUpdate=true;return t;};
  return {map:make(color,true),bumpMap:make(bump),roughnessMap:make(rough)};
@@ -53,7 +54,7 @@ export function createPhotoScene(source,{maxTriangles=2500000,maxMeshes=60000,ma
   if(glass){const physical=new THREE.MeshPhysicalMaterial({color:'#edf4f2',roughness:.07,metalness:0,transmission:.97,thickness:.008,ior:1.5,transparent:false,opacity:1,side:THREE.DoubleSide});out.dispose();out=physical;}
   if(m.userData.publicFinish==='stone'){
    if(!stone){stone=stoneMaps();Object.values(stone).forEach(t=>ownedTexture.add(t));}
-   Object.assign(out,stone);out.bumpScale=.0025;out.roughness=.87;
+   Object.assign(out,stone);out.bumpScale=0;out.normalMap=null;out.roughness=FACADE_ROUGHNESS;
   }
   if(m.userData.publicFinish==='floor'){const profile=m.userData.floorCourses||{},floorKey=JSON.stringify(profile);let maps=floors.get(floorKey);if(!maps){maps=floorJointMaps(profile);floors.set(floorKey,maps);Object.values(maps).forEach(t=>ownedTexture.add(t));}Object.assign(out,maps);out.normalMap=null;out.bumpScale=.0013;out.roughness=1;}
   materials.set(key,out);ownedMaterial.add(out);return out;

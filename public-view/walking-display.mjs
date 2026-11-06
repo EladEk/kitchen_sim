@@ -12,9 +12,9 @@ export function createWalkingDisplay(source,{cellSize=8}={}){
  group.name='walking-batched-building';source.updateWorldMatrix(true,true);
  const inverse=source.matrixWorld.clone().invert(),local=new T.Matrix4(),centre=new T.Vector3();
  const id=m=>{if(!ids.has(m))ids.set(m,ids.size);return ids.get(m);};
- const cell=(o,matrix)=>{
+ const cell=(o,matrix,stone=false)=>{
   if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();o.geometry.boundingBox.getCenter(centre).applyMatrix4(matrix);
-  const level=o.userData.level??0,exterior=o.userData.exterior!==false,key=[level,exterior,Math.floor(centre.x/cellSize),Math.floor(centre.z/cellSize)].join(':');
+  const level=o.userData.level??0,exterior=stone||o.userData.exterior!==false,key=[level,exterior,...(stone?['facade']:[Math.floor(centre.x/cellSize),Math.floor(centre.z/cellSize)])].join(':');
   if(!cells.has(key)){const g=new T.Group();g.userData={level,exterior};cells.set(key,g);group.add(g);}return [key,cells.get(key)];
  };
  for(const motion of motionRoots(source)){
@@ -40,14 +40,14 @@ export function createWalkingDisplay(source,{cellSize=8}={}){
    }
    const ranges=materials.length>1?o.geometry.groups:[{start:0,count:total,materialIndex:0}];
    for(const range of ranges){const material=materials[range.materialIndex];if(!material||material.visible===false||material.opacity===0)continue;
-    const k=JSON.stringify([key,id(material),o.castShadow,o.receiveShadow,o.renderOrder]);
-    if(!buckets.has(k))buckets.set(k,{parent,source:o,material,parts:[]});buckets.get(k).parts.push({geometry:o.geometry,matrix,start:range.start,count:range.count});
+    const [renderKey,renderParent]=material.userData.publicFinish==='stone'?cell(o,matrix,true):[key,parent],k=JSON.stringify([renderKey,id(material),material.userData.publicFinish==='stone'||o.castShadow,o.receiveShadow,o.renderOrder]);
+    if(!buckets.has(k))buckets.set(k,{parent:renderParent,source:o,material,parts:[]});buckets.get(k).parts.push({geometry:o.geometry,matrix,start:range.start,count:range.count});
    }
   }
  });
  for(const {parent,source:o,material,parts}of buckets.values()){
-  const geometry=mergeDistrictParts(parts);if(!geometry)continue;geometry.computeBoundingSphere();owned.push(geometry);
-  const mesh=new T.Mesh(geometry,material);mesh.castShadow=o.castShadow;mesh.receiveShadow=o.receiveShadow;mesh.renderOrder=o.renderOrder;mesh.userData={...o.userData,walkingBatch:true};parent.add(mesh);
+  const geometry=mergeDistrictParts(parts,{wallFinish:['stone','render'].includes(material.userData.publicFinish)});if(!geometry)continue;geometry.computeBoundingSphere();owned.push(geometry);
+  const mesh=new T.Mesh(geometry,material);mesh.castShadow=material.userData.publicFinish==='stone'||o.castShadow;mesh.receiveShadow=o.receiveShadow;mesh.renderOrder=o.renderOrder;mesh.userData={...o.userData,walkingBatch:true};parent.add(mesh);
  }
  for(const {parent,source:o,matrices}of furniture.values()){
   const mesh=new T.InstancedMesh(o.geometry,o.material,walkingInstanceCapacity(matrices.length));mesh.count=matrices.length;matrices.forEach((m,i)=>mesh.setMatrixAt(i,m));mesh.computeBoundingSphere();

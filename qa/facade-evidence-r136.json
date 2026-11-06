@@ -1,0 +1,16 @@
+{
+  "revision": 136,
+  "ownerPhotos": [
+    {"file": "331893.jpg", "evidence": "caption identifies building 4091; broad grey surrounds around paired balcony stacks, stepped between lower and upper parts", "limit": "C5 building, not an exact elevation for C8 building 4102"},
+    {"file": "331894.jpg", "evidence": "oblique view of matte grey balcony surrounds and upper canopy against cream stone", "limit": "no verified building-number caption or metric scale"},
+    {"file": "331895.jpg", "evidence": "grey balcony accents on multiple facades around the courtyard", "limit": "perspective street view, not measured elevations"}
+  ],
+  "earlierReferences": ["public/house/garden/reference-2.jpg", "public/house/garden/reference-3.jpg", "public/house/garden/reference-4.jpg", "public/house/exterior/reference-3.jpg", "public/house/efi-reference/004.jpg"],
+  "webReferences": [
+    {"url": "https://efficapital.co.il/Effi-Afikim/", "role": "official stage-A gallery checked again; marketing renders are illustrative"},
+    {"url": "https://efficapital.co.il/Effi-Afikim/wp-content/uploads/2024/06/הגרלה-1943-מפרט-חתום-1.pdf", "role": "newly consulted official complex-5 C5/C5M specification, section 2.6: mixed stone and plaster/other finish; no exact grey product or RAL"}
+  ],
+  "finish": {"colourEstimate": "#888b87", "roughness": 0.94, "metalness": 0, "stoneCourses": false},
+  "placementBasis": "six main sun-balcony polygons on repeating 4102 floors 1-6; existing balcony fascias on upper terraces also use the grey finish",
+  "unknowns": ["exact grey coating product and RAL", "measured beam and return profile", "complete building-specific C5 and C5M elevations"]
+}

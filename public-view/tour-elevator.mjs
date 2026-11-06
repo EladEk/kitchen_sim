@@ -2,10 +2,10 @@ import {DISTRICT,districtLocation,buildingTransform} from './district.mjs';
 import {inside,locationAt} from './navigation.mjs';
 import {destinationStandingPose} from './tour-tools.mjs';
 
-export function elevatorAt(position,nav){
+export function elevatorAt(position,nav,id){
  const loc=districtLocation(position,nav);if(!loc.building)return null;
  const {floor}=locationAt(loc.position,nav),f=nav.floors[floor],lifts=f?.elevators;if(!lifts?.length)return null;
- const p=loc.position,best=lifts.reduce((a,b)=>Math.hypot(a.position[0]-p.x,a.position[1]-p.z)<Math.hypot(b.position[0]-p.x,b.position[1]-p.z)?a:b),distance=Math.hypot(best.position[0]-p.x,best.position[1]-p.z);
+ const p=loc.position,best=id===undefined?lifts.reduce((a,b)=>Math.hypot(a.position[0]-p.x,a.position[1]-p.z)<Math.hypot(b.position[0]-p.x,b.position[1]-p.z)?a:b):lifts.find(l=>l.id===id);if(!best)return null;const distance=Math.hypot(best.position[0]-p.x,best.position[1]-p.z);
  return {building:loc.building,floor,id:best.id,near:distance<2.4&&inside([p.x,p.z],f.core)};
 }
 export function elevatorLanding(nav,buildingId,floor,id,world){

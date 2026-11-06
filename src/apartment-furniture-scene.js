@@ -37,18 +37,36 @@ export function buildApartmentFurniture({parent,resources,level,base,settings,su
    box(r,'apartment-shower-glass',palette.glass,-r.w/2+.01,1.05,0,.008,2,r.d);
    box(r,'apartment-shower-riser',palette.steel,0,1.45,-r.d/2+.035,.025,1,.025);
    box(r,'apartment-shower-head',palette.steel,0,2,-r.d/2+.17,.18,.025,.22);
-  }else if(r.kind==='kitchen'){
+  }else if(r.kind==='bathtub'){
+   box(r,'apartment-bathtub-bottom',palette.ceramic,0,.18,0,r.w-.10,.10,r.d-.10);
+   for(const x of [-r.w/2+.04,r.w/2-.04])box(r,'apartment-bathtub-end',palette.ceramic,x,.34,0,.08,.43,r.d);
+   for(const z of [-r.d/2+.04,r.d/2-.04])box(r,'apartment-bathtub-side',palette.ceramic,0,.34,z,r.w-.12,.43,.08);
+   box(r,'apartment-bathtub-drain',palette.steel,r.w*.32,.235,0,.055,.008,.055);
+   box(r,'apartment-bathtub-tap',palette.steel,r.w*.32,.68,-r.d/2+.025,.11,.16,.16);
+  }else if(r.kind==='fridge'){
+   box(r,'apartment-fridge-body',palette.cabinet,0,.98,0,r.w,1.94,r.d);
+   box(r,'apartment-fridge-freezer',palette.steel,0,.42,r.d/2+.012,r.w-.025,.78,.025);
+   box(r,'apartment-fridge-door',palette.steel,0,1.37,r.d/2+.012,r.w-.025,1.07,.025);
+   for(const y of [.70,1.08])box(r,'apartment-fridge-handle',palette.dark,r.w*.30,y,r.d/2+.04,.025,.30,.03);
+  }else if(r.kind==='washer'||r.kind==='dryer'){
+   box(r,'apartment-laundry-body',palette.cabinet,0,.43,0,r.w,.84,r.d);
+   box(r,'apartment-laundry-controls',palette.dark,0,.74,r.d/2+.006,r.w*.80,.09,.014);
+   box(r,'apartment-laundry-drum',palette.dark,0,.41,r.d/2+.012,r.w*.66,r.w*.66,.022);
+   const drum=batches.get('apartment-laundry-drum');if(!drum.geometry){drum.geometry=new THREE.CylinderGeometry(.5,.5,1,24);drum.geometry.rotateX(Math.PI/2);resources.push(drum.geometry);}
+  }else if(r.kind==='kitchen'||r.kind==='kitchen-return'){
    box(r,'apartment-kitchen-base',palette.cabinet,0,.45,0,r.w,.82,r.d);
    box(r,'apartment-kitchen-plinth',palette.dark,0,.065,0,r.w-.04,.11,r.d-.06);
-   box(r,'apartment-kitchen-worktop',palette.stone,0,.885,0,r.w+.015,.05,r.d+.02);
+   box(r,'apartment-kitchen-worktop',palette.stone,0,.885,0,r.w+(r.flushWorktop?0:.015),.05,r.d+(r.flushWorktop?0:.02));
    const n=Math.round(r.w/.6);for(let i=0;i<n;i++){const x=-r.w/2+(i+.5)*r.w/n;box(r,'apartment-kitchen-front',palette.cabinet,x,.48,r.d/2+.006,r.w/n-.006,.71,.022);box(r,'apartment-kitchen-handle',palette.dark,x,.74,r.d/2+.023,.18,.014,.022);}
-   // Sink inset and perimeter, plus flush two-zone cooktop; illustrative fixtures.
-   box(r,'apartment-kitchen-sink',palette.dark,-r.w*.27,.914,0,.47,.008,.40);
-   for(const x of [-r.w*.27-.24,-r.w*.27+.24])box(r,'apartment-kitchen-sink-rim',palette.steel,x,.924,0,.018,.015,.42);
-   for(const z of [-.205,.205])box(r,'apartment-kitchen-sink-rim',palette.steel,-r.w*.27,.924,z,.49,.015,.018);
-   box(r,'apartment-kitchen-tap',palette.steel,-r.w*.27,.918,-.12,.08,.30,.22);batches.get('apartment-kitchen-tap').geometry=createFurnitureAnchor('faucet').geometry;batches.get('apartment-kitchen-tap').asset='faucet';
-   box(r,'apartment-kitchen-hob',palette.dark,r.w*.25,.92,0,.57,.014,.46);
-   for(const x of [r.w*.25-.15,r.w*.25+.15])box(r,'apartment-kitchen-hob-zone',palette.steel,x,.929,0,.17,.002,.22);
+   if(r.kind==='kitchen'){
+    const sink=r.sinkOffset??-r.w*.27,hob=r.hobOffset??r.w*.25;
+    box(r,'apartment-kitchen-sink',palette.dark,sink,.914,0,.47,.008,.40);
+    for(const x of [sink-.24,sink+.24])box(r,'apartment-kitchen-sink-rim',palette.steel,x,.924,0,.018,.015,.42);
+    for(const z of [-.205,.205])box(r,'apartment-kitchen-sink-rim',palette.steel,sink,.924,z,.49,.015,.018);
+    box(r,'apartment-kitchen-tap',palette.steel,sink,.918,-.12,.08,.30,.22);batches.get('apartment-kitchen-tap').geometry=createFurnitureAnchor('faucet').geometry;batches.get('apartment-kitchen-tap').asset='faucet';
+    box(r,'apartment-kitchen-hob',palette.dark,hob,.92,0,.57,.014,.46);
+    for(const x of [hob-.15,hob+.15])box(r,'apartment-kitchen-hob-zone',palette.steel,x,.929,0,.17,.002,.22);
+   }
   }
  }
  const shadows=createContactShadows(resources),contacts=items.filter(r=>!['shower','basin','wc'].includes(r.kind)),contact=new THREE.InstancedMesh(shadows.geometry,shadows.material,contacts.length);for(const [i,r]of contacts.entries()){q.setFromAxisAngle(THREE.Object3D.DEFAULT_UP,r.angle);matrix.compose(new THREE.Vector3(r.x,base+.015,r.z),q,new THREE.Vector3(r.w*1.18,1,r.d*1.18));contact.setMatrixAt(i,matrix);}contact.userData={part:'furniture-contact-shadow',visualOnly:true,tourNonPhysical:true,placements:contacts.map(r=>({id:r.id,unit:r.unit}))};contact.computeBoundingSphere();resources.push(contact);parent.add(contact);

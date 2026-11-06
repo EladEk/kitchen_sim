@@ -19,7 +19,7 @@ test('full public model retains baked geometry and horizontal ground after expor
    finishes.add(m.userData.publicFinish);
    const shader={vertexShader:'#include <common>\n#include <worldpos_vertex>\n#include <uv_vertex>',fragmentShader:'#include <common>\n#include <color_fragment>'};
    m.onBeforeCompile(shader);
-   assert(shader.fragmentShader.includes(m.userData.publicFinish==='stone'?'stoneId':'tileEdge'));
+   assert(shader.fragmentShader.includes(m.userData.publicFinish==='stone'?'rowCoverage':'tileEdge'));
    assert(shader.vertexShader.includes('metricPosition'),'metre-scaled texture coordinates must survive export');
   }});assert.deepEqual([...finishes].sort(),['floor','stone']);
   root.updateMatrixWorld(true);loaded.updateMatrixWorld(true);

@@ -1,4 +1,5 @@
 import {SERVICE_ACCESS,SERVICE_ROOM_POLYGONS} from './service-access.mjs';
+import {LOBBY_WALL_COLOR,LOBBY_PANEL_COLOR} from './common-finish.mjs';
 import {Reflector} from 'three/addons/objects/Reflector.js';
 import * as THREE from 'three';
 import {LOBBY_POLYGON,PUMP_ROOM} from './common-spaces.mjs';
@@ -25,7 +26,7 @@ export function buildCommonSpaces({parent,resources,settings,cut=false}){
  for(let x=12;x<22;x+=.8)for(let z=-7.7;z<-.4;z+=.05)if(inside([x,z],LOBBY_POLYGON)&&inside([x,z+.05],LOBBY_POLYGON))box('lobby-tile-joints',x,.027,z+.025,.002,.001,.05,grout);
  for(let z=-7.7;z<-.4;z+=.8)for(let x=12;x<22;x+=.05)if(inside([x,z],LOBBY_POLYGON)&&inside([x+.05,z],LOBBY_POLYGON))box('lobby-tile-joints',x+.025,.027,z,.05,.001,.002,grout);
  // Video-based finishes, surface-mounted on the existing plan walls.
- const oak=mat('#a49884'),panel=mat('#d8d4ca'),shadow=mat('#6b6962');
+ const oak=mat(LOBBY_PANEL_COLOR),panel=mat(LOBBY_WALL_COLOR),shadow=mat('#6b6962');
  oak.onBeforeCompile=shader=>{
   shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vLobbyPoint;').replace('#include <begin_vertex>','#include <begin_vertex>\nvLobbyPoint=position;');
   shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nvarying vec3 vLobbyPoint;').replace('#include <color_fragment>',`#include <color_fragment>

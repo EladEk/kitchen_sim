@@ -1,0 +1,20 @@
+{
+  "district": {
+    "inputRectangles": 26230,
+    "outputRectangles": 16336,
+    "removedSquareMetres": 8510.25,
+    "overlappingStoneRectangles": 0,
+    "albedoTextures": 1,
+    "normalTextures": 1,
+    "roughnessTextures": 1
+  },
+  "walking": {
+    "inputRectangles": 13115,
+    "outputRectangles": 9194,
+    "removedSquareMetres": 4953.19,
+    "overlappingStoneRectangles": 0,
+    "albedoTextures": 1,
+    "normalTextures": 1,
+    "roughnessTextures": 1
+  }
+}
