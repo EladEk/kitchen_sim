@@ -1,0 +1,41 @@
+{
+  "revision": "R143",
+  "coreValidationCommit": "172d29ff938c8d9ed1bc519a2a730b04588f7eb8",
+  "sourceTests": {"passed": 577, "failed": 0},
+  "productionTests": {"passed": 22, "failed": 0},
+  "laterUiChange": "Remove the parallel plan editor; retain only saved-layout management and direct 3D editing. Rebuild only, without repeating the unchanged geometry/movement suite.",
+  "movement": {
+    "cameraRelativeArrowsInEightBuildings": true,
+    "grabOffsetPreserved": true,
+    "saveOnMovedRelease": true,
+    "cancelDoesNotSave": true,
+    "supportedTelevisionFollowsHost": true,
+    "idleSelectedFurnitureKeepsCameraControls": true
+  },
+  "wallHeight": {
+    "closedTopCaps": true,
+    "originalWallsAndDoorGeometryUnchanged": true,
+    "hingeActionsPreserved": true,
+    "residentFurnitureRemainsFullHeight": true,
+    "actualExportedApartment23Reversible": true
+  },
+  "browser": {
+    "fixture": "qa/edit-tools-r143-mobile.html",
+    "iframeViewport": [394, 852],
+    "actualLivePanelAndMovementModules": true,
+    "surface": "SVG plan with real ray/OBB grabbing in place of the GPU scene",
+    "realPointerDragSaved": {"from": [5.91, 2.99], "to": [6.7, 3.6]},
+    "arrowStepsMetres": [0.1, 0.01],
+    "collapsedArrowsWork": true,
+    "expandedCanvasHeightPx": 519.203125,
+    "collapsedCanvasHeightPx": 715,
+    "cutHeightMetres": 0.35,
+    "sectionTopMetresIncludingFloor": 0.3800000250339508,
+    "preferencesRetainedAfterExpanding": true,
+    "undoRestoresPreviousPosition": true,
+    "savedPositionAfterReload": [5.91, 2.99],
+    "fullGpuSceneCertified": false,
+    "physicalAndroidPerformanceCertified": false
+  },
+  "privateAssets": {"compiledWorker": "passed", "vercelAdapter": "passed", "encryptedSources": 252, "directUrlDenied": true, "clientSecretsAbsent": true}
+}

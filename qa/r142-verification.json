@@ -1,0 +1,39 @@
+{
+  "revision": "R142",
+  "sourceTests": {"passed": 573, "failed": 0},
+  "productionTests": {"passed": 21, "failed": 0},
+  "roomGeometry": {
+    "fourOuterWallFacesRetained": true,
+    "actualApartment23BoundingWallAreaRestored": true,
+    "placementDomainRemainsFreeFloor": true,
+    "noAutomaticWardrobePreview": true
+  },
+  "furniture": {
+    "categories": 7,
+    "picturedKinds": 28,
+    "thumbnailModelsMatchSceneParts": true,
+    "quarterTurnAndWallSnapping": true,
+    "wallSnappedCabinetSupportsTV": true,
+    "oldSaveCompatible": true
+  },
+  "browser": {
+    "fixture": "qa/live-catalog-r142-mobile.html",
+    "iframeViewport": [394, 852],
+    "actualLivePanelAndCatalog": true,
+    "allCategoryImagesLoaded": true,
+    "categoryItemSettingsBackFlow": true,
+    "configuredDeskCm": [180, 70, 75],
+    "deskColor": "#aa8054",
+    "savedWallQuarterTurns": 1,
+    "twoRoomsRestoredAfterReload": true,
+    "actualOrbitControlsMovementObserved": true,
+    "browsingMouseLeftAndTouchOne": 0,
+    "manualPlacementMouseLeftAndTouchOne": null,
+    "canvasBottomAndDockTopPx": 615.203125,
+    "canvasHeightPx": 562,
+    "fixtureUsesTestPointButtonsInsteadOfGpuRays": true,
+    "fullGpuSceneCertified": false,
+    "physicalAndroidPerformanceCertified": false
+  },
+  "privateAssets": {"compiledWorker": "passed", "vercelAdapter": "passed", "encryptedSources": 252, "directUrlDenied": true, "clientSecretsAbsent": true}
+}

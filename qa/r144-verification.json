@@ -1,0 +1,24 @@
+{
+  "revision": "R144",
+  "sourceTests": {"passed": 28, "failed": 0, "scope": "editing, movement, room sections, attachments, persistence and new furniture"},
+  "productionTests": {"passed": 11, "failed": 0},
+  "furnitureKinds": 38,
+  "camera": {"resizeNeverRefitsSelection": true, "sameApartmentSelectionRetainsViewedRoom": true, "crossRoomTransferRetainsViewedRoom": true, "editorSynchronizationDoesNotMoveCamera": true},
+  "movement": {"dragAndArrowsAreDraftOnly": true, "explicitSaveRequired": true, "restoreDiscardsDraft": true, "saveAndRestoreReturnToCategories": true, "dedicatedActions": ["wall snap", "quarter-turn", "save position", "settings", "restore previous position"]},
+  "cornerSofa": {"independentArmLengths": true, "seatDepthAndSidePersisted": true, "actualLShapedCollisionAndGrabbing": true, "freeInsideCornerCheckedInEightBuildings": true, "previewRefreshesForShapeChanges": true},
+  "browser": {
+    "fixture": "qa/edit-tools-r144-mobile.html", "viewport": [394, 852],
+    "actualLivePanelAndSaveMovementModules": true,
+    "surface": "SVG floor interaction surface and real PerspectiveCamera resize, without a GPU renderer",
+    "selectedRoomDuringAddSaveAndTransfer": "left",
+    "cameraPoseTargetAndZoomUnchanged": true,
+    "draftArrowDoesNotChangeSavedPosition": true,
+    "restoreReturnsToCategories": true,
+    "realPointerDragBeforeSave": {"draftPosition": [3.1, 3.1], "savedPosition": [2.5, 2.85]},
+    "savedDragReturnsToCategories": true,
+    "crossRoomTransfer": {"from": [3.1, 3.1], "to": [7.5, 3.1], "viewedRoomAfterSaving": "left"},
+    "cornerSofaAfterReloadCm": {"mainArm": 320, "returnArm": 230, "height": 95, "seatDepth": 85, "side": "left"},
+    "fullGpuSceneCertified": false, "physicalAndroidPerformanceCertified": false
+  },
+  "privateAssets": {"compiledWorker": "passed", "vercelAdapter": "passed", "encryptedSources": 252, "directUrlDenied": true, "clientSecretsAbsent": true}
+}

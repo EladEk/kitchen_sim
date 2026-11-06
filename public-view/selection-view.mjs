@@ -35,8 +35,8 @@ export function createSelectionController({root,model,district,nav,variants=new 
     source.visible=true;display=createWalkingDisplay(source);displays.set(source,display);root.add(display.group);visibilityKey=null;
    }
    if(display){display.group.visible=walking;if(walking)display.update(floor);}source.visible=!focused&&!walking;
-   if(focused){const next=state.level+'|'+state.target;if(next!==key){if(section){root.remove(section.group);section.dispose();}section=createSelection(source,nav,{...state,level:Number(state.level)});if(!section.group.children.length)throw Error('Empty selected building section');root.add(section.group);key=next;}if(doorsChanged)section.sync();section.group.visible=true;}else if(section){root.remove(section.group);section.dispose();section=null;key=null;}
-   root.updateMatrixWorld(true);current={content:focused?section.group:walking?display.group:source,building:b,focused};return current;
+   if(focused){const next=state.level+'|'+state.target+'|'+(state.roomFocus?.id||'')+'|'+(state.wallHeight??'full');if(next!==key){if(section){root.remove(section.group);section.dispose();}section=createSelection(source,nav,{...state,level:Number(state.level)});if(!section.group.children.length)throw Error('Empty selected building section');root.add(section.group);key=next;}if(doorsChanged)section.sync();section.group.visible=true;}else if(section){root.remove(section.group);section.dispose();section=null;key=null;}
+   root.updateMatrixWorld(true);current={content:focused?section.group:walking?display.group:source,building:b,focused,...(focused&&Number.isFinite(state.wallHeight)?{framingTop:Math.max(...section.regions.map(r=>(nav.floors.find(f=>f.level===r.level)?.elevation??r.level*nav.storey)+2.8))}:{})};return current;
   },
   get current(){return current;},
   sync(){section?.sync();displays.get(activeModel)?.sync();root.updateMatrixWorld(true);},
@@ -49,7 +49,7 @@ export function selectionBounds(content){
  return box;
 }
 export function fitSelectionCamera(camera,controls,view){
- const box=selectionBounds(view.content);if(box.isEmpty())throw Error('No visible selection bounds');
+ const box=selectionBounds(view.content);if(Number.isFinite(view.framingTop))box.max.y=Math.max(box.max.y,view.framingTop);if(box.isEmpty())throw Error('No visible selection bounds');
  const target=box.getCenter(new THREE.Vector3()),direction=new THREE.Vector3(-.65,.9,-1).normalize().transformDirection(buildingTransform(view.building)),right=new THREE.Vector3(0,1,0).cross(direction).normalize(),up=direction.clone().cross(right).normalize(),vt=Math.tan(THREE.MathUtils.degToRad(camera.fov)/2),ht=vt*camera.aspect;
  let distance=5;
  for(const x of [box.min.x,box.max.x])for(const y of [box.min.y,box.max.y])for(const z of [box.min.z,box.max.z]){const delta=new THREE.Vector3(x,y,z).sub(target);distance=Math.max(distance,delta.dot(direction)+Math.max(Math.abs(delta.dot(right))/ht,Math.abs(delta.dot(up))/vt)*1.15+.2);}

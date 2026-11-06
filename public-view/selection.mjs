@@ -1,11 +1,13 @@
+import {cutGeometryAtHeight,isSectionWall} from './section-height.mjs';
 import * as THREE from 'three';
 import {motionAncestor,motionRoots,createMotionCopy} from './model-motions.mjs';
 import {inside} from './navigation.mjs';
 
 // A section contains actual geometry, so live rendering, photo rendering and
 // bounds all agree. Generic navigation polygons are the only selection data.
-export function selectionRegions(nav,{level=9,target=''}){
+export function selectionRegions(nav,{level=9,target='',roomFocus=null}){
  const d=nav.destinations.find(d=>d.id===target);
+ if(d?.unit&&roomFocus?.unit===d.unit&&roomFocus.floor===d.floor&&roomFocus.polygons?.length){const domain=roomFocus.displayDomain||roomFocus.polygons.map(p=>[p]),polygons=domain.map(r=>r[0]);return [{level:d.floor,polygon:polygons[0],polygons,triangles:domain.flatMap(r=>triangulate(r[0],r.slice(1)).map(t=>t.p))}];}
  if(d?.unit)return nav.floors.flatMap(f=>f.units.filter(u=>u.number===d.unit).map(u=>({level:f.level,polygon:u.polygon,polygons:u.displayPolygons||[u.polygon],triangles:u.displayTriangles})));
  if(d?.polygon)return [{level:d.floor,polygon:d.polygon}];
  return level===9?[]:[{level,polygon:null}];
@@ -20,9 +22,9 @@ function clip(vertices,a,b,sign){
   if(pin!==qin)out.push(mix(p,q,Math.max(0,Math.min(1,dp/(dp-dq)))));
  }return out;
 }
-function triangulate(polygon){
- const points=polygon.map(p=>new THREE.Vector2(...p));
- return THREE.ShapeUtils.triangulateShape(points,[]).map(face=>{const p=face.map(i=>polygon[i]),sign=Math.sign((p[1][0]-p[0][0])*(p[2][1]-p[0][1])-(p[1][1]-p[0][1])*(p[2][0]-p[0][0]));return {p,sign,minX:Math.min(...p.map(v=>v[0])),maxX:Math.max(...p.map(v=>v[0])),minZ:Math.min(...p.map(v=>v[1])),maxZ:Math.max(...p.map(v=>v[1]))};});
+function triangulate(polygon,holes=[]){
+ const points=polygon.map(p=>new THREE.Vector2(...p)),inner=holes.map(r=>r.map(p=>new THREE.Vector2(...p))),all=[polygon,...holes].flat();
+ return THREE.ShapeUtils.triangulateShape(points,inner).map(face=>{const p=face.map(i=>all[i]),sign=Math.sign((p[1][0]-p[0][0])*(p[2][1]-p[0][1])-(p[1][1]-p[0][1])*(p[2][0]-p[0][0]));return {p,sign,minX:Math.min(...p.map(v=>v[0])),maxX:Math.max(...p.map(v=>v[0])),minZ:Math.min(...p.map(v=>v[1])),maxZ:Math.max(...p.map(v=>v[1]))};});
 }
 function compiledTriangles(triangles){return triangles.map(p=>({p,sign:Math.sign((p[1][0]-p[0][0])*(p[2][1]-p[0][1])-(p[1][1]-p[0][1])*(p[2][0]-p[0][0])),minX:Math.min(...p.map(v=>v[0])),maxX:Math.max(...p.map(v=>v[0])),minZ:Math.min(...p.map(v=>v[1])),maxZ:Math.max(...p.map(v=>v[1]))}));}
 export function createSelection(template,nav,state){
@@ -33,7 +35,7 @@ export function createSelection(template,nav,state){
   const region=compiled.find(r=>r.level===(source.userData.level??0));if(!region)continue;
   const bounds=new THREE.Box3().setFromObject(source).applyMatrix4(inverse);
   if(region.polygon&&!region.triangles.some(t=>bounds.max.x>=t.minX&&bounds.min.x<=t.maxX&&bounds.max.z>=t.minZ&&bounds.min.z<=t.maxZ))continue;
-  const copy=createMotionCopy(source,template);moving.push(copy);group.add(copy.group);
+  const copy=createMotionCopy(source,template);moving.push(copy);group.add(copy.group);if(Number.isFinite(state.wallHeight)){copy.group.updateMatrixWorld(true);copy.group.traverse(o=>{if(!o.isMesh)return;const cut=cutGeometryAtHeight(o.geometry,o.matrixWorld,(nav.floors.find(f=>f.level===region.level)?.elevation??region.level*nav.storey)+state.wallHeight+.03);if(cut){owned.push(cut);o.geometry=cut;}});}
  }
  const append=(material,vertices)=>{
   if(!buckets.has(material))buckets.set(material,{positions:[],normals:[],uvs:[]});const out=buckets.get(material);
@@ -55,12 +57,12 @@ export function createSelection(template,nav,state){
    if(!matrices.length)return;
    const mesh=new THREE.InstancedMesh(o.geometry,o.material,matrices.length);mesh.matrixAutoUpdate=false;mesh.matrix.copy(base);matrices.forEach((m,i)=>mesh.setMatrixAt(i,m));mesh.castShadow=o.castShadow;mesh.receiveShadow=o.receiveShadow;mesh.userData={...o.userData};mesh.computeBoundingSphere();group.add(mesh);instances.push(mesh);return;
   }
-  if(!region.polygon){const mesh=o.clone(false);mesh.matrixAutoUpdate=false;mesh.matrix.copy(base);group.add(mesh);if(mesh.isInstancedMesh)instances.push(mesh);return;}
-  const geo=o.geometry,pos=geo.attributes.position,normal=geo.attributes.normal,uv=geo.attributes.uv,idx=geo.index,limit=idx?.count??pos.count;
-  if(!geo.boundingBox)geo.computeBoundingBox();
+  if(!region.polygon&&!(Number.isFinite(state.wallHeight)&&isSectionWall(o))){const mesh=o.clone(false);mesh.matrixAutoUpdate=false;mesh.matrix.copy(base);group.add(mesh);if(mesh.isInstancedMesh)instances.push(mesh);return;}
+  const sourceGeo=o.geometry;
   for(let inst=0;inst<(o.isInstancedMesh?o.count:1);inst++){
    const matrix=base.clone();if(o.isInstancedMesh){o.getMatrixAt(inst,instance);matrix.multiply(instance);}
-   const box=geo.boundingBox.clone().applyMatrix4(matrix),pieces=region.triangles.filter(t=>box.max.x>=t.minX-1e-6&&box.min.x<=t.maxX+1e-6&&box.max.z>=t.minZ-1e-6&&box.min.z<=t.maxZ+1e-6);if(!pieces.length)continue;
+   const cut=Number.isFinite(state.wallHeight)&&isSectionWall(o)?cutGeometryAtHeight(sourceGeo,matrix,(nav.floors.find(f=>f.level===region.level)?.elevation??region.level*nav.storey)+state.wallHeight+.03):null;if(cut)owned.push(cut);const geo=cut||sourceGeo,pos=geo.attributes.position,normal=geo.attributes.normal,uv=geo.attributes.uv,idx=geo.index,limit=idx?.count??pos.count;if(!limit)continue;if(!geo.boundingBox)geo.computeBoundingBox();
+   const box=geo.boundingBox.clone().applyMatrix4(matrix),pieces=region.polygon?region.triangles.filter(t=>box.max.x>=t.minX-1e-6&&box.min.x<=t.maxX+1e-6&&box.max.z>=t.minZ-1e-6&&box.min.z<=t.maxZ+1e-6):[null];if(!pieces.length)continue;
    const nm=new THREE.Matrix3().getNormalMatrix(matrix);
    for(let i=0;i+2<limit;i+=3){
     const face=[];
@@ -69,8 +71,8 @@ export function createSelection(template,nav,state){
     }
     const xs=face.map(p=>p[0]),zs=face.map(p=>p[2]),minX=Math.min(...xs),maxX=Math.max(...xs),minZ=Math.min(...zs),maxZ=Math.max(...zs),material=Array.isArray(o.material)?o.material[geo.groups.find(g=>i>=g.start&&i<g.start+g.count)?.materialIndex??0]:o.material;
     for(const t of pieces){
-     if(maxX<t.minX||minX>t.maxX||maxZ<t.minZ||minZ>t.maxZ)continue;
-     let polygon=face;for(let edge=0;edge<t.p.length&&polygon.length>=3;edge++)polygon=clip(polygon,t.p[edge],t.p[(edge+1)%t.p.length],t.sign);
+     if(t&&(maxX<t.minX||minX>t.maxX||maxZ<t.minZ||minZ>t.maxZ))continue;
+     let polygon=face;for(let edge=0;t&&edge<t.p.length&&polygon.length>=3;edge++)polygon=clip(polygon,t.p[edge],t.p[(edge+1)%t.p.length],t.sign);
      if(polygon.length>=3)append(material,polygon);
     }
    }

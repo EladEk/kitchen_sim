@@ -1,0 +1,18 @@
+{
+  "revision": "R146",
+  "sourceTests": {"passed": 25, "failed": 0},
+  "productionTests": {"passed": 7, "failed": 0},
+  "catalog": {"totalKinds": 52, "newCabinets": 14, "storageKinds": 13, "kitchenKinds": 12, "allNewKindsHaveDistinctGeometryAndImages": true, "minimumAndCustomDimensionEnvelopesChecked": true, "separatedFrontPlanes": true, "glassTransparencyAndCountertopFinishChecked": true},
+  "header": {"editOpensLiveEditor": true, "editBesidePhotoQuality": true, "sameRowAt394px": true, "gapPx": 6, "buttonHeightPx": 32},
+  "browser": {
+    "fixture": "qa/edit-tools-r146-mobile.html", "viewport": [394, 852],
+    "actualHeaderActionsAndLivePanel": true,
+    "photoQualityControl": "layout placeholder in fixture; the production renderer owns the actual control",
+    "surface": "SVG floor and real placement/movement controllers, without GPU rendering",
+    "storageAndKitchenImagesLoaded": true,
+    "slidingWardrobeAfterReload": {"widthCm": 200, "depthCm": 65, "heightCm": 220, "colour": "#789786", "position": [2.5, 3]},
+    "wallGlassCabinetAfterReload": {"widthCm": 90, "depthCm": 35, "heightCm": 70, "baseHeightCm": 145, "mount": "wall", "position": [7.5, 5.54]},
+    "fullGpuSceneCertified": false, "physicalAndroidPerformanceCertified": false
+  },
+  "privateAssets": {"compiledWorker": "passed", "vercelAdapter": "passed", "encryptedSources": 252, "directUrlDenied": true, "clientSecretsAbsent": true}
+}

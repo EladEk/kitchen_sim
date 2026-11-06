@@ -15,7 +15,7 @@ test('the actual public apartment 42 exports its registered fittings and room la
  try{
   const floor=nav.floors.find(f=>f.level===8),rooms=floor.map.rooms.filter(r=>r.unit===42);
   for(const name of ['ממ״ד','חדר שירות','שירותי אורחים','חדר רחצה הורים'])assert(rooms.some(r=>r.he===name),name);
-  for(const kind of ['fridge','laundry','bathtub'])assert(floor.map.furniture.some(p=>p.kind===kind),kind+' is included in the public floor map');
+  for(const kind of ['fridge','laundry'])assert(!floor.map.furniture.some(p=>p.kind===kind),'No automatic '+kind);assert(floor.map.furniture.some(p=>p.kind==='bathtub'));
   // Public export deliberately strips private part/placement IDs. Inspect
   // actual instance buffers and body extents, not metadata that is not shipped.
   model.updateMatrixWorld(true);const matrix=new THREE.Matrix4(),box=new THREE.Box3(),centre=new THREE.Vector3(),size=new THREE.Vector3();
@@ -24,7 +24,7 @@ test('the actual public apartment 42 exports its registered fittings and room la
     for(let i=0;i<o.count;i++){o.getMatrixAt(i,matrix);matrix.premultiply(o.matrixWorld);box.copy(o.geometry.boundingBox).applyMatrix4(matrix);box.getCenter(centre);box.getSize(size);
      if(Math.hypot(centre.x-row.x,centre.z-row.z)<.001&&Math.abs(centre.y-centreY)<.001&&Math.abs(size.y-height)<.001&&Math.abs(size.x-(row.box.maxX-row.box.minX))<.001&&Math.abs(size.z-(row.box.maxZ-row.box.minZ))<.001)instances++;
     }
-   });assert.equal(instances,1,row.id+' has exactly one real exported body');
+   });assert.equal(instances,0,row.id+' has no automatic exported furniture body');
   }
   for(const building of DISTRICT){const matrix=buildingTransform(building);
    for(const row of APARTMENT42_FIXED_FURNITURE){const position=new THREE.Vector3(row.approach[0],24.8+1.62,row.approach[1]).applyMatrix4(matrix),delta=new THREE.Vector3(Math.sin(row.angle),0,Math.cos(row.angle)).transformDirection(matrix).multiplyScalar(.005);

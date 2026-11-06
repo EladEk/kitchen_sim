@@ -1,0 +1,50 @@
+{
+  "revision": "R147",
+  "runtimeCommit": "6a2b444d6c7ad4582947fbbcc5c16a80c8b791e3",
+  "committedBeforeTests": true,
+  "sourceTests": {
+    "passed": 27,
+    "failed": 0
+  },
+  "productionTests": {
+    "passed": 9,
+    "failed": 0
+  },
+  "interaction": {
+    "tourNeverOpensFurnitureEditor": true,
+    "explicit3DEditSessionRequired": true,
+    "hingedAndGlassDoors": true,
+    "slidingDoors": true,
+    "drawersWithTrays": true,
+    "openedLeafPickingAndCollision": true,
+    "allEightBuildingTransforms": true,
+    "positiveInstanceMatrices": true,
+    "geometryAndMaterialsReused": true,
+    "roomAndCameraAndSavedLayoutUnaffected": true,
+    "temporaryDoorPoseSurvivesFurnitureResync": true,
+    "removedFurniturePosePruned": true,
+    "editClosesTemporaryDoors": true
+  },
+  "browser": {
+    "fixture": "qa/cabinet-tour-r147.html",
+    "actualProductionGeometryAndRayPickingAndActionRouter": true,
+    "projection": "Three.js SVGRenderer on CPU; instanced production geometry copied for display only",
+    "observedWardrobeOpenClose": true,
+    "observedSlidingDoorOpen": true,
+    "observedDrawerOpen": true,
+    "tourEditorOpenedCount": 0,
+    "explicitEditSelectsCabinet": true,
+    "savedLayoutUnchanged": true,
+    "fullGpuSceneCertified": false,
+    "physicalAndroidPerformanceCertified": false
+  },
+  "privateAssets": {
+    "compiledWorker": "passed",
+    "vercelAdapter": "passed",
+    "encryptedSources": 252,
+    "directUrlDenied": true,
+    "authorizedOriginalHashes": true,
+    "videoRange": true,
+    "clientSecretsAbsent": true
+  }
+}

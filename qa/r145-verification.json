@@ -1,0 +1,19 @@
+{
+  "revision": "R145",
+  "sourceTests": {"passed": 19, "failed": 0},
+  "productionTests": {"passed": 7, "failed": 0},
+  "placement": {"promptBeforeAnyVisibleItem": true, "newItemsRequireAnExplicitPoint": true, "firstPointUsesNoGridRounding": true, "mouseAndTouchTapRulesChecked": true, "orbitDragsMultitouchAndCanceledGesturesDoNotPlace": true, "invalidTapDoesNotChooseAnAlternative": true, "supportsPreselectedTvStand": true, "adjustmentAndExplicitSaveAfterDrop": true},
+  "browser": {
+    "fixture": "qa/edit-tools-r145-mobile.html", "viewport": [394, 852],
+    "actualLivePanelAndPlacementController": true,
+    "surface": "SVG floor with real pointer input, without GPU rendering",
+    "noPreviewBeforeTap": true, "orbitLikeDragDoesNotPlace": true,
+    "initialClickedPosition": [2.8122, 3.3464], "savedItemsBeforeConfirmation": 0,
+    "adjustedPositionAfterOneCmNudge": [2.8222, 3.3464], "rotationRadians": 1.5708,
+    "changedWidthCm": 150, "saveReturnsToCategories": true,
+    "cameraAndRoomUnchanged": true, "cancelLeavesWorkspaceUnchanged": true,
+    "reloadRestoresOneItemAtTheConfirmedPosition": true,
+    "fullGpuSceneCertified": false, "physicalAndroidPerformanceCertified": false
+  },
+  "privateAssets": {"compiledWorker": "passed", "vercelAdapter": "passed", "encryptedSources": 252, "directUrlDenied": true, "clientSecretsAbsent": true}
+}

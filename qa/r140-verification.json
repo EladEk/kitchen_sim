@@ -1,0 +1,33 @@
+{
+  "revision": "R140",
+  "sourceTests": {"passed": 567, "failed": 0},
+  "productionTests": {"passed": 20, "failed": 0},
+  "production": {
+    "apartments": 43,
+    "buildings": 8,
+    "automaticApartmentFurniture": 0,
+    "actualExportedGeometry": true,
+    "cabinetFaceSeparationMinDefaultMax": true,
+    "livePreviewReusesGeometryWhileMoving": true,
+    "colorsRetainedInInstancesAndSave": true,
+    "supportedTelevisionFollowsHost": true,
+    "wallTelevisionPlacement": true,
+    "residentCollisionUpdatesIndependentOfBase": true,
+    "legacySaveCompatible": true,
+    "privateAssetProtection": true
+  },
+  "browser": {
+    "component": "LiveFurniturePanel",
+    "fixture": "qa/live-controls-r140.html",
+    "modules": "Actual placement, attachment, preview geometry and persistence modules; fixture-controlled placement points and controller callbacks",
+    "consoleWidthCm": 180,
+    "consoleColor": "#aa8054",
+    "televisionColor": "#303735",
+    "televisionBaseHeightCm": 60.8,
+    "supportedTelevisionMovedWithConsole": true,
+    "wallTelevisionHeightCm": 110,
+    "reloadPreservedThreeItemsColorsAndAttachments": true,
+    "fullGpuDistrictCertified": false,
+    "limitation": "The browser disables WebGL (GL_VENDOR=Disabled, GL_RENDERER=Disabled; BindToCurrentSequence failed). Full scene pointer interaction and Android GPU performance could not be verified visually."
+  }
+}

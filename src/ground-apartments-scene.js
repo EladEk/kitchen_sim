@@ -66,7 +66,7 @@ export function buildGroundApartments({root,resources,picks,settings,cut=false,m
  }
  // Generic white ceramic shapes at the plan's wet-room fixture positions.
  // No owner-selected brand or catalogue product is assigned to neighbours.
- if(settings.furniture!==false)for(const f of profile.furniture){
+ if(settings.furniture!==false)for(const f of profile.furniture.filter(f=>settings.apartmentFurnishing!==false||f.kind!=='washer')){
   const p=new THREE.Group();p.position.set(f.position[0],0,f.position[1]);p.rotation.y=f.rotation;p.userData={part:'ground-base-fixture',baseFixtureId:f.id,baseline:true};template.add(p);
   if(f.kind==='wc'){const bowl=createCeramicBowl(resources,{productId:null,w:f.w,d:f.d,top:.424,depth:.20,innerW:f.w-.10,innerD:f.d-.15,innerZ:.03,radius:.13,innerRadius:.1,lowerScale:.75,drainZ:.03});bowl.traverse(o=>{o.userData={...o.userData,productId:null,shapeBasis:'source-plan-footprint',baseline:true,detailsInferred:true};});p.add(bowl);box(0,.2,-.1,.24,.3,.28,white,p);box(0,.46,-.02,f.w-.025,.025,f.d-.06,bowl.children[0].material,p);}
   else if(f.kind==='tub'||f.kind==='basin'){
@@ -78,7 +78,7 @@ export function buildGroundApartments({root,resources,picks,settings,cut=false,m
   else if(f.kind==='shower'){box(0,.025,0,f.w,.045,f.d,wetFloor,p);if(!cut)box(f.w/2-.02,1,0,.012,2,f.d,showerGlass,p);}
   else if(f.kind==='washer'){box(0,f.h/2,0,f.w,f.h,f.d,white,p);const door=cylinder(0,.4,f.d/2+.012,.19,.018,metal,p);door.rotation.x=Math.PI/2;}
  }
- if(settings.furniture!==false){
+ if(settings.furniture!==false&&settings.apartmentFurnishing!==false){
   const p=new THREE.Group();p.userData={part:'ground-base-kitchen',source:'house-plan',page:1,proposed:true};template.add(p);
   buildBaseKitchenDetail({parent:p,box,polygon,cylinder,surface,mat,point});
  }

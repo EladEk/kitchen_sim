@@ -15,7 +15,7 @@ export function neighbourFurniture(level){return level===0?GROUND_APARTMENT_FURN
 export function apartmentFurnitureBoxes(level){return neighbourFurniture(level).map(r=>({...r.box,apartmentFurniture:r.id,unit:r.unit,...(r.walkThrough?{walkableSurface:true}:{})}));}
 export function buildApartmentFurniture({parent,resources,level,base,settings,surfaces=null}){
  if(settings.furniture===false)return;
- const items=neighbourFurniture(level);if(!items.length)return;
+ const items=settings.apartmentFurnishing===false?APARTMENT_BATHROOMS.filter(r=>r.floor===level):neighbourFurniture(level);if(!items.length)return;
  const cube=new THREE.BoxGeometry(1,1,1),soft=new RoundedBoxGeometry(1,1,1,2,.07),cushion=createSoftGeometry(),duvet=createSoftGeometry(1,1,1,{kind:'duvet',radius:.12});resources.push(cube,soft,cushion,duvet);
  const surface=surfaces||createSurfacePalette(resources),mat=(color,extra={})=>{const m=new THREE.MeshStandardMaterial({color,roughness:.75,...extra});resources.push(m);return m;},fabric=color=>surface('fabric',color),palette={wood:surface('wood','#a28d76'),mattress:fabric('#f1eee5'),linen:fabric('#a9b8b3'),pillow:fabric('#faf8ef'),sofa:fabric('#b9b4a7'),rug:fabric('#d1c9b7'),cabinet:surface('paint','#e7e2d7',{interior:true}),stone:surface('stone','#d4cbb9',{interior:true}),dark:mat('#303a3c',{roughness:.32}),screen:mat('#172126',{roughness:.18,metalness:.12}),steel:mat('#9ea8a5',{metalness:.75,roughness:.28}),ceramic:new THREE.MeshPhysicalMaterial({color:'#f5f4ef',roughness:.09,clearcoat:1,clearcoatRoughness:.08}),mirror:mat('#dedfdd',{metalness:1,roughness:.06}),glow:mat('#efece2',{emissive:'#fff2d9',emissiveIntensity:settings.lampsOn?.4:0}),glass:createArchitecturalGlass(resources)},batches=new Map(),matrix=new THREE.Matrix4(),q=new THREE.Quaternion(),position=new THREE.Vector3(),scale=new THREE.Vector3();
  resources.push(palette.ceramic);palette.ceramic.userData={surfaceKind:'ceramic',architecturalInterior:true};for(const m of Object.values(palette))installBuildingSurfaceUVs(m);
@@ -31,7 +31,7 @@ export function buildApartmentFurniture({parent,resources,level,base,settings,su
    box(r,'apartment-wc-seat',palette.ceramic,0,.465,.015,r.w+.005,.038,r.d-.025);
    box(r,'apartment-wc-flush',palette.steel,0,1,-r.d/2-.018,.19,.13,.012);
   }else if(r.kind==='basin'){
-   box(r,'apartment-basin-cabinet',palette.cabinet,0,.59,0,r.w,.38,r.d);
+   if(settings.apartmentFurnishing!==false)box(r,'apartment-basin-cabinet',palette.cabinet,0,.59,0,r.w,.38,r.d);
    for(const child of bowl.children){const part='apartment-basin-'+child.userData.part;box(r,part,/drain|waste/.test(part)?palette.steel:palette.ceramic,0,.835,0,r.w,.14,r.d);batches.get(part).geometry=child.geometry;}
    box(r,'apartment-basin-tap',palette.steel,0,.835,-r.d*.25,.07,.22,.16);batches.get('apartment-basin-tap').geometry=createFurnitureAnchor('faucet').geometry;batches.get('apartment-basin-tap').asset='faucet';
    box(r,'apartment-bath-mirror',palette.mirror,0,1.38,-r.d/2-.025,r.w,.62,.016);

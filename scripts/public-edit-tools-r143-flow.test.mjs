@@ -1,0 +1,6 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {readFile} from 'node:fs/promises';import * as T from 'three';
+import {createSelection} from '../public-view/selection.mjs';import {disposeObjectResources} from '../src/photo-resources.mjs';
+test('actual apartment 23 has a reversible low-wall view without modifying its complete source walls or its source geometry',async()=>{
+ const [nav,json]=await Promise.all(['navigation','building'].map(async n=>JSON.parse(await readFile('dist/client/baseline/'+n+'.json','utf8')))),model=await new T.ObjectLoader().parseAsync(json),state={level:4,target:'unit:23:4'},geometries=new Map();let walls=0;model.traverse(o=>{if(o.isMesh){geometries.set(o,o.geometry);if(o.userData.sectionWall)walls++;}});assert(walls>100);
+ const low=createSelection(model,nav,{...state,wallHeight:1.1}),full=createSelection(model,nav,state);try{assert(low.group.children.length);assert(full.group.children.length);const vertices=r=>{let n=0;r.traverse(o=>{if(o.isMesh)n+=o.geometry.attributes.position.count;});return n;};assert.notEqual(vertices(low.group),vertices(full.group));for(const [o,g]of geometries)assert.equal(o.geometry,g);}finally{low.dispose();full.dispose();for(const [o,g]of geometries)assert.equal(o.geometry,g);disposeObjectResources(model);}
+});

@@ -1,0 +1,24 @@
+{
+  "revision": "R141",
+  "sourceTests": {"passed": 569, "failed": 0},
+  "productionTests": {"passed": 20, "failed": 0},
+  "browser": {
+    "component": "LiveFurniturePanel",
+    "fixture": "qa/live-controls-r141-mobile.html",
+    "iframeViewport": [394, 852],
+    "fixedHeaderActions": ["הנח רהיט", "ביטול", "בטל פעולה", "סיום"],
+    "actionTouchHeightPx": 44,
+    "actionYBeforeAndAfterBodyScrollPx": 476.046875,
+    "bodyScrollTopObservedPx": 181,
+    "roomSelectorWithDuplicateNameNumbers": true,
+    "deskAndBedInSeparateRooms": true,
+    "selectedRoomFiltersItems": true,
+    "outsideRoomPlacementRejected": true,
+    "cancelAndUndoAcrossRooms": true,
+    "returnToApartmentAndReloadPreservesBothRooms": true,
+    "controller": "Actual room-switching, placement, attachment and persistence modules with fixture controller callbacks and button-selected placement points",
+    "fullGpuDistrictCertified": false,
+    "androidPerformanceCertified": false
+  },
+  "privateAssets": {"compiledWorker": "passed", "vercelAdapter": "passed", "encryptedSources": 252, "directUrlDenied": true, "clientSecretsAbsent": true}
+}

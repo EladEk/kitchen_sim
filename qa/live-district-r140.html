@@ -1,0 +1,6 @@
+<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Home Studio R140 live editor QA</title><style>html,body,#root{margin:0;height:100%;}</style></head><body><div id="root"></div><script type="module">
+// Dev-only routing to the actual secure-build public assets. No mock geometry,
+// renderer or interaction handlers. This QA entry is not in the deployment.
+const originalFetch=window.fetch.bind(window);window.fetch=(input,options)=>{const url=new URL(input instanceof Request?input.url:String(input),location.href);return url.origin===location.origin&&url.pathname.startsWith('/baseline/')?originalFetch('/dist/client'+url.pathname+url.search,options):originalFetch(input,options);};
+await import('../public-view/main.jsx');
+</script></body></html>
