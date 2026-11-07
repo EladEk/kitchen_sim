@@ -33,7 +33,9 @@ await build({configFile:false,publicDir:false,build:{ssr:'server/worker.mjs',out
 for(const root of roots)await rm(join('dist/client',root),{recursive:true,force:true,maxRetries:8,retryDelay:200});
 await writeFile('dist/server/document-manifest.json',JSON.stringify(manifest));
 await writeFile('dist/server/wrangler.json',JSON.stringify({name:'home-studio',main:'index.js',compatibility_date:'2026-10-01',assets:{directory:'../client',binding:'ASSETS',run_worker_first:true,not_found_handling:'none'}},null,2));
-await mkdir('dist/.openai',{recursive:true});await copyFile('.openai/hosting.json','dist/.openai/hosting.json');
+await mkdir('dist/.openai',{recursive:true});
+// Site hosting metadata is injected by the Sites build environment and is intentionally absent from GitHub/Vercel checkouts.
+try{await access('.openai/hosting.json');await copyFile('.openai/hosting.json','dist/.openai/hosting.json');}catch(error){if(error.code!=='ENOENT')throw error;}
 console.log(`Protected ${Object.keys(manifest).length} source files; server-only environment access, no plaintext originals in public output.`);
 
 // Fail closed if a later build plugin ever recreates private plaintext.
