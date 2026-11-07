@@ -1,0 +1,40 @@
+import test from 'node:test';import assert from 'node:assert/strict';import * as T from 'three';
+import {furnitureClearances,liveFurnitureClearances,nearestPolygonClearance,clearanceCentimetres} from './furniture-clearances.mjs';import {clearanceWorldGuides,projectClearanceGuide} from './furniture-clearance-overlay.mjs';import {DISTRICT,buildingTransform} from './district.mjs';import {itemPolygons,emptyWorkspace,scopeKey,updateUnit,encodeLayout,decodeLayout} from './apartment-editing.mjs';import {newLiveSession,saveLiveFurniture} from './live-furniture.mjs';import {nudgeFurniture} from './furniture-movement.mjs';import {createApartmentEditorScene} from './apartment-editor-scene.mjs';
+const box=(x,z,w,d)=>[[x,z],[x+w,z],[x+w,z+d],[x,z+d]],scope={building:'4102',floor:0,unit:1},walls=[box(-.2,-.2,8.4,.2),box(-.2,6,8.4,.2),box(-.2,0,.2,6),box(8,0,.2,6)],context={scope,elevation:0,walls,polygons:[box(0,0,8,6)],domain:[[box(0,0,8,6)]],doors:[],furniture:[],bounds:{minX:0,minZ:0,maxX:8,maxZ:6}},item={id:'selected',kind:'wardrobe',x:2,z:2,w:1,d:.6,h:2.2,yaw:0,color:'#cbbda4'},other={...item,id:'neighbor',kind:'desk',x:4,w:1.2,d:.8,h:.75},nav={storey:3.1,floors:[{level:0,elevation:0,units:[{number:1,polygon:box(0,0,8,6)}],map:{walls,doors:[],rooms:[],furniture:[]}}]},near=(a,b)=>assert(Math.abs(a-b)<1e-6,`${a} vs ${b}`);
+
+test('actual wall faces and neighbouring furniture are measured edge to edge in centimetres, without changing input',()=>{
+ const snapshot=JSON.stringify({item,context,items:[item,other]}),value=furnitureClearances(item,context,[item,other]);near(value.nearestWall.gap,1.5);near(value.nearestFurniture.gap,.9);assert.equal(value.directions.right.type,'furniture');near(value.directions.left.gap,1.5);near(value.directions.up.gap,1.7);near(value.directions.down.gap,3.7);assert.equal(clearanceCentimetres(value.nearestFurniture.gap),90);assert.equal(JSON.stringify({item,context,items:[item,other]}),snapshot);for(const g of value.guides)near(Math.hypot(g.to[0]-g.from[0],g.to[1]-g.from[1]),g.gap);
+ const snapped={...item,x:.585};near(furnitureClearances(snapped,context,[]).nearestWall.gap,.085);assert.equal(clearanceCentimetres(.085),8.5);assert.equal(clearanceCentimetres(.001),.1);
+});
+
+test('rotations and corner-sofa recesses use the real footprint, with diagonal shortest distances',()=>{
+ const rotated={...item,yaw:Math.PI/2};near(furnitureClearances(rotated,context,[]).nearestWall.gap,1.5);
+ const diagonal={...item,yaw:Math.PI/4,w:2,d:.6};near(furnitureClearances(diagonal,context,[]).nearestWall.gap,2-1.3/Math.sqrt(2));
+ const sofa={...item,kind:'corner_sofa',x:3,z:3,w:3,d:3,seatDepth:.8,cornerSide:'right'},table={...item,id:'inside-recess',kind:'coffee',x:2.5,z:3.5,w:.5,d:.5,h:.4};const v=furnitureClearances(sofa,context,[table]);assert(v.nearestFurniture.gap>.4);assert(!v.guides.some(g=>g.type==='furniture'&&g.gap===0),'empty L-shaped recess is not occupied');
+ const a=[box(0,0,1,1)],b=[box(2,2,1,1)];near(nearestPolygonClearance(a,b).gap,Math.sqrt(2));near(nearestPolygonClearance(a,[box(.5,.5,1,1)]).gap,0);near(nearestPolygonClearance(a,[box(.2,.2,.2,.2)]).gap,0);
+});
+
+test('walls occlude furniture in adjacent rooms; touching a wall does not hide a valid side-by-side gap',()=>{
+ const divider=box(2.8,0,.2,6),otherRoom={...other,x:3.6};const value=furnitureClearances(item,{...context,walls:[...walls,divider]},[otherRoom]);assert.equal(value.nearestFurniture,null);assert.equal(value.directions.right.type,'wall');near(value.directions.right.gap,.3);
+ const againstWall={...item,z:.3},alsoAgainstWall={...other,z:.4};const side=furnitureClearances(againstWall,context,[alsoAgainstWall]);near(side.nearestFurniture.gap,.9);
+});
+
+test('TV supports, descendants, vertically separate cabinets and the selected item are excluded; fresh unsited templates have no distances',()=>{
+ const tv={...item,id:'tv',kind:'tv_stand',y:2.208,h:.8,attachment:{mode:'top',supportId:item.id,offset:[0,0],yaw:0}},raised={...other,id:'raised',y:2.4};const value=furnitureClearances(item,context,[item,tv,raised]);assert.equal(value.nearestFurniture,null);assert.equal(furnitureClearances(tv,context,[item,tv]).nearestFurniture,null);
+ const fresh=newLiveSession(scope);assert.equal(liveFurnitureClearances({...fresh,template:item,stage:'configure'},context,[other]),null);assert.equal(liveFurnitureClearances({...fresh,item,hasPoint:false,stage:'pick'},context,[other]),null);assert(liveFurnitureClearances(newLiveSession(scope,item),context,[other]));assert.equal(liveFurnitureClearances({...newLiveSession(scope,item),stage:'categories'},context,[other]),null);assert.equal(furnitureClearances({...item,w:NaN},context),null);
+});
+
+test('preview movement and rotation refresh distances while explicit save/export preserve positions and separate tour door poses',()=>{
+ const workspace=updateUnit(emptyWorkspace(),scopeKey(scope),[item,other]),original=JSON.stringify(workspace),session=newLiveSession(scope,item),before=liveFurnitureClearances(session,context,[item,other]),moved=nudgeFurniture(session,'right',{context,items:[item,other],distance:.1}),after=liveFurnitureClearances(moved,context,[item,other]);near(after.nearestFurniture.gap,before.nearestFurniture.gap-.1);assert.equal(JSON.stringify(workspace),original);
+ const rotated={...moved,item:{...moved.item,yaw:Math.PI/2}},turn=liveFurnitureClearances(rotated,context,[item,other]);near(turn.nearestFurniture.gap,1);const saved=saveLiveFurniture(moved,workspace,{nav}),imported=decodeLayout(encodeLayout(saved.workspace),nav).workspace;near(imported.units[scopeKey(scope)].items[0].x,2.1);assert.equal(saved.session.stage,'categories');assert.equal(liveFurnitureClearances(saved.session,context,[item,other]),null);
+ const scene=createApartmentEditorScene({nav});try{scene.sync(workspace);scene.toggle(scope,item.id);for(let i=0;i<5;i++)scene.tick(.08);assert.equal(scene.getMotionState(scope,item.id)[0].progress,1);near(furnitureClearances(item,context,[other]).nearestFurniture.gap,.9);}finally{scene.dispose();}
+});
+
+test('world guides preserve metric gaps in all eight building rotations and mirrors, at the correct storey and mounting height',()=>{
+ for(const building of DISTRICT){const value=furnitureClearances({...item,y:1.2},{...context,scope:{...scope,building:building.id},elevation:9.3},[other]),world=clearanceWorldGuides(value),inverse=buildingTransform(building).invert();assert.equal(world.length,value.guides.length);for(const g of world){near(g.from.distanceTo(g.to),g.gap);near(g.from.y,9.3+.03+g.fromY);const local=g.from.clone().applyMatrix4(inverse),source=value.guides.find(v=>v.direction===g.direction&&v.id===g.id);near(local.x,source.from[0]);near(local.z,source.from[1]);}}
+});
+
+test('projected 3D dimensions follow orbit/resize, clip to the viewport and disappear behind the camera',()=>{
+ const value=furnitureClearances(item,context,[other]),guide=clearanceWorldGuides(value)[0],transform=buildingTransform(DISTRICT.find(b=>b.id===scope.building)),camera=new T.PerspectiveCamera(48,394/500,.06,1200);camera.position.copy(new T.Vector3(5,8,9).applyMatrix4(transform));camera.lookAt(new T.Vector3(3,0,3).applyMatrix4(transform));camera.updateMatrixWorld(true);const before=projectClearanceGuide(guide,camera,394,500);assert(before);const pose=camera.position.toArray(),quaternion=camera.quaternion.toArray();camera.aspect=394/700;camera.updateProjectionMatrix();const resized=projectClearanceGuide(guide,camera,394,700);assert(resized);assert.notDeepEqual(resized,before);assert.deepEqual(camera.position.toArray(),pose);assert.deepEqual(camera.quaternion.toArray(),quaternion);camera.lookAt(camera.position.clone().multiplyScalar(2).sub(guide.from));camera.updateMatrixWorld(true);assert.equal(projectClearanceGuide(guide,camera,394,500),null);
+ const c=new T.PerspectiveCamera(60,1,.1,100);c.updateMatrixWorld(true);const partial=projectClearanceGuide({from:new T.Vector3(-10,0,-2),to:new T.Vector3(0,0,-2)},c,300,300);assert(partial);near(partial.from[0],0);assert(partial.to[0]<=300);assert.equal(projectClearanceGuide({from:new T.Vector3(5,0,-1),to:new T.Vector3(6,0,-1)},c,300,300),null);
+});

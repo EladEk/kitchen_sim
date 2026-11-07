@@ -1,0 +1,92 @@
+{
+  "revision": "R148",
+  "runtimeCommit": "a2ea710ab887b368a5e770061f008520c7da19a0",
+  "committedBeforeTests": true,
+  "sourceTests": {
+    "passed": 26,
+    "failed": 0
+  },
+  "productionTests": {
+    "passed": 8,
+    "failed": 0
+  },
+  "measurements": {
+    "edgeToEdge": true,
+    "wallFaces": true,
+    "directionalNearestObstacles": true,
+    "nearestWallAndFurnitureSummary": true,
+    "rotatedFootprintsAndCornerSofaRecess": true,
+    "adjacentRoomsOccludedByWalls": true,
+    "differentHeightsAndTVSupportExcluded": true,
+    "allEightBuildingTransforms": true,
+    "realApartments": [
+      5,
+      23,
+      42
+    ],
+    "realApartmentOrientations": 24,
+    "realRoomContexts": 31,
+    "centimetresWithTenths": true,
+    "unplacedTemplatesHidden": true,
+    "guidesHiddenAfterSaveOrCancel": true,
+    "sameGeometryAcrossGPUBackends": true
+  },
+  "browser": {
+    "fixture": "qa/clearances-r148-mobile.html",
+    "viewport": [
+      394,
+      852
+    ],
+    "projection": "Three.js SVGRenderer on CPU; production geometry, actual overlay, placement/drag controllers and LiveFurniturePanel",
+    "initialCm": {
+      "wall": 120,
+      "neighbor": 80
+    },
+    "afterArrow10cm": {
+      "wall": 130,
+      "neighbor": 70,
+      "unsavedX": 2.1,
+      "savedX": 2
+    },
+    "afterDrag": {
+      "wall": 170,
+      "neighbor": 30,
+      "unsavedX": 2.5,
+      "savedX": 2
+    },
+    "afterQuarterTurn": {
+      "wall": 200,
+      "neighbor": 60
+    },
+    "cancelRestoresAndHides": true,
+    "saveReturnsCatalogAndHides": true,
+    "savedXAfterReload": 2.1,
+    "afterWidth140cm": {
+      "wall": 120,
+      "neighbor": 60
+    },
+    "newChairAfterChosenPoint": {
+      "wallCm": 73.8,
+      "neighborCm": 119.2
+    },
+    "newUnplacedChairHasNoGuides": true,
+    "switchingRoomsClearsGuidesAndSelection": true,
+    "cameraUnchanged": [
+      24.7,
+      8,
+      4.723
+    ],
+    "overlayDoesNotBlockDrag": true,
+    "fullGpuSceneCertified": false,
+    "physicalAndroidPerformanceCertified": false
+  },
+  "privateAssets": {
+    "compiledWorker": "passed",
+    "vercelAdapter": "passed",
+    "encryptedSources": 252,
+    "directUrlDenied": true,
+    "authorizedOriginalHashes": true,
+    "videoRange": true,
+    "clientSecretsAbsent": true
+  }
+}

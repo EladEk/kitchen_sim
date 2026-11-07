@@ -1,0 +1,98 @@
+{
+  "revision": "R149",
+  "runtimeCommit": "f95690e3f2dc4cf1cc5caff37c62d6e94a1bc5ca",
+  "changesCommittedBeforeChecks": true,
+  "sourceTests": {
+    "passed": 35,
+    "failed": 0
+  },
+  "productionTests": {
+    "passed": 9,
+    "failed": 0
+  },
+  "measurements": {
+    "exactlyFourHorizontalDirections": true,
+    "axesFollowItemRotation": true,
+    "nearestObstacleIsWallOrFurniture": true,
+    "stableNumberedTargetNames": true,
+    "perDirectionColoursAndNumbers": true,
+    "visibleEndpointsAndTargetOutlines": true,
+    "labelLeaderLines": true,
+    "verticalSurfaceClearancesForOverlappingFootprints": true,
+    "aboveAndBelowChooseNearestSurfaces": true,
+    "TVSupportVerticalGap": true,
+    "openBoundaryExplicitlyNamed": true,
+    "cornerSofaRecessRespected": true,
+    "allEightBuildingTransforms": true,
+    "realApartments": [
+      5,
+      8,
+      23,
+      42
+    ],
+    "realApartmentOrientations": 32,
+    "realRoomContexts": 37
+  },
+  "browser": {
+    "fixture": "qa/clearances-r149-mobile.html",
+    "viewport": [
+      394,
+      852
+    ],
+    "projection": "Three.js SVGRenderer on CPU; production geometry, actual clearance overlay, placement/drag controllers and LiveFurniturePanel",
+    "horizontalDirections": {
+      "left": {
+        "type": "wall",
+        "cm": 120
+      },
+      "right": {
+        "target": "שולחן מחשב 1",
+        "cm": 80
+      },
+      "up": {
+        "target": "כיסא 1",
+        "cm": 65
+      },
+      "down": {
+        "target": "מיטת יחיד 1",
+        "cm": 40
+      }
+    },
+    "hangingCabinet": {
+      "mountingHeightCm": 145,
+      "lowerSurfaceCm": 90,
+      "gapCm": 55,
+      "changedMountingHeightCm": 165,
+      "changedGapCm": 75,
+      "gapAfterSaveAndReloadCm": 75,
+      "fourHorizontalPlusOneVertical": true,
+      "targetName": "ארון מטבח תחתון 1"
+    },
+    "alignment": {
+      "previousOverlayHeight": 733,
+      "previousCanvasHeight": 511,
+      "fixedMoveOverlayRectHeight": 510.6875,
+      "fixedMoveCanvasClientHeight": 511,
+      "fixedConfigureHostRectHeight": 267.6875,
+      "fixedConfigureOverlayRectHeight": 267.6875,
+      "overlayAnchoredToCanvas": true
+    },
+    "cameraDuringHeightChange": [
+      23.5,
+      5,
+      -1.777
+    ],
+    "saveReturnsCatalogAndHides": true,
+    "fullGpuSceneCertified": false,
+    "physicalAndroidPerformanceCertified": false
+  },
+  "privateAssets": {
+    "compiledWorker": "passed",
+    "vercelAdapter": "passed",
+    "encryptedSources": 252,
+    "directUrlDenied": true,
+    "authorizedOriginalHashes": true,
+    "videoRange": true,
+    "clientSecretsAbsent": true
+  }
+}

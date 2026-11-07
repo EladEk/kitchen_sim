@@ -1,0 +1,36 @@
+.editor-tools{flex:none;max-width:100%;padding:3px 0}.editor-tools-rail{display:flex;gap:5px;overflow-x:auto;white-space:nowrap;padding:2px}.editor-tools button{flex:none;font-size:.73rem;min-height:34px;padding:5px 9px}.editor-tools-expanded{max-height:180px;overflow:auto;padding:6px}.editor-toggles{display:flex;flex-wrap:wrap;gap:8px;font-size:.75rem}.editor-toggles label{display:flex;align-items:center;gap:4px}.editor-tools form{display:flex;gap:5px;margin:6px 0}.editor-tools input{min-width:0}.editor-tools small{display:block;font-size:.65rem}.exact-distance{display:flex;align-items:end;gap:6px;padding:4px}.exact-distance label{display:flex;flex-direction:column;font-size:.75rem}.exact-distance input{width:110px}.editor-gizmo{position:absolute;inset:0;z-index:8;pointer-events:none}.editor-gizmo[hidden]{display:none}.editor-handle{position:absolute;transform:translate(-50%,-50%);width:38px;height:38px;min-height:38px!important;padding:0!important;border:2px solid white!important;border-radius:50%!important;color:white!important;box-shadow:0 1px 5px #0005;pointer-events:auto;touch-action:none;font-size:22px!important}.handle-x{background:#bf493e!important}.handle-z{background:#367aa8!important}.handle-y{background:#4a8652!important}.handle-rotate{background:#8259a6!important}.live-move-panel.is-collapsed>:not(.editor-tools):not(.move-collapse){display:none}.move-collapse{min-height:28px!important;padding:2px!important}.live-furniture-panel button[aria-pressed=true]{box-shadow:inset 0 0 0 2px #315e51}.live-clearance-row{border:0!important;padding:2px!important;min-height:24px!important;background:transparent!important}.furniture-clearance-overlay .clearance-label,.furniture-clearance-overlay .clearance-label *{pointer-events:auto!important;cursor:pointer}.live-builder-status:empty{display:none}
+/* R152: explicit panel specificity prevents the generic form rules enlarging controls. */
+.live-furniture-panel .editor-tools{padding:1px 0;min-width:0;display:block}
+.live-furniture-panel .editor-tools-rail{gap:4px;padding:2px;align-items:center;scrollbar-width:thin;overflow-y:hidden}
+.live-furniture-panel .editor-tools-rail button{font-size:11px;line-height:1.15;min-height:28px;padding:3px 6px;border-radius:6px}
+.live-furniture-panel .editor-wall-height{display:flex;align-items:center;gap:4px;flex:none;white-space:nowrap;font-size:10px}
+.live-furniture-panel .editor-wall-height select{font-size:11px;min-height:28px;max-width:80px;padding:2px 4px}
+.live-furniture-panel .editor-tools-expanded{padding:2px 3px}
+.live-furniture-panel .editor-toggles{display:flex;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;gap:9px;align-items:center;scrollbar-width:thin;min-height:28px}
+.live-furniture-panel .editor-toggles label{flex:none;white-space:nowrap;font-size:10px;line-height:1.2;gap:3px;min-height:26px;margin:0}
+.live-furniture-panel .editor-toggles input[type=checkbox]{appearance:auto;flex:none;width:12px;height:12px;min-height:12px;padding:0;margin:0}
+.editor-gizmo .editor-handle{width:22px;height:22px;min-height:22px!important;border-width:1px!important;font-size:14px!important;box-shadow:0 1px 3px #0004}
+.live-furniture-panel .move-collapse{font-size:10px;min-height:20px!important;line-height:1.1;padding:1px!important}
+.live-furniture-panel .live-move-actions{flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;gap:4px}
+.live-furniture-panel .live-move-actions>button{flex:0 0 auto;font-size:11px;min-height:30px;white-space:nowrap;padding:3px 7px}
+.live-furniture-panel .live-movement-bar{padding:3px;gap:4px;flex-wrap:nowrap}
+.live-furniture-panel .live-movement-arrows button{min-width:28px;min-height:28px;font-size:14px;padding:2px}
+.live-furniture-panel .live-movement-bar select{font-size:11px;min-height:28px;padding:2px}
+.live-furniture-panel .live-movement-bar label{font-size:10px}
+.live-furniture-panel .live-clearance-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:3px}
+.live-furniture-panel .live-clearance-row,.live-furniture-panel .live-clearance-row bdi{font-size:9px;line-height:1.15}
+.live-furniture-panel .live-clearance-row{min-height:18px!important}
+.live-move-panel>.live-builder-status,.live-move-panel>.live-builder-error{font-size:10px;line-height:1.2;margin-top:2px}
+.furniture-clearance-overlay .clearance-label text{font-size:9px}
+.furniture-clearance-overlay .clearance-line-halo{stroke-width:3;opacity:.65}
+.furniture-clearance-overlay .clearance-dimension-line{stroke-width:1.2;stroke-dasharray:4 3}
+.furniture-clearance-overlay .clearance-target-outline{stroke-width:1;stroke-dasharray:3 3}
+.furniture-clearance-overlay .clearance-end-caps{stroke-width:1.2}
+.furniture-clearance-overlay .clearance-label rect{stroke-width:.8}
+/* Translucent overlays reveal the room beneath; direct interaction restores contrast. */
+.editor-gizmo .editor-handle{opacity:.5;transition:opacity .12s}
+.editor-gizmo .editor-handle:hover,.editor-gizmo .editor-handle:active,.editor-gizmo .editor-handle:focus-visible{opacity:1}
+.furniture-clearance-overlay>g{opacity:.55;transition:opacity .12s}
+.furniture-clearance-overlay>g:hover,.furniture-clearance-overlay>g:focus-within{opacity:1}
+.furniture-clearance-overlay .clearance-label rect{fill-opacity:.5}
+.furniture-clearance-overlay .clearance-label:hover rect,.furniture-clearance-overlay .clearance-label:focus-visible rect{fill-opacity:.9}

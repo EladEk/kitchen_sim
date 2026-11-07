@@ -1,0 +1,21 @@
+.furniture-clearance-host{position:relative}
+.furniture-clearance-overlay{position:absolute;inset:0;z-index:7;width:100%;height:100%;overflow:hidden;pointer-events:none!important;color:#315e51}
+.furniture-clearance-overlay *{pointer-events:none!important}
+.furniture-clearance-overlay .clearance-line-halo{stroke:#fffdf5;stroke-width:5;opacity:.8;vector-effect:non-scaling-stroke}
+.furniture-clearance-overlay .clearance-dimension-line{stroke:var(--clearance-color,#588778);stroke-width:2.2;stroke-dasharray:6 3;vector-effect:non-scaling-stroke}
+.furniture-clearance-overlay .clearance-target-outline{stroke:var(--clearance-color);stroke-width:2;stroke-dasharray:4 3;fill:none;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.furniture-clearance-overlay .clearance-end-caps{stroke:var(--clearance-color);stroke-width:2.5;fill:none;vector-effect:non-scaling-stroke}
+.furniture-clearance-overlay circle,.furniture-clearance-overlay .clearance-target-diamond{fill:var(--clearance-color);stroke:#fffdf5;stroke-width:1.5}
+.furniture-clearance-overlay .clearance-label-leader{stroke:var(--clearance-color);stroke-width:1.2;stroke-dasharray:2 2;vector-effect:non-scaling-stroke}
+.furniture-clearance-overlay rect{fill:#fffdf5;fill-opacity:.97;stroke:var(--clearance-color);stroke-width:1.3}
+.furniture-clearance-overlay text{font:11.5px Arial,sans-serif;fill:#243c32;direction:rtl;unicode-bidi:plaintext}
+.furniture-clearance-overlay .clearance-target-name{font-size:10.5px;fill:var(--clearance-color);font-weight:600}
+.live-furniture-clearances{display:flex;flex-direction:column;flex:none;padding:4px 6px;gap:3px;color:#315e51;background:#edf3eb;border-radius:8px;line-height:1.35}
+.live-clearance-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px 7px;width:100%}
+.live-clearance-row{display:flex;align-items:center;gap:3px;min-width:0;font-size:.72rem}
+.live-clearance-key{display:inline-flex;justify-content:center;align-items:center;flex:none;width:15px;height:15px;border-radius:50%;background:var(--clearance-color);color:#fff;font:600 10px Arial,sans-serif}
+.live-clearance-row>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}.live-clearance-row bdi{white-space:nowrap;font-size:.72rem}
+.live-furniture-clearances small{color:#6b796d;text-align:center;font-size:.62rem}
+@media(max-width:720px){.live-clearance-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.live-clearance-row,.live-clearance-row bdi{font-size:.66rem}.live-furniture-clearances small{font-size:.58rem}}
+
+.live-clearance-row{justify-content:center}.live-clearance-key{display:none}

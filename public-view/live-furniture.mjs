@@ -1,3 +1,4 @@
+import {editorPreferences} from './editor-assistance.mjs';
 import {createRoomFocus} from './room-selection.mjs';
 import {categoryForKind} from './furniture-catalog.mjs';
 import {FURNITURE_TYPES,newItemId,placementError,polygonsOverlap,itemPolygon,itemPolygons,furnitureOverlaps,polygonBounds,normalizeWorkspace,updateUnit,validatePlacements,scopeKey,unitContext} from './apartment-editing.mjs';
@@ -25,6 +26,7 @@ export function livePlacementError(item,context,items=[]){
  if(!item)return 'בחרו רהיט.';
  let prospective;
  try{prospective=normalizeWorkspace({schema:1,units:{[scopeKey(context.scope)]:{items:[...items.filter(r=>r.id!==item.id),item]}}}).units[scopeKey(context.scope)].items;}catch(e){return e.message;}
+ for(const original of items.filter(r=>r.locked)){const next=prospective.find(r=>r.id===original.id);if(next&&['x','z','y','w','d','h','yaw'].some(k=>Math.abs((next[k]||0)-(original[k]||0))>.0002))return 'יש לשחרר את נעילת הרהיט לפני שינוי.';}
  const family=new Set([item.id,...prospective.filter(r=>r.attachment?.supportId===item.id).map(r=>r.id)]);
  for(const r of prospective.filter(r=>family.has(r.id))){const error=placementError(r,context);if(error)return error;if(prospective.some(o=>o.id!==r.id&&!family.has(o.id)&&verticalOverlap(r,o)&&furnitureOverlaps(r,o)))return 'הריהוט חופף לפריט אחר. הזיזו אותו למקום פנוי.';}
  const error=placementError(item,context);if(error)return error;
@@ -42,12 +44,12 @@ export function liveCandidate({item,point,mount='floor',context,items=[],grid=.1
 }
 export function modeForItem(item){return item.attachment?.mode||(item.kind==='tv_wall'||['kitchen_wall','wall_storage','kitchen_wall_glass','kitchen_hood_cabinet','kitchen_open_shelf'].includes(item.kind)?'wall':'floor');}
 export function newLiveSession(scope,existing=null){
- return {scope,template:existing?{...existing}:null,item:existing?{...existing}:null,existing:!!existing,original:existing?structuredClone(existing):null,stage:existing?'move':'categories',category:existing?categoryForKind(existing.kind):null,mount:existing?modeForItem(existing):'floor',grid:.1,moveStep:.1,collapsed:false,wallHeight:null,hasPoint:!!existing,supportId:existing?.attachment?.supportId||null,error:'',status:''};
+ return {...editorPreferences(),scope,template:existing?{...existing}:null,item:existing?{...existing}:null,existing:!!existing,original:existing?structuredClone(existing):null,stage:existing?'move':'categories',category:existing?categoryForKind(existing.kind):null,mount:existing?modeForItem(existing):'floor',grid:.1,moveStep:.1,collapsed:false,wallHeight:null,hasPoint:!!existing,supportId:existing?.attachment?.supportId||null,error:'',status:''};
 }
 export function switchLiveRoom(session,roomId,{nav,workspace,overrides=null}){
  const scope={...session.scope,roomId:roomId||''},context=unitContext(nav,scope,overrides);
  if(!context||(roomId&&!context.selectedRoom))throw Error('החדר שנבחר אינו נמצא בדירה.');
- return {context,focus:createRoomFocus(context),session:{...newLiveSession(scope),grid:session.grid,moveStep:session.moveStep,collapsed:session.collapsed,wallHeight:session.wallHeight,status:'בחרו קטגוריה או רהיט קיים. גררו את התצוגה לסיבוב המצלמה.'}};
+ return {context,focus:createRoomFocus(context),session:{...newLiveSession(scope),...editorPreferences(session),grid:session.grid,moveStep:session.moveStep,collapsed:session.collapsed,wallHeight:session.wallHeight,status:'בחרו קטגוריה או רהיט קיים. גררו את התצוגה לסיבוב המצלמה.'}};
 }
 export function configureLiveFurniture(session,kind,context,items){
  const template=furnitureTemplate(kind,context,items,session.template?.color);
@@ -78,11 +80,11 @@ export function previewFurnitureItems(session,items){if(!session?.item)return []
 
 // Saving, restoring and previewing never change the display room or the camera.
 export function catalogLiveSession(session,status=''){
- return {...newLiveSession(session.scope),grid:session.grid,moveStep:session.moveStep,collapsed:false,wallHeight:session.wallHeight,status};
+ return {...newLiveSession(session.scope),...editorPreferences(session),grid:session.grid,moveStep:session.moveStep,collapsed:false,wallHeight:session.wallHeight,status};
 }
 export function livePlacementContext(nav,session,overrides=null){return unitContext(nav,session.existing?{...session.scope,roomId:''}:session.scope,overrides);}
 export function saveLiveFurniture(session,workspace,{nav,overrides=null}){
- const item=session.item||session.template;if(!item||!session.hasPoint)throw Error('בחרו מיקום לרהיט.');
+ const item=session.item||session.template;if(session.original?.locked)throw Error('יש לשחרר את נעילת הרהיט לפני שינוי.');if(!item||!session.hasPoint)throw Error('בחרו מיקום לרהיט.');
  const key=scopeKey(session.scope),items=workspace.units[key]?.items||[];
  if(session.existing&&!items.some(r=>r.id===item.id))throw Error('הרהיט המקורי אינו קיים עוד.');
  const problem=livePlacementError(item,livePlacementContext(nav,session,overrides),items);if(problem)throw Error(problem);

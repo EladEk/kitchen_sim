@@ -15,11 +15,12 @@ export function createApartmentEditorScene({nav,overrides=null}){
  for(const name of Object.keys(FURNITURE_PALETTE)){palette[name]=new T.MeshStandardMaterial({color:'#ffffff',...furnitureMaterialProperties(name)});palette[name].userData={architecturalInterior:true};}
  const proxy=new T.MeshBasicMaterial({colorWrite:false,depthWrite:false,transparent:true,opacity:1,side:T.DoubleSide}),flip=new T.Matrix4().makeScale(-1,1,1);
  const physicalMeshes=[],placements=[],visualBatches=[],assemblies=[],poses=new Map(),itemsByKey=new Map();
+ const ghostMaterials=new Map();let ghostKey="",ghostTime=0;
  let index=null,disposed=false,focusedRoom=null,viewKey=null,editing=false;
  const itemKey=(scope,id)=>scope+'|'+id;
  const visible=o=>{for(let p=o;p;p=p.parent)if(!p.visible)return false;return true;};
  const inRoom=r=>!focusedRoom||r.scope.building===focusedRoom.building&&r.scope.floor===focusedRoom.floor&&r.scope.unit===focusedRoom.unit&&itemInRoom(r.item,{selectedRoom:focusedRoom,polygons:focusedRoom.polygons});
- function clear(){index?.dispose();index=null;group.traverse(o=>{if(o.isInstancedMesh)o.dispose();});group.clear();physicalMeshes.length=placements.length=visualBatches.length=assemblies.length=0;itemsByKey.clear();viewKey=null;}
+ function clear(){index?.dispose();index=null;group.traverse(o=>{if(o.isInstancedMesh)o.dispose();});group.clear();physicalMeshes.length=placements.length=visualBatches.length=assemblies.length=0;itemsByKey.clear();viewKey=null;ghostKey="";}
  function pose(m){
   const t=m.state.progress,tween=t*t*(3-2*t),p=m.spec.pivot;
   m.local.identity();
@@ -58,7 +59,7 @@ export function createApartmentEditorScene({nav,overrides=null}){
    for(const batch of buckets.values()){
     const mesh=new T.InstancedMesh(batch.geometry,batch.material,walkingInstanceCapacity(batch.matrices.length));batch.mesh=mesh;mesh.count=batch.matrices.length;
     batch.matrices.forEach((m,i)=>{mesh.setMatrixAt(i,m);if(!batch.physical)mesh.setColorAt(i,batch.colors[i]);});
-    mesh.userData={editorPhysical:batch.physical,editorScope:key,editorBuilding:scope.building,editorItemIds:batch.ids,...(batch.physical?{action:'edit-furniture'}:{tourNonPhysical:true,renderFixture:true})};mesh.castShadow=!batch.physical&&!batch.material.transparent;mesh.receiveShadow=!batch.physical;mesh.computeBoundingSphere();root.add(mesh);if(batch.physical)physicalMeshes.push(mesh);else visualBatches.push(batch);
+    mesh.userData={editorPhysical:batch.physical,editorScope:key,editorBuilding:scope.building,editorItemIds:batch.ids,...(batch.physical?{action:'edit-furniture'}:{tourNonPhysical:true,renderFixture:true})};mesh.castShadow=!batch.physical&&!batch.material.transparent;mesh.receiveShadow=!batch.physical;mesh.computeBoundingSphere();root.add(mesh);if(!batch.physical){let material=ghostMaterials.get(batch.material);if(!material){material=batch.material.clone();material.transparent=true;material.opacity=.18;material.depthWrite=false;ghostMaterials.set(batch.material,material);}batch.ghost=new T.InstancedMesh(batch.geometry,material,walkingInstanceCapacity(batch.matrices.length));batch.ghost.count=0;batch.ghost.userData={tourNonPhysical:true,renderFixture:true};root.add(batch.ghost);}if(batch.physical)physicalMeshes.push(mesh);else visualBatches.push(batch);
    }
   }
   for(const k of poses.keys())if(!used.has(k))poses.delete(k);
@@ -71,6 +72,12 @@ export function createApartmentEditorScene({nav,overrides=null}){
   const hidden=new Set(state.liveHiddenIds||[]),next=(focusedRoom?`${active}:${focusedRoom.floor}:${focusedRoom.unit}:${focusedRoom.id}`:'all')+'|'+[...hidden].join(',');if(next===viewKey)return;viewKey=next;
   for(const r of placements)r.hidden=hidden.has(r.item.id);
   for(const b of visualBatches){const selected=focusedRoom&&b.scope.building===active&&b.scope.floor===focusedRoom.floor&&b.scope.unit===focusedRoom.unit,allowed=selected?new Set(b.items.filter(r=>itemInRoom(r,{selectedRoom:focusedRoom,polygons:focusedRoom.polygons})).map(r=>r.id)):null;b.active=[];for(let i=0;i<b.matrices.length;i++)if(!hidden.has(b.ids[i])&&(!allowed||allowed.has(b.ids[i])))b.active.push(i);refreshBatch(b);}
+ }
+ function occlusion(camera,target,enabled,now=performance.now()){
+  if(enabled&&now-ghostTime<120)return;ghostTime=now;const ids=new Set();
+  if(enabled){const direction=target.clone().sub(camera.position),distance=direction.length(),ray=new T.Ray(camera.position,direction.normalize());for(const r of placements){if(r.hidden||!visible(r.root)||!inRoom(r))continue;const local=ray.clone().applyMatrix4(r.inverse),hit=local.intersectBox(new T.Box3(new T.Vector3(-r.item.w/2,0,-r.item.d/2),new T.Vector3(r.item.w/2,r.item.h,r.item.d/2)),new T.Vector3());if(hit&&hit.applyMatrix4(r.base).distanceTo(camera.position)<distance-.1)ids.add(itemKey(r.key,r.item.id));}}
+  const key=[...ids].sort().join(',')+'|'+viewKey;if(key===ghostKey)return;ghostKey=key;
+  for(const b of visualBatches){let solid=0,ghost=0;for(const i of b.active){const mesh=ids.has(itemKey(b.key,b.ids[i]))?b.ghost:b.mesh,index=mesh===b.ghost?ghost++:solid++;mesh.setMatrixAt(index,b.matrices[i]);mesh.setColorAt(index,b.colors[i]);}for(const [mesh,count]of [[b.mesh,solid],[b.ghost,ghost]]){mesh.count=count;mesh.instanceMatrix.needsUpdate=true;if(mesh.instanceColor)mesh.instanceColor.needsUpdate=true;mesh.computeBoundingSphere();}}
  }
  function toggle(scope,id,point,motionId){
   if(disposed||editing)return false;const r=itemsByKey.get(itemKey(typeof scope==='string'?scope:scopeKey(scope),id));if(!r?.motions.length)return false;
@@ -107,11 +114,11 @@ export function createApartmentEditorScene({nav,overrides=null}){
  function pick(ray){
   const hit=ray.intersectObjects(physicalMeshes.filter(visible),false).find(hit=>{const r=itemsByKey.get(itemKey(hit.object.userData.editorScope,hit.object.userData.editorItemIds[hit.instanceId]));return r&&!r.hidden&&inRoom(r);})||null;if(hit)hit.buildingId=hit.object.userData.editorBuilding;return closestHit(hit,motionHit(ray));
  }
- return {group,sync,updateView,pick,blocksPosition,toggle,tick,setEditing,
+ return {group,sync,updateView,pick,occlusion,blocksPosition,toggle,tick,setEditing,
   firstHit(ray,options){const hit=index?.firstHit(ray,options)||null;if(hit)hit.buildingId=hit.object.userData.editorBuilding;return closestHit(hit,motionHit(ray,options));},
   getMotionState(scope,id){return (itemsByKey.get(itemKey(typeof scope==='string'?scope:scopeKey(scope),id))?.motions||[]).map(m=>({id:m.spec.id,type:m.spec.type,progress:m.state.progress,target:m.state.target,matrix:m.world.clone(),bounds:m.box.clone()}));},
   get stats(){return {...(index?.stats||{records:0}),assemblies:assemblies.length};},
-  dispose(){if(disposed)return;disposed=true;clear();poses.clear();cube.dispose();soft.dispose();for(const g of mirrors.values())g.dispose();mirrors.clear();for(const m of Object.values(palette))m.dispose();proxy.dispose();group.removeFromParent();}
+  dispose(){if(disposed)return;disposed=true;clear();poses.clear();cube.dispose();soft.dispose();for(const g of mirrors.values())g.dispose();mirrors.clear();for(const m of Object.values(palette))m.dispose();for(const m of ghostMaterials.values())m.dispose();proxy.dispose();group.removeFromParent();}
  };
 }
 export function withApartmentEdits(base,edits){return {canStand:position=>!edits.blocksPosition(position)&&(base.canStand?.(position)??true),firstHit(ray,options={}){const a=base.firstHit(ray,options),b=edits.firstHit(ray,options);return b&&(!a||b.distance<a.distance)?b:a;},refreshVariant:(...a)=>base.refreshVariant(...a),refreshDoors:(...a)=>base.refreshDoors(...a),get memory(){return {...base.memory,indexBytes:(base.memory?.indexBytes||0)+(edits.stats.bufferBytes||0)};},get stats(){return base.stats;},dispose(){base.dispose();}};}
