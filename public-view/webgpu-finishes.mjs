@@ -29,8 +29,8 @@ export function createFinishNodeMaterial(source){
   if(source.map&&data.publicFinish!=='stone'){
    if(floorCourses){
     // R153: each tile samples its own offset in the scanned stone (matches WebGL).
-    source.map.updateMatrix();const v=hash(floorCell),mapped=uniform(source.map.matrix).mul(vec3(coordinates,1)).xy;
-    base=base.mul(texture(source.map,mapped.add(vec2(v,fract(v.mul(7.31).add(.17))))).grad(mapped.dFdx(),mapped.dFdy()).rgb);
+    source.map.updateMatrix();const v=hash(floorCell),transform=uniform(source.map.matrix),mapped=transform.mul(vec3(coordinates,1)).xy,dx=transform.mul(vec3(coordinates.dFdx(),0)).xy,dy=transform.mul(vec3(coordinates.dFdy(),0)).xy;
+    base=base.mul(texture(source.map,mapped.add(vec2(v,fract(v.mul(7.31).add(.17))))).grad(dx,dy).rgb);
    }else base=base.mul(sample(source.map,coordinates).rgb);
   }
   if(floorCourses){
