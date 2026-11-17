@@ -25,10 +25,10 @@ export function createNodePresentation(renderer,scene,camera,{mobile=false,enhan
  scenePass.setMRT(mrt({output,normal:normalView,...(enhanced&&!mobile?{surface}:{})}));
  const beauty=scenePass.getTextureNode('output'),normal=scenePass.getTextureNode('normal'),depth=scenePass.getTextureNode('depth');let colour=beauty.rgb;
  if(enhanced&&!mobile){
-  const gi=ssgi(beauty,depth,normal,camera);gi.sliceCount.value=2;gi.stepCount.value=6;gi.radius.value=2;gi.giIntensity.value=.6;gi.aoIntensity.value=.65;owned.push(gi);
+  const gi=ssgi(beauty,depth,normal,camera);gi.sliceCount.value=2;gi.stepCount.value=6;gi.radius.value=2;gi.giIntensity.value=.6;gi.aoIntensity.value=.8;owned.push(gi);
   const diffuse=denoise(gi.getGINode(),depth,normal,camera),occlusion=denoise(gi.getAONode(),depth,normal,camera);owned.push(diffuse,occlusion);colour=colour.mul(occlusion.r).add(diffuse.rgb);
-  const parameters=scenePass.getTextureNode('surface'),reflection=ssr(beauty,depth,normal,{camera,roughnessNode:parameters.r,metalnessNode:parameters.g,reflectNonMetals:true});reflection.resolutionScale=.5;reflection.quality.value=.35;reflection.intensity.value=.12;owned.push(reflection);colour=colour.add(reflection.rgb);
- }else{const cavity=ao(depth,normal,camera);cavity.resolutionScale=.5;cavity.radius.value=.8;cavity.scale.value=.65;owned.push(cavity);colour=colour.mul(mix(1,cavity.r,.55));}
+  const parameters=scenePass.getTextureNode('surface'),reflection=ssr(beauty,depth,normal,{camera,roughnessNode:parameters.r,metalnessNode:parameters.g,reflectNonMetals:true});reflection.resolutionScale=.5;reflection.quality.value=.35;reflection.intensity.value=.2;owned.push(reflection);colour=colour.add(reflection.rgb);
+ }else{const cavity=ao(depth,normal,camera);cavity.resolutionScale=.5;cavity.radius.value=.8;cavity.scale.value=.65;owned.push(cavity);colour=colour.mul(mix(1,cavity.r,.7));}
  const glow=bloom(vec4(colour,beauty.a),.08,.25,1.4);glow.setResolutionScale(.25);owned.push(glow);const antialias=fxaa(renderOutput(vec4(colour.add(glow.rgb),beauty.a)));owned.push(antialias);pipeline.outputColorTransform=false;pipeline.outputNode=antialias;
  const render=()=>{const tone=renderer.toneMapping,space=renderer.outputColorSpace,xr=renderer.xr.enabled;try{pipeline.render();}finally{renderer.toneMapping=tone;renderer.outputColorSpace=space;renderer.xr.enabled=xr;renderer.setMRT(null);renderer.setRenderTarget(null);}};
  return {

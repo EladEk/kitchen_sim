@@ -25,10 +25,17 @@ export function createFinishNodeMaterial(source){
   if(source.roughnessMap)rough=rough.mul(texture(source.roughnessMap,rotate(p).add(.5)).grad(rotate(continuous.dFdx()),rotate(continuous.dFdy())).g);
   base=base.mul(mix(photographed,uniform(new Color(data.productId==='terrace-floor'?'#88705b':'#96918a')),joint));rough=mix(rough,.98,joint);height=height.sub(float(profile.recessMetres).mul(float(1).sub(smoothstep(profile.jointMetres/2,profile.jointMetres/2+.0006,edge))));
  }else{
-  if(source.map&&data.publicFinish!=='stone')base=base.mul(sample(source.map,coordinates).rgb);
-  if(data.publicFinish==='floor'){
-   const {tile=[.8,.8],joint=.004}=data.floorCourses||{},p=positionWorld.xz,cell=p.div(vec2(...tile)),distance=float(.5).sub(abs(fract(cell).sub(.5))).mul(vec2(...tile)),grout=joint2(distance,footprint(p),joint,tile),variation=hash(floor(cell));
-   base=base.mul(mix(float(.985).add(variation.mul(.025)),.62,grout.mul(.9)));rough=mix(mix(.50,.62,variation),.92,grout);height=height.sub(float(.00065).mul(float(1).sub(smoothstep(joint/2,joint/2+.0012,min(distance.x,distance.y)))));
+  const floorCourses=data.publicFinish==='floor'?data.floorCourses||{}:null,floorCell=floorCourses?floor(positionWorld.xz.div(vec2(...(floorCourses.tile||[.8,.8])))):null;
+  if(source.map&&data.publicFinish!=='stone'){
+   if(floorCourses){
+    // R153: each tile samples its own offset in the scanned stone (matches WebGL).
+    source.map.updateMatrix();const v=hash(floorCell),mapped=uniform(source.map.matrix).mul(vec3(coordinates,1)).xy;
+    base=base.mul(texture(source.map,mapped.add(vec2(v,fract(v.mul(7.31).add(.17))))).grad(mapped.dFdx(),mapped.dFdy()).rgb);
+   }else base=base.mul(sample(source.map,coordinates).rgb);
+  }
+  if(floorCourses){
+   const {tile=[.8,.8],joint=.004}=floorCourses,p=positionWorld.xz,cell=p.div(vec2(...tile)),distance=float(.5).sub(abs(fract(cell).sub(.5))).mul(vec2(...tile)),grout=joint2(distance,footprint(p),joint,tile),variation=hash(floorCell);
+   base=base.mul(mix(float(.985).add(variation.mul(.025)),.62,grout.mul(.9)));rough=mix(mix(.30,.42,variation),.92,grout);height=height.sub(float(.00065).mul(float(1).sub(smoothstep(joint/2,joint/2+.0012,min(distance.x,distance.y)))));
   }
  }
  if(data.scanAlbedoGain)base=base.mul(vec3(...data.scanAlbedoGain));

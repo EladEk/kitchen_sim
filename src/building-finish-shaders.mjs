@@ -41,19 +41,26 @@ export function installFloorCourses(interiorFloor,{tile=[.8,.8],joint=.004}={}){
     float grout=1.0-(1.0-gx)*(1.0-gz);
     vec2 tileId=floor(vInteriorWorld.xz/tilePeriod);
     float tileVariation=fract(sin(dot(tileId,vec2(127.1,311.7)))*43758.5453);
+    #ifdef USE_MAP
+     // R153: each tile shows its own part of the scanned stone instead of one
+     // continuous sheet across the joints. Explicit gradients avoid mip seams.
+     vec2 tileShift=vec2(tileVariation,fract(tileVariation*7.31+.17));
+     vec2 tileUvDx=dFdx(vMapUv),tileUvDy=dFdy(vMapUv);
+     diffuseColor.rgb*=textureGrad(map,vMapUv+tileShift,tileUvDx,tileUvDy).rgb/max(textureGrad(map,vMapUv,tileUvDx,tileUvDy).rgb,vec3(.03));
+    #endif
     float tileEdgeDistance=min(tileEdge.x,tileEdge.y);
     float tileRelief=-.00065*(1.-smoothstep(${(joint/2).toFixed(5)},${(joint/2+.0012).toFixed(5)},tileEdgeDistance));
     float speckle=sin(vInteriorWorld.x*63.0+sin(vInteriorWorld.z*31.0))*sin(vInteriorWorld.z*57.0)*.014;
     diffuseColor.rgb*=mix(vec3(.985+tileVariation*.025+speckle*(1.0-smoothstep(.003,.03,aa))),vec3(.62),grout*.9);
    `).replace('#include <roughnessmap_fragment>',`#include <roughnessmap_fragment>
-    roughnessFactor=mix(mix(.50,.62,tileVariation),.92,grout);
+    roughnessFactor=mix(mix(.30,.42,tileVariation),.92,grout);
    `).replace('#include <normal_fragment_maps>',`#include <normal_fragment_maps>
     vec3 tileSigmaX=dFdx(-vViewPosition),tileSigmaY=dFdy(-vViewPosition);
     vec3 tileR1=cross(tileSigmaY,normal),tileR2=cross(normal,tileSigmaX);
     float tileDet=dot(tileSigmaX,tileR1);
     if(abs(tileDet)>1.e-12)normal=normalize(abs(tileDet)*normal-sign(tileDet)*(dFdx(tileRelief)*tileR1+dFdy(tileRelief)*tileR2));
    `);
-  };interiorFloor.customProgramCacheKey=()=> `building-neutral-floor-r113:${tile}:${joint}`;
+  };interiorFloor.customProgramCacheKey=()=> `building-neutral-floor-r153:${tile}:${joint}`;
   interiorFloor.userData.architecturalInterior=true;
 
 }

@@ -23,3 +23,14 @@ sRGB and normalized at runtime to retain the chosen finish tint. The existing
 limestone albedo above remains illustrative; these scans do not turn it into a
 photograph or a manufacturer material. Owner-ordered floors keep their own
 protected photographed samples.
+
+## R153 photoreal surfaces
+
+`pbr-r153/` adds measured CC0 albedo detail for plaster walls (`plaster_grey_04`,
+Poly Haven), painted surfaces (`white_plaster_02`, Poly Haven), porcelain floors
+(`Marble012`, ambientCG) and cement (`smooth_concrete_floor`, Poly Haven, with
+normal and roughness). Albedo is converted to greyscale, normalized to a fixed
+mean and reduced in contrast (painted plaster is also high-passed to remove
+weathering stains), so the finish colour in the model stays authoritative.
+`SOURCES.json` records URLs, licences, hashes, preparation and the mean linear
+albedo used by the runtime gain. Rebuild with `python3 scripts/prepare-pbr-r153.py`.
