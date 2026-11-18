@@ -9,6 +9,7 @@ import {Uniform} from 'three';
 // milky, plastic look.
 export const HOME_AGX_GLSL=`
 uniform float homeExposure;
+uniform float homeNeutral;
 const mat3 HOME_REC2020_TO_SRGB = mat3(
 	vec3( 1.6605, - 0.1246, - 0.0182 ),
 	vec3( - 0.5876, 1.1329, - 0.1006 ),
@@ -99,12 +100,34 @@ vec3 homeAgX( vec3 color ) {
 }
 
 
+// Khronos PBR Neutral (three's NeutralToneMapping): base-colour white stays
+// white and hues stay true, with a soft highlight roll-off.
+vec3 homeNeutralCurve( vec3 color ) {
+	const float StartCompression = 0.8 - 0.04;
+	const float Desaturation = 0.15;
+	color *= homeExposure;
+	float x = min( color.r, min( color.g, color.b ) );
+	float offset = x < 0.08 ? x - 6.25 * x * x : 0.04;
+	color -= offset;
+	float peak = max( color.r, max( color.g, color.b ) );
+	if ( peak < StartCompression ) return color;
+	float d = 1. - StartCompression;
+	float newPeak = 1. - d * d / ( peak + d - StartCompression );
+	color *= newPeak / peak;
+	float g = 1. - 1. / ( Desaturation * ( peak - newPeak ) + 1. );
+	return mix( color, vec3( newPeak ), g );
+}
+
 void mainImage(const in vec4 inputColor,const in vec2 uv,out vec4 outputColor){
- outputColor=vec4(homeAgX(max(inputColor.rgb,vec3(0.))),inputColor.a);
+ vec3 c=max(inputColor.rgb,vec3(0.));
+ outputColor=vec4(homeNeutral>.5?homeNeutralCurve(c):homeAgX(c),inputColor.a);
 }
 `;
 export class HomeToneMappingEffect extends Effect{
- constructor({exposure=1}={}){super('HomeToneMappingEffect',HOME_AGX_GLSL,{blendFunction:BlendFunction.SRC,uniforms:new Map([['homeExposure',new Uniform(exposure)]])});}
+ constructor({exposure=1}={}){super('HomeToneMappingEffect',HOME_AGX_GLSL,{blendFunction:BlendFunction.SRC,uniforms:new Map([['homeExposure',new Uniform(exposure)],['homeNeutral',new Uniform(0)]])});}
  get exposure(){return this.uniforms.get('homeExposure').value;}
  set exposure(value){this.uniforms.get('homeExposure').value=Number.isFinite(value)?value:1;}
+ // Follows renderer.toneMapping: NeutralToneMapping selects the PBR Neutral curve.
+ set neutral(value){this.uniforms.get('homeNeutral').value=value?1:0;}
+ get neutral(){return this.uniforms.get('homeNeutral').value>.5;}
 }

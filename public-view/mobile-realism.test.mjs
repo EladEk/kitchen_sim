@@ -29,6 +29,91 @@ test('furniture contact shadows render in the walk view with a rounded footprint
  assert.equal(contactShadowAlpha(0,.5),0,'fades to nothing at the quad edge');
  assert.ok(contactShadowAlpha(.15,.5)>contactShadowAlpha(.05,.5),'monotonic falloff');
  assert.ok(contactShadowAlpha(.2,.2)>0,'rectangular, not a disc');
+ const {createContactShadows}=await import('../src/contact-shadows.mjs');const owned=[],decal=createContactShadows(owned).mesh(2,1);
+ assert.equal(decal.userData.renderFixture,true,'editor/home decals must survive the walk-view filter');
+ owned.forEach(r=>r.dispose?.());
  const scene=readFileSync(new URL('../src/apartment-furniture-scene.js',import.meta.url),'utf8');
  assert.match(scene,/part:'furniture-contact-shadow',visualOnly:true,tourNonPhysical:true,renderFixture:true/);
+});
+
+test('daylight uses PBR Neutral tone mapping on both backends so white walls stay white', ()=>{
+ const viewer=readFileSync(new URL('./DistrictViewer.jsx',import.meta.url),'utf8');
+ assert.match(viewer,/renderer\.toneMapping=THREE\.NeutralToneMapping/);
+ assert.doesNotMatch(viewer,/renderer\.toneMapping=THREE\.AgXToneMapping/);
+ assert.match(tone,/vec3 homeNeutralCurve\(/);
+ assert.match(effects,/tone\.neutral=mapping===NeutralToneMapping/);
+});
+
+test('legacy neutral-lighting preference is retired once; the new key is honoured', async ()=>{
+ const {readReferenceLighting,saveReferenceLighting,LEGACY_REFERENCE_LIGHTING_KEY}=await import('./reference-lighting.mjs');
+ const data=new Map([[LEGACY_REFERENCE_LIGHTING_KEY,'on']]),storage={getItem:k=>data.get(k),setItem:(k,v)=>data.set(k,v),removeItem:k=>data.delete(k)};
+ assert.equal(readReferenceLighting(storage),false);
+ assert.equal(data.has(LEGACY_REFERENCE_LIGHTING_KEY),false);
+ saveReferenceLighting(storage,true);assert.equal(readReferenceLighting(storage),true);
+});
+
+test('fabric and wood scans keep full resolution on phones', async ()=>{
+ const {MOBILE_FULL_RES_SCANS}=await import('./scanned-material-core.mjs');
+ assert.deepEqual([...MOBILE_FULL_RES_SCANS],['fabric','wood']);
+});
+
+test('alpha glass drops its milky white body and restores it for transmission', async ()=>{
+ const {createArchitecturalGlass,setArchitecturalGlassQuality}=await import('../src/architectural-glass.mjs');
+ const resources=[],glass=createArchitecturalGlass(resources,{mobile:false});
+ setArchitecturalGlassQuality(glass,{mobile:true});assert.equal(glass.color.getHexString(),'282a2a');assert.equal(glass.opacity,.075);
+ setArchitecturalGlassQuality(glass,{});assert.equal(glass.color.getHexString(),'f6faf8');assert.equal(glass.transmission,.9);
+ resources.forEach(r=>r.dispose());
+});
+
+test('legacy alpha panes lose the white body once; tinted or textured panes are untouched', async ()=>{
+ const T=await import('three');const {dimAlphaGlazing}=await import('../src/architectural-glass.mjs');
+ const pane=new T.MeshStandardMaterial({color:'#f6faf8',transparent:true,opacity:.08});
+ assert.equal(dimAlphaGlazing(pane),true);assert.equal(pane.color.getHexString(),'282a2a');assert.equal(pane.opacity,.08);
+ assert.equal(dimAlphaGlazing(pane),false);
+ const tinted=new T.MeshStandardMaterial({color:'#9fb4c0',transparent:true,opacity:.08});assert.equal(dimAlphaGlazing(tinted),false);
+ const solid=new T.MeshStandardMaterial({color:'#f6faf8'});assert.equal(dimAlphaGlazing(solid),false);
+});
+
+test('photo sky: lazy, daylight-only, sun-aligned', async ()=>{
+ const src=readFileSync(new URL('./photo-sky.mjs',import.meta.url),'utf8');
+ assert.match(src,/setTimeout\(/,'loaded lazily after the tour draws');
+ const {photoSkyStrength,photoSkyYaw,PHOTO_SKY_SUN_U}=await import('./photo-sky-math.mjs');
+ assert.equal(photoSkyStrength({dark:true,sun:{elevation:50}}),0);
+ assert.equal(photoSkyStrength({sun:{elevation:60}}),1);
+ assert.ok(photoSkyStrength({sun:{elevation:6}})>0&&photoSkyStrength({sun:{elevation:6}})<1);
+ const a=2*Math.PI*PHOTO_SKY_SUN_U,yaw=photoSkyYaw([1,0,0]),x=Math.cos(a),z=Math.sin(a);
+ assert.ok(Math.abs(x*Math.cos(yaw)+z*Math.sin(yaw)-1)<1e-9,'pano sun lands on the real sun azimuth');
+});
+
+test('lawn: CC0 photoscan, raster-only path, anti-tiled with macro breakup on both backends', ()=>{
+ const scans=readFileSync(new URL('./scanned-materials.mjs',import.meta.url),'utf8');
+ assert.match(scans,/assets\/grass-r180\/color\.jpg/);assert.match(scans,/technique:'photoscan'/);
+ const src=JSON.parse(readFileSync(new URL('./assets/grass-r180/SOURCES.json',import.meta.url),'utf8'));assert.equal(src.license,'CC0-1.0');
+ const loader=readFileSync(new URL('./ktx-material-loader.mjs',import.meta.url),'utf8');assert.match(loader,/ktx2.*return loadSurfaceTexture\(url,options\)/s);
+ const site=readFileSync(new URL('./site-scene.mjs',import.meta.url),'utf8');assert.match(site,/LAWN_MAP_GLSL/);assert.match(site,/district-surface-r180-/);
+ const gpu=readFileSync(new URL('./webgpu-finishes.mjs',import.meta.url),'utf8');assert.match(gpu,/R180 photographed lawn/);
+});
+test('lawn shading GLSL defines its noise and keeps a single extra map tap', async ()=>{
+ const {LAWN_NOISE_GLSL,LAWN_MAP_GLSL,LAWN_MACRO_GLSL}=await import('./lawn-shading.mjs');
+ assert.match(LAWN_NOISE_GLSL,/float lawnNoise\(vec2 p\)/);
+ assert.equal((LAWN_MAP_GLSL.match(/texture2D\(map/g)||[]).length,2);
+ assert.match(LAWN_MACRO_GLSL,/lawnPatch/);
+});
+
+test('facades: district copies use dense dark glazing; template glass stays clear for the visited apartment', async ()=>{
+ const T=await import('three');const {createArchitecturalGlass,distantGlazing,setArchitecturalGlassQuality,DISTANT_GLASS_OPACITY,ALPHA_GLASS_COLOR}=await import('../src/architectural-glass.mjs');
+ const own=createArchitecturalGlass([],{mobile:true});setArchitecturalGlassQuality(own,{mobile:true});const far=distantGlazing(own);
+ try{
+  assert.notEqual(far,own);assert.equal(own.opacity,.075);assert.equal('#'+own.color.getHexString(),ALPHA_GLASS_COLOR);
+  for(const q of [{mobile:true},{mobile:false,tier:0}]){setArchitecturalGlassQuality(far,q);assert.equal(far.transmission,0);assert(far.transparent);assert.equal(far.opacity,DISTANT_GLASS_OPACITY);}
+  setArchitecturalGlassQuality(own,{mobile:false,tier:0});assert.equal(own.transmission,.9,'own apartment keeps desktop transmission');
+  const src=readFileSync(new URL('./district.mjs',import.meta.url),'utf8');assert.match(src,/architecturalGlass\?glassFor\(mat\):mat/);
+ }finally{own.dispose();far.dispose();}
+});
+
+test('merged scan loader keeps the phone 1024px cap for fabric/wood inside the shared, parallel channel cache', ()=>{
+ const src=readFileSync(new URL('./scanned-material-core.mjs',import.meta.url),'utf8');
+ assert.match(src,/function shareChannel\(p,channel,kind,/);
+ assert.match(src,/max=mobile&&!MOBILE_FULL_RES_SCANS\.includes\(kind\)\?512:1024,sharedKey=JSON\.stringify\(\[.*,max\]\)/);
+ assert.match(src,/if\(p\.technique\)texture\.userData\.scanTechnique=p\.technique/);
 });

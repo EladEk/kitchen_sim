@@ -3,21 +3,25 @@ import {loadSurfaceTexture} from './surface-detail.mjs';
 import {installBuildingSurfaceUVs} from '../src/building-surface-uvs.mjs';
 import {installScanAlbedo} from '../src/scan-albedo.mjs';
 
+export const MOBILE_FULL_RES_SCANS=Object.freeze(['fabric','wood']);
 export function createScanMaterialController({scans,mobile=false,signal,loader=loadSurfaceTexture}={}){
  const maps=new Map(),sharedTextures=new Map(),owned=new Set(),bound=new Set(),pending=new Set();let disposed=false;
- async function decodeChannel(p,channel,onProgress=()=>{}){
+ async function decodeChannel(p,channel,max,onProgress=()=>{}){
   const texture=await loader(p[channel],{signal,pending,onProgress});if(!texture||disposed){texture?.dispose();return null;}
-  const source=texture.image,max=mobile?512:1024;
+  const source=texture.image;
   if(!texture.isCompressedTexture&&typeof document!=='undefined'&&(channel==='color'&&!p.naturalColor&&!p.colorMean||Math.max(source.width,source.height)>max)){const canvas=document.createElement('canvas'),ratio=Math.min(1,max/Math.max(source.width,source.height));canvas.width=Math.max(1,Math.round(source.width*ratio));canvas.height=Math.max(1,Math.round(source.height*ratio));const context=canvas.getContext('2d');if(context){context.drawImage(source,0,0,canvas.width,canvas.height);if(channel==='color'&&!p.naturalColor&&!p.colorMean){
     // Remove the scan's average tint, retaining measured grain and weave.
     // The selected finish remains the albedo authority, including dark wood.
     const pixels=context.getImageData(0,0,canvas.width,canvas.height),data=pixels.data,mean=[0,0,0],count=data.length/4;for(let i=0;i<data.length;i+=4)for(let c=0;c<3;c++)mean[c]+=data[i+c]/count;for(let i=0;i<data.length;i+=4)for(let c=0;c<3;c++)data[i+c]=Math.min(255,236*data[i+c]/Math.max(1,mean[c]));context.putImageData(pixels,0,0);
    }texture.image=canvas;}}
-  texture.colorSpace=channel==='color'?THREE.SRGBColorSpace:THREE.NoColorSpace;texture.wrapS=texture.wrapT=THREE.RepeatWrapping;texture.repeat.setScalar(1/p.metres);texture.anisotropy=16;texture.generateMipmaps=!texture.isCompressedTexture;texture.minFilter=THREE.LinearMipmapLinearFilter;texture.magFilter=THREE.LinearFilter;texture.needsUpdate=true;owned.add(texture);return texture;
+  if(p.technique)texture.userData.scanTechnique=p.technique;texture.colorSpace=channel==='color'?THREE.SRGBColorSpace:THREE.NoColorSpace;texture.wrapS=texture.wrapT=THREE.RepeatWrapping;texture.repeat.setScalar(1/p.metres);texture.anisotropy=16;texture.generateMipmaps=!texture.isCompressedTexture;texture.minFilter=THREE.LinearMipmapLinearFilter;texture.magFilter=THREE.LinearFilter;texture.needsUpdate=true;owned.add(texture);return texture;
  }
- function shareChannel(p,channel,onProgress=()=>{}){
-  const sharedKey=JSON.stringify([p[channel],channel,p.metres,!!p.naturalColor]);
-  if(!sharedTextures.has(sharedKey))sharedTextures.set(sharedKey,decodeChannel(p,channel,onProgress).then(texture=>{if(!texture)sharedTextures.delete(sharedKey);return texture;}));
+ function shareChannel(p,channel,kind,onProgress=()=>{}){
+  // Fabric and wood weave is the detail that keeps upholstery and veneer
+  // from reading as plastic; it keeps 1024px on phones (two scans, ~8 MB).
+  // The cap is part of the share key so a 512px copy never serves a 1024px kind.
+  const max=mobile&&!MOBILE_FULL_RES_SCANS.includes(kind)?512:1024,sharedKey=JSON.stringify([p[channel],channel,p.metres,!!p.naturalColor,max]);
+  if(!sharedTextures.has(sharedKey))sharedTextures.set(sharedKey,decodeChannel(p,channel,max,onProgress).then(texture=>{if(!texture)sharedTextures.delete(sharedKey);return texture;}));
   return sharedTextures.get(sharedKey);
  }
  async function load(kind,onProgress=()=>{}){
@@ -25,7 +29,7 @@ export function createScanMaterialController({scans,mobile=false,signal,loader=l
   const task=(async()=>{const out={};
    // Bound concurrent image decoding and transient canvas memory to one scan.
    const channels=['color','normal','roughness'].filter(channel=>p[channel]);let done=0;for(const channel of channels){if(disposed||signal?.aborted)break;if(!p[channel])continue;
-    const texture=await shareChannel(p,channel,fraction=>onProgress((done+fraction)/channels.length));if(!texture)continue;
+    const texture=await shareChannel(p,channel,kind,fraction=>onProgress((done+fraction)/channels.length));if(!texture)continue;
     out[channel]=texture;onProgress(++done/channels.length);
    }return out;
   })();maps.set(kind,task);return task;

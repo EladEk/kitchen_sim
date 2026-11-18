@@ -20,7 +20,7 @@ export function installCelestialSky({renderer,scene,camera,getSettings=()=>({}),
  // A light ground bounce reaches downward-facing ceilings and soffits. It
  // uses the existing solar intensity, so night/lamp-only modes stay dark.
  fill=new THREE.HemisphereLight('#faf6f0',ownSun?'#e5ddd0':'#666663',0);fill.userData={part:'astronomical-sky-fill',daylight:true};lightRig.add(fill);
- const exteriorFill=new THREE.Color('#f9f4ec'),interiorFill=new THREE.Color('#faf5ed');
+ const exteriorFill=new THREE.Color('#f9f4ec'),interiorFill=new THREE.Color('#f6f8fa');// R179: neutral indoors (survey-155 walls read white)
  function update({now=new Date(),focus=camera.position,shadowRadius=55,interior=0}={}){
   if(disposed)return null;
   const settings=getSettings()||{},minute=Math.floor(now.getTime()/60000),nextKey=JSON.stringify([settings.solar,settings.light,settings.solar?.live===true?minute:null]);

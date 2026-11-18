@@ -294,7 +294,8 @@ test('R175 mobile, reduced-tier and XR glazing retain clear paired panes and sta
   }
   assert(setArchitecturalGlassQuality(glass,{}));assert.equal(glass.transmission,.9);assert.equal(glass.opacity,1);assert.equal(glass.transparent,false);
   const root=new T.Group(),geometry=new T.BoxGeometry(),mesh=new T.Mesh(geometry,glass);root.add(mesh);setArchitecturalGlassQuality(glass,{mobile:true});
-  const owned=applyArchitecturalMaterials(root);try{assert.equal(mesh.material.opacity,.075);assert.equal(mesh.material.attenuationDistance,1.15);assert.equal(mesh.material.color.getHexString(),'f6faf8');}finally{owned.forEach(m=>m.dispose());geometry.dispose();}
+  // R179: alpha-blended panes use a neutral near-black body (no milky veil, no cyan).
+  const owned=applyArchitecturalMaterials(root);try{assert.equal(mesh.material.opacity,.075);assert.equal(mesh.material.attenuationDistance,1.15);assert.equal(mesh.material.color.getHexString(),'282a2a');}finally{owned.forEach(m=>m.dispose());geometry.dispose();}
  }finally{resources.forEach(m=>m.dispose());}
 });
 
@@ -352,11 +353,12 @@ test('R175 WebGPU and WebGL share warm clear-air fog and retain night/dusk and d
 
 test('R175 room probe and window bounce stay warm without lighting lamp-only mode',()=>{
  const pixels=interiorProbePixels({width:32,height:16});
- for(let i=0;i<pixels.data.length;i+=4){assert(pixels.data[i]>pixels.data[i+1]&&pixels.data[i+1]>pixels.data[i+2]);assert.equal(pixels.data[i+3],1);assert(Number.isFinite(pixels.data[i]));}
+ // R179: the owner's photos are neutral-cool white; the probe must not tint warm.
+ for(let i=0;i<pixels.data.length;i+=4){assert(pixels.data[i+2]>=pixels.data[i]&&pixels.data[i+2]/pixels.data[i]<1.12);assert.equal(pixels.data[i+3],1);assert(Number.isFinite(pixels.data[i]));}
  const scene=new T.Scene(),renderer={toneMappingExposure:1},lighting=createInteriorLighting(scene,renderer,{environmentFactory:()=>({texture:new T.Texture(),dispose(){this.texture.dispose();}})});
  try{
   const window=scene.getObjectByName('tour-window-bounce'),bounce=scene.getObjectByName('tour-floor-bounce'),walls=scene.getObjectByName('tour-wall-bounce');
-  assert.equal(window.color.getHexString(),'fff8ee');assert.equal(bounce.groundColor.getHexString(),'e8e1d5');assert.equal(walls.color.getHexString(),'f8f4ec');
+  assert.equal(window.color.getHexString(),'f4f8ff');assert.equal(bounce.groundColor.getHexString(),'e2e2df');assert.equal(walls.color.getHexString(),'f5f7f9');
   const result=lighting.update({inside:true,walking:true,solar:{daylight:.81},dt:.1});close(window.intensity,result.amount*.9*2.1);
   lighting.update({inside:true,walking:true,solar:{daylight:1,dark:true}});assert.equal(window.intensity,0);assert.equal(bounce.intensity,0);assert.equal(walls.intensity,0);
  }finally{lighting.dispose();}
@@ -495,7 +497,7 @@ test('R177 nearby lawn instances use the lifted olive palette and leave non-walk
  try{
   lawn.update(new T.Vector3(0,1.62,0),1000,{walking:false});assert.equal(lawn.mesh.count,0);
   lawn.update(new T.Vector3(0,1.62,0),1400,{walking:true});assert(lawn.mesh.count>0);
-  for(let i=0;i<lawn.mesh.count;i++){lawn.mesh.getColorAt(i,colour);const {h,s,l}=colour.getHSL({});assert(h>=.23-1e-6&&h<=.28+1e-6);assert(s>=.38-1e-6&&s<=.52+1e-6);assert(l>=.23-1e-6&&l<=.33+1e-6);assert(colour.g>colour.r&&colour.g>colour.b);}
+  for(let i=0;i<lawn.mesh.count;i++){lawn.mesh.getColorAt(i,colour);const {h,s,l}=colour.getHSL({});assert(h>=.23-1e-6&&h<=.28+1e-6);assert(s>=.38-1e-6&&s<=.52+1e-6);assert(l>=.32-1e-6&&l<=.42+1e-6);/* R180: lifted to match the photographed lawn */assert(colour.g>colour.r&&colour.g>colour.b);}
   lawn.update(new T.Vector3(0,1.62,0),1800,{walking:false});assert.equal(lawn.mesh.visible,false);
  }finally{lawn.dispose();}
 });

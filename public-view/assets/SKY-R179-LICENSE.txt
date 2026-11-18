@@ -1,0 +1,7 @@
+sky-r179.jpg
+Source: Poly Haven, "Kloofendal 48d Partly Cloudy (Pure Sky)"
+https://polyhaven.com/a/kloofendal_48d_partly_cloudy_puresky
+Authors: Greg Zaal (original), Jarod Guest (sky edits)
+License: CC0 1.0 Universal (public domain) - https://polyhaven.com/license
+Processing: tonemapped JPG downscaled to 2048x1024; the mirrored lower half
+replaced by a horizon haze gradient (hidden by buildings and ground).

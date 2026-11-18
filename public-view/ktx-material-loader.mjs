@@ -7,6 +7,8 @@ export function createCompressedMaterialLoader(renderer,fallbacks){
  const pending=new Set();
  const load=async(url,options={})=>{
   if(disposed||options.signal?.aborted)return null;
+  // Raster-only scans (e.g. the R180 lawn) skip the Basis transcoder entirely.
+  if(!/\.ktx2(?:[?#]|$)/i.test(url))return loadSurfaceTexture(url,options);
   active++;
   try{
    const bytes=await fetchLoadingBytes(url,{signal:options.signal,onProgress:event=>options.onProgress?.(event.fraction*.85)}),buffer=bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength);if(disposed||options.signal?.aborted)return null;

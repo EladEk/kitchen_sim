@@ -8,6 +8,7 @@ import {compactRenderAttributes} from './compact-attributes.mjs';
 import {DISTRICT,PLAN_CENTER,PLAN_ROTATION} from './district-layout.mjs';
 import {inside} from './navigation.mjs';
 import {createDistrictSite} from './site-scene.mjs';
+import {distantGlazing} from '../src/architectural-glass.mjs';
 export {DISTRICT} from './district-layout.mjs';
 export {PLAN_ROTATION} from './district-layout.mjs';
 export const districtSolar=solar=>({...solar,northBearing:((solar.northBearing??135)+90)%360});
@@ -22,6 +23,7 @@ export function districtLocation(position,data){
 // Common surfaces stay shared across the entire district.
 export function createDistrict(template,siteData,{mobile=false,variants=new Map(),siteOptions={},doorController=null}={}){
  const group=new THREE.Group(),geometries=[],materials=[],textures=[],buckets=new Map(),furnitureBatches=new Map(),copies=[],moving=[];template.updateMatrixWorld(true);
+ const distantGlass=new Map(),glassFor=m=>{if(!distantGlass.has(m)){const g=distantGlazing(m);materials.push(g);distantGlass.set(m,g);}return distantGlass.get(m);};
  const add=(o,matrix)=>{if(o.userData.furnitureRender){const key=JSON.stringify([o.geometry.uuid,[o.material].flat().map(m=>m.uuid)]);if(!furnitureBatches.has(key))furnitureBatches.set(key,{geometry:o.geometry,material:o.material,matrices:[],kind:o.userData.furnitureRender});furnitureBatches.get(key).matrices.push(matrix);return;} // The baseline is already sanitized. Keep all balcony returns and ground slabs.
 
  const mats=[o.material].flat(),total=o.geometry.index?.count??o.geometry.attributes.position.count;const ranges=mats.length>1?o.geometry.groups:[{start:0,count:total,materialIndex:0}];
@@ -38,7 +40,7 @@ export function createDistrict(template,siteData,{mobile=false,variants=new Map(
   for(const motion of motionRoots(source)){if(motion.userData.tourDoor||!include(motion))continue;for(const b of members){const copy=createMotionCopy(motion,source),wrapper=new THREE.Group();wrapper.matrixAutoUpdate=false;wrapper.matrix.copy(buildingTransform(b));wrapper.add(copy.group);group.add(wrapper);moving.push({id:b.id,wrapper,copy});}}
   source.traverseVisible(o=>{if(!o.isMesh||o.userData.furnitureCollisionProxy||motionAncestor(o,source)||!include(o))return;const base=inverse.clone().multiply(o.matrixWorld);if(o.isInstancedMesh){const m=new THREE.Matrix4();for(let i=0;i<o.count;i++){o.getMatrixAt(i,m);add(o,base.clone().multiply(m));}}else add(o,base);});
   for(const [mat,byDetail] of buckets)for(const [flags,parts] of byDetail){const [detail,cast]=flags.split('|');const geo=mergeDistrictParts(parts,{wallFinish:['stone','render'].includes(mat.userData.publicFinish)});if(!geo)continue;geometries.push(geo);
-   for(const mirror of [false,true]){const buildings=members.filter(b=>!!b.mirror===mirror);if(!buildings.length)continue;const geometry=mirror?mirroredGeometry(geo):geo;if(mirror)geometries.push(geometry);const mesh=new THREE.InstancedMesh(geometry,mat,buildings.length);buildings.forEach((b,i)=>mesh.setMatrixAt(i,buildingTransform({...b,mirror:false})));mesh.castShadow=cast==='1';mesh.receiveShadow=true;mesh.userData={district:true,detail};copies.push({mesh,buildings,detail});group.add(mesh);}
+   for(const mirror of [false,true]){const buildings=members.filter(b=>!!b.mirror===mirror);if(!buildings.length)continue;const geometry=mirror?mirroredGeometry(geo):geo;if(mirror)geometries.push(geometry);const mesh=new THREE.InstancedMesh(geometry,mat.userData.architecturalGlass?glassFor(mat):mat,buildings.length);buildings.forEach((b,i)=>mesh.setMatrixAt(i,buildingTransform({...b,mirror:false})));mesh.castShadow=cast==='1';mesh.receiveShadow=true;mesh.userData={district:true,detail};copies.push({mesh,buildings,detail});group.add(mesh);}
   }
   for(const batch of furnitureBatches.values())for(const mirror of [false,true]){const buildings=members.filter(b=>!!b.mirror===mirror);if(!buildings.length)continue;const geometry=mirror?mirroredGeometry(batch.geometry,[0,0]):batch.geometry;if(mirror)geometries.push(geometry);const mesh=new THREE.InstancedMesh(geometry,batch.material,buildings.length*batch.matrices.length);mesh.castShadow=mesh.receiveShadow=true;mesh.userData={district:true,detail:'interior',furnitureRender:batch.kind,tourNonPhysical:true};copies.push({mesh,buildings,detail:'interior',localMatrices:batch.matrices,mirror});group.add(mesh);}
   furnitureBatches.clear();buckets.clear();

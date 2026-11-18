@@ -9,6 +9,7 @@ import {createLawnDetail} from './lawn-detail.mjs';
 import {createLandscapeDetails} from './landscape-details.mjs';
 import {createDistrictContext,contextParking,contextPolygon} from './context-scene.mjs';
 
+import {LAWN_NOISE_GLSL,LAWN_MAP_GLSL,LAWN_MACRO_GLSL} from './lawn-shading.mjs';
 export function createDistrictSite(source,{mobile=false,includeFence=()=>true,includeCar=()=>true,lawnRegions=[]}={}){
  const layout=createSiteLayout(source),group=new THREE.Group(),geometries=[],materials=[],textures=[],surfaces=new Map(),boxes=new Map();group.name='public-district-development';const details=createSurfaceDetails({mobile});
  function material(color,kind='plain',extra={}){
@@ -21,13 +22,13 @@ export function createDistrictSite(source,{mobile=false,includeFence=()=>true,in
     #ifdef USE_INSTANCING
     siteVertex=instanceMatrix*siteVertex;
     #endif
-    vSiteXZ=(modelMatrix*siteVertex).xz;`);s.fragmentShader='varying vec2 vSiteXZ;\n'+FINISH_GRID_GLSL+s.fragmentShader;s.fragmentShader=s.fragmentShader.replace('#include <color_fragment>',`#include <color_fragment>
+    vSiteXZ=(modelMatrix*siteVertex).xz;`);s.fragmentShader='varying vec2 vSiteXZ;\n'+FINISH_GRID_GLSL+(kind==='grass'?LAWN_NOISE_GLSL:'')+s.fragmentShader;if(kind==='grass')s.fragmentShader=s.fragmentShader.replace('#include <map_fragment>',LAWN_MAP_GLSL);s.fragmentShader=s.fragmentShader.replace('#include <color_fragment>',`#include <color_fragment>
     float grain=fract(sin(dot(floor(vSiteXZ*125.0),vec2(127.1,311.7)))*43758.5453);
     float footprint=max(fwidth(vSiteXZ.x),fwidth(vSiteXZ.y));
     diffuseColor.rgb*=1.0+(grain-.5)*.07*(1.0-smoothstep(.004,.03,footprint));
-    ${kind==='grass'?`float meadow=sin(vSiteXZ.x*.43+sin(vSiteXZ.y*.21))*sin(vSiteXZ.y*.37-vSiteXZ.x*.13);diffuseColor.rgb*=vec3(1.0+meadow*.045,1.0+meadow*.035,1.0+meadow*.025);`:''}
+    ${kind==='grass'?LAWN_MACRO_GLSL:''}
     ${kind==='paving'?`vec2 tile=vSiteXZ*vec2(2.0,4.0);tile.x+=mod(floor(tile.y),2.0)*.5;vec2 edge=min(fract(tile),1.0-fract(tile))*vec2(.5,.25);float gx=finishGridCoverage(edge.x,fwidth(vSiteXZ.x),.003,.5),gz=finishGridCoverage(edge.y,fwidth(vSiteXZ.y),.003,.25);float grout=1.0-(1.0-gx)*(1.0-gz);diffuseColor.rgb*=mix(1.0,.75,grout);`:''}
-   `);};m.customProgramCacheKey=()=> 'district-surface-r103-'+kind;
+   `);};m.customProgramCacheKey=()=> 'district-surface-r180-'+kind;
   }return m;
  }
  const parkingPavers=material('#8b8b83','paving');

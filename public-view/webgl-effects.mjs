@@ -1,7 +1,7 @@
 import {EffectComposer,RenderPass,EffectPass,BloomEffect,FXAAEffect} from 'postprocessing';
 import {HomeToneMappingEffect} from './home-tone-mapping.mjs';
 import {N8AOPostPass} from 'n8ao';
-import {HalfFloatType,NoToneMapping} from 'three';
+import {HalfFloatType,NoToneMapping,NeutralToneMapping} from 'three';
 // realism-effects 1.1.2 imports the removed WebGLMultipleRenderTargets export.
 // Its GI/reflection equivalent uses maintained Three TSL nodes on WebGPU.
 export function createWebGLPresentation(renderer,scene,camera,{mobile=false}={}){
@@ -20,7 +20,7 @@ export function createWebGLPresentation(renderer,scene,camera,{mobile=false}={})
   return {resize(w,h){for(const target of [composer.inputBuffer,composer.outputBuffer,composer.depthRenderTarget])target?.setSize(w,h);for(const pass of composer.passes)pass.setSize(w,h);},render(){
    // The composer owns tone mapping (HomeToneMappingEffect, fed the renderer's
    // exposure). The renderer itself must not map the final pass again.
-   const mapping=renderer.toneMapping;tone.exposure=renderer.toneMappingExposure;renderer.toneMapping=NoToneMapping;
+   const mapping=renderer.toneMapping;tone.exposure=renderer.toneMappingExposure;tone.neutral=mapping===NeutralToneMapping;renderer.toneMapping=NoToneMapping;
    try{composer.render();}finally{renderer.toneMapping=mapping;}
   },dispose(){composer.dispose();renderer.autoClear=autoClear;}};
  }catch(e){composer?.dispose();renderer.autoClear=autoClear;for(const o of owned)o.dispose?.();throw e;}
