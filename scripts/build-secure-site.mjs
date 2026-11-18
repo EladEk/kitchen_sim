@@ -5,9 +5,13 @@ import {createPublicBaseline} from './public-baseline.mjs';
 import {readdir,readFile,writeFile,mkdir,rm,copyFile,cp,access} from 'node:fs/promises';
 import {join,relative} from 'node:path';
 import {randomBytes,createCipheriv,createHash} from 'node:crypto';
+import {deriveAssetKey} from '../server/asset-key.mjs';
 
-const env={...loadEnv('production',process.cwd(),''),...process.env},key=Buffer.from(env.DOCUMENTS_ASSET_SECRET||env.DOCUMENTS_SECRET||'','base64');
-if(key.length!==32)throw Error('Set DOCUMENTS_SECRET to a base64-encoded 32-byte server secret before building. No unprotected build is produced.');
+const env={...loadEnv('production',process.cwd(),''),...process.env};
+const configuredKey=await deriveAssetKey(env);
+if(!configuredKey&&(env.DOCUMENTS_ASSET_SECRET||env.DOCUMENTS_SECRET))throw Error('Vault configuration invalid: provide a 32-byte base64 DOCUMENTS_ASSET_SECRET or non-empty DOCUMENTS_SECRET.');
+if(!configuredKey)console.warn('[vault] No DOCUMENTS_ASSET_SECRET or DOCUMENTS_SECRET configured. Using a random local-build key; serverless deployments require a stable configured secret.');
+const key=configuredKey?Buffer.from(configuredKey):randomBytes(32);
 await rm('dist',{recursive:true,force:true,maxRetries:8,retryDelay:200});
 // Stage owner output outside the deployment tree so delayed filesystem writes
 // cannot recreate plaintext in the public asset directory after sealing.
@@ -24,10 +28,12 @@ async function seal(directory,sourceRoot,prefix=''){for(const name of await read
 await mkdir('dist/client/_vault',{recursive:true});
 await seal(personalBuild,personalBuild,'/_personal');
 await rm(personalBuild,{recursive:true,force:true,maxRetries:8,retryDelay:200});
-for(const root of roots.filter(r=>r!=='_personal'))await seal(join('public',root),'public');
+for(const root of roots.filter(r=>r!=='_personal')){try{await access(join('public',root));}catch(error){if(error.code==='ENOENT')continue;throw error;}await seal(join('public',root),'public');}
 for(const entry of await readdir('public',{withFileTypes:true}))if(!roots.includes(entry.name)&&!entry.name.startsWith('.'))await cp(join('public',entry.name),join('dist/client',entry.name),{recursive:true});
 await mkdir('.site-private',{recursive:true});await writeFile('.site-private/document-manifest.mjs','export const DOCUMENT_MANIFEST='+JSON.stringify(manifest)+';\n');
-await build({configFile:false,publicDir:false,build:{ssr:'server/worker.mjs',outDir:'dist/server',target:'es2022',rollupOptions:{output:{entryFileNames:'index.js'}}}});
+const buildKeyFile='server/build-asset-key.mjs',emptyBuildKey="// This module is populated only while the protected Worker bundle is built.\nexport const BUILD_ASSET_SECRET = '';\n";
+await writeFile(buildKeyFile,`// Generated transiently by scripts/build-secure-site.mjs; server bundle only.\nexport const BUILD_ASSET_SECRET = '${configuredKey?'':key.toString('base64')}';\n`);
+try{await build({configFile:false,publicDir:false,build:{ssr:'server/worker.mjs',outDir:'dist/server',target:'es2022',rollupOptions:{output:{entryFileNames:'index.js'}}}});}finally{await writeFile(buildKeyFile,emptyBuildKey);}
 // Keep the final deploy tree clean after both Vite builds. A later build phase
 // may recreate the public directory structure; originals must stay vault-only.
 for(const root of roots)await rm(join('dist/client',root),{recursive:true,force:true,maxRetries:8,retryDelay:200});

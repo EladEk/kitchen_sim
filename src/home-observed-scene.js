@@ -1,3 +1,4 @@
+import {buildSafeRoomVents} from './safe-room-vents.js';
 import * as THREE from 'three';
 import {HOUSE,ROOMS,WINDOWS,WALLS,KITCHEN_ANCHOR,openingPoint,point} from './home-model.mjs';
 import {OBSERVED_ELEMENTS} from './home-photo-reference.mjs';
@@ -6,17 +7,32 @@ import {CEILING_COLOR,CEILING_MATERIAL} from './ceiling-finish.mjs';
 
 // Permanent, photo-observed fittings remain visible when furniture is hidden.
 // All vertical sizes below are explicit estimates, independent of plan x/z.
-export function buildObservedArchitecture({group,box,cylinder,mat,resources,wallHeight}){
+export function buildObservedArchitecture({group,box,cylinder,mat,resources,wallHeight,surface=null}){
  const buildingGroups=new Map();
  for(const e of OBSERVED_ELEMENTS){
   if(wallHeight<e.bottom)continue;
   const p=new THREE.Group(),data={action:'building',buildingId:e.id};
-  p.userData={buildingId:e.id,source:'site-photos',page:e.page,dimensionsInferred:true};
+  p.userData={buildingId:e.id,source:e.source||'site-photos',page:e.page,dimensionsInferred:true};
   group.add(p);buildingGroups.set(e.id,p);
   const white=mat('#efeee8'),[w,d,h]=e.dimensions;
-  if(e.kind==='kitchen-bulkhead'){
+  if(e.kind==='survey-ac'){
+   const [x,z]=point(...e.pdf);p.position.set(x,0,z);p.rotation.y=e.rotation;
+   box(0,e.bottom+h/2,0,w,h,d,white,p,{...data,part:'observed-split-ac'},.025);
+   box(0,e.bottom+.045,d/2+.003,w-.08,.035,.009,mat('#444c4c'),p,data);
+   box(0,e.bottom+.038,d/2+.012,w-.08,.012,.018,white,p,data);
+   box(w*.32,e.bottom+h*.55,d/2+.004,.025,.009,.003,mat('#9ca59d'),p,data);
+  }else if(e.kind==='survey-ceiling-fittings'){
+   const [x,z]=point(...e.pdf);p.position.set(x,0,z);
+   // Two observed shapes only; no unverified electrical/ventilation function.
+   box(.16,e.bottom+h/2,0,.2,h,.2,white,p,data);
+   cylinder(.16,e.bottom+.012,0,.072,.024,mat('#848b85'),p,data);
+   cylinder(-.26,e.bottom+h/2,0,.09,h,white,p,data);
+   cylinder(-.26,e.bottom+.008,0,.038,.016,mat('#858b87'),p,data);
+  }else if(e.kind==='safe-door-vents'){
+   buildSafeRoomVents({parent:p,element:e,box,cylinder,mat,resources,data});
+  }else if(e.kind==='kitchen-bulkhead'){
    p.position.set(KITCHEN_ANCHOR[0],0,KITCHEN_ANCHOR[1]);p.rotation.y=Math.PI;
-   const hvac=createKitchenHvac({box,mat,data});for(const child of [...hvac.children])p.add(child);
+   const hvac=createKitchenHvac({box,mat,surface,data});for(const child of [...hvac.children])p.add(child);
   }else if(e.kind==='hall-ceiling'||e.kind==='master-ceiling'){
    const poly=e.kind==='hall-ceiling'?ROOMS.find(r=>r.id==='hall').polygon:[[719.4,635.32],[815.76,635.32],[815.76,743.02],[719.4,743.02]].map(v=>point(...v));
    const shape=new THREE.Shape();poly.forEach(([x,z],i)=>i?shape.lineTo(x,z):shape.moveTo(x,z));shape.closePath();

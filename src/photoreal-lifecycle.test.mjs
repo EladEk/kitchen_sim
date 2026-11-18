@@ -54,12 +54,26 @@ test('sustained camera movement and background suspension retire photo buffers b
  const f=fixture();try{
   const now=performance.now();f.button.click();f.photo.render(now+1500);f.photo.render(now+3000);await flush();f.photo.render(now+4500);f.photo.render(now+4600);assert(f.photo.capture());
   for(let i=0;i<12;i++){f.camera.position.x+=.1;f.photo.render(now+4700+i*50);}
-  assert.equal(f.photo.capture(),null);assert.equal(f.counts.disposed,2);assert.equal(f.button.attributes['aria-pressed'],'true');assert.equal(f.host.children.length,1);
-  f.photo.render(now+9000);await flush();f.photo.render(now+10500);f.photo.render(now+10600);assert(f.photo.capture());
+  assert.equal(f.photo.capture(),null);assert.equal(f.counts.disposed,0,'brief orbit keeps the same renderer and BVH');assert.equal(f.button.attributes['aria-pressed'],'true');
+  for(let i=0;i<20;i++){f.camera.position.x+=.1;f.photo.render(now+5400+i*500);}
+  assert.equal(f.counts.disposed,2);assert.equal(f.host.children.length,1);
+  f.photo.render(now+17000);await flush();f.photo.render(now+18500);f.photo.render(now+18600);assert(f.photo.capture());
   f.photo.suspend();assert.equal(f.counts.disposed,4);assert.equal(f.host.children.length,1);assert.equal(f.photo.capture(),null);
  }finally{f.finish();}
 });
 
 test('walking never performs a whole-scene photo signature scan',()=>{
  const f=fixture();try{let traversals=0;const original=f.scene.traverseVisible.bind(f.scene);f.scene.traverseVisible=fn=>{traversals++;return original(fn);};f.button.click();const now=performance.now();for(let i=0;i<60;i++){f.camera.position.x+=.05;f.photo.render(now+i*50);}assert.equal(traversals,0,'all expensive snapshot work must wait until the camera stops');}finally{f.finish();}
+});
+
+test('small camera moves reuse photo acceleration data and expose active workload',async()=>{
+ const f=fixture();try{
+  const now=performance.now();f.button.click();assert(f.photo.enabled);f.photo.render(now+1500);f.photo.render(now+3000);await flush();f.photo.render(now+4500);f.photo.render(now+4600);assert(f.photo.displayed);const built=f.counts.prepared;
+  for(let i=0;i<10;i++){f.camera.position.x+=.1;f.photo.render(now+4700+i*50);}assert(!f.photo.displayed);assert(f.photo.enabled);assert.equal(f.counts.disposed,0);
+  f.photo.render(now+7000);f.photo.render(now+7100);assert(f.photo.displayed);assert.equal(f.counts.prepared,built);f.button.click();assert(!f.photo.enabled);
+ }finally{f.finish();}
+});
+
+test('explicit invalidation hides a displayed image and prepares a fresh snapshot',async()=>{
+ const f=fixture();try{const now=performance.now();f.button.click();f.photo.render(now+1500);f.photo.render(now+3000);await flush();f.photo.render(now+4500);f.photo.render(now+4600);assert(f.photo.capture());const before=f.counts.prepared;f.photo.invalidate();assert.equal(f.photo.capture(),null);f.photo.render(now+6000);await flush();f.photo.render(now+8000);await flush();assert(f.counts.prepared>before);}finally{f.finish();}
 });

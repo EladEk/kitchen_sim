@@ -8,8 +8,7 @@ export default {async fetch(request,env){
   if(!['GET','HEAD'].includes(request.method))return new Response(null,{status:405});
   if(!await documentSession(request,env))return documentLockedResponse(request);
   const entry=DOCUMENT_MANIFEST[path==='/_personal'||path==='/_personal/'?'/_personal/index.html':path];if(!entry)return new Response('Not found',{status:404,headers:{'Cache-Control':'private, no-store'}});
-  const assetUrl=new URL(entry.asset,url.origin),encrypted=await env.ASSETS.fetch(new Request(assetUrl,{method:'GET'}));if(!encrypted.ok)return new Response('Document unavailable',{status:503});
-  return decryptedDocumentResponse(request,env,entry,await encrypted.arrayBuffer());
+  return decryptedDocumentResponse(request,env,entry,async()=>{const encrypted=await env.ASSETS.fetch(new Request(new URL(entry.asset,url.origin),{method:'GET'}));if(!encrypted.ok)throw Error('Document unavailable');return encrypted.arrayBuffer();});
  }
  if(path.startsWith('/_vault/'))return new Response('Not found',{status:404});
  if(path.startsWith('/api/'))return new Response('Not found',{status:404});

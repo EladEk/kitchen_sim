@@ -1,0 +1,79 @@
+/* R176 UX polish: one shared interaction language for every public-view control.
+   Loaded after the feature stylesheets; it only adds states, sizes and contrast. */
+:root{--ux-accent:#397a78;--ux-accent-strong:#2f6461;--ux-hover:#eef3e8;--ux-border-hover:#8fa58a;--ux-muted:#5c6b5c}
+
+/* Hover / pressed feedback (pointer devices only, so touch does not stick). */
+button,select,.primary,a.primary{transition:background-color .15s ease,border-color .15s ease,box-shadow .15s ease,transform .08s ease}
+@media(hover:hover){
+ button:not(:disabled):not(.primary):hover,select:not(:disabled):hover{background-color:var(--ux-hover);border-color:var(--ux-border-hover)}
+ .primary:not(:disabled):hover,a.primary:hover{background-color:#3a4f38;box-shadow:0 2px 8px #24382522}
+ .tour-map-heading button:not(:disabled):hover{background-color:#e7efea}
+}
+button:not(:disabled):active,.primary:not(:disabled):active{transform:translateY(1px)}
+button[aria-expanded="true"]{background-color:#e3ece0;border-color:var(--ux-border-hover)}
+
+/* Disabled: visibly inert and explained by the cursor. */
+button:disabled,select:disabled,input:disabled{cursor:not-allowed}
+select:disabled,input:disabled{opacity:.55}
+
+/* Keyboard focus is always visible, on every interactive element. */
+:where(button,select,input,textarea,summary,a,[tabindex]):focus-visible{outline:3px solid var(--ux-accent);outline-offset:2px}
+.tour-map svg:focus-visible{outline-offset:-3px}
+:where(button,select,input,textarea,summary,a):focus:not(:focus-visible){outline:none}
+
+/* Readable secondary text (WCAG AA ≥4.5:1 on the light panels). */
+.hint,footer,.tour-quality p,.tour-viewpoints small,.options-content small{color:var(--ux-muted)}
+.viewer-revision{color:#56655a}
+
+/* Status lines announce changes without layout jumps. */
+.tour-action-status:empty{visibility:hidden}
+
+/* Load-failure screen: message on top, recovery actions as a clear row. */
+.loading[role="alert"]{display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:10px;padding:24px;text-align:center;line-height:1.6}
+.loading[role="alert"]>button{flex:0 0 auto;min-height:44px}
+
+/* Location chip buttons: easier targets, grouped spacing. */
+.location{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px}
+.location button{margin:0;min-height:32px;padding:5px 10px;font-size:12px;border-radius:8px}
+
+/* Touch screens: every control reaches the 44px target size. */
+@media(pointer:coarse){
+ .toolbar>button,.selectors select,.location button,.tour-map-heading button,.tour-map-tools button,.tour-actions button,.tour-viewpoints button,.tour-viewpoints input,.tour-quality select,.elevator-floors button,.elevator-close,.viewer-header-actions>.apartment-edit-open,.photo-header-slot button,.options-heading button,.live-furniture-panel button,.apartment-editor-dialog button,.graphics-log-dialog button{min-height:44px!important}
+ .tour-map-heading button,.tour-map-tools button,.elevator-close{min-width:44px}
+ .toolbar label select{height:34px}
+ .neutral-lighting-options input{width:24px;height:24px}
+}
+
+/* Elevator: current floor is marked, not only greyed out. */
+.elevator-floors button[aria-current="true"]{border:2px solid var(--ux-accent);font-weight:700}
+.elevator-close{min-width:40px;min-height:40px;padding:6px 10px;font-size:20px;line-height:1}
+
+/* Decorative glyphs never inherit link/button underline or selection. */
+.ux-icon{display:inline-block;margin-inline-end:4px;user-select:none}
+
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}
+
+/* Destructive actions read as such before they are pressed. */
+button.danger{color:#9b2c22;border-color:#d9b2ab}
+@media(hover:hover){button.danger:not(:disabled):hover{background-color:#fbecea;border-color:#c0675c}}
+
+/* Options dialog: explanatory text and its action no longer share one ragged line. */
+.tour-quality small{display:block;line-height:1.6;color:var(--ux-muted)}
+.tour-quality>.graphics-log-open{display:block;margin-top:10px}
+.tour-quality>label{font-weight:600}
+.options-content>section+section,.options-content>section+.release-version{margin-top:4px}
+
+/* Live furniture editor: keyboard hint only where a keyboard is likely. */
+.live-shortcut-help{display:block;font-size:11px;color:var(--ux-muted);margin-top:2px;line-height:1.4}
+@media(pointer:coarse){.live-shortcut-help{display:none}}
+
+/* Wide screens: the furniture editor docks beside the 3D view instead of under
+   it, so the apartment keeps the full viewport height while editing. */
+@media(min-width:1100px) and (min-aspect-ratio:4/3){
+ .viewport.editor-active{flex-direction:row}
+ .viewport.editor-active>.live-furniture-panel{order:-1;width:min(430px,36vw);max-height:none;height:100%;overflow-y:auto;border-radius:0 14px 14px 0;box-shadow:4px 0 18px #18271c1c}
+ .viewport.editor-active>.canvas{min-width:0}
+ .viewport.editor-active .live-catalog-rail{scroll-snap-type:x mandatory}
+ /* Narrow dock: wrap the tool rail so undo/redo and tools are never scrolled off. */
+ .viewport.editor-active .editor-tools-rail{flex-wrap:wrap;white-space:normal;overflow-x:visible}
+}

@@ -1,4 +1,5 @@
 import * as T from 'three';
+import {upgradeFurnitureMaterials} from './physical-finishes.mjs';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 import {applyFurnitureColours,FURNITURE_COLOURS} from './furniture-colours.mjs';
 // Runtime templates are loaded once from the shared GLB. These keys are public
@@ -25,8 +26,8 @@ export function applyCompleteFurniture(root,templates){
  }return replacements;
 }
 export function furnitureTemplatesFromGLTF(gltf){
- applyFurnitureColours(gltf.scene);const templates=new Map(),components=new Map();gltf.scene.updateMatrixWorld(true);
- for(const root of gltf.scene.children){const name=root.name,parts=[];root.traverse(o=>{if(!o.isMesh)return;const geometry=o.geometry.clone().applyMatrix4(o.matrixWorld),materials=[o.material].flat();for(const material of materials){material.userData={...material.userData,furnitureMaterial:true,architecturalInterior:true};if(material.map)material.map.anisotropy=4;}
+ upgradeFurnitureMaterials(gltf.scene);applyFurnitureColours(gltf.scene);const templates=new Map(),components=new Map();gltf.scene.updateMatrixWorld(true);
+ for(const root of gltf.scene.children){const name=root.name,parts=[];root.traverse(o=>{if(!o.isMesh)return;const geometry=o.geometry.clone().applyMatrix4(o.matrixWorld),materials=[o.material].flat();for(const material of materials){material.userData={...material.userData,furnitureMaterial:true,architecturalInterior:true};if(material.map)material.map.anisotropy=16;}
   // GLTF multi-primitives may arrive as children or as material groups. Keep
   // their PBR materials/UVs and share each geometry across every instance.
   parts.push({geometry,material:o.material});

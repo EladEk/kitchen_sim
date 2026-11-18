@@ -1,9 +1,10 @@
 import {Color,Vector2} from 'three';
+import {DRY_PORCELAIN} from './floor-appearance.mjs';
 
 // Optical values are rendering estimates, not manufacturer PBR data or
 // measured grout specifications. Tile dimensions always come from the order.
 export const FLOOR_RENDERING=Object.freeze({
- 'dry-floor':Object.freeze({joint:.002,recess:.0004,bevel:.0006,grout:'#918a81',ior:1.48,specularIntensity:.42}),
+ 'dry-floor':Object.freeze({joint:DRY_PORCELAIN.joint,recess:.00022,bevel:.0006,grout:DRY_PORCELAIN.grout,ior:1.48,specularIntensity:.42}),
  'wet-floor':Object.freeze({joint:.002,recess:.0004,bevel:.0005,grout:'#96918a',ior:1.48,specularIntensity:.55}),
  'shower-floor':Object.freeze({joint:.002,recess:.0004,bevel:.0005,grout:'#96918a',ior:1.48,specularIntensity:.45}),
  'terrace-floor':Object.freeze({joint:.003,recess:.0006,bevel:.0007,grout:'#88705b',ior:1.48,specularIntensity:.5})
@@ -30,7 +31,7 @@ mat2 floorTileRotation(vec2 cell) {
 vec2 floorLineCoverage(vec2 distanceMetres,vec2 footprintMetres) {
  vec2 w=max(footprintMetres,vec2(.000001));
  float h=floorJointMetres*.5;
- // Integrate both edges across the pixel. A distant 2 mm joint covers only
+ // Integrate both edges across the pixel. A distant narrow joint covers only
  // its fraction of a pixel, rather than becoming a full one-pixel line.
  return clamp((h+w*.5-distanceMetres)/w,0.,1.)
        -clamp((-h+w*.5-distanceMetres)/w,0.,1.);
@@ -93,7 +94,7 @@ roughnessFactor=mix(roughnessFactor,.98,floorJoint);
 #endif`)
    .replace('#include <normal_fragment_maps>',FLOOR_NORMAL_FRAGMENT);
  };
- material.customProgramCacheKey=()=>`photographed-floor-r127:${product.productId}`;
+ material.customProgramCacheKey=()=>`photographed-floor-r176:${product.productId}`;
  material.userData.floorRendering={revision:27,jointMetres:profile.joint,recessMetres:profile.recess,rotation:uniforms.floorQuarterTurns.value===4?'quarter-turns':'half-turns',mirrored:false,parametersInferred:true};
  return material;
 }

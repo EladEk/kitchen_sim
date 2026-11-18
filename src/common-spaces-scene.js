@@ -91,10 +91,10 @@ export function buildCommonSpaces({parent,resources,settings,cut=false}){
   box('service-controller-display',19.43,-access.depth+1.55,-8.875,.10,.065,.008,black);
   box('service-controller-isolator',19.50,-access.depth+1.39,-8.875,.075,.075,.012,red);
   pipe('service-controller-conduit',[19.46,-access.depth+.17,-8.94],[19.46,-access.depth+1.27,-8.94],.016,white);
-  const glow=mat('#f7f4df',{emissive:'#f7f4df',emissiveIntensity:settings.lampsOn!==false?.6:0}),q=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1,0,0),Math.PI/2);
+  const glow=mat('#f7f4df',{emissive:'#f7f4df',emissiveIntensity:.6}),q=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1,0,0),Math.PI/2);
   item(cylinder,white,[18.84,-access.depth+.95,-8.95],[.09,.025,.09],q,'service-landing-round-light');
   item(cylinder,glow,[18.84,-access.depth+.95,-8.93],[.075,.008,.075],q,'service-landing-light-diffuser');
-  if(settings.lampsOn!==false){const l=new THREE.PointLight(lightColour(4000),10,4,2);l.position.set(19.1,-access.depth+1,-8.6);l.userData={fixtureLight:true,kelvin:4000,positionInferred:true,source:'simulator-placeholder'};root.add(l);}
+  {const l=new THREE.PointLight(lightColour(4000),10,4,2);l.position.set(19.1,-access.depth+1,-8.6);l.userData.nominalIntensity=l.intensity;l.intensity=settings.lampsOn===false?0:l.intensity;l.visible=settings.lampsOn!==false;l.userData={...l.userData,fixtureLight:true,kelvin:4000,positionInferred:true,source:'simulator-placeholder'};root.add(l);}
  }
  for(const poly of [...Object.values(SERVICE_ROOM_POLYGONS),SERVICE_CONNECTOR]){
   for(let x=14;x<23.5;x+=.6)for(let z=-9;z< -5.35;z+=.1)if(inside([x,z],poly)&&inside([x,z+.1],poly))box('service-floor-joints',x,-access.depth+.027,z+.05,.002,.001,.10,serviceJoint);
@@ -132,13 +132,13 @@ export function buildCommonSpaces({parent,resources,settings,cut=false}){
  box('pump-cable-tray',13.99,1.1,-6.7,.025,.08,2.4,steel);
  }
  // Undocumented fixtures remain explicitly tagged simulator placeholders, 4000K.
- if(!cut){const colour=lightColour(4000),on=settings.lampsOn!==false,glow=mat('#fff9ed',{emissive:colour,emissiveIntensity:on?1.1:0});
+ if(!cut){const colour=lightColour(4000),on=settings.lampsOn!==false,glow=mat('#fff9ed',{emissive:colour,emissiveIntensity:1.1});
   for(const [x,z] of [[15.8,-6.65],[16,-3.5],[20,-3.5],[12.6,-9.1]]){
    if(z<-5){box('common-simulator-lamp',x,2.77,z,.38,.035,.38,white);box('common-simulator-diffuser',x,2.745,z,.33,.012,.33,glow);}
-   if(on){const l=new THREE.PointLight(colour,15,6,2);l.position.set(x,2.65,z);l.userData={fixtureLight:true,kelvin:4000,positionInferred:true,source:'simulator-placeholder'};root.add(l);}
+   {const l=new THREE.PointLight(colour,15,6,2);l.position.set(x,2.65,z);l.userData.nominalIntensity=l.intensity;l.intensity=settings.lampsOn===false?0:l.intensity;l.visible=settings.lampsOn!==false;l.userData={...l.userData,fixtureLight:true,kelvin:4000,positionInferred:true,source:'simulator-placeholder'};root.add(l);}
   }
  }
- if(!cut){const on=settings.lampsOn!==false,colour=lightColour(4000),diffuser=mat('#f4f1e9',{emissive:colour,emissiveIntensity:on?1.2:0});
+ if(!cut){const on=settings.lampsOn!==false,colour=lightColour(4000),diffuser=mat('#f4f1e9',{emissive:colour,emissiveIntensity:1.2});
   for(const [x,z] of [[14.1,-1.05],[15.1,-1.05],[16.1,-1.05],[17.1,-1.05],[15.4,-4],[17,-4],[19,-4],[20.6,-4]]){
    item(cylinder,white,[x,2.735,z],[.065,.025,.065],null,'lobby-round-downlight');item(cylinder,diffuser,[x,2.719,z],[.054,.008,.054],null,'lobby-downlight-diffuser');
   }

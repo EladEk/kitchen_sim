@@ -21,7 +21,7 @@ export function installPhotorealRenderer({renderer,scene,camera,host,lang=()=> '
   if(globalThis.navigator?.gpu){let r;
    try{const [{WebGPURenderer},{WebGPUPathTracer}]=await Promise.all([import('three/webgpu'),import('three-gpu-pathtracer/webgpu')]);
     r=new WebGPURenderer({antialias:false,alpha:false});await r.init();if(!r.backend?.isWebGPUBackend)throw Error('No native WebGPU');
-    const t=new WebGPUPathTracer(r);t.maxBounces=10;t.maxTransparentBounces=8;t.frameBudget=mobile()?50000:250000;t.maxSamples=512;t.dynamicLowRes=false;t.renderDelay=0;
+    const t=new WebGPUPathTracer(r);t.maxBounces=mobile()?5:10;t.maxTransparentBounces=mobile()?4:8;t.frameBudget=mobile()?16000:250000;t.maxSamples=512;t.dynamicLowRes=false;t.renderDelay=0;
     return {renderer:r,tracer:t,backend:'WebGPU'};
    }catch{r?.dispose();}
   }
@@ -32,7 +32,7 @@ export function installPhotorealRenderer({renderer,scene,camera,host,lang=()=> '
   return {renderer:r,tracer:t,worker:w,backend:'WebGL2'};
  }
  function size(){if(!photoRenderer)return;const w=host.clientWidth||renderer.domElement.clientWidth||900,h=host.clientHeight||renderer.domElement.clientHeight||600;
-  if(w===lastWidth&&h===lastHeight)return;lastWidth=w;lastHeight=h;const maxPixels=mobile()?1200000:4000000,ratio=Math.min(globalThis.devicePixelRatio||1,mobile()?1.5:2,Math.sqrt(maxPixels/(w*h)));
+  if(w===lastWidth&&h===lastHeight)return;lastWidth=w;lastHeight=h;const maxPixels=mobile()?650000:4000000,ratio=Math.min(globalThis.devicePixelRatio||1,mobile()?1.25:2,Math.sqrt(maxPixels/(w*h)));
   photoRenderer.setPixelRatio(ratio);photoRenderer.setSize(w,h,false);tracer?.updateCamera();steps=0;
  }
  async function prepare(){
@@ -56,13 +56,15 @@ export function installPhotorealRenderer({renderer,scene,camera,host,lang=()=> '
  const onXR=()=>{hide();cleanup();stableAt=performance.now();if(enabled)say('VR · תצוגה סטריאוסקופית בזמן אמת','VR · real-time stereo');};renderer.xr.addEventListener('sessionstart',onXR);renderer.xr.addEventListener('sessionend',onXR);
  const onPointer=()=>{stableAt=performance.now();hide();loading.hide();};host.addEventListener('pointerdown',onPointer);host.addEventListener('wheel',onPointer,{passive:true});
  return {
+  invalidate(){dirty=true;sceneKey='';stableAt=performance.now();hide();},
+  get enabled(){return enabled;},get displayed(){return enabled&&canvas?.style.visibility==='visible';},get preparing(){return busy;},
   render(now=performance.now(),{suspend=false}={}){
    if(lastLang!==lang())updateButton();if(disposed||!enabled)return false;if(renderer.xr.isPresenting||suspend){hide();if(tracer||busy||snapshot)cleanup();stableAt=now;movingSince=null;return false;}
-   const cameraNext=photoCameraSignature(camera);if(cameraNext!==cameraKey){cameraKey=cameraNext;stableAt=now;hide();loading.hide();if(!busy)controls.setAttribute('aria-busy','false');if(movingSince===null)movingSince=now;if(now-movingSince>=400&&(tracer||busy||snapshot))cleanup();if(!busy)tracer?.updateCamera();steps=0;}else if(now-stableAt>200)movingSince=null;
+   const cameraNext=photoCameraSignature(camera);if(cameraNext!==cameraKey){cameraKey=cameraNext;stableAt=now;hide();loading.hide();if(!busy)controls.setAttribute('aria-busy','false');if(movingSince===null)movingSince=now;if(now-movingSince>=(mobile()?5000:8000)&&(tracer||busy||snapshot))cleanup();if(!busy)tracer?.updateCamera();steps=0;}else if(now-stableAt>200)movingSince=null;
    if(now-stableAt<1100||busy)return false;
    if(dirty||!tracer){void prepare();return false;}
    if(now-lastCheck>1200){lastCheck=now;const key=photoSceneSignature(scene);if(key!==sceneKey){sceneKey=key;dirty=true;stableAt=now;hide();return false;}}
-   try{size();controls.setAttribute('aria-busy','true');tracer.renderSample();steps++;loading.setProgress(steps>1?100:90);if(steps>1){canvas.style.visibility='visible';loading.hide();}
+   try{size();controls.setAttribute('aria-busy','true');photoRenderer.toneMappingExposure=renderer.toneMappingExposure;tracer.renderSample();steps++;loading.setProgress(steps>1?100:90);if(steps>1){canvas.style.visibility='visible';loading.hide();}
     if(now-lastStatus>1200){lastStatus=now;say('איכות צילום · מעדן תאורה והשתקפויות…','Photo quality · refining lighting and reflections…');}
     return true;
    }catch{lastError='unsupported';off();say('חזרנו לסיור בזמן אמת','Returned to live rendering');return false;}

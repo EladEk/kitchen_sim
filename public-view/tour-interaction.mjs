@@ -1,3 +1,4 @@
+import {isPointClippedByGpuSelection} from './gpu-selection-clip.mjs';
 // A click acts on the first visible surface, so closed walls and glass still
 // occlude doors. Dragging or a canceled/multiple-pointer gesture never acts.
 export function createTourTap(){
@@ -6,6 +7,6 @@ export function createTourTap(){
 }
 export function pickTourSurface(ray,root,{far=6}={}){
  root.updateWorldMatrix(true,true);const previous=ray.far;ray.far=far;
- try{return ray.intersectObject(root,true).find(hit=>{for(let o=hit.object;o;o=o.parent)if(!o.visible||o.userData.sceneUi||o.userData.tourNonPhysical&&!o.userData.renderFixture)return false;const m=Array.isArray(hit.object.material)?hit.object.material[hit.face?.materialIndex??0]:hit.object.material;return m?.visible!==false&&m?.opacity!==0&&m?.colorWrite!==false;})||null;}finally{ray.far=previous;}
+ try{return ray.intersectObject(root,true).find(hit=>{if(isPointClippedByGpuSelection(hit.object,hit.point))return false;for(let o=hit.object;o;o=o.parent)if(!o.visible||o.userData.sceneUi||o.userData.tourNonPhysical&&!o.userData.renderFixture)return false;const m=Array.isArray(hit.object.material)?hit.object.material[hit.face?.materialIndex??0]:hit.object.material;return m?.visible!==false&&m?.opacity!==0&&m?.colorWrite!==false;})||null;}finally{ray.far=previous;}
 }
 export function tourActionData(object){for(let o=object;o;o=o.parent)if(o.userData.action)return o.userData;return null;}

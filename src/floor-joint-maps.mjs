@@ -1,7 +1,8 @@
 import * as THREE from 'three';
+import {DRY_PORCELAIN} from './floor-appearance.mjs';
 // Texture-space equivalent of the live generic floor shader for path tracing.
 // Ordered product photos are never substituted with this inferred material.
-export function floorJointMaps({tile=[.8,.8],joint=.004,size=512}={}){
+export function floorJointMaps({tile=[1,1],joint=DRY_PORCELAIN.joint,size=512}={}){
  const color=new Uint8Array(size*size*4),bump=new Uint8Array(color.length),rough=new Uint8Array(color.length);
  for(let y=0;y<size;y++)for(let x=0;x<size;x++){
   const edge=Math.min(Math.min(x,size-x)*tile[0]/size,Math.min(y,size-y)*tile[1]/size),coverage=Math.max(0,Math.min(1,.5+(joint/2-edge)/(Math.min(...tile)/size))),bevel=Math.max(0,Math.min(1,(joint/2+.0012-edge)/.0012)),noise=Math.sin(x*12.9898+y*78.233)*43758.5453,grain=noise-Math.floor(noise),i=(y*size+x)*4;

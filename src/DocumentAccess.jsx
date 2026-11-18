@@ -1,3 +1,4 @@
+import {REFERENCE_MEDIA_INCLUDED} from './distribution.mjs';
 import React,{createContext,useCallback,useContext,useEffect,useState} from 'react';
 import {LockKeyhole,X} from 'lucide-react';
 import './document-access.css';
@@ -22,11 +23,12 @@ export function DocumentLockForm({lang='he'}){
  async function submit(event){event.preventDefault();const entered=password;setPassword('');setBusy(true);setError('');try{await login(entered);}catch(e){setError(e.message==='password'?(he?'הסיסמה אינה נכונה':'Incorrect password'):e.message==='attempts'?(he?'בוצעו ניסיונות רבים. נסו שוב מאוחר יותר.':'Too many attempts. Please try later.'):(he?'שירות המסמכים אינו זמין כרגע':'Document service is unavailable'));}finally{setBusy(false);}}
  return <form className="document-lock-form" dir={he?'rtl':'ltr'} onSubmit={submit}><LockKeyhole size={24}/><h3 id="document-auth-title">{he?'גישה מוגנת':'Protected access'}</h3><p>{he?'הזינו את הסיסמה לפתיחת הגישה האישית. הגישה נפתחת לשעתיים.':'Enter the password to view original photographs and plans. Access lasts two hours.'}</p>{checking?<p role="status">{he?'בודק גישה…':'Checking access…'}</p>:!configured?<p role="alert">{he?'הגישה למסמכים טרם הוגדרה בשרת.':'Document access has not been configured on the server.'}</p>:<><label>{he?'סיסמה':'Password'}<input type="password" autoComplete="current-password" maxLength={256} required value={password} onChange={e=>setPassword(e.target.value)} disabled={busy}/></label><button type="submit" disabled={busy}>{busy?(he?'בודק…':'Checking…'):(he?'פתיחת הגישה':'Unlock documents')}</button></>}{error&&<p role="alert">{error}</p>}</form>;
 }
-export function DocumentGate({children,lang='he'}){
- const {authorized,lock}=useDocumentAccess();return authorized?<><div className="document-session-bar"><span>{lang==='he'?'מסמכים פתוחים זמנית':'Documents temporarily unlocked'}</span><button onClick={lock}><LockKeyhole size={14}/>{lang==='he'?'נעילה':'Lock'}</button></div>{children}</>:<DocumentLockForm lang={lang}/>;
+export function DocumentGate({children,lang='he',referenceMedia=false}){
+ const {authorized,lock}=useDocumentAccess();if(referenceMedia&&!REFERENCE_MEDIA_INCLUDED)return <p role="status">{lang==='he'?'תמונות הייחוס ומסמכי המקור אינם כלולים בחבילת הקוד הנקייה.':'Reference photos and documents are not included in the Clean package.'}</p>;return authorized?<><div className="document-session-bar"><span>{lang==='he'?'מסמכים פתוחים זמנית':'Documents temporarily unlocked'}</span><button onClick={lock}><LockKeyhole size={14}/>{lang==='he'?'נעילה':'Lock'}</button></div>{children}</>:<DocumentLockForm lang={lang}/>;
 }
 export function ProtectedImage({src,alt,...props}){
  const {authorized,requestUnlock}=useDocumentAccess();const protectedSource=/^\/(house|plans)\//.test(src||'')||(src||'').startsWith('/materials/owner-products/')||(src||'').startsWith('/materials/harash/');
+ if(protectedSource&&!REFERENCE_MEDIA_INCLUDED)return <span className="document-image-lock">{alt}</span>;
  if(!protectedSource||authorized)return <img src={src} alt={alt} {...props}/>;
  return <span className="document-image-lock" role="button" tabIndex={0} aria-label="פתיחת תמונת מקור מוגנת" onClick={e=>{e.preventDefault();e.stopPropagation();requestUnlock();}} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();requestUnlock();}}}><LockKeyhole size={20}/><span>{alt}</span><small>פתיחת תמונת המקור</small></span>;
 }

@@ -1,3 +1,7 @@
+import {createKitchenKinematics} from './kitchen-kinematics.mjs';
+import {createSceneStateUpdater} from './scene-state.mjs';
+import {createArchitecturalGlass} from './architectural-glass.mjs';
+import {applyArchitecturalMaterials} from './architectural-materials.mjs';
 import {instantiateCompleteFurniture} from './complete-furniture.mjs';
 import {RectAreaLightUniformsLib} from 'three/addons/lights/RectAreaLightUniformsLib.js';
 import {buildLightingPoints} from './home-lighting-scene.js';
@@ -59,7 +63,7 @@ export function createKitchen(settings){
  box(hole.x+hole.width/2,(hole.sill+hole.height+visualCeiling)/2,-75,hole.width,visualCeiling-hole.sill-hole.height,150,wall);
  // Two dark sliding sashes, recessed into the wall with a flush inner face.
  const windowGroup=new THREE.Group();windowGroup.userData.windowId='kitchen-window';group.add(windowGroup);
- const frame=mat('#343d3d',{metalness:.3,roughness:.45}),windowMat=mat('#b0c8be',{transparent:true,opacity:.15,roughness:.16,depthWrite:false});
+ const frame=mat('#343d3d',{metalness:.3,roughness:.45}),windowMat=createArchitecturalGlass(resources);
  const windowBox=(x,y,z,w,h,d,material,part)=>{const mesh=box(x,y,z,w,h,d,material,null,windowGroup);if(part==='window-glass')mesh.castShadow=false;mesh.userData={windowId:'kitchen-window',part};return mesh;};
  for(let i=0;i<2;i++){
   const x=hole.x+hole.width*(i+.5)/2,z=i?-38:-62,w=hole.width/2,y=hole.sill+hole.height/2;
@@ -72,7 +76,7 @@ export function createKitchen(settings){
  for(const y of [hole.sill+15,hole.sill+hole.height-15])windowBox(hole.x+hole.width/2,y,-45,hole.width,30,90,frame,'window-frame');
  windowBox(hole.x+hole.width/2,hole.sill-12,-60,hole.width,24,120,stone,'window-sill');
  const hvacBox=(x,y,z,w,h,d,m,parent,data)=>{const mesh=box(x/M,y/M,z/M,w/M,h/M,d/M,m,null,parent);mesh.userData={...data};return mesh;};
- const hvac=createKitchenHvac({box:hvacBox,mat});group.add(hvac);
+ const hvac=createKitchenHvac({box:hvacBox,mat,surface});group.add(hvac);
  const roomStructure=new Set(group.children);
  // Hollow cabinet bodies and independent opening mechanisms reveal the interior.
  const openParts=new Set(normalizeOpenParts(settings.openParts));
@@ -109,14 +113,14 @@ export function createKitchen(settings){
    for(const x of [left,right])box(x,bottom+height/2,center,12,height,depth,interior,null,trayGroup);
    for(const zz of [center-depth/2,center+depth/2])box(w/2,bottom+height/2,zz,w-70,height,12,interior,null,trayGroup);
   }
-  for(const x of [25,w-25])box(x,bottom+15,300+extension/2,8,12,510+extension,steel,null,trayGroup);
+  for(const x of [25,w-25]){const rail=box(x,bottom+15,300+extension/2,8,12,510+extension,steel,null,trayGroup);rail.userData.slideRail=true;}
   if(opening)markOpening(trayGroup,opening[0],opening[1]);
   return trayGroup;
  }
  function door(parent,w,y,h,side,isOpen,material,id,xOffset=0,key='door'){
   const pivot=new THREE.Group();pivot.position.set((xOffset+(side==='right'?w:0))*M,y*M,(ROOM.depth+10)*M);pivot.rotation.y=isOpen?(side==='right'?1:-1)*Math.PI*.43:0;parent.add(pivot);
   const front=box((side==='right'?-1:1)*w/2,h/2,0,w-4,h-4,18,material,id,pivot,true);part(front,'hinged-front');
-  if(settings.activePart===`${id}:${key}`)box((side==='right'?-1:1)*w/2,h/2,11,w-4,h-4,2,selection,null,pivot);
+  {const outline=box((side==='right'?-1:1)*w/2,h/2,11,w-4,h-4,2,selection,null,pivot);outline.userData={activeOpening:`${id}:${key}`,sceneUi:true,part:'opening-selection-outline'};outline.visible=settings.activePart===`${id}:${key}`;outline.castShadow=false;}
   for(const cy of [Math.min(90,h*.18),h-Math.min(90,h*.18)]){
    const hinge=box((side==='right'?-1:1)*20,cy,-14,35,45,12,steel,null,pivot);part(hinge,'soft-close-hinge');
   }
@@ -124,7 +128,7 @@ export function createKitchen(settings){
  }
  function front(module,parent,w,h,y,type,material,id){
   const z=ROOM.depth+10;
-  const face=(cx,cy,ww,hh,zz=z,kind='front',key=null)=>{const mesh=part(box(cx,cy,zz,ww-4,hh-4,18,material,id,parent,true),kind);if(key){markOpening(mesh,id,key);if(settings.activePart===`${id}:${key}`)box(cx,cy,zz+10,ww-4,hh-4,3,selection,null,parent);}return mesh;};
+  const face=(cx,cy,ww,hh,zz=z,kind='front',key=null)=>{const mesh=part(box(cx,cy,zz,ww-4,hh-4,18,material,id,parent,true),kind);if(key){markOpening(mesh,id,key);{const outline=box(cx,cy,zz+10,ww-4,hh-4,3,selection,null,parent);outline.userData={activeOpening:`${id}:${key}`,sceneUi:true,part:'opening-selection-outline'};outline.visible=settings.activePart===`${id}:${key}`;outline.castShadow=false;markOpening(outline,id,key);}}return mesh;};
   if(['drawers','hob'].includes(type)){
    const heights=[h*.25,h*.375,h*.375];let top=y+h;
    heights.forEach((hh,i)=>{top-=hh;const key=`drawer-${i}`,dz=opened(id,key)?280:0;tray(parent,w,top+18,Math.max(70,hh-42),dz,false,i,[id,key]);face(w/2,top+hh/2,w,hh,z+dz,'drawer-front',key);markOpening(box(w/2,top+hh-15,z+13+dz,w-42,6,6,recess,null,parent),id,key);});
@@ -175,7 +179,7 @@ export function createKitchen(settings){
    if(module.internalDrawers){for(let i=0;i<module.internalDrawers;i++)tray(parent,w,y+35+i*330,200,opened(id,`internal-${i}`)?300:0,false,i,[id,`internal-${i}`]);}
    else if(module.mixerLift){
     const isOpen=opened(id,'mixer-lift');const liftGroup=new THREE.Group();parent.add(liftGroup);const liftY=isOpen?960:450,liftZ=isOpen?700:300;const lift=box(w/2,liftY,liftZ,w-65,22,390,interior,null,liftGroup);part(lift,'mixer-lift-platform');
-    for(const x of [35,w-35]){const arm=box(x,(liftY+180)/2,250,12,liftY-180,18,steel,null,liftGroup);part(arm,'mixer-lift-arm');}
+    for(const x of [35,w-35]){const arm=box(x,(liftY+180)/2,250,12,liftY-180,18,steel,null,liftGroup);part(arm,'mixer-lift-arm');arm.userData.mixerLiftArm=true;}
     const bowl=cylinder(w/2,liftY+85,liftZ+45,85,130,steel,liftGroup);part(bowl,'illustrative-mixer');box(w/2,liftY+180,liftZ-75,100,120,180,mat('#c0c5ba'),null,liftGroup,true);markOpening(liftGroup,id,'mixer-lift');
    }else shelf(parent,w,y+h/2);
   }
@@ -267,7 +271,7 @@ export function createKitchen(settings){
  });
  // The shared photographed HVAC replaces the former decorative ceiling strips.
  // Island: 2400 carcass + 20 mm stone overhang each end; 300 mm seating overhang.
- box(ISLAND.x+ISLAND.width/2,893,ISLAND.z+450,2440,38,900,stone,'island-1',group,true);
+ part(box(ISLAND.x+ISLAND.width/2,893,ISLAND.z+450,2440,38,900,stone,'island-1',group,true),'worktop');
  box(ISLAND.x+1220,60,ISLAND.z+280,2400,120,510,plinth);
  box(ISLAND.x+1220,497,ISLAND.z+610,2400,754,18,base,'island-1');
  for(const x of [ISLAND.x+20,ISLAND.x+ISLAND.width-20])box(x,497,ISLAND.z+300,18,754,620,base,'island-1');
@@ -279,10 +283,10 @@ export function createKitchen(settings){
  const furnishingRoots=group.children.filter(child=>!roomStructure.has(child));
  // Lighting changes are local to this scene group.
  if(!settings.inspection)buildBuildingContext({group,resources,settings,mode:'kitchen',kitchenAnchor:KITCHEN_ANCHOR});
- const updateDaylight=buildDaylight({group,settings,resources,kitchen:true,center:[2.725,0,1.65],radius:45,distance:100});
- if(settings.led&&settings.lampsOn!==false){
-  const ledmat=mat(lightColour(4000),{emissive:lightColour(4000),emissiveIntensity:2});for(const [a,b] of [[1095,3470],[4370,4845]])furnishingRoots.push(box((a+b)/2,1494,300,b-a,4,12,ledmat));
-  RectAreaLightUniformsLib.init();const l=new THREE.RectAreaLight(lightColour(4000),settings.intensity/100*3,3.4,.035);l.userData={fixtureLight:true,part:'kitchen-linear-area-light'};l.position.set(2.95,1.49,.30);l.lookAt(2.95,.92,.55);group.add(l);furnishingRoots.push(l);
+ const updateSunlight=buildDaylight({group,settings,resources,kitchen:true,center:[2.725,0,1.65],radius:45,distance:100});
+ {
+  const ledmat=mat(lightColour(4000),{emissive:lightColour(4000),emissiveIntensity:2});ledmat.userData.kitchenLed=true;for(const [a,b] of [[1095,3470],[4370,4845]])furnishingRoots.push(box((a+b)/2,1494,300,b-a,4,12,ledmat));
+  RectAreaLightUniformsLib.init();const l=new THREE.RectAreaLight(lightColour(4000),3,3.4,.035);l.userData={fixtureLight:true,part:'kitchen-linear-area-light'};l.position.set(2.95,1.49,.30);l.lookAt(2.95,.92,.55);group.add(l);furnishingRoots.push(l);
  }
  const dimensionGroup=new THREE.Group();group.add(dimensionGroup);dimensionGroup.visible=settings.dimensions;
  const dimmat=new THREE.LineBasicMaterial({color:'#526e60'});resources.push(dimmat);
@@ -292,7 +296,7 @@ export function createKitchen(settings){
  if(settings.inspection&&settings.selected&&moduleGroups.has(settings.selected)){const selected=moduleGroups.get(settings.selected);for(const child of group.children)child.visible=child===selected||child.isLight;}
  // Shared observed markers use metre-based helpers; kitchen solids use mm.
  const electricalGroups=new Map(),waterGroups=new Map();
- if(settings.showElectrical&&!settings.inspection){
+ if(!settings.inspection){
   const tag=(mesh,data)=>{if(data){mesh.userData={...data};picks.push(mesh);}return mesh;};
   const electricalBox=(x,y,z,w,h,d,material,parent,data)=>tag(box(x/M,y/M,z/M,w/M,h/M,d/M,material,null,parent),data);
   const electricalCylinder=(x,y,z,r,h,material,parent,data)=>tag(cylinder(x/M,y/M,z/M,r/M,h/M,material,parent),data);
@@ -300,7 +304,11 @@ export function createKitchen(settings){
   for(const [id,p] of buildWaterPoints({group,box:electricalBox,cylinder:electricalCylinder,mat,resources,settings:{...settings,electricalPresentation:'fixtures'},points:KITCHEN_WATER_POINTS}))waterGroups.set(id,p);
  }
  const lightingGroups=settings.inspection?new Map():buildLightingPoints({group,box:(x,y,z,w,h,d,m,parent)=>box(x/M,y/M,z/M,w/M,h/M,d/M,m,null,parent),cylinder:(x,y,z,r,h,m,parent)=>cylinder(x/M,y/M,z/M,r/M,h/M,m,parent),mat,resources,settings,points:KITCHEN_LIGHTING_POINTS,picks,interactive:false});
- const activePicks=picks.filter(objectVisible),electricalOccluders=[];
- group.traverse(mesh=>{if(mesh.isMesh&&objectVisible(mesh)&&!mesh.userData.electricalId&&opaqueMesh(mesh))electricalOccluders.push(mesh);});
- return {group,updateDaylight,lightingGroups,windowGroup,picks:activePicks,moduleGroups,openingObjects,electricalGroups,waterGroups,dimensionGroup,serviceGroups:new Map([...electricalGroups,...waterGroups]),furnishingRoots,roomStructure,electricalOccluders,dispose(){group.traverse(o=>{if(o.isLight&&o.shadow)o.shadow.dispose();});resources.forEach(r=>r.dispose?.());}};
+ const finishUpgrades=applyArchitecturalMaterials(group);resources.push(...finishUpgrades.values());const updateDaylight=createSceneStateUpdater(group,updateSunlight,settings);updateDaylight(settings);
+ const updateKinematics=createKitchenKinematics(openingObjects,settings);
+ const activePicks=[],electricalOccluders=[],allOccluders=[];
+ group.traverse(mesh=>{if(mesh.isMesh&&!mesh.userData.electricalId)allOccluders.push(mesh);});
+ const refreshInteractionTargets=()=>{activePicks.splice(0,activePicks.length,...picks.filter(objectVisible));electricalOccluders.splice(0,electricalOccluders.length,...allOccluders.filter(m=>objectVisible(m)&&opaqueMesh(m)));};
+ refreshInteractionTargets();
+ return {group,updateDaylight,updateKinematics,refreshInteractionTargets,lightingGroups,windowGroup,picks:activePicks,moduleGroups,openingObjects,electricalGroups,waterGroups,dimensionGroup,serviceGroups:new Map([...electricalGroups,...waterGroups]),furnishingRoots,roomStructure,electricalOccluders,dispose(){group.traverse(o=>{if(o.isLight&&o.shadow)o.shadow.dispose();});resources.forEach(r=>r.dispose?.());}};
 }

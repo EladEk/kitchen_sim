@@ -1,15 +1,14 @@
 {
-  "name": "kitchen-studio",
+  "name": "home-studio-clean",
   "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
     "postinstall": "node scripts/apply-three-fixes.mjs",
-    "predev": "node scripts/apply-three-fixes.mjs",
-    "pretest": "node scripts/apply-three-fixes.mjs",
-    "dev": "vite --host 0.0.0.0 --port 4173",
+    "dev": "npm run build && node scripts/serve-lite.mjs",
     "build": "node scripts/build-secure-site.mjs",
-    "test": "node --test src/*.test.mjs"
+    "start": "node scripts/serve-lite.mjs",
+    "test": "node --test src/document-access.test.mjs src/vault-runtime.test.mjs src/scene-state.test.mjs src/kitchen-kinematics.test.mjs src/photoreal-lifecycle.test.mjs src/photoreal-upgrades.test.mjs src/material-pipeline.test.mjs src/rendering-fixes-r173.test.mjs public-view/photo-capture-runtime.test.mjs public-view/gpu-selection.test.mjs public-view/walking-dda.test.mjs public-view/scan-albedo-ktx2.test.mjs src/physical-defines.test.mjs src/ceiling-white.test.mjs public-view/live-shortcuts.test.mjs"
   },
   "dependencies": {
     "lucide-react": "1.31.0",
@@ -21,16 +20,13 @@
     "three": "0.185.0",
     "three-gpu-pathtracer": "0.0.27",
     "three-mesh-bvh": "0.9.15",
-    "xatlas-web": "0.1.0"
+    "polygon-clipping": "0.15.7"
   },
   "devDependencies": {
-    "@gltf-transform/core": "^4.5.1",
-    "@gltf-transform/extensions": "^4.5.1",
-    "@gltf-transform/functions": "^4.5.1",
-    "@gpu-tex-enc/basis": "^1.16.4",
     "@vitejs/plugin-react": "6.0.2",
-    "meshoptimizer": "^1.3.0",
-    "polygon-clipping": "0.15.7",
     "vite": "8.0.13"
+  },
+  "engines": {
+    "node": ">=22.12.0"
   }
 }

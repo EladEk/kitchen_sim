@@ -1,6 +1,8 @@
+import {withSelectionSnapshots} from '../public-view/gpu-selection-clip.mjs';
 import * as THREE from 'three';
 import {traditionalMaterial} from './traditional-material.mjs';
-import {FACADE_ROUGHNESS} from './facade-finish.mjs';
+import {ARCHITECTURAL_MATERIALS,porcelainProfile} from './architectural-materials.mjs';
+import {FACADE_ROUGHNESS,FACADE_COURSES,facadeCourseSample} from './facade-finish.mjs';
 import {floorJointMaps} from './floor-joint-maps.mjs';
 import {metricSurfaceUVs} from './metric-surface-geometry.mjs';
 // This is an owned snapshot: tracing can generate attributes/BVHs without
@@ -8,22 +10,28 @@ import {metricSurfaceUVs} from './metric-surface-geometry.mjs';
 export class PhotoSceneLimit extends Error {}
 export function photoSceneSignature(scene){
  let hash=2166136261,count=0;const add=s=>{for(let i=0;i<s.length;i++)hash=Math.imul(hash^s.charCodeAt(i),16777619);};
- scene.updateMatrixWorld(true);scene.traverseVisible(o=>{if(!o.isMesh&&!o.isLight)return;if(o.userData.part==='furniture-contact-shadow'||o.userData.visualOnly||o.userData.celestialBackground||o.userData.securityOverlay||o.userData.sceneUi)return;count++;add(o.uuid);if(o.isMesh){add(String(o.geometry?.version||0));add(String(o.geometry?.attributes.position?.version||0));add(String(o.instanceMatrix?.version||0));}
+ scene.updateMatrixWorld(true);scene.traverseVisible(o=>{const clip=o.userData?.gpuSelectionClip;if(clip){add(String(Math.round(clip.uSectionCutY.value*1000)));add(String(clip.rings?.length||0));add(String(clip.uSelectionMode?.value||0));for(const ring of clip.rings||[])for(const point of ring.points||ring)add(point.join?.(',')||`${point.x},${point.y}`);}if(!o.isMesh&&!o.isLight)return;if(o.userData.part==='furniture-contact-shadow'||o.userData.visualOnly||o.userData.celestialBackground||o.userData.securityOverlay||o.userData.sceneUi)return;count++;add(o.uuid);if(o.isMesh){add(String(o.geometry?.version||0));add(String(o.geometry?.attributes.position?.version||0));add(String(o.instanceMatrix?.version||0));}
  for(const v of o.matrixWorld.elements)add(String(Math.round(v*10000)));
  if(o.isLight)add(`${o.intensity}:${o.color.getHex()}`);
  for(const m of [o.material].flat().filter(Boolean))add(`${m.uuid}:${m.version}:${m.opacity}:${m.map?.version}:${m.bumpMap?.version}:${m.color?.getHex()}`);
  });add(`${scene.environment?.uuid}:${scene.environmentIntensity}:${scene.background?.getHex?.()}`);return `${count}:${hash>>>0}`;
 }
 export function photoCameraSignature(camera){camera.updateMatrixWorld();return [...camera.matrixWorld.elements,...camera.projectionMatrix.elements].map(v=>Math.round(v*100000)).join(',');}
-function stoneMaps(){
- const w=512,h=256,color=new Uint8Array(w*h*4),bump=new Uint8Array(w*h*4),rough=new Uint8Array(w*h*4);
+export function stoneMaps(){
+ const w=1024,h=512,c=FACADE_COURSES,color=new Uint8Array(w*h*4),bump=new Uint8Array(w*h*4),rough=new Uint8Array(w*h*4),normal=new Uint8Array(w*h*4);
+ const du=c.width*2/w,dv=c.height*2/h,byte=v=>Math.round(Math.max(0,Math.min(255,v)));
  for(let y=0;y<h;y++)for(let x=0;x<w;x++){
-  const u=x/w*1.88,v=y/h*.96,row=Math.floor(v/.48),ux=u+(row%2)*.47,edge=Math.min(ux%.94,.94-ux%.94,v%.48,.48-v%.48),joint=edge<.002;
-  const shade=joint?245:255,i=(y*w+x)*4;
-  color.set([shade,shade,shade,255],i);bump.set([128,128,128,255],i);rough.set([255,255,255,255],i);
+  const u=(x+.5)*du,v=(y+.5)*dv,s=facadeCourseSample(u,v),i=(y*w+x)*4;
+  const grain=(Math.sin(x*127.1+y*311.7)*43758.5453%1)*.009;
+  // Store sRGB albedo; the live shader applies the same shade in linear space.
+  const shade=byte(THREE.ColorManagement.workingColorSpace===THREE.LinearSRGBColorSpace?THREE.MathUtils.clamp(1.055*Math.pow(Math.max(0,s.shade+grain),1/2.4)-.055,0,1)*255:255*s.shade);
+  const height=byte(s.height/c.recess*255);
+  color.set([shade,shade,shade,255],i);bump.set([height,height,height,255],i);rough.set([255,255,255,255],i);
+  const dx=(facadeCourseSample(u-du,v).height-facadeCourseSample(u+du,v).height)/(2*du),dy=(facadeCourseSample(u,v-dv).height-facadeCourseSample(u,v+dv).height)/(2*dv),inv=1/Math.hypot(dx,dy,1);
+  normal.set([byte((dx*inv*.5+.5)*255),byte((dy*inv*.5+.5)*255),byte((inv*.5+.5)*255),255],i);
  }
- const make=(data,srgb=false)=>{const t=new THREE.DataTexture(data,w,h,THREE.RGBAFormat);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(1/1.88,1/.96);t.magFilter=THREE.LinearFilter;t.minFilter=THREE.LinearMipmapLinearFilter;t.generateMipmaps=true;t.colorSpace=srgb?THREE.SRGBColorSpace:THREE.NoColorSpace;t.needsUpdate=true;return t;};
- return {map:make(color,true),bumpMap:make(bump),roughnessMap:make(rough)};
+ const make=(data,srgb=false)=>{const t=new THREE.DataTexture(data,w,h,THREE.RGBAFormat);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(1/(c.width*2),1/(c.height*2));t.magFilter=THREE.LinearFilter;t.minFilter=THREE.LinearMipmapLinearFilter;t.generateMipmaps=true;t.anisotropy=16;t.colorSpace=srgb?THREE.SRGBColorSpace:THREE.NoColorSpace;t.needsUpdate=true;return t;};
+ return {map:make(color,true),bumpMap:make(bump),normalMap:make(normal),roughnessMap:make(rough)};
 }
 const excluded=o=>o.userData.part==='furniture-contact-shadow'||o.userData.visualOnly||o.userData.celestialBackground||o.userData.securityOverlay||o.userData.electricalId||o.userData.waterId||o.userData.sceneUi||o.userData.part==='sun-position-marker';
 export function estimatePhotoScene(source,{maxTriangles=2500000,maxMeshes=60000,maxBytes=Infinity,textureSize=1024}={}){
@@ -41,7 +49,7 @@ export function estimatePhotoScene(source,{maxTriangles=2500000,maxMeshes=60000,
  });
  return {triangles,meshes,bytes:cloneBytes+triangles*160+meshes*256+textures.size*textureSize*textureSize*4};
 }
-export function createPhotoScene(source,{maxTriangles=2500000,maxMeshes=60000,maxBytes=Infinity,textureSize=1024}={}){
+function createPhotoSceneSnapshot(source,{maxTriangles=2500000,maxMeshes=60000,maxBytes=Infinity,textureSize=1024}={}){
  estimatePhotoScene(source,{maxTriangles,maxMeshes,maxBytes,textureSize});
  source.updateMatrixWorld(true);const scene=new THREE.Scene(),geometries=new Map(),materials=new Map(),ownedGeometry=new Set(),ownedMaterial=new Set(),ownedTexture=new Set(),floors=new Map();let triangles=0,meshes=0,stone;
  scene.background=source.background?.isColor?source.background.clone():source.background;
@@ -51,12 +59,12 @@ export function createPhotoScene(source,{maxTriangles=2500000,maxMeshes=60000,ma
   let out=m.isMeshStandardMaterial?m.clone():new THREE.MeshStandardMaterial({color:m.color||'#ffffff',map:m.map||null,side:m.side,transparent:m.transparent,opacity:m.opacity,emissive:m.color||'#000000',emissiveIntensity:m.isMeshBasicMaterial?.3:0});
   if(m.userData.scanAlbedoGain)out.color.multiply(new THREE.Color(...m.userData.scanAlbedoGain));
   out.envMap=null;out.onBeforeCompile=()=>{};out.customProgramCacheKey=()=>'';
-  if(glass){const physical=new THREE.MeshPhysicalMaterial({color:'#edf4f2',roughness:.07,metalness:0,transmission:.97,thickness:.008,ior:1.5,transparent:false,opacity:1,side:THREE.DoubleSide});out.dispose();out=physical;}
+  if(glass){const physical=new THREE.MeshPhysicalMaterial({...ARCHITECTURAL_MATERIALS.glass,side:THREE.DoubleSide});out.dispose();out=physical;}
   if(m.userData.publicFinish==='stone'){
    if(!stone){stone=stoneMaps();Object.values(stone).forEach(t=>ownedTexture.add(t));}
-   Object.assign(out,stone);out.bumpScale=0;out.normalMap=null;out.roughness=FACADE_ROUGHNESS;
+   Object.assign(out,stone);out.bumpScale=FACADE_COURSES.recess;out.normalScale.set(1,1);out.roughness=FACADE_ROUGHNESS;
   }
-  if(m.userData.publicFinish==='floor'){const profile=m.userData.floorCourses||{},floorKey=JSON.stringify(profile);let maps=floors.get(floorKey);if(!maps){maps=floorJointMaps(profile);floors.set(floorKey,maps);Object.values(maps).forEach(t=>ownedTexture.add(t));}Object.assign(out,maps);out.normalMap=null;out.bumpScale=.0013;out.roughness=1;}
+  if(m.userData.publicFinish==='floor'){const {tile,joint}=porcelainProfile(m.userData),profile={tile,joint},floorKey=JSON.stringify(profile);let maps=floors.get(floorKey);if(!maps){maps=floorJointMaps(profile);floors.set(floorKey,maps);Object.values(maps).forEach(t=>ownedTexture.add(t));}Object.assign(out,maps);out.normalMap=null;out.bumpScale=.0013;out.roughness=1;}
   materials.set(key,out);ownedMaterial.add(out);return out;
  };
  const add=(o,matrix,color=null)=>{
@@ -83,3 +91,5 @@ export function createPhotoScene(source,{maxTriangles=2500000,maxMeshes=60000,ma
   }
  });scene.updateMatrixWorld(true);return {scene,dispose,triangles,meshes};}catch(error){dispose();throw error;}
 }
+
+export function createPhotoScene(source,options){return withSelectionSnapshots(source,()=>createPhotoSceneSnapshot(source,options));}

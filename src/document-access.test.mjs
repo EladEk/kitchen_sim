@@ -7,7 +7,7 @@ const login=(password,extra={},time=now)=>documentAuthRoute(new Request(origin+'
 const req=(path='/',cookie='',extra={})=>new Request(origin+path,{headers:{Cookie:cookie,...extra}});
 
 test('server configuration fails closed and password verification never returns environment values',async()=>{
- assert(!documentsConfigured({}));assert(!documentsConfigured({...env,DOCUMENTS_SECRET:'invalid'}));assert(await verifyDocumentPassword(env.DOCUMENTS_PASSWORD,env));assert(!await verifyDocumentPassword('wrong',env));assert(!await verifyDocumentPassword('a'.repeat(300),env));
+ assert(!documentsConfigured({}));assert(!documentsConfigured({...env,DOCUMENTS_SECRET:''}));assert(await verifyDocumentPassword(env.DOCUMENTS_PASSWORD,env));assert(!await verifyDocumentPassword('wrong',env));assert(!await verifyDocumentPassword('a'.repeat(300),env));
  const response=await documentAuthRoute(req('/api/documents/session'),{});assert.deepEqual(await response.json(),{authorized:false,configured:false});
  const unavailable=await documentAuthRoute(new Request(origin+'/api/documents/login',{method:'POST',headers:{Origin:origin},body:'password=anything'}),{});assert.equal(unavailable.status,503);
 });

@@ -1,3 +1,5 @@
+import {prepareSceneGeometry} from '../src/geometry-safety.mjs';
+import {applyArchitecturalMaterials} from '../src/architectural-materials.mjs';
 import {isSectionWall} from '../public-view/section-height.mjs';
 import {APP_REVISION,BASELINE_REVISION} from '../public-view/revision.mjs';
 import {buildGardenTerraces} from '../src/garden-terraces-scene.js';
@@ -31,6 +33,7 @@ export async function createPublicBaseline(directory){
  // Identity placement of the SAME base-plan template used for the neighbours.
  const temp=new THREE.Group(),bases=buildGroundApartments({root:temp,resources,picks:[],settings,mode:'walk',interactiveDoors:true,units:[4]}),own=bases.get(4).clone(true);
  own.traverse(o=>{if(o.userData.doorId?.startsWith('ground:1:')){o.userData.doorId=o.userData.doorId.replace('ground:1:','ground:4:');if(o.userData.tourDoor){o.userData.tourDoor.id=o.userData.doorId;o.userData.tourMotionId='public:'+o.userData.doorId;}}});
+ const ownServices=temp.getObjectByName('garden-apartment-4-services');if(ownServices)own.add(ownServices.clone(true));
  own.matrix.identity();own.name='public-base-apartment-4';own.userData={level:0,variantSlot:4};root.add(own);
  buildGardenTerraces({parent:root,resources,units:[4],variantSlot:4});
  // Replicate generic neighbour furnishing, never FURNITURE or owner layouts.
@@ -49,6 +52,8 @@ export async function createPublicBaseline(directory){
  // Export the actual wall openings and furnishing footprints as compact 2D
  // data. No plan images, inspection notes or owner layouts enter the public map.
  const maps=new Map(BUILDING_FLOORS.map(f=>[f.level,extractFloorMap(root,{elevation:f.elevation})]));
+ // Assign architectural roles while mesh part names are still available.
+ prepareSceneGeometry(root);applyArchitecturalMaterials(root);
  // Strict metadata allowlist, no inspection descriptions, product IDs or sources.
  function clean(o,inherited=0,doorId=null,sectionWall=false){
   sectionWall=sectionWall||isSectionWall(o);
@@ -79,10 +84,10 @@ export async function createPublicBaseline(directory){
   if(o.isMesh&&!o.isInstancedMesh)o.type='Mesh';
   if(o.material?.isShaderMaterial)o.material=new THREE.MeshStandardMaterial({color:'#9daaa7',metalness:.75,roughness:.16});
  });
- const seen=new Set(),textureCache=new Map();root.traverse(o=>{if(o.geometry)o.geometry.userData={};for(const mat of [o.material].flat().filter(Boolean)){if(seen.has(mat))continue;seen.add(mat);mat.userData={...(mat.userData.architecturalGlass?{architecturalGlass:true}:{}),...(mat.userData.architecturalInterior?{architecturalInterior:true}:{}),...(mat.userData.floorCourses?{floorCourses:{...mat.userData.floorCourses}}:{}),...(mat.userData.wallCavity?{wallCavity:{...mat.userData.wallCavity}}:{}),...(mat.userData.metricInstancedUVs?{metricInstancedUVs:true}:{}),...(['limestone','cement','porcelain','plaster','paint','door','wood','fabric','ceramic','stone'].includes(mat.userData.surfaceKind)?{surfaceKind:mat.userData.surfaceKind}:{}),...(["stone","floor","render"].includes(mat.userData.publicFinish)?{publicFinish:mat.userData.publicFinish}:{})};mat.name='';for(const [key,value] of Object.entries(mat))if(value?.isTexture&&!value.image?.data)mat[key]=null;for(const key of ['map','bumpMap','roughnessMap','normalMap']){const tex=mat[key];if(tex){
+ const seen=new Set(),textureCache=new Map();root.traverse(o=>{if(o.geometry)o.geometry.userData={};for(const mat of [o.material].flat().filter(Boolean)){if(seen.has(mat))continue;seen.add(mat);mat.userData={...(mat.userData.architecturalRole?{architecturalRole:mat.userData.architecturalRole}:{}),...(mat.userData.transmissionBase?{transmissionBase:mat.userData.transmissionBase}:{}),...(mat.userData.physicalFinishRevision?{physicalFinishRevision:mat.userData.physicalFinishRevision}:{}),...(mat.userData.architecturalCeiling?{architecturalCeiling:true}:{}),...(mat.userData.selectedFinishColor?{selectedFinishColor:mat.userData.selectedFinishColor}:{}),...(mat.userData.furnitureColourRole?{furnitureColourRole:mat.userData.furnitureColourRole}:{}),...(mat.userData.architecturalGlass?{architecturalGlass:true}:{}),...(mat.userData.architecturalInterior?{architecturalInterior:true}:{}),...(mat.userData.floorCourses?{floorCourses:{...mat.userData.floorCourses}}:{}),...(mat.userData.wallCavity?{wallCavity:{...mat.userData.wallCavity}}:{}),...(mat.userData.metricInstancedUVs?{metricInstancedUVs:true}:{}),...(['limestone','cement','porcelain','plaster','paint','door','wood','fabric','ceramic','stone'].includes(mat.userData.surfaceKind)?{surfaceKind:mat.userData.surfaceKind}:{}),...(["stone","floor","render"].includes(mat.userData.publicFinish)?{publicFinish:mat.userData.publicFinish}:{})};mat.name='';for(const [key,value] of Object.entries(mat))if(value?.isTexture&&!value.image?.data)mat[key]=null;for(const key of ['map','bumpMap','roughnessMap','normalMap']){const tex=mat[key];if(tex){
      // Compact procedural colours; external images and render-target mirrors
      // are never copied into the public snapshot.
-     if(!tex.image?.data||!['map','bumpMap','roughnessMap'].includes(key)){mat[key]=null;continue;}
+     if(!tex.image?.data||!['map','bumpMap','roughnessMap','normalMap'].includes(key)){mat[key]=null;continue;}
      const image=tex.image,size=64,bytes=new Uint8Array(size*size*4);
      for(let y=0;y<size;y++)for(let x=0;x<size;x++){const from=(Math.floor(y*image.height/size)*image.width+Math.floor(x*image.width/size))*4;bytes.set(image.data.subarray(from,from+4),(y*size+x)*4);}
      const fingerprint=createHash('sha256').update(bytes).update(JSON.stringify([tex.repeat.x,tex.repeat.y,tex.colorSpace,tex.wrapS,tex.wrapT])).digest('hex');
@@ -98,7 +103,8 @@ export async function createPublicBaseline(directory){
  const destinations=[];
  for(const f of BUILDING_FLOORS)for(const u of f.units){const duplex=duplexForUnit(u.number,f.level);if(duplex&&f.level!==duplex.entryFloor)continue;const source=BUILDING_INTERIORS.floors[f.level],entry=source.entries.find(e=>e.unit===u.number),door=source.doors.find(d=>d.id===entry?.doorId);let position,yaw=0;if(u.number===4){position=[6.1,2.8];yaw=Math.PI;}else if(door){const normal=door.opened.map((n,i)=>(n-door.hinge[i])/(Math.hypot(...door.opened.map((x,k)=>x-door.hinge[k]))||1));position=door.hinge.map((n,i)=>(n+door.closed[i])/2+normal[i]*.85);yaw=Math.atan2(-normal[0],-normal[1]);}else{position=[...u.polygon[0]];}destinations.push({id:`unit:${u.number}:${f.level}`,label:`דירה ${u.number}`,floor:f.level,unit:u.number,position,yaw,polygon:u.polygon});}
  for(const c of COMMON_SPACES)destinations.push({id:c.id,label:c.he||c.nameHe||c.id,floor:0,position:c.walk,elevation:serviceFloorHeight(c.walk,0)??0,yaw:c.yaw||0,polygon:c.polygon});
- const assets={'building.json':JSON.stringify(root.toJSON()),'site.json':JSON.stringify(publicSiteData()),'navigation.json':JSON.stringify({revision:BASELINE_REVISION,center:BUILDING_CENTER,storey:BUILDING.storey,floors,destinations})};
+ const shell={revision:APP_REVISION,storey:BUILDING.storey,floors:BUILDING_FLOORS.map(f=>({elevation:f.elevation,envelope:f.envelope.map(p=>({polygon:p.polygon,openings:p.openings.map(o=>({a:o.a,b:o.b,edge:o.edge,kind:o.kind}))}))}))};
+ const assets={'shell.json':JSON.stringify(shell),'building.json':JSON.stringify(root.toJSON()),'site.json':JSON.stringify(publicSiteData()),'navigation.json':JSON.stringify({revision:BASELINE_REVISION,center:BUILDING_CENTER,storey:BUILDING.storey,floors,destinations})};
  await mkdir(directory,{recursive:true});for(const [name,body] of Object.entries(assets))await writeFile(directory+'/'+name,body);
  await writeFile(directory+'/loading.json',JSON.stringify({revision:APP_REVISION,bytes:Object.fromEntries(Object.entries(assets).map(([name,body])=>[name,Buffer.byteLength(body)]))}));
  console.log('Public baseline: 43 unfurnished apartments; sanitary fixtures and standard gardens; resident furniture only.');

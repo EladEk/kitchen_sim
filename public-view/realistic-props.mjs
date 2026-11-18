@@ -72,6 +72,7 @@ export function createRealisticProps({trees=[],cars=[],mobile=false}={}){
   for(let i=0;i<leafMap.image.data.length;i+=4){const a=leafMap.image.data[i+3]/255;if(a<.47)continue;const value=leafMap.image.data[i]/255;leafAlbedo+=THREE.ColorManagement.colorSpaceToWorking(new THREE.Color(value,value,value),THREE.SRGBColorSpace).r*a;leafWeight+=a;}
   leafAlbedo/=leafWeight||1;
   const bark=material(new THREE.MeshStandardMaterial({color:'#76624e',roughness:.97})),leaves=material(new THREE.MeshStandardMaterial({color:'#ffffff',map:leafMap,alphaTest:.47,alphaToCoverage:true,side:THREE.DoubleSide,roughness:.9})),canopy=material(new THREE.MeshStandardMaterial({color:new THREE.Color(leafAlbedo,leafAlbedo,leafAlbedo),roughness:.95}));
+  leaves.userData.foliage=true;canopy.userData.foliage=true;
   const treeTemplates=[];
   for(let tier=0;tier<3;tier++){
    const trunk=[cylinder([0,0,0],[.075,1.8,.02],.17,.115,tier===2?6:10),cylinder([.075,1.8,.02],[-.02,3.3,.04],.115,.035,tier===2?6:8)],leafParts=[],shrubs=[];

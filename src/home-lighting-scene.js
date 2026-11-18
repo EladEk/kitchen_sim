@@ -1,19 +1,21 @@
 import {lightOutput} from './lighting-controls.mjs';
 import * as THREE from 'three';
 import {LIGHTING_STYLE,lightingVisible} from './home-lighting.mjs';
+import {warmDimColor} from './photometric-lighting.mjs';
+export {warmDimColor} from './photometric-lighting.mjs';
 
 export function buildLightingPoints({group,box,cylinder,mat,resources,settings,points,picks,interactive=true,selectedRoom}){
  const groups=new Map(),ivory=mat('#f5f3e9',{roughness:.48}),dark=mat('#807d71');
  const focus=points.find(p=>p.roomId===selectedRoom)?.position||[3,2.75,8];
  // Bound shadow samplers on mobile. All lamps emit; the six closest to the
  // inspected room cast detailed shadows, including walls between nearby rooms.
- const shadows=new Set([...points].filter(p=>lightOutput(settings,p.id).power>0).sort((a,b)=>Math.hypot(a.position[0]-focus[0],a.position[2]-focus[2])-Math.hypot(b.position[0]-focus[0],b.position[2]-focus[2])).slice(0,6).map(p=>p.id));
+ const shadows=new Set([...points].sort((a,b)=>Math.hypot(a.position[0]-focus[0],a.position[2]-focus[2])-Math.hypot(b.position[0]-focus[0],b.position[2]-focus[2])).slice(0,6).map(p=>p.id));
  for(const e of points){
-  if(!lightingVisible(e,settings))continue;
-  const output=lightOutput(settings,e.id),glow=mat('#f8f7f0',{emissive:output.color,emissiveIntensity:output.power*1.6});
+  if(e.roomInferred&&settings.electricalInferred===false)continue;
+  const output=lightOutput(settings,e.id),colour=warmDimColor(output.color,output.power,settings.light==='night'),glow=mat('#f8f7f0',{emissive:colour,emissiveIntensity:2.4});
   const p=new THREE.Group(),[x,y,z]=e.position;p.position.set(x,y,z);
   const n=e.normal,wall=e.mount==='wall',target=[x,y-(wall?0:e.drop),z],from=wall?[x+n[0]*1.6,y-.65,z+n[1]*1.6]:[x+.65,y-1.1,z+1.1];
-  p.userData={buildingId:e.id,lightingId:e.id,simulation:!!e.simulation,dimensionsInferred:true,inspectionView:{target,from}};group.add(p);groups.set(e.id,p);
+  p.visible=lightingVisible(e,settings);p.userData={serviceLayer:'lighting',buildingId:e.id,lightingId:e.id,simulation:!!e.simulation,dimensionsInferred:true,inspectionView:{target,from}};group.add(p);groups.set(e.id,p);
   const data=interactive?{action:'building',buildingId:e.id,lightingId:e.id}:null;
   const part=(mesh,name)=>{mesh.userData={...mesh.userData,...data,part:name};if(interactive&&!picks.includes(mesh))picks.push(mesh);return mesh;};
   if(wall){
@@ -35,8 +37,8 @@ export function buildLightingPoints({group,box,cylinder,mat,resources,settings,p
   // Visibility is owned by applySceneUiVisibility, including initial clean saves
   // and scene rebuilds while controls are hidden; restoring must show the ring.
   ring.userData={...data,part:'lighting-marker'};p.add(ring);if(interactive)picks.push(ring);
-  if(output.power>0){
-   const light=wall?new THREE.PointLight(output.color,6*output.power,5,2):new THREE.SpotLight(output.color,18*output.power,8,Math.PI*.46,.5,2);
+  {
+   const light=wall?new THREE.PointLight(colour,6,5,2):new THREE.SpotLight(colour,18,8,Math.PI/3.1,.68,2);
    light.userData={lightingId:e.id,fixtureLight:true,kelvin:output.kelvin,simulation:!!e.simulation};light.position.set(0,wall?0:-e.drop-.15,wall?.18:0);p.add(light);
    if(!wall){const target=new THREE.Object3D();target.position.set(0,-3,0);p.add(target);light.target=target;}
    light.castShadow=shadows.has(e.id);light.shadow.mapSize.set(wall?256:512,wall?256:512);light.shadow.camera.near=.03;light.shadow.normalBias=.008;light.shadow.bias=-.00015;

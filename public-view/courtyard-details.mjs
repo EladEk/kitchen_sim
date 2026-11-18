@@ -47,6 +47,7 @@ export function createCourtyardDetails(courtyard){
  const core=geometry(new THREE.IcosahedronGeometry(1,0).scale(.83,.43,.83).translate(0,.43,0));
  for(const [foliage,color] of [['green','#567447'],['burgundy','#794345']]){
   const leaf=material({color,map,alphaTest:.48,alphaToCoverage:true,side:THREE.DoubleSide}),body=material({color:new THREE.Color(color).multiplyScalar(.77)});
+  leaf.userData.foliage=true;body.userData.foliage=true;
   for(let sector=0;sector<3;sector++){
    const items=courtyard.shrubs.filter(p=>p.foliage===foliage&&Math.min(2,Math.floor((p.position[1]+25)/75))===sector);if(!items.length)continue;
    for(const [g,m,part] of [[core,body,'canopy'],[leaves,leaf,'leaves']]){

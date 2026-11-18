@@ -64,3 +64,15 @@ export function prepareFloorPhoto(pixels,size){
  }
  return {color,lightingCorrection:{method:'bounded-quadratic-and-low-frequency-light-field',maxGain:high,minGain:low,calibrated:false}};
 }
+
+// Retain photographed mineral detail while mapping the uncalibrated phone
+// illumination to the owner's explicitly selected architectural swatch.
+export function applyFloorReflectance(color,target=[245,244,240]){
+ let mean=0;for(let i=0;i<color.length;i+=4)mean+=.2126*linear[color[i]]+.7152*linear[color[i+1]]+.0722*linear[color[i+2]];
+ mean/=color.length/4;const output=new Uint8Array(color);
+ for(let i=0;i<color.length;i+=4){
+  const luminance=.2126*linear[color[i]]+.7152*linear[color[i+1]]+.0722*linear[color[i+2]],detail=Math.max(.86,Math.min(1.035,1+(luminance/Math.max(.0001,mean)-1)*.35));
+  for(let c=0;c<3;c++)output[i+c]=Math.min(255,srgb(linear[target[c]]*detail));
+ }
+ return output;
+}

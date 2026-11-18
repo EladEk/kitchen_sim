@@ -28,4 +28,4 @@ function FloorPhotoComparisonContent({lang}){
  </details>;
 }
 
-export function FloorPhotoComparison(props){return <DocumentGate lang={props.lang||props.settings?.lang}><FloorPhotoComparisonContent {...props}/></DocumentGate>;}
+export function FloorPhotoComparison(props){return <DocumentGate referenceMedia lang={props.lang||props.settings?.lang}><FloorPhotoComparisonContent {...props}/></DocumentGate>;}

@@ -1,3 +1,4 @@
+import {DRY_PORCELAIN} from './floor-appearance.mjs';
 import {productById} from './home-products.mjs';
 import {FLOOR_PHOTO} from './owner-product-references.mjs';
 import {cataloguePhoto} from './harash-catalog.mjs';
@@ -8,7 +9,7 @@ import {orderedFinishForRoom} from './home-finish-schedule.mjs';
 // replace the selected product. MI402439 now uses the owner's photographed
 // sample. Matched wet/exterior finishes use native catalogue product images.
 const definitions={
- 'dry-floor':{kind:'porcelain',pattern:'owner-photo',color:'#a39b93',roughness:.72,bumpScale:0,photo:FLOOR_PHOTO},
+ 'dry-floor':{kind:'porcelain',pattern:'owner-photo',color:DRY_PORCELAIN.color,roughness:.25,bumpScale:0,photo:{...FLOOR_PHOTO,previewRgb:DRY_PORCELAIN.rgb,appearanceRgb:DRY_PORCELAIN.rgb,appearanceSwatch:DRY_PORCELAIN.color}},
  'wet-floor':{kind:'cement',pattern:'catalogue',color:'#b6afa8',roughness:.9,bumpScale:0,photo:cataloguePhoto('wet-floor')},
  'shower-floor':{kind:'cement',pattern:'catalogue',color:'#b6afa8',roughness:.97,bumpScale:0,photo:cataloguePhoto('shower-floor')},
  'terrace-floor':{kind:'terrace',pattern:'catalogue',color:'#aa8769',roughness:.86,bumpScale:0,photo:cataloguePhoto('terrace-floor')},

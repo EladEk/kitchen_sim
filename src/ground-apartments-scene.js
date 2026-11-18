@@ -1,3 +1,5 @@
+import {DRY_PORCELAIN} from './floor-appearance.mjs';
+import {ROOM_WINDOW_IDS,ROOM_WINDOW_COLOR} from './room-survey-155.mjs';
 import {splitWallReturnGeometry} from './wall-return-geometry.mjs';
 import {buildBaseKitchenDetail} from './base-kitchen-detail.mjs';
 import {FACADE_COLOR,FACADE_ROUGHNESS} from './facade-finish.mjs';
@@ -23,10 +25,10 @@ import {CEILING_COLOR,CEILING_MATERIAL} from './ceiling-finish.mjs';
 // movable owner furniture and the owner's kitchen never enter this builder.
 export function buildGroundApartments({root,resources,picks,settings,cut=false,mode='building',floorMaterial=null,interactiveDoors=false,units=[1,2,3]}){
  const profile=groundBaseProfile(),template=new THREE.Group(),h=cut?.85:profile.height,mat=(color,extra={})=>{const m=new THREE.MeshStandardMaterial({color,roughness:.72,...extra});resources.push(m);return m;},surface=createSurfacePalette(resources);
- const paint=surface('plaster',INTERIOR_WHITE),ceilingFinish=surface('plaster',CEILING_COLOR,CEILING_MATERIAL),stone=surface('limestone',FACADE_COLOR,{roughness:FACADE_ROUGHNESS}),neutralFloor=floorMaterial||surface('porcelain','#d0cdc5'),wetFloor=surface('cement','#c4c3bd'),white=mat('#f0f0e9'),metal=mat('#343e3d',{metalness:.35,roughness:.4}),glass=mat('#acc2ca',{transparent:true,opacity:.28,depthWrite:false,roughness:.18}),wood=surface('paint','#dedbd1');
- installWallCavity(paint,{height:profile.height});installStoneCourses(stone);if(!floorMaterial)installFloorCourses(neutralFloor);installFloorCourses(wetFloor,{tile:[.3,.3],joint:.003});
+ const paint=surface('plaster',INTERIOR_WHITE),ceilingFinish=surface('plaster',CEILING_COLOR,CEILING_MATERIAL),stone=surface('limestone',FACADE_COLOR,{roughness:FACADE_ROUGHNESS}),neutralFloor=floorMaterial||surface('porcelain',DRY_PORCELAIN.color),wetFloor=surface('cement','#c4c3bd'),white=mat('#f0f0e9'),metal=mat('#2d3136',{metalness:.85,roughness:.36}),glass=mat('#c5d4d2',{transparent:true,opacity:.28,depthWrite:false,roughness:.18}),wood=surface('paint','#dedbd1');
+ installWallCavity(paint,{height:profile.height});installStoneCourses(stone);if(!floorMaterial)installFloorCourses(neutralFloor,{tile:[1,1]});installFloorCourses(wetFloor,{tile:[.3,.3],joint:.003});
  const showerGlass=createArchitecturalGlass(resources,{mobile:settings.xr===true||globalThis.matchMedia?.('(pointer: coarse)').matches===true});
- const innerDoor=surface('door','#d8d0c3'),entryDoor=surface('door','#536c66');for(const material of [innerDoor,entryDoor])installBuildingSurfaceUVs(material);
+ const innerDoor=surface('door','#f3f2ee'),entryDoor=surface('door','#454a4e');for(const material of [innerDoor,entryDoor])installBuildingSurfaceUVs(material);
  for(const material of [paint,ceilingFinish,stone,neutralFloor,wetFloor,wood])installBuildingSurfaceUVs(material);
  const cube=new THREE.BoxGeometry(1,1,1);resources.push(cube);const facadeCube=splitWallReturnGeometry(cube);resources.push(facadeCube);const verticalFacadeCube=splitWallReturnGeometry(cube,{vertical:true});resources.push(verticalFacadeCube);let interactive=false;
  const box=(x,y,z,w,hh,d,m,parent=template,data=null)=>{const mesh=new THREE.Mesh(cube,m);mesh.position.set(x,y,z);mesh.scale.set(w,hh,d);mesh.castShadow=mesh.receiveShadow=true;mesh.userData={...(data||{}),baseline:true};parent.add(mesh);if(interactive&&data?.action)picks.push(mesh);return mesh;};
@@ -59,9 +61,9 @@ export function buildGroundApartments({root,resources,picks,settings,cut=false,m
   }
   for(const xx of [-o.width/2,o.width/2])box(xx,hh/2,0,.035,hh,.09,metal,p);if(!cut)box(0,hh,0,o.width,.035,.09,metal,p);
   if(o.type==='window'||o.type==='slider'){
-   if(o.type==='window'){box(0,hh/2,0,o.width-.05,hh-.05,.012,glass,p);box(0,hh/2,0,.03,hh,.07,metal,p);box(0,-.035,0,o.width+.08,.055,.25,stone,p);}
+   if(o.type==='window'){if(ROOM_WINDOW_IDS.includes(o.id)||o.id==='safe-window'){for(let i=0;i<2;i++){const sx=(i?1:-1)*o.width/4,zz=(i?1:-1)*.019;box(sx,hh/2,zz,o.width/2-.04,hh-.05,.008,glass,p,{part:'observed-window-sash'});for(const xx of [sx-o.width/4,sx+o.width/4])box(xx,hh/2,zz,.028,hh,.035,metal,p);}}else box(0,hh/2,0,o.width-.05,hh-.05,.012,glass,p);box(0,hh/2,0,.03,hh,.07,metal,p);box(0,-.035,0,o.width+.08,.055,.25,stone,p);}
    else{box(o.width/4,hh/2,0,o.width/2-.04,hh-.03,.012,glass,p);box(0,hh/2,0,.035,hh,.09,metal,p);}
-   if(!cut&&o.type==='window'&&o.id!=='ensuite-window'&&o.id!=='utility-window'){box(0,hh+.13,0,o.width+.08,.22,.18,paint,p);}
+   if(!cut&&o.type==='window'&&o.id!=='ensuite-window'&&o.id!=='utility-window'){const wall=profile.walls.find(w=>w.id===o.wallId),inside=o.vertical?1:-1;box(0,hh+.13,inside*(wall.thickness/2+.026),o.width+.07,.26,.045,mat(ROOM_WINDOW_COLOR),p);}
   }
  }
  // Generic white ceramic shapes at the plan's wet-room fixture positions.

@@ -1,3 +1,5 @@
+import {SURVEY_ELEMENTS} from './room-survey-155.mjs';
+import {SAFE_ROOM_VENTS} from './safe-room-reference.mjs';
 // Observations from the owner's ten photographs and 32-second walkthrough.
 // Photographs establish appearance and relative placement, not measured sizes.
 // The document-derived walls, opening dimensions and owner's layout stay authoritative.
@@ -15,11 +17,13 @@ export const PHOTO_REFERENCES=[
 ];
 export const PHOTO_SOURCE={id:'site-photos',kind:'photos',he:'תמונות וסרטון הבית',en:'House photos & video',pages:[1,2,3,4,5,6,7,8,9,10,11],imagePrefix:'/house/photos/photo-',video:'/house/photos/walkthrough.mp4',poster:'/house/photos/video-poster.jpg'};
 export const SHUTTER_COVERS={
- 'bed-a-window':{height:.26,page:3},'bed-b-window':{height:.26,page:4},
- 'master-window':{height:.26,page:7},'bed-c-window':{height:.26,page:7},
+ 'bed-a-window':{height:.26,page:1,source:'survey-bedroom-a',color:'#303639'},'bed-b-window':{height:.26,page:1,source:'survey-bedroom-b',color:'#303639'},
+ 'master-window':{height:.26,page:1,source:'survey-master',color:'#303639'},'bed-c-window':{height:.26,page:1,source:'survey-bedroom-c',color:'#303639'},
  patio:{height:.22,page:10,second:3}
 };
 export const OBSERVED_ELEMENTS=[
+ ...SURVEY_ELEMENTS,
+ SAFE_ROOM_VENTS,
  {id:'kitchen-hvac',roomId:'kitchen',kind:'kitchen-bulkhead',he:'מיזוג — גריל מטבח, גריל מסדרון ובקר',en:'HVAC — kitchen grille, hall grille and controller',dimensions:[6.55,1,.33],bottom:2.42,page:11,noteHe:'ההנמכה עוקבת לאורך המטבח ומעמיקה מעל כניסת המסדרון. הגריל הגדול מעל הפתח, הגריל הקטן לאורך קיר המטבח והבקר ביניהם לפי צילום 277903 והסרטון. תוואי המדרגה נתמך בתוכנית; עומק, תחתית, גרילים ובקר במידות משוערות.',noteEn:'The work-run bulkhead projects deeper over the hall mouth. The large grille is above the entrance, the smaller grille along the kitchen and the controller between them, following 277903 and the video. The plan supports the return; depth, underside, grille and controller sizes remain estimates.'},
  {id:'hall-ceiling',roomId:'hall',kind:'hall-ceiling',he:'הנמכת תקרת המסדרון',en:'Lowered hall ceiling',dimensions:[2.25,6.2,.29],bottom:2.46,page:10,second:5,noteHe:'הסרטון מציג תקרה מונמכת במסדרון. המתאר עוקב אחרי המסדרון בתוכנית; גובה התחתית ועובי ההנמכה משוערים.',noteEn:'The video shows a lowered hall ceiling. Its outline follows the plan; underside height and depth are assumed.'},
  {id:'master-ceiling',roomId:'master',kind:'master-ceiling',he:'הנמכה בכניסה לחדר ההורים',en:'Main-bedroom entrance ceiling drop',dimensions:[1.7,1.9,.33],bottom:2.42,page:6,noteHe:'מעל אזור הכניסה שליד רחצת ההורים. תחום ההנמכה וגובהה נאמדו מהתמונה ומהסרטון.',noteEn:'Above the entrance beside the en suite. Its extent and height are estimated from the photo and video.'},

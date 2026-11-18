@@ -3,7 +3,7 @@ import {inside} from './navigation.mjs';
 const EPS=1e-6;
 export function isSectionWall(object){
  const d=object.userData||{},part=d.part||object.name||'';
- return !!d.sectionWall||!!d.tourDoor||/wall|facade|window|glazing|lintel|sill|door-frame|apartment-door|building-door|balcony-grey|rail-and|storey-separation/.test(part)&&!/cabinet|wardrobe|furniture/.test(part);
+ return !!d.sectionWall||!!d.tourDoor||/wall|facade|window|column|partition|beam|glazing|lintel|sill|door-frame|apartment-door|building-door|balcony-grey|rail-and|storey-separation/.test(part)&&!/cabinet|wardrobe|furniture/.test(part);
 }
 function clipTop(face,height){const out=[];for(let i=0;i<face.length;i++){const a=face[i],b=face[(i+1)%face.length],da=height-a[1],db=height-b[1];if(da>=-EPS)out.push(a);if((da>=-EPS)!==(db>=-EPS)){const t=da/(da-db);out.push(a.map((v,k)=>v+(b[k]-v)*t));}}return out;}
 function capLoops(segments){

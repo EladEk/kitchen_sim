@@ -1,3 +1,4 @@
+import {wrapPublicDoor} from './public-door-motion.mjs';
 import {buildPhotoSite} from './site-photo-scene.js';
 import * as THREE from 'three';
 import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
@@ -45,7 +46,7 @@ export function buildSiteContext({root,resources,picks,settings,cut=false,ceilin
  const meter=siteMainMeterFeature();
  if(meter){const [x,z]=meter.position,[w,d,h]=meter.dimensions,data={action:'building',buildingId:meter.id,part:'site-main-meter-cabinet',heightInferred:true};box(x,h/2,z,w,h,d,kerb,data);for(let i=0;i<4;i++){const xx=x-w/2+(i+.5)*w/4;box(xx,h/2,z+d/2+.005,w/4-.012,h-.08,.02,paint,data);box(xx+w/8-.06,h*.5,z+d/2+.024,.018,.15,.02,cover,data);}}
  const entryGlass=mat('#a8c4ce',{transparent:true,opacity:.27,depthWrite:false,roughness:.18});
- for(const d of COMMON_ENTRY_DOORS){const end=settings.closedBuildingDoors?.includes(d.id)?d.closed:d.opened,dx=end[0]-d.hinge[0],dz=end[1]-d.hinge[1],width=Math.hypot(dx,dz),height=cut?.82:2.28,angle=-Math.atan2(dz,dx),data={action:'building-door',doorId:d.id,part:'site-common-entry-door',source:'building-plan',page:3};const pane=box((d.hinge[0]+end[0])/2,height/2,(d.hinge[1]+end[1])/2,width,height,.025,entryGlass,data);pane.rotation.y=angle;for(const q of [d.hinge,end])box(q[0],height/2,q[1],.04,height,.04,cover,data);for(const y of [.035,height-.035]){const rail=line(d.hinge,end,y,.04,cover);rail.userData=data;picks.push(rail);}}
+ for(const d of COMMON_ENTRY_DOORS){const before=new Set(group.children);const end=settings.closedBuildingDoors?.includes(d.id)?d.closed:d.opened,dx=end[0]-d.hinge[0],dz=end[1]-d.hinge[1],width=Math.hypot(dx,dz),height=cut?.82:2.28,angle=-Math.atan2(dz,dx),data={action:'building-door',doorId:d.id,part:'site-common-entry-door',source:'building-plan',page:3};const pane=box((d.hinge[0]+end[0])/2,height/2,(d.hinge[1]+end[1])/2,width,height,.025,entryGlass,data);pane.rotation.y=angle;for(const q of [d.hinge,end])box(q[0],height/2,q[1],.04,height,.04,cover,data);for(const y of [.035,height-.035]){const rail=line(d.hinge,end,y,.04,cover);rail.userData=data;picks.push(rail);}wrapPublicDoor(group,group.children.filter(o=>!before.has(o)),{door:d,level:0,base:0,opened:!settings.closedBuildingDoors?.includes(d.id),kind:'entry'});}
  const fixed=box(21.8239,1.14,(-3.6998-2.7005)/2,.018,cut?.82:2.28,.9993,entryGlass);fixed.userData={part:'site-entry-fixed-glazing'};if(cut)fixed.position.y=.41;
  // Close the actual entrance head: the general facade skips door openings,
  // so the complete glazed opening needs its own lintel up to storey height.

@@ -37,7 +37,7 @@ export function createSpatialCollisionIndex(root, {trees = new Map(), include = 
   if (n) { sources.push(object); counts.push(n); starts.push(count); count += n; }
  });
  let matrices = new Float32Array(count * 16), boxes = new Float32Array(count * 6);
- let sourceIds = new Uint32Array(count), visited = new Uint32Array(count), stamp = 0;
+ let sourceIds = new Uint32Array(count), seenStamp = new Int32Array(count), stamp = 0;
  const matrix = new THREE.Matrix4(), instance = new THREE.Matrix4(), box = new THREE.Box3();
  const envelope = new THREE.Box3(), grid = new Map(), global = [];
  let at = 0;
@@ -75,17 +75,17 @@ export function createSpatialCollisionIndex(root, {trees = new Map(), include = 
  for (const [key, values] of grid) { const ids = new Uint32Array(values); grid.set(key, ids); cellBytes += ids.byteLength; }
  let overflow = new Uint32Array(global), disposed = false;
  const proxy = sources.length ? new THREE.Mesh(sources[0].geometry, sources[0].material) : null;
- const hits = [], normal = new THREE.Matrix3(), faceNormal = new THREE.Vector3(), endpoint = new THREE.Vector3();
- const stats = {records: count, cells: grid.size, bufferBytes: matrices.byteLength + boxes.byteLength + sourceIds.byteLength + visited.byteLength + overflow.byteLength + cellBytes, queries: 0, candidates: 0, narrowTests: 0};
+ const hits = [], normal = new THREE.Matrix3(), faceNormal = new THREE.Vector3();
+ const stats = {records: count, cells: grid.size, bufferBytes: matrices.byteLength + boxes.byteLength + sourceIds.byteLength + seenStamp.byteLength + overflow.byteLength + cellBytes, queries: 0, candidates: 0, narrowTests: 0, visitedCells: 0, ddaLimit: 0};
  return {
   bounds: envelope, stats,
   firstHit(raycaster, {floor = false, any = false} = {}) {
    if (disposed || !proxy || !Number.isFinite(raycaster.far)) return null;
-   stats.queries++; stats.candidates = stats.narrowTests = 0;
-   if (++stamp >= 0xffffffff) { visited.fill(0); stamp = 1; }
+   stats.queries++; stats.candidates = stats.narrowTests = stats.visitedCells = 0;
+   if (++stamp >= 0x7fffffff) { seenStamp.fill(0); stamp = 1; }
    let closest = null;
    const test = id => {
-    if (visited[id] === stamp) return false; visited[id] = stamp; stats.candidates++;
+    if (seenStamp[id] === stamp) return false; seenStamp[id] = stamp; stats.candidates++;
     if (!overlapsRay(raycaster.ray, closest?.distance ?? raycaster.far, boxes, id * 6)) return false;
     stats.narrowTests++;
     const source = sources[sourceIds[id]];
@@ -100,23 +100,45 @@ export function createSpatialCollisionIndex(root, {trees = new Map(), include = 
     }
     return any && !!closest;
    };
-   endpoint.copy(raycaster.ray.direction).multiplyScalar(raycaster.far).add(raycaster.ray.origin);
-   const origin = raycaster.ray.origin;
-   const x0 = Math.max(min[0], Math.floor((Math.min(origin.x, endpoint.x) - EPS) / CELL)), x1 = Math.min(max[0], Math.floor((Math.max(origin.x, endpoint.x) + EPS) / CELL));
-   const y0 = Math.max(min[1], Math.floor((Math.min(origin.y, endpoint.y) - EPS) / CELL)), y1 = Math.min(max[1], Math.floor((Math.max(origin.y, endpoint.y) + EPS) / CELL));
-   const z0 = Math.max(min[2], Math.floor((Math.min(origin.z, endpoint.z) - EPS) / CELL)), z1 = Math.min(max[2], Math.floor((Math.max(origin.z, endpoint.z) + EPS) / CELL));
-   outer: for (let z = z0; z <= z1; z++) for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
-    const ids = grid.get(cellKey(x, y, z)); if (!ids) continue;
-    for (const id of ids) if (test(id)) break outer;
+   const {origin,direction}=raycaster.ray;
+   if(!Number.isFinite(origin.x+origin.y+origin.z+direction.x+direction.y+direction.z)||direction.lengthSq()<1e-20)return null;
+   let entry=Math.max(0,raycaster.near),exit=raycaster.far;
+   for(let axis=0;axis<3;axis++){
+    const key=axis===0?'x':axis===1?'y':'z',o=origin[key],d=direction[key],low=min[axis]*CELL,high=(max[axis]+1)*CELL;
+    if(Math.abs(d)<1e-12){if(o<low||o>high)return null;}
+    else{let a=(low-o)/d,b=(high-o)/d;if(a>b){const t=a;a=b;b=t;}entry=Math.max(entry,a);exit=Math.min(exit,b);if(entry>exit)return null;}
    }
-   if (!any || !closest) for (const id of overflow) if (test(id)) break;
+   // Large spanning slabs are tested once, before grid traversal so their hit
+   // distance can bound all later work. Integer stamps deduplicate candidates.
+   for(const id of overflow)if(test(id)){hits.length=0;return closest;}
+   let ix=Math.max(min[0],Math.min(max[0],Math.floor((origin.x+direction.x*entry)/CELL))),
+       iy=Math.max(min[1],Math.min(max[1],Math.floor((origin.y+direction.y*entry)/CELL))),
+       iz=Math.max(min[2],Math.min(max[2],Math.floor((origin.z+direction.z*entry)/CELL)));
+   const sx=Math.sign(direction.x),sy=Math.sign(direction.y),sz=Math.sign(direction.z),
+         dx=sx?CELL/Math.abs(direction.x):Infinity,dy=sy?CELL/Math.abs(direction.y):Infinity,dz=sz?CELL/Math.abs(direction.z):Infinity;
+   let tx=sx?((ix+(sx>0?1:0))*CELL-origin.x)/direction.x:Infinity,
+       ty=sy?((iy+(sy>0?1:0))*CELL-origin.y)/direction.y:Infinity,
+       tz=sz?((iz+(sz>0?1:0))*CELL-origin.z)/direction.z:Infinity,steps=0;
+   for(;steps<256;steps++){
+    stats.visitedCells++;
+    const bucket=grid.get(cellKey(ix,iy,iz));if(bucket)for(const id of bucket)if(test(id)){hits.length=0;return closest;}
+    const next=Math.min(tx,ty,tz);
+    if(next>exit||closest&&next>closest.distance)break;
+    // Advance every tied axis: objects on boundaries occupy adjacent cells
+    // with EPS padding, so edge/corner crossings cannot skip a surface.
+    if(tx<=next+1e-10){ix+=sx;tx+=dx;}if(ty<=next+1e-10){iy+=sy;ty+=dy;}if(tz<=next+1e-10){iz+=sz;tz+=dz;}
+    if(ix<min[0]||ix>max[0]||iy<min[1]||iy>max[1]||iz<min[2]||iz>max[2])break;
+   }
+   // Extremely long rays use a bounded linear safety fallback, never silently
+   // miss collisions beyond the DDA guard. Normal walking uses a few cells.
+   if(steps===256){stats.ddaLimit++;for(let id=0;id<count;id++)if(test(id))break;}
    hits.length = 0;
    return closest;
   },
   dispose() {
    if (disposed) return; disposed = true;
    sources.length = counts.length = starts.length = hits.length = global.length = 0; grid.clear();
-   matrices = boxes = sourceIds = visited = overflow = null; stats.bufferBytes = 0;
+   matrices = boxes = sourceIds = seenStamp = overflow = null; stats.bufferBytes = 0;
    if (proxy) proxy.geometry = proxy.material = null;
   }
  };

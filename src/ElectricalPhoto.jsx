@@ -26,4 +26,4 @@ function ElectricalPhotoContent({reference,entries,lang,selectedId,onSelect,kind
  </div>;
 }
 
-export function ElectricalPhoto(props){return <DocumentGate lang={props.lang||props.settings?.lang}><ElectricalPhotoContent {...props}/></DocumentGate>;}
+export function ElectricalPhoto(props){return <DocumentGate referenceMedia lang={props.lang||props.settings?.lang}><ElectricalPhotoContent {...props}/></DocumentGate>;}

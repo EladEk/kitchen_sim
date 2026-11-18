@@ -1,3 +1,7 @@
+import {DRY_PORCELAIN} from './floor-appearance.mjs';
+import {createSceneStateUpdater} from './scene-state.mjs';
+import {applyArchitecturalMaterials} from './architectural-materials.mjs';
+import {ROOM_WINDOW_IDS,ROOM_WINDOW_COLOR} from './room-survey-155.mjs';
 import {splitWallReturnGeometry} from './wall-return-geometry.mjs';
 import {addRoomCornerOcclusion} from './room-corner-occlusion.mjs';
 import {FACADE_COLOR,FACADE_ROUGHNESS} from './facade-finish.mjs';
@@ -46,7 +50,8 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
  const group=new THREE.Group(),picks=[],resources=[],motions=[],roomGroups=new Map(),furnitureGroups=new Map(),doorGroups=new Map(),shutterGroups=new Map();
  const mat=(color,opts={})=>{const m=new THREE.MeshStandardMaterial({color,roughness:.78,...opts});resources.push(m);return m;};
  const surface=createSurfacePalette(resources);
- const entryDoorFinish=surface('door','#536c66'),doorFinish=surface('door','#d8d0c3'),doorFrame=surface('paint','#e2dcd1'),ceilingFinish=surface('plaster',CEILING_COLOR,{...CEILING_MATERIAL,side:THREE.FrontSide,shadowSide:THREE.DoubleSide}),offwhite=surface('paint','#efebe2'),oak=surface('wood','#ae8b61'),ink=mat('#35463d'),windowInk=mat('#343d3d',{metalness:.3,roughness:.5}),steel=mat('#a7b1ac',{metalness:.55,roughness:.35}),white=mat('#f0f0e8'),dark=mat('#29352f'),glass=mat('#b0c8be',{transparent:true,opacity:.28,roughness:.16,depthWrite:false}),linen=surface('fabric','#c5c5af'),clay=mat('#b58e75'),cap=mat('#c7c9bc');
+ const skirtingFinish=surface('porcelain',DRY_PORCELAIN.color,{roughness:.6});
+ const entryDoorFinish=surface('door','#454a4e'),doorFinish=surface('door','#f3f2ee'),doorFrame=surface('paint','#f3f2ee'),ceilingFinish=surface('plaster',CEILING_COLOR,{...CEILING_MATERIAL,side:THREE.FrontSide,shadowSide:THREE.DoubleSide}),offwhite=surface('paint','#efebe2'),oak=surface('wood','#ae8b61'),ink=mat('#35463d'),windowInk=mat('#343d3d',{metalness:.3,roughness:.5}),steel=mat('#a7b1ac',{metalness:.55,roughness:.35}),white=mat('#f0f0e8'),dark=mat('#29352f'),glass=mat('#b0c8be',{transparent:true,opacity:.28,roughness:.16,depthWrite:false}),linen=surface('fabric','#c5c5af'),clay=mat('#b58e75'),cap=mat('#c7c9bc');
  // Selecting a destination removes upper floors, but must not enable wall cuts.
  const wallCutaway=settings.cutaway===true&&mode!=='walk'&&(mode==='building'?settings.buildingLevel===0:mode==='unit'?parseDestination(settings.tourDestination).floor===0:true);
  const wallHeight=wallCutaway?.86:HOUSE.height;
@@ -103,7 +108,7 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
        const pts=[],at=(axis,y)=>vertical?[normal+sign*.004,y,axis]:[axis,y,normal+sign*.004];for(let y=Math.ceil(bottom/.25)*.25;y<top;y+=.25)pts.push(at(aa,y),at(bb,y));for(let q=Math.ceil(aa/.75)*.75;q<bb;q+=.75)pts.push(at(q,bottom),at(q,top));lines(pts,'#858d83',.3);
       }
      }
-     if(bottom===0&&rr?.floor==='ordered-white'){const trim=vertical?box(normal,.035,(aa+bb)/2,.014,.07,bb-aa,offwhite):box((aa+bb)/2,.035,normal,bb-aa,.07,.014,offwhite);trim.userData.productId='skirting';}
+     if(bottom===0&&rr?.floor==='ordered-white'){const trim=vertical?box(normal,.035,(aa+bb)/2,.014,.07,bb-aa,skirtingFinish):box((aa+bb)/2,.035,normal,bb-aa,.07,.014,skirtingFinish);trim.userData.productId='skirting';}
     }
    }
   };
@@ -113,18 +118,24 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
  appendFacadeVeneers(group,claddingRows,facadeStone,resources);
  for(const o of WINDOWS){const [x,z]=openingPoint(o),height=Math.min(o.height,wallHeight-o.sill);if(height<=0)continue;const p=new THREE.Group();p.position.set(x,o.sill,z);p.rotation.y=o.vertical?Math.PI/2:0;group.add(p);
   p.userData.windowId=o.id;p.userData.schedule=o.schedule;
-  const sliding=o.operation==='sliding';
+  const frameInk=ROOM_WINDOW_IDS.includes(o.id)?mat(ROOM_WINDOW_COLOR,{metalness:.3,roughness:.5}):windowInk;
+  const sliding=o.operation==='sliding'||o.id==='safe-window';
   if(sliding)for(let i=0;i<2;i++){
    const sash=new THREE.Group();sash.position.set((i?1:-1)*o.width/4,0,(i?1:-1)*.019);sash.userData.part='window-sash';p.add(sash);
    glazing(o.id,height/2,o.width/2-.045,height-.06,sash);
-   for(const xx of [-o.width/4,o.width/4])box(xx,height/2,0,.028,height,.035,windowInk,sash);
-   for(const yy of [.015,height-.015])box(0,yy,0,o.width/2,.03,.035,windowInk,sash);
-   box((i?-1:1)*(o.width/4-.04),height*.48,.023,.016,.14,.015,windowInk,sash);
+   for(const xx of [-o.width/4,o.width/4])box(xx,height/2,0,.028,height,.035,frameInk,sash);
+   for(const yy of [.015,height-.015])box(0,yy,0,o.width/2,.03,.035,frameInk,sash);
+   box((i?-1:1)*(o.width/4-.04),height*.48,.023,.016,.14,.015,frameInk,sash);
   }else glazing(o.id,height/2,o.width-.05,height-.06,p);
-  for(const xx of [-o.width/2,o.width/2])box(xx,height/2,0,.035,height,.085,windowInk,p);
-  for(const yy of [0,height]){const rail=box(0,yy,0,o.width,.035,.085,windowInk,p);rail.userData.part=yy?'window-head':'window-sill';}
+  for(const xx of [-o.width/2,o.width/2])box(xx,height/2,0,.035,height,.085,frameInk,p);
+  for(const yy of [0,height]){const rail=box(0,yy,0,o.width,.035,.085,frameInk,p);rail.userData.part=yy?'window-head':'window-sill';}
   box(0,-.03,0,o.width+.1,.04,.21,offwhite,p);
+  if(ROOM_WINDOW_IDS.includes(o.id)){const inset=WALLS.find(w=>w.id===o.wallId).thickness/2-.035;for(const child of p.children)child.position.z+=o.vertical?inset:-inset;}
   if(o.id==='safe-window'){
+   // The video places both dark sash tracks near the inside face of the thick reveal.
+   const reveal=WALLS.find(w=>w.id===o.wallId).thickness/2-.035;
+   for(const child of p.children)child.position.z-=reveal;
+   p.userData.appearanceSource='safe-room-video';
    const wall=WALLS.find(w=>w.id===o.wallId),slats=new THREE.Group();slats.position.z=wall.thickness/2+.055;slats.userData.part='photo-exterior-slats';p.add(slats);
    for(let y=.07;y<height-.03;y+=.095){const blade=box(0,y,0,o.width-.055,.033,.065,windowInk,slats);blade.rotation.x=-.35;}
    for(const xx of [-o.width/2+.025,o.width/2-.025])box(xx,height/2,0,.03,height,.07,windowInk,slats);
@@ -132,14 +143,14 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
  }
  for(const d of DOORS){const [x,z]=openingPoint(d),p=new THREE.Group();p.position.set(x+(d.vertical?d.faceOffset||0:0),0,z+(d.vertical?0:d.faceOffset||0));p.rotation.y=d.vertical?-Math.PI/2:0;p.userData.doorId=d.id;group.add(p);doorGroups.set(d.id,p);
   const h=Math.min(d.height,wallHeight),isOpen=settings.openDoors.includes(d.id),data={action:'door',doorId:d.id};
-  const frameGeometry=doorFrameGeometry({width:d.width,height:h,depth:CONSTRUCTION_WALLS.find(w=>w.id===d.wallId)?.thickness||.12,cut:h<d.height}),frameMesh=new THREE.Mesh(frameGeometry,doorFrame);resources.push(frameGeometry);frameMesh.userData={...data,part:'door-frame',frameProfile:'stepped',tourNonPhysical:true};frameMesh.castShadow=frameMesh.receiveShadow=true;p.add(frameMesh);picks.push(frameMesh);
+  const frameGeometry=doorFrameGeometry({width:d.width,height:h,depth:CONSTRUCTION_WALLS.find(w=>w.id===d.wallId)?.thickness||.12,cut:h<d.height}),frameMesh=new THREE.Mesh(frameGeometry,d.id.startsWith('safe')?surface('paint','#f2f1ec'):doorFrame);resources.push(frameGeometry);frameMesh.userData={...data,part:'door-frame',frameProfile:'stepped',tourNonPhysical:true};frameMesh.castShadow=frameMesh.receiveShadow=true;p.add(frameMesh);picks.push(frameMesh);
   if(d.type==='slider'){
    for(let i=0;i<2;i++){const leaf=new THREE.Group(),closed=-d.width/4+i*d.width/2;leaf.position.x=i?closed:(isOpen?d.width/4:closed);p.add(leaf);if(!i)motions.push({id:`door:${d.id}`,object:leaf,property:'x',axis:'position',target:leaf.position.x,closedTarget:-d.width/4,openTarget:d.width/4});
     glazing(d.id,h/2,d.width/2-.025,h,leaf,data);for(const xx of [-d.width/4,d.width/4])box(xx,h/2,.008,.025,h,.04,ink,leaf,data);for(const yy of [.015,h-.015])box(0,yy,.008,d.width/2,.025,.04,ink,leaf,data);box(-d.width/4+.07,h*.48,.04,.018,.22,.02,ink,leaf,data);
    }
   }else{
    const sign=d.hinge==='end'?-1:1,pivot=new THREE.Group(),openTarget=(d.swing||-1)*Math.PI*.48;pivot.position.x=-sign*d.width/2;pivot.rotation.y=isOpen?openTarget:0;p.add(pivot);motions.push({id:`door:${d.id}`,object:pivot,property:'y',axis:'rotation',target:pivot.rotation.y,openTarget});
-   box(sign*d.width/2,h/2,0,d.width-.045,h-.025,d.id==='safe'?.065:.035,d.id==='entry'?entryDoorFinish:d.material==='steel'?surface('door',d.id==='service-exit'?'#3e4946':'#b4bbb2',{metalness:.25}):doorFinish,pivot,data,.009);for(const side of [-1,1]){box(sign*(d.width-.12),h*.48,side*.025,.028,.16,.012,steel,pivot,data);box(sign*(d.width-.15),h*.48+.012,side*.047,.105,.018,.022,steel,pivot,data);}
+   box(sign*d.width/2,h/2,0,d.width-.045,h-.025,d.id==='safe'?.065:.035,d.id.startsWith('safe')?surface('door','#f2f1ec',{metalness:d.material==='steel'?.15:0}):d.id==='entry'?entryDoorFinish:d.material==='steel'?surface('door',d.id==='service-exit'?'#3e4946':'#b4bbb2',{metalness:.25}):doorFinish,pivot,data,.009);for(const side of [-1,1]){box(sign*(d.width-.12),h*.48,side*.025,.028,.16,.012,steel,pivot,data);box(sign*(d.width-.15),h*.48+.012,side*.047,.105,.018,.022,steel,pivot,data);}
   }
  }
  // Curtain outside the glass; the photographed dark access cover faces inside.
@@ -148,8 +159,8 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
   const [x,z]=openingPoint(o),p=new THREE.Group(),outside=o.vertical?-1:1;p.position.set(x+(o.vertical?outside*(w.thickness/2+.04):0),o.sill,z+(o.vertical?0:outside*(w.thickness/2+.04)));p.rotation.y=o.vertical?Math.PI/2:0;p.userData.shutterId=s.id;group.add(p);shutterGroups.set(s.id,p);
   const data={action:'shutter',shutterId:s.id},shutterMat=mat('#b9bcb0',{metalness:.35,roughness:.65});
   const cover=SHUTTER_COVERS[s.id];if(cover){
-   const c=new THREE.Group(),inside=o.vertical?1:-1;c.position.set(x,o.sill,z);c.rotation.y=o.vertical?Math.PI/2:0;c.userData={shutterCoverId:s.id,source:'site-photos',page:cover.page,dimensionsInferred:true};group.add(c);
-   const zz=inside*(w.thickness/2+.026);box(0,height+cover.height/2,zz,o.width+.07,cover.height,.045,windowInk,c,data);
+   const c=new THREE.Group(),inside=o.vertical?1:-1;c.position.set(x,o.sill,z);c.rotation.y=o.vertical?Math.PI/2:0;c.userData={shutterCoverId:s.id,source:cover.source||'site-photos',page:cover.page,dimensionsInferred:true};group.add(c);
+   const zz=inside*(w.thickness/2+.026);box(0,height+cover.height/2,zz,o.width+.07,cover.height,.045,cover.color?mat(cover.color):windowInk,c,data);
    box(0,height+cover.height/2,zz+inside*.025,o.width+.025,cover.height-.035,.007,mat('#404949'),c,data);
   }
   const curtain=new THREE.Group();curtain.position.y=height;curtain.scale.y=settings.closedShutters?.includes(s.id)?1:.015;p.add(curtain);motions.push({id:`shutter:${s.id}`,object:curtain,axis:'scale',property:'y',target:curtain.scale.y,closedTarget:.015,openTarget:1});
@@ -157,7 +168,7 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
   for(let y=.04;y<height;y+=.055)box(0,-y,.015,o.width-.028,.004,.005,ink,curtain,data);
   for(const xx of [-o.width/2,o.width/2])box(xx,height/2,0,.025,height,.04,shutterMat,p,data);
  }
- const buildingGroups=buildObservedArchitecture({group,box,cylinder,mat,resources,wallHeight});
+ const buildingGroups=buildObservedArchitecture({group,box,cylinder,mat,surface,resources,wallHeight});
  for(const [id,p] of buildEntranceServices({group,box,cylinder,floor,mat,resources,motions,picks,settings,mode}))buildingGroups.set(id,p);
  for(const p of buildingGroups.values())if(p.userData.pickMeshes){picks.push(...p.userData.pickMeshes);delete p.userData.pickMeshes;}
  // Room furniture is illustrative and editable through room finishes; it never
@@ -186,7 +197,7 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
   }
   const w=f.w,d=f.d,h=f.h,isWardrobe=['wardrobe','office-cabinet'].includes(f.kind),low=isWardrobe?.42:0;
   for(const x of [-w/2+.012,w/2-.012])box(x,h/2,0,.024,h,d,wood,p,{action:'furniture',furnitureId:f.id});
-  box(0,h/2,-d/2+.012,w-.045,h,.024,offwhite,p);for(const yy of [.035,h-.012])box(0,yy,0,w,.024,d,wood,p);
+  box(0,h/2,-d/2+.012,w-.048,h-.048,.024,offwhite,p);for(const yy of [.035,h-.012])box(0,yy,0,w-.048,.024,d-.024,wood,p);
   if(f.kind==='console'){
    for(let i=0;i<3;i++){const key=`${f.id}:drawer-${i}`,drawer=new THREE.Group();drawer.position.set(-w/2+w/6+i*w/3,0,openParts.has(key)?.34:0);p.add(drawer);motions.push({id:key,object:drawer,property:'z',axis:'position',target:drawer.position.z,closedTarget:0,openTarget:.34});const data={action:'part',partId:key,furnitureId:f.id};box(0,h/2,d/2,w/3-.01,h-.06,.025,wood,drawer,data);box(0,.08,0,w/3-.06,.025,d-.07,offwhite,drawer,data);for(const xx of [-w/6+.035,w/6-.035])box(xx,h/2,0,.018,h-.12,d-.05,offwhite,drawer,data);}
    return;
@@ -201,7 +212,7 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
   }else box(0,h/2,0,w-.05,.018,d-.05,offwhite,p);
  }
  function tap(p,x,y,z){const faucet=instantiateCompleteFurniture('faucet',{w:.075,h:.19,d:.145,data:{productId:'basin-tap'}});faucet.position.set(x,y,z+.055);p.add(faucet);}
- function mirror(p,w,y,z){if(settings.lampsOn&&mode==='walk'&&['bathroom','ensuite'].includes(selectedRoom)){const active=furnitureForSettings(settings).find(f=>f.roomId===selectedRoom&&f.kind==='vanity');if(active&&p.userData.furnitureId===active.id){RectAreaLightUniformsLib.init();const light=new THREE.RectAreaLight('#fff5e8',1.3,w,.6);light.position.set(0,y,z-.003);light.lookAt(0,y,z-.3);light.userData={fixtureLight:true,part:'bath-mirror-area-light'};p.add(light);}}box(0,y,z,w,.68,.025,steel,p);const m=box(0,y,z+.015,w-.025,.655,.008,mat('#dedfdd',{metalness:1,roughness:.06}),p);m.userData.productId='mirror';m.userData.mirrorSurface=true;const rim=mat('#f4f1e9',{emissive:'#fff5df',emissiveIntensity:settings.lampsOn?.6:0});for(const x of [-w/2+.006,w/2-.006])box(x,y,z+.011,.012,.65,.008,rim,p);}
+ function mirror(p,w,y,z){if(mode==='walk'&&['bathroom','ensuite'].includes(selectedRoom)){const active=furnitureForSettings(settings).find(f=>f.roomId===selectedRoom&&f.kind==='vanity');if(active&&p.userData.furnitureId===active.id){RectAreaLightUniformsLib.init();const light=new THREE.RectAreaLight('#fff5e8',1.3,w,.6);light.position.set(0,y,z-.003);light.lookAt(0,y,z-.3);light.userData={fixtureLight:true,part:'bath-mirror-area-light'};p.add(light);}}box(0,y,z,w,.68,.025,steel,p);const m=box(0,y,z+.015,w-.025,.655,.008,mat('#dedfdd',{metalness:1,roughness:.06}),p);m.userData.productId='mirror';m.userData.mirrorSurface=true;const rim=mat('#f4f1e9',{emissive:'#fff5df',emissiveIntensity:.6});for(const x of [-w/2+.006,w/2-.006])box(x,y,z+.011,.012,.65,.008,rim,p);}
  function bathFittings(p,x,z,overhead){
   // Four-way family is known, exact cover is unresolved; keep ordered chrome.
   const y=1.05,railX=x+.17;cylinder(railX,1.39,z+.055,.012,.75,steel,p).userData.productId='hand-shower';
@@ -271,10 +282,10 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
   const centre=[(w.a[0]+w.b[0])/2,(w.a[1]+w.b[1])/2],faces=wallExteriorFaces({margin:.24,centre,normal:v?[1,0]:[0,1],thickness:w.thickness,length:v?Math.abs(w.b[1]-w.a[1]):Math.abs(w.b[0]-w.a[0]),inside:groundBuildingContains,positiveFace:v?0:4,negativeFace:v?1:5}),skin=facadeSkinRows([centre[0],HOUSE.height+h/2,centre[1],v?w.thickness:Math.abs(w.b[0]-w.a[0]),h,v?Math.abs(w.b[1]-w.a[1]):w.thickness],faces,{vertical:v,positiveFace:v?0:4,negativeFace:v?1:5});appendFacadeVeneers(group,skin.skin,facadeStone,resources);beltRows.push(...skin.belt);
  }
  appendFacadeVeneers(group,beltRows,beltMaterial,resources,{part:'garden-storey-separation'});
- const buildingContext=context?buildBuildingContext({group,resources,settings,mode,picks,apartmentOutline:HOUSE_OUTLINE}):{group:null,floors:new Map()};
+ const buildingContext=context?buildBuildingContext({group,resources,settings,mode,picks,apartmentOutline:HOUSE_OUTLINE,interactiveDoors:true}):{group:null,floors:new Map()};
  buildSecurityCameras({group,resources,settings,picks});
  buildOwnerCars({group,resources});
- const updateDaylight=daylight?buildDaylight({group,settings,resources,center:BUILDING_CENTER,radius:Math.max(BUILDING_BOUNDS.maxX-BUILDING_BOUNDS.minX,BUILDING_BOUNDS.maxZ-BUILDING_BOUNDS.minZ)*.8,distance:100}):()=>{};
+ const updateSunlight=daylight?buildDaylight({group,settings,resources,center:BUILDING_CENTER,radius:Math.max(BUILDING_BOUNDS.maxX-BUILDING_BOUNDS.minX,BUILDING_BOUNDS.maxZ-BUILDING_BOUNDS.minZ)*.8,distance:100}):()=>{};
  for(const [id,p] of buildLightingPoints({group,box,cylinder,mat,resources,settings,points:LIGHTING_LAYOUT.points,picks,selectedRoom}))gardenGroups.set(id,p);
  addRoomCornerOcclusion(group,ROOMS.filter(r=>!['garden','outdoor'].includes(r.kind)),resources);
  // One shadow budget for the apartment and common rooms together on mobile.
@@ -283,5 +294,5 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
  group.traverse(o=>{if(o.isLight&&o.userData.fixtureLight&&o.castShadow)shadowCandidates.push(o);});
  shadowCandidates.sort((a,b)=>{const pa=a.getWorldPosition(new THREE.Vector3()),pb=b.getWorldPosition(new THREE.Vector3());return Math.hypot(pa.x-focusXZ[0],pa.z-focusXZ[1])-Math.hypot(pb.x-focusXZ[0],pb.z-focusXZ[1]);});
  shadowCandidates.slice(6).forEach(light=>{light.castShadow=false;});
- let disposed=false;return {get ready(){return surface.ready();},group,resources,picks,motions,roomGroups,furnitureGroups,doorGroups,shutterGroups,buildingGroups,gardenGroups,buildingContext,wallHeight,updateDaylight,dispose(){if(disposed)return;disposed=true;group.traverse(o=>{if(o.isLight&&o.shadow)o.shadow.dispose();});for(const r of new Set(resources)){r.dispose?.();if(r.isTexture&&r.source)r.source.data=null;}resources.length=picks.length=motions.length=0;for(const map of [roomGroups,furnitureGroups,doorGroups,shutterGroups,buildingGroups,gardenGroups])map.clear();group.removeFromParent();group.clear();}};
+ const finishUpgrades=applyArchitecturalMaterials(group);resources.push(...finishUpgrades.values());const updateDaylight=createSceneStateUpdater(group,updateSunlight,settings);updateDaylight(settings);let disposed=false;return {get ready(){return surface.ready();},group,resources,picks,motions,roomGroups,furnitureGroups,doorGroups,shutterGroups,buildingGroups,gardenGroups,buildingContext,wallHeight,updateDaylight,dispose(){if(disposed)return;disposed=true;group.traverse(o=>{if(o.isLight&&o.shadow)o.shadow.dispose();});for(const r of new Set(resources)){r.dispose?.();if(r.isTexture&&r.source)r.source.data=null;}resources.length=picks.length=motions.length=0;for(const map of [roomGroups,furnitureGroups,doorGroups,shutterGroups,buildingGroups,gardenGroups])map.clear();group.removeFromParent();group.clear();}};
 }

@@ -7,7 +7,7 @@ import {createSurfacePalette} from './surface-materials.mjs';
 export function buildEntranceServices({group,box,cylinder,floor,mat,resources,motions,picks,settings,mode}){
  const surface=createSurfacePalette(resources),groups=new Map(),opened=new Set(settings.openParts),paint=surface('door','#e1dace'),ceilingFinish=surface('plaster',CEILING_COLOR,CEILING_MATERIAL),frame=mat('#a4aaa5',{metalness:.5,roughness:.43}),white=mat('#f4f3ee',{roughness:.38}),black=mat('#242727',{roughness:.95}),blue=mat('#266b86',{roughness:.6}),grey=mat('#626561',{roughness:.75}),steel=mat('#9d9e91',{metalness:.66,roughness:.5}),brass=mat('#92754d',{metalness:.7,roughness:.42});
  const context=new THREE.Group();context.userData={part:'entry-common-context',outsideApartment:true,dimensionsInferred:true};group.add(context);
- floor(E.context.polygon,mat('#d3cec2'),-.005,context);
+ const landing=floor(E.context.polygon,surface('wood','#5a5856',{roughness:.45}),-.005,context);landing.userData.part='entry-common-floor';
  // Show the public ceiling only in the full-height views, keeping the cutaway clear.
  if(mode==='walk'||!settings.cutaway){const slab=floor(E.context.polygon,ceilingFinish,E.ceiling,context);slab.castShadow=true;slab.userData.part='entry-common-ceiling';}
  for(const c of E.cabinets){
