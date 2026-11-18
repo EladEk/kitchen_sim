@@ -99,3 +99,14 @@ test('lawn shading GLSL defines its noise and keeps a single extra map tap', asy
  assert.equal((LAWN_MAP_GLSL.match(/texture2D\(map/g)||[]).length,2);
  assert.match(LAWN_MACRO_GLSL,/lawnPatch/);
 });
+
+test('facades: district copies use dense dark glazing; template glass stays clear for the visited apartment', async ()=>{
+ const T=await import('three');const {createArchitecturalGlass,distantGlazing,setArchitecturalGlassQuality,DISTANT_GLASS_OPACITY,ALPHA_GLASS_COLOR}=await import('../src/architectural-glass.mjs');
+ const own=createArchitecturalGlass([],{mobile:true});setArchitecturalGlassQuality(own,{mobile:true});const far=distantGlazing(own);
+ try{
+  assert.notEqual(far,own);assert.equal(own.opacity,.075);assert.equal('#'+own.color.getHexString(),ALPHA_GLASS_COLOR);
+  for(const q of [{mobile:true},{mobile:false,tier:0}]){setArchitecturalGlassQuality(far,q);assert.equal(far.transmission,0);assert(far.transparent);assert.equal(far.opacity,DISTANT_GLASS_OPACITY);}
+  setArchitecturalGlassQuality(own,{mobile:false,tier:0});assert.equal(own.transmission,.9,'own apartment keeps desktop transmission');
+  const src=readFileSync(new URL('./district.mjs',import.meta.url),'utf8');assert.match(src,/architecturalGlass\?glassFor\(mat\):mat/);
+ }finally{own.dispose();far.dispose();}
+});

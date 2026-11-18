@@ -10,9 +10,18 @@ export function createArchitecturalGlass(resources,{mobile=globalThis.matchMedia
 // stacked panes. Real glazing is near-black in diffuse terms; reflections come
 // from the specular/env lobe, which keeps working with the dark body colour.
 export const ALPHA_GLASS_COLOR='#282a2a';
+export const DISTANT_GLASS_COLOR='#1c2327',DISTANT_GLASS_OPACITY=.66;
+// District copies get their own glass clone (shared template glass stays clear
+// for the visited apartment).
+export function distantGlazing(source){const m=source.clone();m.userData={...source.userData,distantGlazing:true};m.roughness=Math.min(m.roughness,.04);setArchitecturalGlassQuality(m);return m;}
 export function setArchitecturalGlassQuality(material,{mobile=false,tier=0,xr=false}={}){
- const transmission=!mobile&&tier===0&&!xr?(material.userData.transmissionBase??.9):0,transparent=transmission===0,opacity=transparent?.075:1;
- material.userData.glassColor??='#'+material.color.getHexString();const color=transparent?ALPHA_GLASS_COLOR:material.userData.glassColor;
+ // Neighbouring buildings (district copies) have no lit interiors behind their
+ // panes, so a 7.5% veil shows the back walls and reads as blank stone. Real
+ // windows across the street read as dark, reflective glass: always alpha
+ // (no transmission pass for distant copies), with a dense near-black body.
+ const distant=material.userData.distantGlazing===true;
+ const transmission=!distant&&!mobile&&tier===0&&!xr?(material.userData.transmissionBase??.9):0,transparent=transmission===0,opacity=transparent?(distant?DISTANT_GLASS_OPACITY:.075):1;
+ material.userData.glassColor??='#'+material.color.getHexString();const color=transparent?(distant?DISTANT_GLASS_COLOR:ALPHA_GLASS_COLOR):material.userData.glassColor;
  if(material.transmission===transmission&&material.transparent===transparent&&material.opacity===opacity&&'#'+material.color.getHexString()===color)return false;
  material.transmission=transmission;material.transparent=transparent;material.opacity=opacity;material.color.set(color);material.needsUpdate=true;return true;
 }
