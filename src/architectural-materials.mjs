@@ -5,7 +5,7 @@ import {DRY_PORCELAIN} from './floor-appearance.mjs';
 // converted by Three.Color on assignment, not measured spectral material data.
 export const ARCHITECTURAL_MATERIALS=Object.freeze({
  wall:{color:'#f2efe9',roughness:.82,metalness:0,clearcoat:0,envMapIntensity:.8},
- ceiling:{color:'#f8f8f6',roughness:.94,metalness:0,clearcoat:0,envMapIntensity:1.1},
+ ceiling:{color:'#f8f8f6',roughness:.94,metalness:0,clearcoat:0,specularIntensity:.15,envMapIntensity:1.1},
  facade:{color:'#e6dfd3',roughness:.82,metalness:0},
  secondary:{color:'#b8bcc0',roughness:.8,metalness:0},
  fascia:{color:'#7e8286',roughness:.85,metalness:0},
@@ -61,6 +61,9 @@ export function applyArchitecturalMaterials(root){
    if(role==='secondary')Object.assign(material.userData,{publicFinish:'stone',surfaceKind:'limestone'});
    if(role==='entranceFloor')Object.assign(material.userData,{publicFinish:'floor',floorCourses:{tile:[.2,1.2],joint:.003}});
    if(role==='glass')Object.assign(material.userData,{architecturalGlass:true,transmissionBase:.9});
+   // R177: lowered hallway ceilings/HVAC bulkheads get the ceiling role from their part
+   // name only. Without this flag the room probe skipped them and they lit from the sky.
+   if(role==='ceiling')material.userData.architecturalCeiling=true;
    cache.set(key,material);return material;
   };
   object.material=Array.isArray(object.material)?object.material.map(convert):convert(object.material);

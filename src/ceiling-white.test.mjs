@@ -16,3 +16,14 @@ test('R177 ceiling is neutral white and receives enough floor bounce',()=>{
  assert(g>.5,'floor/wall bounce too dim for a white ceiling: '+g.toFixed(3));
  assert(r/b<1.07,'bounce light too warm; ceiling would read beige: '+(r/b).toFixed(3));
 });
+
+test('R177 lowered hallway ceilings (HVAC bulkheads) are treated as ceilings',async()=>{
+ const T=await import('three');const {applyArchitecturalMaterials}=await import('./architectural-materials.mjs');const {createInteriorProbe}=await import('./interior-probe.mjs');
+ const root=new T.Group(),mesh=new T.Mesh(new T.BoxGeometry(),new T.MeshStandardMaterial({color:'#dddddd'}));mesh.userData.part='hvac-bulkhead-hall';root.add(mesh);
+ applyArchitecturalMaterials(root);const m=mesh.material;
+ assert.equal(m.userData.architecturalRole,'ceiling');assert.equal(m.userData.architecturalCeiling,true);
+ assert.equal(m.specularIntensity,.15,'matte paint: no grazing-angle sheen');
+ const env={texture:new T.Texture(),dispose(){}},probe=createInteriorProbe(null,{environmentFactory:()=>env});probe.bind(root);probe.update(1);
+ assert.equal(m.envMap,env.texture,'room probe must light the lowered ceiling');assert.equal(m.envMapIntensity,CEILING_BOUNCE);
+ probe.dispose();mesh.geometry.dispose();
+});
