@@ -21,3 +21,14 @@ test('home AgX shader is self-contained with an exposure uniform', ()=>{
  const glsl=tone.slice(tone.indexOf('HOME_AGX_GLSL=`'),tone.lastIndexOf('`;'));
  assert.doesNotMatch(glsl,/toneMappingExposure|AgXToneMapping/,'must not rely on three chunk uniforms');
 });
+
+test('furniture contact shadows render in the walk view with a rounded footprint', async ()=>{
+ const {contactShadowAlpha}=await import('../src/contact-shadows.mjs');
+ assert.ok(contactShadowAlpha(.5,.5)>.4,'dense under the piece');
+ assert.ok(contactShadowAlpha(.5,.5)<=.5,'never a black slab');
+ assert.equal(contactShadowAlpha(0,.5),0,'fades to nothing at the quad edge');
+ assert.ok(contactShadowAlpha(.15,.5)>contactShadowAlpha(.05,.5),'monotonic falloff');
+ assert.ok(contactShadowAlpha(.2,.2)>0,'rectangular, not a disc');
+ const scene=readFileSync(new URL('../src/apartment-furniture-scene.js',import.meta.url),'utf8');
+ assert.match(scene,/part:'furniture-contact-shadow',visualOnly:true,tourNonPhysical:true,renderFixture:true/);
+});
