@@ -35,7 +35,7 @@ test('building cutaways remove upper storeys while the apartment view keeps non-
   const m=model({buildingLevel:level});try{assert.deepEqual([...m.floors.keys()],Array.from({length:level+1},(_,i)=>i));const all=nodes(m);assert.equal(all.some(o=>o.name==='building-roof'),level===9);assert(all.filter(o=>o.isInstancedMesh).every(o=>o.count>0));assert(all.filter(o=>o.userData.part==='building-glazing').every(o=>!o.castShadow));assert(m.picks.every(o=>o.userData.buildingFloor<=level));for(const o of all.filter(o=>o.isInstancedMesh)){const mat=new THREE.Matrix4();for(let i=0;i<o.count;i++){o.getMatrixAt(i,mat);assert(mat.elements.every(Number.isFinite));assert(mat.determinant()>0);}}}finally{m.dispose();}
  }
  const hidden=model({},'overview');try{assert(hidden.shadowOnly);assert.equal(hidden.picks.length,0);const meshes=nodes(hidden).filter(o=>o.isMesh);assert(meshes.some(o=>o.castShadow));assert(meshes.every(o=>!o.material.colorWrite&&!o.material.depthWrite));assert.equal(hidden.floors.size,10);}finally{hidden.dispose();}
- const off=model({buildingShadows:false},'overview');assert.equal(off.group,null);off.dispose();const walk=model({buildingShadows:false},'walk');assert(walk.group&&!walk.shadowOnly);assert.equal(walk.floors.size,10);walk.dispose();
+ const off=model({buildingShadows:false},'overview');assert(off.group);assert.equal(off.group.visible,false);off.dispose();const walk=model({buildingShadows:false},'walk');assert(walk.group&&!walk.shadowOnly);assert.equal(walk.floors.size,10);walk.dispose();
 });
 
 test('context walls leave the apartment entry and service cabinets clear and its outline remains the unchanged original',()=>{

@@ -28,7 +28,7 @@ test('photo materials use physical glass and baked metric stone courses; technic
  const secret=new THREE.Mesh(g,new THREE.MeshBasicMaterial({colorWrite:false}));s.add(secret);
  const overlay=new THREE.Mesh(g,stone);overlay.userData.securityOverlay=true;s.add(overlay);
  const photo=createPhotoScene(s);assert.equal(photo.meshes,2);const [p,w]=photo.scene.children;
- assert(p.material.isMeshPhysicalMaterial);assert(p.material.transmission>.9);near(p.material.ior,1.5);assert.equal(p.material.opacity,1);
+ assert(p.material.isMeshPhysicalMaterial);assert.equal(p.material.transmission,.9);assert.equal(p.material.thickness,.024);assert.equal(p.material.attenuationDistance,1.15);near(p.material.ior,1.52);assert.equal(p.material.opacity,1);
  assert(w.material.map.isDataTexture);assert(w.material.bumpMap);assert.notEqual(w.geometry,g);assert.equal(g.attributes.position.count,w.geometry.attributes.position.count);
  photo.dispose();s.traverse(o=>{if(o.material)o.material.dispose();});g.dispose();
 });

@@ -30,7 +30,7 @@ test('every observed light has a real source rectangle, one identity and an esti
 test('home fixtures exist in daylight and walking views, are pickable and hide without changing furniture or walls',()=>{
  for(const mode of ['overview','walk']){
   const visible=createHomeScene(normalizeHomeSettings(),{mode}),hidden=createHomeScene(normalizeHomeSettings({showLighting:false}),{mode});
-  try{for(const p of LIGHTING_LAYOUT.points){assert(visible.gardenGroups.has(p.id));assert(visible.picks.some(m=>m.userData.lightingId===p.id));assert(!hidden.gardenGroups.has(p.id));}
+  try{for(const p of LIGHTING_LAYOUT.points){assert(visible.gardenGroups.has(p.id));assert(visible.picks.some(m=>m.userData.lightingId===p.id));assert.equal(hidden.gardenGroups.get(p.id).visible,false);}
    assert.equal(visible.furnitureGroups.size,hidden.furnitureGroups.size);assert.equal(visible.wallHeight,hidden.wallHeight);
    let holders=0,bulbs=0,temporary=0;visible.group.traverse(m=>{if(m.userData.part==='observed-lamp-holder')holders++;if(m.userData.part==='installed-simulator-bulb')bulbs++;if(m.userData.part==='simulator-ceiling-fixture')temporary++;});assert.equal(holders,8);assert.equal(bulbs,8);assert.equal(temporary,6);
   }finally{visible.dispose();hidden.dispose();}
@@ -51,5 +51,5 @@ test('detailed kitchen lights use the same horizontal source locations and exist
  assert.equal(KITCHEN_LIGHTING_POINTS.length,2);
  for(const p of KITCHEN_LIGHTING_POINTS){const home=lightingPoint(p.id);assert.deepEqual(p.position,[KITCHEN_ANCHOR[0]-home.position[0],ROOM.height/1000,KITCHEN_ANCHOR[1]-home.position[2]]);assert.deepEqual(p.evidence,home.evidence);}
  const visible=createKitchen(DEFAULTS),hidden=createKitchen({...DEFAULTS,showLighting:false});
- try{assert.equal(visible.lightingGroups.size,2);assert.equal(hidden.lightingGroups.size,0);assert.equal(visible.moduleGroups.size,hidden.moduleGroups.size);}finally{visible.dispose();hidden.dispose();}
+ try{assert.equal(visible.lightingGroups.size,2);assert([...hidden.lightingGroups.values()].every(p=>!p.visible));assert.equal(visible.moduleGroups.size,hidden.moduleGroups.size);}finally{visible.dispose();hidden.dispose();}
 });

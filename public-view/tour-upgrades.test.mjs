@@ -15,20 +15,21 @@ test('adaptive quality ignores suspension/XR, degrades gradually and recovers on
  for(let i=0;i<400;i++)quality.sample(now+=60,{xr:true});assert.deepEqual(quality.profile,initial);
  let changes=0;
  for(let i=0;i<500;i++)if(quality.sample(now+=65))changes++;
- assert(changes>=3);assert(quality.profile.scale<.8);assert(quality.profile.shadowSize<=1024);assert(quality.profile.detailScale<1);assert(!quality.profile.effects);
+ assert(changes>=3);assert(quality.profile.scale<.8);assert(quality.profile.shadowSize<=1024);assert(quality.profile.detailScale<1);assert(quality.profile.effects);assert.equal(quality.profile.tier,1);
  const reduced=quality.profile.scale;
  for(let i=0;i<400;i++)quality.sample(now+=16);assert.equal(quality.profile.scale,reduced,'short headroom cannot oscillate quality');
  for(let i=0;i<1600;i++)quality.sample(now+=16);assert(quality.profile.scale>reduced);
  assert(quality.ratioForSize(3000,3000)**2*3000*3000<=1400001);
- quality.setMode('quality');for(let i=0;i<1000;i++)quality.sample(now+=90);assert.equal(quality.profile.scale,1);
+ // Mobile "quality" keeps the device-lost safety guard (mobile-gpu-policy): sustained ~11 fps steps it down, never below .66.
+ quality.setMode('quality');for(let i=0;i<1000;i++)quality.sample(now+=90);assert(quality.profile.scale<1&&quality.profile.scale>=.66);
  quality.setMode('performance');assert.equal(quality.profile.tier,2);
 });
 
 test('interior exposure and shared floor/wall bounce ease in and out while preserving solar night',()=>{
  const scene=new THREE.Scene(),renderer={toneMappingExposure:.98},lighting=createInteriorLighting(scene,renderer);
- assert.equal(scene.children.length,5);
+ assert.equal(scene.children.length,14);
  const first=lighting.update({inside:true,walking:true,solar:{daylight:.8},dt:.016});assert(first.exposure>.98&&first.exposure<1.01);
- let state;for(let i=0;i<480;i++)state=lighting.update({inside:true,walking:true,solar:{daylight:.8},dt:.016});assert(state.exposure>1.18&&state.bounce>0&&state.walls>0);
+ let state;for(let i=0;i<480;i++)state=lighting.update({inside:true,walking:true,solar:{daylight:.8},dt:.016});assert(state.exposure>1.3&&state.exposure<1.36&&state.bounce>0&&state.walls>0);
  state=lighting.update({inside:true,walking:true,solar:{daylight:0},dt:.016});assert.equal(state.bounce,0);assert.equal(state.walls,0);
  for(let i=0;i<360;i++)state=lighting.update({inside:false,walking:true,solar:{daylight:.8},dt:.016});assert(state.exposure<.99);
  lighting.dispose();assert.equal(scene.children.length,0);

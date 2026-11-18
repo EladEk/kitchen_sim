@@ -11,8 +11,8 @@ test('detailed kitchen window follows the architectural opening and apartment sc
  for(const hardware of ['black','brass','steel']){
   const model=createKitchen({...DEFAULTS,hardware});try{
    model.group.updateMatrixWorld(true);const bounds=new THREE.Box3().setFromObject(model.windowGroup);assert(bounds.max.z<.00001,'frame and sill do not project beyond the wall plane');
-   const panes=[],frames=[];model.windowGroup.traverse(o=>{if(o.userData.part==='window-glass')panes.push(o);if(o.userData.part==='window-frame')frames.push(o);});assert.equal(panes.length,4);assert(panes.every(p=>p.material.transparent&&p.material.opacity<.2));assert(frames.every(p=>p.material.color.getHexString()==='343d3d'));
-   const ray=new THREE.Raycaster(new THREE.Vector3(.3,1.7,.3),new THREE.Vector3(0,0,-1),0,1),hits=ray.intersectObjects([...model.roomStructure],true);assert(hits.some(h=>h.object.userData.part==='window-glass'));assert(!hits.some(h=>!h.object.material?.transparent),'the larger window has a real unobstructed opening in the wall');
+   const panes=[],frames=[];model.windowGroup.traverse(o=>{if(o.userData.part==='window-glass')panes.push(o);if(o.userData.part==='window-frame')frames.push(o);});assert.equal(panes.length,4);assert(panes.every(p=>p.material.userData.architecturalGlass&&p.material.thickness===.024));assert(frames.every(p=>p.material.color.getHexString()==='2d3136'));
+   const ray=new THREE.Raycaster(new THREE.Vector3(.3,1.7,.3),new THREE.Vector3(0,0,-1),0,1),hits=ray.intersectObjects([...model.roomStructure],true);assert(hits.some(h=>h.object.userData.part==='window-glass'));assert(!hits.some(h=>!h.object.material?.transparent&&!h.object.material?.userData.architecturalGlass),'the larger window has a real unobstructed opening in the wall');
   }finally{model.dispose();}
  }
 });

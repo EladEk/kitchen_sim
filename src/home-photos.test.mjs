@@ -1,3 +1,4 @@
+import {ROOM_SURVEY_SOURCES} from './room-survey-155.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
@@ -65,5 +66,5 @@ test('all supplied photos and the video have local, portable preview assets and 
  assert.equal(PHOTO_REFERENCES.length,10);assert.equal(provenance.items.length,11);assert.equal(new Set(PHOTO_REFERENCES.map(p=>p.file)).size,10);
  for(const p of PHOTO_REFERENCES){const preview=p.image||`${PHOTO_SOURCE.imagePrefix}${p.page}.jpg`,original=provenance.items.find(i=>i.original===p.file);assert(original);assert.match(original.sha256,/^[a-f0-9]{64}$/);const bytes=readFileSync(file(preview));assert.equal(bytes.readUInt16BE(0),0xffd8);}
  const video=readFileSync(file(PHOTO_SOURCE.video));assert.equal(video.toString('ascii',4,8),'ftyp');assert(video.indexOf('moov')<video.indexOf('mdat'),'video is fast-start encoded');assert(video.length<5_000_000);assert(existsSync(file(PHOTO_SOURCE.poster)));assert(statSync(file(PHOTO_SOURCE.poster)).size>5000);
- for(const e of OBSERVED_ELEMENTS)assert(PHOTO_SOURCE.pages.includes(e.page));
+ for(const e of OBSERVED_ELEMENTS)assert(([PHOTO_SOURCE,...ROOM_SURVEY_SOURCES].find(s=>s.id===e.source)||PHOTO_SOURCE).pages.includes(e.page));
 });

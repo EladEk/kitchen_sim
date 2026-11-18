@@ -1,0 +1,13 @@
+{
+  "original": "338866.mp4",
+  "sha256": "a6412f3fc22f7750c2b207e06cdc9b5c0b3c0a0aa1f53d5843abb64f55079aec",
+  "received": "2026-11-11",
+  "durationSeconds": 6.638,
+  "roomId": "safe-room",
+  "roomIdentification": "owner-confirmed",
+  "frames": {
+    "window.jpg": 0,
+    "door.jpg": 5
+  },
+  "dimensions": "plan retained; ventilation dimensions estimated"
+}
