@@ -1,0 +1,23 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {liveShortcut} from './live-shortcuts.mjs';
+const k=(key,o={})=>({key,ctrlKey:false,metaKey:false,shiftKey:false,altKey:false,target:{tagName:'CANVAS'},...o});
+test('live furniture keyboard shortcuts',()=>{
+ const moving={stage:'move',item:{id:'a'},existing:true,hasPoint:true};
+ assert.equal(liveShortcut(k('z',{ctrlKey:true}),{stage:'categories'}),'undo');
+ assert.equal(liveShortcut(k('Z',{metaKey:true,shiftKey:true}),{stage:'categories'}),'redo');
+ assert.equal(liveShortcut(k('r'),moving),'rotate');
+ assert.equal(liveShortcut(k('R',{shiftKey:true}),moving),'rotateBack');
+ assert.equal(liveShortcut(k('Enter'),moving),'commit');
+ assert.equal(liveShortcut(k('Escape'),moving),'cancel');
+ assert.equal(liveShortcut(k('Delete'),moving),'remove');
+ assert.equal(liveShortcut(k('Delete'),{...moving,existing:false}),null);
+ assert.equal(liveShortcut(k('r'),{...moving,item:{locked:true}}),null);
+ assert.equal(liveShortcut(k('Enter'),{...moving,error:'x'}),null);
+ assert.equal(liveShortcut(k('r',{target:{tagName:'INPUT'}}),moving),null,'typing in a field is never hijacked');
+ assert.equal(liveShortcut(k('Escape'),{stage:'items'}),'back');
+ assert.equal(liveShortcut(k('w'),moving),null,'walking keys stay free');
+ assert.equal(liveShortcut(k('z',{ctrlKey:true}),moving),null,'undo waits until the open item is saved or cancelled');
+ assert.equal(liveShortcut(k('y',{ctrlKey:true}),{stage:'categories'}),'redo');
+ assert.equal(liveShortcut(k('r'),null),null);
+});

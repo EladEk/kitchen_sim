@@ -62,3 +62,18 @@ button.danger{color:#9b2c22;border-color:#d9b2ab}
 .tour-quality>.graphics-log-open{display:block;margin-top:10px}
 .tour-quality>label{font-weight:600}
 .options-content>section+section,.options-content>section+.release-version{margin-top:4px}
+
+/* Live furniture editor: keyboard hint only where a keyboard is likely. */
+.live-shortcut-help{display:block;font-size:11px;color:var(--ux-muted);margin-top:2px;line-height:1.4}
+@media(pointer:coarse){.live-shortcut-help{display:none}}
+
+/* Wide screens: the furniture editor docks beside the 3D view instead of under
+   it, so the apartment keeps the full viewport height while editing. */
+@media(min-width:1100px) and (min-aspect-ratio:4/3){
+ .viewport.editor-active{flex-direction:row}
+ .viewport.editor-active>.live-furniture-panel{order:-1;width:min(430px,36vw);max-height:none;height:100%;overflow-y:auto;border-radius:0 14px 14px 0;box-shadow:4px 0 18px #18271c1c}
+ .viewport.editor-active>.canvas{min-width:0}
+ .viewport.editor-active .live-catalog-rail{scroll-snap-type:x mandatory}
+ /* Narrow dock: wrap the tool rail so undo/redo and tools are never scrolled off. */
+ .viewport.editor-active .editor-tools-rail{flex-wrap:wrap;white-space:normal;overflow-x:visible}
+}
