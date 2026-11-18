@@ -13,6 +13,9 @@ export function interiorProbePixels({width=1024,height=512}={}){
   data.set([base*1.015+window*1.05,base*.995+window*.99,base*.965+window*.91,1],(y*width+x)*4);
  }return {width,height,data};
 }
+// A downward-facing ceiling sees only floor/wall bounce; in the owner's daylight
+// photos it still reads nearly as bright as the walls, so it takes more of the probe.
+export const CEILING_BOUNCE=1.1;
 export function createInteriorProbe(renderer,{mobile=false,environmentFactory=null}={}){
  const pixels=interiorProbePixels({width:mobile?512:1024,height:mobile?256:512}),source=new THREE.DataTexture(Uint16Array.from(pixels.data,THREE.DataUtils.toHalfFloat),pixels.width,pixels.height,THREE.RGBAFormat,THREE.HalfFloatType);source.mapping=THREE.EquirectangularReflectionMapping;source.needsUpdate=true;
  let target,disposed=false;const materials=new Map();
@@ -34,7 +37,7 @@ export function createInteriorProbe(renderer,{mobile=false,environmentFactory=nu
   const light=Math.max(0,Math.min(1,daylight));
   for(const [m] of materials){
    const paint=m.userData.surfaceKind==='plaster'||m.userData.architecturalCeiling||m.userData.wallCavity;
-   m.envMapIntensity=light*(paint?(m.userData.architecturalCeiling?1:.8):m.userData.furnitureMaterial?.7:m.userData.publicFinish==='floor'?.6:.8);
+   m.envMapIntensity=light*(paint?(m.userData.architecturalCeiling?CEILING_BOUNCE:.8):m.userData.furnitureMaterial?.7:m.userData.publicFinish==='floor'?.6:.8);
   }
  }
  function dispose(){
