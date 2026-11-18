@@ -8,7 +8,7 @@ import {createFurnitureClearanceOverlay} from './furniture-clearance-overlay.mjs
 import {selectResidentFurniture} from './furniture-interaction.mjs';
 import {ViewerHeaderActions} from './ViewerHeaderActions.jsx';
 import {beginFurniturePlacement,createFurniturePlacement} from './furniture-placement.mjs';
-import {resizeEditorViewport} from './editor-viewport.mjs';
+import {resizeEditorViewport,scheduleEditorFraming} from './editor-viewport.mjs';
 import {furnitureMovementAxes,nudgeFurniture,furnitureGrab,createFurnitureDrag} from './furniture-movement.mjs';
 import {applyLiveFurnitureControls} from './live-furniture-controls.mjs';
 import {createRoomFocus} from './room-selection.mjs';
@@ -160,6 +160,7 @@ export function DistrictViewer({createVariant=null,initialView={},banner=null,op
  wallOcclusion=createCameraWallFade();editorHandles=createEditorHandles(host.current,{getState:()=>latest.current.liveSession,onPatch:item=>liveActions.current.handle(item),onRestore:state=>setLiveSession(state),controls});
  runtime.current.topView=()=>{const view=selection?.current;if(view?.focused){photo.suspend();setEditorTopView(camera,controls,selectionBounds(view.content));}};
  runtime.current.perspective=()=>{if(selection?.current?.focused){photo.suspend();fitSelectionCamera(camera,controls,selection.current);}};
+ runtime.current.frameEditor=()=>{if(disposed||vr?.active||latest.current.mode==='walk')return true;if(!selection?.current?.focused||busyView||rendererWork.busy)return false;rendererWork.resize();try{photo.suspend();fitSelectionCamera(camera,controls,selection.current);}catch{return false;}sky.invalidateShadows();interior.invalidateShadows();presentation.resetHistory();return true;};
  runtime.current.applyWallHeight=()=>{visible();sky.invalidateShadows();interior.invalidateShadows();photo.invalidate?.();presentation.resetHistory();};
  runtime.current.cancelFurnitureDrag=()=>{furnitureDrag.cancel(null,false);furniturePlacement?.cancel();};
  runtime.current.movementAxes=scope=>furnitureMovementAxes(camera,scope);
@@ -264,6 +265,8 @@ export function DistrictViewer({createVariant=null,initialView={},banner=null,op
  },[backendMode,gpuDisabled,xrCompatibility,graphicsEpoch]);
  useEffect(()=>runtime.current?.fit(),[mode,target,building,level,roomFocus]);
  useEffect(()=>runtime.current?.applyWallHeight?.(),[liveSession?.wallHeight]);
+ const editing=!!liveSession;
+ useEffect(()=>editing?scheduleEditorFraming(()=>runtime.current?.frameEditor?.()??false):undefined,[editing]);
  useEffect(()=>{runtime.current?.applyEditor?.();},[editorShelf.active]);
  useEffect(()=>{runtime.current?.applyLive?.();},[liveSession]);
  useEffect(()=>{if(xrCompatibility&&ready)setActionStatus('מצב VR מוכן. לחצו על כניסה עם משקפי VR.');},[xrCompatibility,ready]);
