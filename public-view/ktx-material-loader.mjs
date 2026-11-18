@@ -3,7 +3,7 @@ import {KTX2Loader} from 'three/addons/loaders/KTX2Loader.js';
 import {loadSurfaceTexture} from './surface-detail.mjs';
 import {assertWebGPUBasisDimensions} from './compressed-texture-layout.mjs';
 export function createCompressedMaterialLoader(renderer,fallbacks){
- const ktx=new KTX2Loader().setTranscoderPath('/decoders/basis/').setWorkerLimit(1).detectSupport(renderer);let disposed=false,active=0;
+ const ktx=new KTX2Loader().setTranscoderPath('/decoders/basis/').setWorkerLimit(2).detectSupport(renderer);let disposed=false,active=0;
  const pending=new Set();
  const load=async(url,options={})=>{
   if(disposed||options.signal?.aborted)return null;

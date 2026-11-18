@@ -110,3 +110,10 @@ test('facades: district copies use dense dark glazing; template glass stays clea
   const src=readFileSync(new URL('./district.mjs',import.meta.url),'utf8');assert.match(src,/architecturalGlass\?glassFor\(mat\):mat/);
  }finally{own.dispose();far.dispose();}
 });
+
+test('merged scan loader keeps the phone 1024px cap for fabric/wood inside the shared, parallel channel cache', ()=>{
+ const src=readFileSync(new URL('./scanned-material-core.mjs',import.meta.url),'utf8');
+ assert.match(src,/function shareChannel\(p,channel,kind,/);
+ assert.match(src,/max=mobile&&!MOBILE_FULL_RES_SCANS\.includes\(kind\)\?512:1024,sharedKey=JSON\.stringify\(\[.*,max\]\)/);
+ assert.match(src,/if\(p\.technique\)texture\.userData\.scanTechnique=p\.technique/);
+});
