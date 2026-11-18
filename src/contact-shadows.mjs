@@ -15,5 +15,5 @@ export function createContactShadows(resources){
  const material=new THREE.MeshBasicMaterial({color:'#000000',alphaMap:map,transparent:true,opacity:1,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-1,toneMapped:false});
  // alphaMap uses green; map's alpha is the coverage channel instead.
  material.alphaMap=null;material.map=map;const geometry=new THREE.PlaneGeometry(1,1);geometry.rotateX(-Math.PI/2);resources.push(map,material,geometry);
- return {geometry,material,mesh(w,d){const mesh=new THREE.Mesh(geometry,material);mesh.scale.set(w*1.18,1,d*1.18);mesh.userData={part:'furniture-contact-shadow',visualOnly:true,tourNonPhysical:true};mesh.renderOrder=1;return mesh;}};
+ return {geometry,material,mesh(w,d){const mesh=new THREE.Mesh(geometry,material);mesh.scale.set(w*1.18,1,d*1.18);mesh.userData={part:'furniture-contact-shadow',visualOnly:true,tourNonPhysical:true,renderFixture:true};mesh.renderOrder=1;return mesh;}};
 }

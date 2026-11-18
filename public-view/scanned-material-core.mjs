@@ -3,6 +3,7 @@ import {loadSurfaceTexture} from './surface-detail.mjs';
 import {installBuildingSurfaceUVs} from '../src/building-surface-uvs.mjs';
 import {installScanAlbedo} from '../src/scan-albedo.mjs';
 
+export const MOBILE_FULL_RES_SCANS=Object.freeze(['fabric','wood']);
 export function createScanMaterialController({scans,mobile=false,signal,loader=loadSurfaceTexture}={}){
  const maps=new Map(),sharedTextures=new Map(),owned=new Set(),bound=new Set(),pending=new Set();let disposed=false;
  async function load(kind,onProgress=()=>{}){
@@ -12,7 +13,9 @@ export function createScanMaterialController({scans,mobile=false,signal,loader=l
    const channels=['color','normal','roughness'].filter(channel=>p[channel]);let done=0;for(const channel of channels){if(disposed||signal?.aborted)break;if(!p[channel])continue;
     const sharedKey=JSON.stringify([p[channel],channel,p.metres,!!p.naturalColor]);if(sharedTextures.has(sharedKey)){out[channel]=sharedTextures.get(sharedKey);onProgress(++done/channels.length);continue;}
     const texture=await loader(p[channel],{signal,pending,onProgress:fraction=>onProgress((done+fraction)/channels.length)});if(!texture||disposed){texture?.dispose();continue;}
-    const source=texture.image,max=mobile?512:1024;
+    // Fabric and wood weave is the detail that keeps upholstery and veneer
+    // from reading as plastic; it keeps 1024px on phones (two scans, ~8 MB).
+    const source=texture.image,max=mobile&&!MOBILE_FULL_RES_SCANS.includes(kind)?512:1024;
     if(!texture.isCompressedTexture&&typeof document!=='undefined'&&(channel==='color'&&!p.naturalColor&&!p.colorMean||Math.max(source.width,source.height)>max)){const canvas=document.createElement('canvas'),ratio=Math.min(1,max/Math.max(source.width,source.height));canvas.width=Math.max(1,Math.round(source.width*ratio));canvas.height=Math.max(1,Math.round(source.height*ratio));const context=canvas.getContext('2d');if(context){context.drawImage(source,0,0,canvas.width,canvas.height);if(channel==='color'&&!p.naturalColor&&!p.colorMean){
       // Remove the scan's average tint, retaining measured grain and weave.
       // The selected finish remains the albedo authority, including dark wood.

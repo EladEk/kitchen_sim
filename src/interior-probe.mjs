@@ -10,7 +10,8 @@ export function interiorProbePixels({width=1024,height=512}={}){
   const wall=.64+.06*Math.cos(phi*2),ceiling=.88,floor=.46;
   const base=up>0?wall+(ceiling-wall)*up:wall+(floor-wall)*-up;
   const window=Math.pow(Math.max(0,Math.cos(phi-.6)),28)*Math.exp(-up*up*20)*1.8;
-  data.set([base*1.022+window*1.035,base*.996+window*.998,base*.958+window*.945,1],(y*width+x)*4);
+  // R179: neutral room bounce and cool window sky (survey-155 reads white).
+  data.set([base*.994+window*.97,base*1.0+window*1.0,base*1.01+window*1.05,1],(y*width+x)*4);
  }return {width,height,data};
 }
 // A downward-facing ceiling sees only floor/wall bounce; in the owner's daylight
