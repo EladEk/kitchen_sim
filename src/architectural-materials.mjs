@@ -53,6 +53,8 @@ export function applyArchitecturalMaterials(root){
    const role=architecturalRole(object,source);if(!role)return source;
    const key=source.uuid+':'+role;if(cache.has(key))return cache.get(key);
    const material=new MeshPhysicalMaterial();MeshStandardMaterial.prototype.copy.call(material,source);
+   // Standard copy() replaces defines with {STANDARD}; WebGL2 needs PHYSICAL (IOR) for transmission glass.
+   material.defines={...source.defines,STANDARD:'',PHYSICAL:''};
    material.onBeforeCompile=source.onBeforeCompile;material.customProgramCacheKey=source.customProgramCacheKey;
    const values={...ARCHITECTURAL_MATERIALS[role]};if(source.userData.selectedFinishColor)delete values.color;if(role==='glass'&&source.userData.architecturalGlass)Object.assign(values,{transmission:source.transmission,transparent:source.transparent,opacity:source.opacity});material.setValues(values);
    material.userData={...source.userData,architecturalRole:role};

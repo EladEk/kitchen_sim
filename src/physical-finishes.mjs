@@ -36,7 +36,7 @@ export function upgradeFurnitureMaterials(root){
   o.castShadow=o.receiveShadow=true;
   const convert=source=>{
    if(!source?.isMeshStandardMaterial||source.isNodeMaterial)return source;if(converted.has(source))return converted.get(source);
-   const m=source.isMeshPhysicalMaterial?source:new T.MeshPhysicalMaterial();if(m!==source){T.MeshStandardMaterial.prototype.copy.call(m,source);m.onBeforeCompile=source.onBeforeCompile;m.customProgramCacheKey=source.customProgramCacheKey;}
+   const m=source.isMeshPhysicalMaterial?source:new T.MeshPhysicalMaterial();if(m!==source){T.MeshStandardMaterial.prototype.copy.call(m,source);m.defines={...source.defines,STANDARD:'',PHYSICAL:''};m.onBeforeCompile=source.onBeforeCompile;m.customProgramCacheKey=source.customProgramCacheKey;}
    const kind=source.userData.surfaceKind||(/linen|cloth|fabric|pillow|duvet|upholster/i.test(source.name)?'fabric':(/glass|glaz/i.test(source.name)||source.transmission>0)?'glass':source.metalness>.6&&source.roughness>.12?'metal':/wood|oak|walnut/i.test(source.name)?'wood':null);
    if(kind)physicalFinish(m,kind);if(kind==='glass'){m.transmission=.95;m.ior=1.5;m.thickness=.012;m.roughness=.08;m.metalness=0;m.transparent=false;m.opacity=1;m.userData.architecturalGlass=true;}if(kind==='fabric'&&!m.normalMap)m.normalMap=microNormalTexture('fabric');m.userData={...m.userData,furnitureMaterial:true};
    for(const value of Object.values(m))if(value?.isTexture&&!value.isRenderTargetTexture){value.anisotropy=16;value.needsUpdate=true;}
