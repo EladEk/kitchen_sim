@@ -1,16 +1,17 @@
+import {FACADE_COLOR} from './facade-finish.mjs';
 import * as THREE from 'three';
 import {installStoneCourses} from './building-finish-shaders.mjs';
 import {EXTERIOR_LAYOUT as E,HOUSE,WALLS,DOORS,WINDOWS} from './home-model.mjs';
 
 export function buildExteriorDetails({group,box,cylinder,floor,lines,mat,surface=(kind,color,options)=>mat(color,options),resources,settings,mode}){
  const groups=new Map(),full=mode==='walk'||!settings.cutaway,h=full?HOUSE.height:.86;
- const stone=surface('limestone','#d4cbb9'),joint=mat('#b5ac99'),metal=mat('#68716c',{metalness:.45}),dark=mat('#414a46'),body=mat('#e0e1d5');
+ const stone=surface('limestone',FACADE_COLOR),joint=mat('#b5ac99'),metal=mat('#68716c',{metalness:.45}),dark=mat('#414a46'),body=mat('#e0e1d5');
  installStoneCourses(stone);
  const node=(id,view)=>{const p=new THREE.Group();p.userData={buildingId:id,source:'exterior-details',dimensionsInferred:true,inspectionView:view};group.add(p);groups.set(id,p);return p;};
  const P=E.porch,C=E.court,pc=(P.minX+P.maxX)/2,cc=(C.minX+C.maxX)/2;
  const porch=node(P.id,{from:[pc,HOUSE.eyeHeight,P.maxZ+1.8],target:[pc,1.2,P.minZ]}),court=node(C.id,{from:[cc,HOUSE.eyeHeight,C.maxZ+1.1],target:[cc,1.6,C.minZ]});
  const tag=id=>({action:'building',buildingId:id}),porchTag=tag(P.id),courtTag=tag(C.id);
- floor(P.polygon,surface('terrace','#857058'),.012,porch,{...porchTag,part:'observed-porch-paving'});
+ floor(P.polygon,surface('terrace','#776d61'),.012,porch,{...porchTag,part:'observed-porch-paving'});
  const tiles=[];for(let x=P.minX+.15;x<P.maxX;x+=.15)tiles.push([x,.014,P.minZ],[x,.014,P.maxZ]);for(let z=P.minZ+.6;z<P.maxZ;z+=.6)tiles.push([P.minX,.014,z],[P.maxX,.014,z]);lines(tiles,'#b5a089',.48,porch);
  floor(C.polygon,surface('soil','#aa9271'),.003,court,{...courtTag,part:'open-kitchen-court-ground'});
  // Overlay only solid parts of existing walls: never fill a window or door.

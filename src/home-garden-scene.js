@@ -8,6 +8,7 @@ export function buildGardenArchitecture({group,box,mat,surface=(kind,color,optio
  const data=id=>({action:'building',buildingId:id});
  const cream=mat(L.pergolaColor||'#e6dfcc',{roughness:.53,metalness:.22}),stone=surface('limestone','#c6c0af'),grey=mat(L.fence.color,{roughness:.57,metalness:.25});
  // Retain the same boundary segments. The quoted 37 m is not used to resize the plot.
+ grey.userData.selectedFinishColor=L.fence.color;
  for(const run of L.fence.runs){
   const p=node(run.id),vertical=run.a[0]===run.b[0],cx=(run.a[0]+run.b[0])/2,cz=(run.a[1]+run.b[1])/2;
   const beam=(y,h,thickness,material,part)=>{const m=box(cx,y,cz,vertical?thickness:run.length,h,vertical?run.length:thickness,material,p,data(run.id));m.userData.part=part;return m;};
@@ -37,6 +38,9 @@ export function buildGardenArchitecture({group,box,mat,surface=(kind,color,optio
   const count=Math.floor((L.depth-.1)/.15),pitch=(L.depth-.1)/count;
   for(let i=0;i<count;i++)box(b.minX+.05+pitch*(i+.5),top-0.015,middleZ,.11,.03,L.width-.1,roofMat,pergola,{...tag,part:'pergola-shade-profile'});
  }
+ // Requested architectural LED profiles follow the existing pergola beams.
+ const led=mat('#fff7e9',{emissive:'#ffe2b1',emissiveIntensity:settings.light==='night'?1.8:.1,roughness:.6});
+ for(const z of [b.minZ+.035,b.maxZ-.035])box(middleX,top-.155,z,L.depth-.12,.012,.018,led,pergola,{...tag,part:'pergola-led-strip',planned:true});
  // Existing balcony edge is plan-derived. Hide its roof with the same roof control.
  const balcony=node('upper-balcony'),u=L.upper,upperTag=data('upper-balcony');
  if(settings.pergolaRoof!==false){

@@ -14,7 +14,8 @@ export function createPersonalDistrictVariant({model,siteData,settings,kitchenSe
  const root=model.clone(true),slots=[];root.traverse(o=>{if(o.userData.variantSlot===4)slots.push(o);});
  if(!slots.length)throw Error('נדרש רענון של נתוני '+APP_REVISION+' לתכנון האישי.');
  for(const slot of slots){slot.traverse(o=>{if(o.isInstancedMesh)o.dispose();});slot.removeFromParent();}slots.length=0;
- let current=normalizeHomeSettings({...settings,cutaway:false,showElectrical:false,showWater:false});
+ let current=normalizeHomeSettings({...settings,cutaway:false,showElectrical:true,showLighting:true,electricalInferred:true,showWater:false});
+ current.electricalPresentation='fixtures';
  const home=createHomeScene(current,{mode:'walk',kitchenSettings,context:false,daylight:false});
  const walls=new Map(CONSTRUCTION_WALLS.map(w=>[w.id,w]));
  const localLights=[];

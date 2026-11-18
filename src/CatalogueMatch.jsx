@@ -27,4 +27,4 @@ export function CataloguePage({productId,reference=0,page,image,lang}){
  return <DocumentSourcePage image={image} page={page} lang={lang} rect={r?.rect} caption={r&&(he?r.captionHe:r.captionEn)} highlightId={productId} documentName={he?'קטלוג חרש':'Harash catalogue'}/>;
 }
 
-export function DocumentSourcePage(props){return <DocumentGate lang={props.lang||props.settings?.lang}><DocumentSourcePageContent {...props}/></DocumentGate>;}
+export function DocumentSourcePage(props){return <DocumentGate referenceMedia lang={props.lang||props.settings?.lang}><DocumentSourcePageContent {...props}/></DocumentGate>;}

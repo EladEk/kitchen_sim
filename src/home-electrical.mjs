@@ -7,11 +7,17 @@ export const ELECTRICAL_KINDS={
  outlet:{he:'שקע חשמל',en:'Power socket',color:SERVICE_COLORS.outlet,symbol:'P'},
  control:{he:'מפסק / בקרה — זיהוי משוער',en:'Possible switch / control',color:SERVICE_COLORS.control,symbol:'S'},
  preparation:{he:'קופסה / הכנה לא מזוהה',en:'Unidentified box / preparation',color:SERVICE_COLORS.preparation,symbol:'?'},
+ intercom:{he:'שפופרת אינטרקום',en:'Intercom handset',color:SERVICE_COLORS.control,symbol:'I'},
  water:WATER_STYLE
 };
 const photo=(page,file,he,en,image=`/house/photos/photo-${page}.jpg`)=>({page,id:`p${page}`,file,he,en,image});
 const frame=(page,second,he,en)=>({page,id:`v${second}`,file:'277904.mp4',second,he,en,image:`/house/electrical/frame-${second}.jpg`});
 export const ELECTRICAL_REFERENCES=[
+ photo(29,'room1-electrical.jpg','תיעוד חדר — R155','Room survey — R155','/house/survey-155/room1-electrical.jpg'),
+ photo(30,'room2-left-electrical.jpg','תיעוד חדר — R155','Room survey — R155','/house/survey-155/room2-left-electrical.jpg'),
+ photo(31,'room2-right-electrical.jpg','תיעוד חדר — R155','Room survey — R155','/house/survey-155/room2-right-electrical.jpg'),
+ photo(32,'master-electrical.jpg','תיעוד חדר — R155','Room survey — R155','/house/survey-155/master-electrical.jpg'),
+ photo(33,'office-electrical.jpg','תיעוד חדר — R155','Room survey — R155','/house/survey-155/office-electrical.jpg'),
  photo(1,'01-277867.jpg','מטבח — שני קירות','Kitchen — both walls'),
  photo(2,'02-277869.jpg','מטבח — קיר קצר','Kitchen — short wall'),
  photo(3,'03-277875.jpg','חדר מצולם מהדלת','Bedroom from doorway'),
@@ -44,7 +50,7 @@ export const ELECTRICAL_REFERENCES=[
 // Rectangles are fractions of the displayed source image: x, y, width, height.
 const ev=(page,rect)=>({page,rect});
 const p=(label,roomId,kind,wallId,along,side,height,he,en,evidence,extra={})=>({id:`electrical-${label}`,label,roomId,kind,wallId,along,side,height,he,en,evidence,...extra});
-const inferred={roomInferred:true};
+const inferred={roomInferred:false,roomIdentificationSource:'owner-room-videos-155'};
 const ownerSocket={identificationSource:'owner-clarification'};
 export const ELECTRICAL_EXCLUSIONS=[{id:'electrical-K05',label:'K05',page:1,reasonHe:'לפי הבהרת בעל הדירה, אינה נקודת חשמל',reasonEn:'Owner clarified that this is not an electrical point'}];
 export const ELECTRICAL_OBSERVATIONS=[
@@ -62,7 +68,7 @@ export const ELECTRICAL_OBSERVATIONS=[
  p('L03','living','preparation','bed-a-north',767,-1,.55,'יציאת כבלים נמוכה בקיר הסלון','Low cable opening on living wall',[ev(26,[.479,.559,.068,.043]),ev(10,[.896,.575,.073,.05])]),
  p('L04','living','control','patio-west',287,1,1.1,'אביזר בקרה לצד הוויטרינה','Possible control beside slider',[ev(11,[.362,.493,.038,.02])]),
  p('L05','living','preparation','patio-west',275,1,1.1,'קופסה פתוחה לצד אביזר הבקרה','Open box beside slider control',[ev(11,[.415,.494,.04,.023])]),
- p('A01','bedroom-b','preparation','west',524,1,1.1,'הכנה ליד החלון — סוג האביזר לא מאומת','Preparation beside window — fitting unconfirmed',[ev(23,[.711,.451,.047,.023]),ev(4,[.587,.532,.025,.026])],inferred),
+ p('A01','bedroom-b','control','west',524,1,1.1,'מפסק לצד החלון','Switch beside window',[ev(23,[.711,.451,.047,.023]),ev(4,[.587,.532,.025,.026])],inferred),
  p('A02','bedroom-b','outlet','west',502,1,.38,'שקע נמוך ליד החלון','Low socket beside window',[ev(4,[.661,.646,.025,.025])],inferred),
  p('A03','bedroom-b','preparation','west',491,1,.38,'קופסה נמוכה נוספת ליד החלון','Second low box beside window',[ev(4,[.691,.647,.025,.027])],inferred),
  p('B01','bedroom-a','preparation','bed-a-south',771,-1,1.35,'קופסה גבוהה פתוחה בקיר הצדדי','Open high side-wall box',[ev(5,[.072,.283,.095,.076])],inferred),
@@ -70,19 +76,25 @@ export const ELECTRICAL_OBSERVATIONS=[
  p('B03','bedroom-a','preparation','west',443,1,1.1,'הכנה לא מזוהה ליד החלון','Unidentified preparation beside window',[ev(22,[.255,.397,.058,.026]),ev(5,[.841,.531,.05,.05])],inferred),
  p('B04','bedroom-a','preparation','bed-a-south',646,-1,.38,'קופסה נמוכה בקצה הקיר','Low box at wall end',[ev(5,[.604,.755,.03,.047])],inferred),
  p('B05','bedroom-a','outlet','bed-a-south',631,-1,.38,'שקע נמוך לצד הקופסה','Low socket beside box',[ev(5,[.639,.737,.028,.043])],inferred),
- p('O01','bedroom-c','preparation','south',927,-1,1.1,'אביזר לצד החלון — משמאל','Fitting to left of window',[ev(25,[.485,.44,.042,.02]),ev(8,[.304,.447,.035,.039]),ev(7,[.397,.447,.032,.028])],inferred),
+ p('O01','bedroom-c','control','south',927,-1,1.1,'אביזר לצד החלון — משמאל','Fitting to left of window',[ev(25,[.485,.44,.042,.02]),ev(8,[.304,.447,.035,.039]),ev(7,[.397,.447,.032,.028])],inferred),
  p('O02','bedroom-c','outlet','south',855,-1,.38,'שקע נמוך מימין לחלון','Low socket to right of window',[ev(8,[.686,.636,.033,.034]),ev(7,[.692,.55,.031,.04])],inferred),
  p('O03','bedroom-c','preparation','south',841,-1,.38,'קופסה לצד השקע הנמוך','Box beside low socket',[ev(8,[.735,.637,.033,.035]),ev(7,[.733,.551,.03,.04])],inferred),
  p('O04','bedroom-c','preparation','master-east',795,1,1.35,'קופסה גבוהה ראשונה בקיר הצדדי','First high side-wall box',[ev(7,[.892,.385,.025,.037])],inferred),
  p('O05','bedroom-c','preparation','master-east',782,1,1.35,'קופסה גבוהה שנייה בקיר הצדדי','Second high side-wall box',[ev(7,[.919,.382,.024,.037])],inferred),
  p('O06','bedroom-c','outlet','bedroom-c-east',820,-1,.38,'שקע נמוך בקיר הנגדי לצד החלון','Low socket on the opposite side wall',[ev(28,[.583,.643,.071,.034])],inferred),
  p('O07','bedroom-c','preparation','bedroom-c-east',834,-1,.38,'קופסה נמוכה לצד השקע בקיר הנגדי','Low box beside socket on opposite side wall',[ev(28,[.671,.633,.065,.034])],inferred),
- p('M01','master','preparation','south',800,-1,.5,'פתח עגול בקיר חדר ההורים','Round opening on main-bedroom wall',[ev(6,[0,.576,.012,.026])]),
+ p('M01','master','intercom','south',800,-1,.5,'שפופרת אינטרקום בקיר חדר ההורים','Main-bedroom intercom handset',[ev(32,[0,.57,.18,.24]),ev(6,[0,.576,.012,.026])],{boxHeight:.24,width:.085}),
  p('M02','master','preparation','south',787,-1,.5,'קופסה ראשונה בקיר חדר ההורים','First main-bedroom wall box',[ev(6,[.028,.574,.024,.022])]),
- p('M03','master','preparation','south',773,-1,.5,'קופסה שנייה בקיר חדר ההורים','Second main-bedroom wall box',[ev(6,[.061,.57,.023,.022])]),
+ p('M03','master','outlet','south',773,-1,.5,'קופסה שנייה בקיר חדר ההורים','Second main-bedroom wall box',[ev(6,[.061,.57,.023,.022])]),
  p('M04','master','outlet','south',622,-1,.45,'שקע נמוך בקיר האחורי, סמוך לפינת החלון','Low rear-wall socket near the window corner',[ev(24,[.241,.497,.036,.022]),ev(6,[.344,.53,.018,.025])]),
  p('M05','master','preparation','ensuite-east',708,1,1.35,'קופסה גבוהה במחיצה ליד הרחצה','High partition box beside en suite',[ev(6,[.744,.451,.046,.043])],{width:.14}),
  p('M06','master','preparation','ensuite-east',708,1,.45,'קופסה נמוכה באותה מחיצה','Low box on same partition',[ev(6,[.723,.707,.045,.053])],{width:.14}),
+
+ p('A04','bedroom-b','outlet','bed-b-south',660,-1,.38,'שקע נמוך ראשון בקיר הצדדי','First low side-wall socket',[ev(30,[.26,.65,.085,.05])],inferred),
+ p('A05','bedroom-b','outlet','bed-b-south',675,-1,.38,'שקע נמוך שני בקיר הצדדי','Second low side-wall socket',[ev(30,[.35,.64,.08,.05])],inferred),
+ p('B06','bedroom-a','control','bed-a-east-upper',400,-1,1.1,'מפסק ליד הכניסה לחדר 1','Bedroom 1 entrance switch',[ev(29,[.04,.75,.25,.15])],inferred),
+ p('A06','bedroom-b','control','bed-b-east',534,-1,1.1,'מפסק ליד הכניסה לחדר 2','Bedroom 2 entrance switch',[ev(31,[.65,.7,.2,.15])],inferred),
+ p('O08','bedroom-c','control','master-east',730,1,1.1,'מפסק לצד דלת חדר 3','Bedroom 3 entrance switch',[ev(33,[.35,.64,.1,.04])],inferred),
  p('S01','safe-room','outlet','wet-east',566,-1,1.35,'שקע גבוה בקיר הצדדי של הממ״ד','High safe-room side-wall socket',[ev(13,[.128,.318,.055,.03])]),
  p('S02','safe-room','preparation','wet-east',552,-1,1.35,'קופסה גבוהה ליד השקע בממ״ד','High box beside safe-room socket',[ev(13,[.046,.318,.06,.03])]),
  p('S03','safe-room','outlet','wet-east',661,-1,.42,'שקע נמוך בקיר הצדדי של הממ״ד','Low safe-room side-wall socket',[ev(9,[.161,.525,.025,.025]),ev(13,[.503,.545,.04,.025])]),
@@ -106,7 +118,7 @@ export function createElectricalLayout(point,walls,{kitchenAnchor=point(1260.78,
   const w=walls.find(w=>w.id===o.wallId);if(!w)throw Error(`Missing electrical wall ${o.wallId}`);
   const vertical=Math.abs(w.a[0]-w.b[0])<.001,along=vertical?point(606,o.along)[1]:point(o.along,45.7)[0],offset=o.side*(w.thickness/2+.033);
   const position=vertical?[w.a[0]+offset,o.height,along]:[along,o.height,w.a[1]+offset],normal=vertical?[o.side,0]:[0,o.side];
-  return applyKitchenElectricalRelocation({...o,position,normal,vertical,width:o.width||.09,depth:.018,boxHeight:.085,electrical:true,source:'electrical-survey',page:o.evidence[0].page,dimensionsInferred:true,positionInferred:true},kitchenAnchor);
+  return applyKitchenElectricalRelocation({...o,position,normal,vertical,width:o.width||.09,depth:.018,boxHeight:o.boxHeight||.085,electrical:true,source:'electrical-survey',page:o.evidence[0].page,dimensionsInferred:true,positionInferred:true},kitchenAnchor);
  });
  return {points,reviewedVideo:{file:'277904.mp4',duration:32.332896,samplingSeconds:.5,targetedSamplingSeconds:.25,reviewRevision:39,sha256:'f29792fe1aa136a45b9902e9328698468627c4c8209e6a805a462de800108d45'},excluded:['ceiling lights','water and gas outlets','drains','ventilation covers','cistern flush plates']};
 }

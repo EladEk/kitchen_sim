@@ -1,3 +1,4 @@
+import {prepareSurfaceGeometry} from '../src/geometry-safety.mjs';
 import * as THREE from 'three';
 import {mergeWallSurfaces} from './wall-surface-merge.mjs';
 import {inVariantSlot,hasVariantSlot} from './model-variants.mjs';
@@ -87,7 +88,7 @@ export function mergeDistrictParts(parts,{wallFinish=false}={}){
  for(const {geometry:g,matrix,start=0,count:partCount} of parts){const p=g.attributes.position,no=g.attributes.normal,uv=g.attributes.uv,index=g.index,length=index?.count??p.count,nm=new THREE.Matrix3().getNormalMatrix(matrix),reverse=matrix.determinant()<0;
   for(let i=start;i<Math.min(length,start+(partCount??length));i++){const triangle=i-i%3,offset=reverse&&i%3?3-i%3:i%3,j=index?index.getX(triangle+offset):triangle+offset;v.fromBufferAttribute(p,j).applyMatrix4(matrix);if(no)n.fromBufferAttribute(no,j).applyMatrix3(nm).normalize();else n.set(0,1,0);positions[at*3]=v.x;positions[at*3+1]=v.y;positions[at*3+2]=v.z;normals[at*3]=n.x;normals[at*3+1]=n.y;normals[at*3+2]=n.z;uvs[at*2]=uv?.getX(j)??0;uvs[at*2+1]=uv?.getY(j)??0;at++;}
  }
- const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(positions,3));geo.setAttribute('normal',new THREE.BufferAttribute(normals,3));geo.setAttribute('uv',new THREE.BufferAttribute(uvs,2));return compactRenderAttributes(geo);
+ const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(positions,3));geo.setAttribute('normal',new THREE.BufferAttribute(normals,3));geo.setAttribute('uv',new THREE.BufferAttribute(uvs,2));return compactRenderAttributes(prepareSurfaceGeometry(geo).geometry);
 }
 
 function mergeIndexedParts(parts,vertices,count){
@@ -102,5 +103,5 @@ function mergeIndexedParts(parts,vertices,count){
    indices[corner++]=output;
   }
  }
- const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.BufferAttribute(positions,3));geometry.setAttribute('normal',new THREE.BufferAttribute(normals,3));geometry.setAttribute('uv',new THREE.BufferAttribute(uvs,2));geometry.setIndex(new THREE.BufferAttribute(indices,1));return compactRenderAttributes(geometry);
+ const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.BufferAttribute(positions,3));geometry.setAttribute('normal',new THREE.BufferAttribute(normals,3));geometry.setAttribute('uv',new THREE.BufferAttribute(uvs,2));geometry.setIndex(new THREE.BufferAttribute(indices,1));return compactRenderAttributes(prepareSurfaceGeometry(geometry).geometry);
 }

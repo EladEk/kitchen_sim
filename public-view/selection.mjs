@@ -7,7 +7,7 @@ import {inside} from './navigation.mjs';
 // bounds all agree. Generic navigation polygons are the only selection data.
 export function selectionRegions(nav,{level=9,target='',roomFocus=null}){
  const d=nav.destinations.find(d=>d.id===target);
- if(d?.unit&&roomFocus?.unit===d.unit&&roomFocus.floor===d.floor&&roomFocus.polygons?.length){const domain=roomFocus.displayDomain||roomFocus.polygons.map(p=>[p]),polygons=domain.map(r=>r[0]);return [{level:d.floor,polygon:polygons[0],polygons,triangles:domain.flatMap(r=>triangulate(r[0],r.slice(1)).map(t=>t.p))}];}
+ if(d?.unit&&roomFocus?.unit===d.unit&&roomFocus.floor===d.floor&&roomFocus.polygons?.length){const domain=roomFocus.displayDomain||roomFocus.polygons.map(p=>[p]),polygons=domain.map(r=>r[0]);return [{level:d.floor,polygon:polygons[0],polygons,domains:domain,triangles:domain.flatMap(r=>triangulate(r[0],r.slice(1)).map(t=>t.p))}];}
  if(d?.unit)return nav.floors.flatMap(f=>f.units.filter(u=>u.number===d.unit).map(u=>({level:f.level,polygon:u.polygon,polygons:u.displayPolygons||[u.polygon],triangles:u.displayTriangles})));
  if(d?.polygon)return [{level:d.floor,polygon:d.polygon}];
  return level===9?[]:[{level,polygon:null}];

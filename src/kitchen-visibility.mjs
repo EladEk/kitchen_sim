@@ -11,7 +11,7 @@ export function opaqueMesh(mesh){const materials=Array.isArray(mesh.material)?me
 export function applyKitchenVisibility(roots,mode,resources){
  const copies=new Map();
  for(const root of roots){
-  root.visible=mode!=='hidden';
+  root.userData.kitchenFurnishing=true;root.visible=mode!=='hidden';
   root.traverse(mesh=>{
    if(!mesh.isMesh)return;
    mesh.userData.kitchenFurnishing=true;

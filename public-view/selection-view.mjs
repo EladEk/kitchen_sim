@@ -1,13 +1,13 @@
 import * as THREE from 'three';
 import {DISTRICT,buildingTransform,districtLocation} from './district.mjs';
 import {PLAN_CENTER} from './district-layout.mjs';
-import {createSelection} from './selection.mjs';
+import {createGpuSelection} from './gpu-selection.mjs';
 import {createWalkingDisplay} from './walking-display.mjs';
 
-export function createSelectionController({root,model,district,nav,variants=new Map(),doorController=null}){
+export function createSelectionController({root,model,district,nav,variants=new Map(),doorController=null,mobile=false,nodeMaterialFor=null,onPrepareGroup=null}){
  let section,key,current,walkBuilding,visibilityKey,activeModel=model;
  const displays=new Map(),interiorsByModel=new Map();for(const source of new Set([model,...variants.values()])){const interiors=[];source.traverse(o=>{if(o.isMesh&&o.userData.exterior===false)interiors.push({object:o,visible:o.visible});});interiorsByModel.set(source,interiors);}
- if(model.parent!==root)root.add(model);
+ if(model.parent!==root)root.add(model);onPrepareGroup?.(model);
  return {
   update(state,{walking=false,position=null}={}){
    let b=DISTRICT.find(b=>b.id===state.building)||DISTRICT[0];
@@ -18,10 +18,10 @@ export function createSelectionController({root,model,district,nav,variants=new 
     b=walkBuilding;
    }else if(!walking)walkBuilding=null;
    const source=variants.get(b.id)||model,doorsChanged=doorController?.activate(b.id,source);
-   if(source!==activeModel){if(section){section.dispose();section=null;key=null;}root.clear();activeModel=source;root.add(source);if(displays.has(source))root.add(displays.get(source).group);visibilityKey=null;}
+   if(source!==activeModel){if(section){section.dispose();section=null;key=null;}root.clear();activeModel=source;root.add(source);onPrepareGroup?.(source);if(displays.has(source))root.add(displays.get(source).group);visibilityKey=null;}
    const interiors=interiorsByModel.get(source);
    const floor=position?Math.max(0,Math.floor((position.y-1.62+.35)/nav.storey)):0,nextVisibility=walking&&position?'walk:'+floor:'all';
-   if(visibilityKey!==nextVisibility){for(const {object,visible} of interiors)object.visible=visible&&(!walking||!position||Math.abs((object.userData.level??0)-floor)<=1);visibilityKey=nextVisibility;}
+   if(visibilityKey!==nextVisibility){for(const {object,visible} of interiors)object.visible=visible&&(!walking||!position||(object.userData.level??0)===floor);visibilityKey=nextVisibility;}
    const focused=!walking&&(Number(state.level)!==9||!!state.target);
    // Whole-building views use the same accurately merged display batches as
    // the other seven buildings. Keep the original for bounds/collisions and
@@ -32,10 +32,10 @@ export function createSelectionController({root,model,district,nav,variants=new 
    let display=displays.get(source);if(walking&&!display){
     // Build from the complete source once, before the floor visibility mask.
     for(const {object,visible}of interiors)object.visible=visible;
-    source.visible=true;display=createWalkingDisplay(source);displays.set(source,display);root.add(display.group);visibilityKey=null;
+    source.visible=true;display=createWalkingDisplay(source,{batchShadows:mobile});displays.set(source,display);root.add(display.group);onPrepareGroup?.(display.group);visibilityKey=null;
    }
    if(display){display.group.visible=walking;if(walking)display.update(floor);}source.visible=!focused&&!walking;
-   if(focused){const next=state.level+'|'+state.target+'|'+(state.roomFocus?.id||'')+'|'+(state.wallHeight??'full');if(next!==key){if(section){root.remove(section.group);section.dispose();}section=createSelection(source,nav,{...state,level:Number(state.level)});if(!section.group.children.length)throw Error('Empty selected building section');root.add(section.group);key=next;}if(doorsChanged)section.sync();section.group.visible=true;}else if(section){root.remove(section.group);section.dispose();section=null;key=null;}
+   if(focused){if(!section){section=createGpuSelection(source,nav,{toNodeMaterial:nodeMaterialFor});root.add(section.group);onPrepareGroup?.(section.group);}section.update({...state,level:Number(state.level)},root.matrixWorld);if(doorsChanged)section.sync();section.group.visible=true;}else if(section)section.group.visible=false;
    root.updateMatrixWorld(true);current={content:focused?section.group:walking?display.group:source,building:b,focused,...(focused&&Number.isFinite(state.wallHeight)?{framingTop:Math.max(...section.regions.map(r=>(nav.floors.find(f=>f.level===r.level)?.elevation??r.level*nav.storey)+2.8))}:{})};return current;
   },
   get current(){return current;},
@@ -44,6 +44,7 @@ export function createSelectionController({root,model,district,nav,variants=new 
  };
 }
 export function selectionBounds(content){
+ if(content.userData.selectionBounds&&!content.userData.selectionBounds.isEmpty())return content.userData.selectionBounds.clone();
  content.updateWorldMatrix(true,true);const box=new THREE.Box3();
  content.traverseVisible(o=>{if(!o.isMesh||o.userData.sceneUi||(o.userData.securityOverlay||o.userData.tourNonPhysical)&&!o.userData.renderFixture)return;const mats=Array.isArray(o.material)?o.material:[o.material];if(!mats.some(m=>m&&m.visible!==false&&m.opacity!==0&&m.colorWrite!==false))return;let local;if(o.isInstancedMesh){if(!o.boundingBox)o.computeBoundingBox();local=o.boundingBox;}else{if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();local=o.geometry.boundingBox;}if(local)box.union(local.clone().applyMatrix4(o.matrixWorld));});
  return box;

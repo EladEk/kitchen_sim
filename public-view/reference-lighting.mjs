@@ -1,13 +1,13 @@
 import * as T from 'three';
 export const REFERENCE_LIGHTING_KEY='homestudio-neutral-lighting';
-export function readReferenceLighting(storage){try{return storage?.getItem(REFERENCE_LIGHTING_KEY)!=='off';}catch{return true;}}
+export function readReferenceLighting(storage){try{return storage?.getItem(REFERENCE_LIGHTING_KEY)==='on';}catch{return false;}}
 export function saveReferenceLighting(storage,on){try{storage?.setItem(REFERENCE_LIGHTING_KEY,on?'on':'off');}catch{}}
 
 // White inspection lighting, independent of the astronomical sky. The sky is
 // still visible through windows. Two broad directions retain surface depth.
 // Lights remain registered at zero intensity while disabled, keeping native
 // shader/shadow layouts stable when the option is changed.
-export function createReferenceLighting(scene,renderer,{enabled=true,environmentFactory=null}={}){
+export function createReferenceLighting(scene,renderer,{enabled=false,environmentFactory=null}={}){
  const original={tone:renderer.toneMapping,exposure:renderer.toneMappingExposure,environment:scene.environment,intensity:scene.environmentIntensity,photo:scene.userData.photoEnvironment},materials=new Map(),lights=new Map(),sourceLights=new Set(),owned=new Set(),rig=new T.Group();rig.name='reference-lighting';
  const ambient=new T.AmbientLight('#ffffff',0),hemisphere=new T.HemisphereLight('#ffffff','#dfdfdf',0),key=new T.DirectionalLight('#ffffff',0),fill=new T.DirectionalLight('#ffffff',0),keyTarget=new T.Object3D(),fillTarget=new T.Object3D();
  key.target=keyTarget;fill.target=fillTarget;for(const light of [ambient,hemisphere,key,fill]){light.userData.referenceLighting=true;owned.add(light);rig.add(light);}rig.add(keyTarget,fillTarget);scene.add(rig);
@@ -18,13 +18,16 @@ export function createReferenceLighting(scene,renderer,{enabled=true,environment
  function bind(root){if(disposed||!root)return;root.traverse(o=>{if(o.isLight&&!owned.has(o))sourceLights.add(o);for(const m of [o.material].flat().filter(Boolean))if(m.isMeshStandardMaterial&&!materials.has(m))materials.set(m,{map:m.envMap,intensity:m.envMapIntensity});});}
  function apply({focus=new T.Vector3()}={}){
   if(disposed)return;
-  ambient.intensity=on?.28:0;hemisphere.intensity=on?.65:0;key.intensity=on?1.25:0;fill.intensity=on?.42:0;
+  ambient.intensity=on?.28:0;hemisphere.intensity=on?1.0:0;key.intensity=on?2.4:0;fill.intensity=on?.6:0;
   if(!on){renderer.toneMapping=original.tone;return;}
   for(const o of sourceLights){lights.set(o,{intensity:o.intensity,visible:o.visible,shadow:o.shadow?.needsUpdate});o.intensity=0;if(o.parent?.name==='astronomical-light-rig')o.visible=true;if(o.shadow?.map)o.shadow.needsUpdate=false;}
-  keyTarget.position.copy(focus);fillTarget.position.copy(focus);key.position.copy(focus).add(new T.Vector3(-4,7,5));fill.position.copy(focus).add(new T.Vector3(5,4,-3));
-  scene.environment=target.texture;scene.environmentIntensity=.65;scene.userData.photoEnvironment=source;
-  for(const [m]of materials){m.envMap=target.texture;m.envMapIntensity=.65;}
-  renderer.toneMapping=T.NeutralToneMapping;renderer.toneMappingExposure=1;
+  keyTarget.position.copy(focus);fillTarget.position.copy(focus);key.position.copy(focus).add(new T.Vector3(-4,2,-5));fill.position.copy(focus).add(new T.Vector3(5,3,3));
+  scene.environment=target.texture;scene.environmentIntensity=.9;scene.userData.photoEnvironment=source;
+  for(const [m]of materials){
+   const paint=m.userData.surfaceKind==='plaster'||m.userData.architecturalCeiling;
+   m.envMap=target.texture;m.envMapIntensity=paint?.9:.65;
+  }
+  renderer.toneMapping=T.AgXToneMapping;renderer.toneMappingExposure=1.35;
  }
  return {bind,beginFrame,apply,get enabled(){return on;},setEnabled(value){const next=!!value;if(next===on)return;beginFrame();on=next;if(!on)for(const o of sourceLights)if(o.shadow)o.shadow.needsUpdate=true;for(const [m]of materials)m.needsUpdate=true;},get stats(){return {materials:materials.size,targets:disposed?0:1};},dispose(){if(disposed)return;beginFrame();disposed=true;rig.removeFromParent();if(scene.environment===target.texture){scene.environment=original.environment;scene.environmentIntensity=original.intensity;scene.userData.photoEnvironment=original.photo;}target.dispose();source.dispose();source.source.data=null;materials.clear();sourceLights.clear();renderer.toneMapping=original.tone;renderer.toneMappingExposure=original.exposure;}};
 }

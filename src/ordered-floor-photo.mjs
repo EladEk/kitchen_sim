@@ -1,6 +1,6 @@
 import {trackSceneAsset} from './scene-loading.mjs';
 import {orderedSurface} from './ordered-flooring.mjs';
-import {prepareFloorPhoto} from './floor-photo-preparation.mjs';
+import {prepareFloorPhoto,applyFloorReflectance} from './floor-photo-preparation.mjs';
 const tasks=new Map();
 export function orderedFloorPhotoData(productId){
  const photo=orderedSurface(productId)?.photo;
@@ -18,6 +18,7 @@ export function orderedFloorPhotoData(productId){
     if(photo.rotate){context.translate(size/2,size/2);context.rotate(photo.rotate*Math.PI/180);context.drawImage(image,...sample,-size/2,-size/2,size,size);}
     else context.drawImage(image,...sample,0,0,size,size);
     const pixels=context.getImageData(0,0,size,size).data,prepared=productId==='dry-floor'?prepareFloorPhoto(pixels,size):{color:new Uint8Array(pixels)},height=new Uint8Array(pixels.length),roughness=new Uint8Array(pixels.length);
+    if(photo.appearanceRgb){prepared.color=applyFloorReflectance(prepared.color,photo.appearanceRgb);prepared.lightingCorrection={...prepared.lightingCorrection,appearanceSwatch:photo.appearanceSwatch,calibrated:false};}
     // Actual flecks/mottling with bounded broad-lighting correction for the
     // owner's photo only. Catalogue RGB and the flat height remain unchanged.
     for(let i=0;i<pixels.length;i+=4){height.set([128,128,128,255],i);const grain=(prepared.color[i]*.2126+prepared.color[i+1]*.7152+prepared.color[i+2]*.0722)-(prepared.color[Math.max(0,i-4)]*.2126+prepared.color[Math.max(0,i-4)+1]*.7152+prepared.color[Math.max(0,i-4)+2]*.0722),r=Math.round(Math.max(222,Math.min(250,240-grain*.65)));roughness.set([r,r,r,255],i);}

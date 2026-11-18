@@ -40,10 +40,10 @@ export function KitchenElectricalPanel({point:p,lang,onSource,onFocus,onClose}){
 }
 
 export function KitchenElectricalPlan({settings,onSelect}){
- return <g className="kitchen-electrical-plan">{settings.showElectrical&&<>{KITCHEN_ELECTRICAL_POINTS.map(p=><ElectricalFixtureGlyph key={p.id} point={p} x={p.position[0]*1000} y={p.position[2]*1000} settings={settings} onSelect={onSelect}/>)}<WaterPlanMarkers points={KITCHEN_WATER_POINTS} settings={settings} scale={1000} onSelect={onSelect}/></>}<LightingPlanMarkers points={KITCHEN_LIGHTING_POINTS} settings={settings} scale={1000}/></g>;
+ return <g className="kitchen-electrical-plan">{<>{KITCHEN_ELECTRICAL_POINTS.map(p=><ElectricalFixtureGlyph key={p.id} point={p} x={p.position[0]*1000} y={p.position[2]*1000} settings={settings} onSelect={onSelect}/>)}<WaterPlanMarkers points={KITCHEN_WATER_POINTS} settings={settings} scale={1000} onSelect={onSelect}/></>}<LightingPlanMarkers points={KITCHEN_LIGHTING_POINTS} settings={settings} scale={1000}/></g>;
 }
 export function KitchenElectricalElevation({settings,wall,onSelect}){
- if(!settings.showElectrical)return null;
+ 
  return <g className="kitchen-electrical-elevation">{kitchenElectricalElevation(wall).map(({point:p,x,y})=><ElectricalFixtureGlyph key={p.id} point={p} x={x} y={y} settings={settings} onSelect={onSelect}/>)}{KITCHEN_WATER_POINTS.filter(p=>p.wall===wall&&waterVisible(p,settings)).map(p=><WaterGlyph key={p.id} point={p} x={p.position[0]*1000} y={2600-p.height*1000} lang={settings.lang} onSelect={e=>{e.stopPropagation();onSelect?.(p.id);}}/>)}</g>;
 }
 export function ElectricalFixtureGlyph({point:p,x,y,settings,onSelect}){

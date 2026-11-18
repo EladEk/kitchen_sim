@@ -1,4 +1,6 @@
 import {WebGLRenderer} from 'three';
+import {prepareSceneGeometry} from '../src/geometry-safety.mjs';
+import {applyArchitecturalMaterials} from '../src/architectural-materials.mjs';
 const aborted=()=>new DOMException('Canceled','AbortError');
 export function boundedGraphicsTask(task,{signal,timeout=8000,retire=()=>{}}={}){
  return new Promise((resolve,reject)=>{
@@ -19,6 +21,6 @@ export async function createTourRenderer({mode='auto',preferXR=false,signal,navi
    if(signal?.aborted){session.dispose();throw aborted();}return session;
   }catch(error){if(signal?.aborted)throw error;emit('webgpu-initialization-failed',error);if(mode==='webgpu')throw Object.assign(Error('Forced WebGPU initialization failed',{cause:error}),{code:'WEBGPU_FAILED'});reason='driver';emit('webgl-fallback',error);}
  }
- if(signal?.aborted)throw aborted();emit('webgl-initialization',null,{reason});const renderer=createGL();let disposed=false;
- return {renderer,native:false,backend:'webgl2',reason,adapt(){},dispose(){if(disposed)return;disposed=true;renderer.dispose();renderer.forceContextLoss?.();renderer.domElement?.remove?.();}};
+ if(signal?.aborted)throw aborted();emit('webgl-initialization',null,{reason});const renderer=createGL(),ownedMaterials=new Set();let disposed=false;
+ return {renderer,native:false,backend:'webgl2',reason,adapt(root){if(!root||disposed)return;prepareSceneGeometry(root);for(const m of applyArchitecturalMaterials(root).values())ownedMaterials.add(m);},dispose(){if(disposed)return;disposed=true;for(const m of ownedMaterials)m.dispose();ownedMaterials.clear();renderer.dispose();renderer.forceContextLoss?.();renderer.domElement?.remove?.();}};
 }

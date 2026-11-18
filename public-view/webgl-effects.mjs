@@ -7,9 +7,7 @@ export function createWebGLPresentation(renderer,scene,camera,{mobile=false}={})
  let composer;const owned=[],autoClear=renderer.autoClear;
  try{
   composer=new EffectComposer(renderer,{frameBufferType:HalfFloatType,multisampling:0});const render=new RenderPass(scene,camera),ao=new N8AOPostPass(scene,camera,1,1);owned.push(ao);
-  ao.setQualityMode(mobile?'Low':'Medium');// R153: deeper, slightly wider contact occlusion grounds furniture, door
-  // frames and room corners (still half resolution).
-  Object.assign(ao.configuration,{aoRadius:1,intensity:.9,halfRes:true,gammaCorrection:false,transparencyAware:false});
+  ao.setQualityMode(mobile?'Low':'Medium');Object.assign(ao.configuration,{aoRadius:.8,intensity:.65,halfRes:true,gammaCorrection:false,transparencyAware:false});
   const glow=new BloomEffect({intensity:.08,luminanceThreshold:1.4,luminanceSmoothing:.25,mipmapBlur:true,resolutionScale:.25}),tone=new ToneMappingEffect({mode:ToneMappingMode.AGX}),aa=new FXAAEffect();composer.addPass(render);composer.addPass(ao);composer.addPass(new EffectPass(camera,glow,tone,aa));
   const draw=ao.render.bind(ao),hidden=[];ao.render=(...args)=>{scene.traverseVisible(o=>{if(o.isMesh&&(o.userData.celestialBackground||[o.material].flat().some(m=>m?.alphaTest>0||m?.transparent&&m.opacity<.98))){hidden.push(o);o.visible=false;}});try{draw(...args);}finally{for(const o of hidden)o.visible=true;hidden.length=0;}};
   return {resize(w,h){for(const target of [composer.inputBuffer,composer.outputBuffer,composer.depthRenderTarget])target?.setSize(w,h);for(const pass of composer.passes)pass.setSize(w,h);},render(){composer.render();},dispose(){composer.dispose();renderer.autoClear=autoClear;}};

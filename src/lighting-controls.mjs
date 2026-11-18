@@ -8,4 +8,4 @@ export function normalizeLightControls(value){
 }
 export const lightControl=(settings,id)=>normalizeLightControls(settings.lightControls)[id]||{enabled:true,brightness:75,kelvin:4000};
 export const lightColour=kelvin=>({2700:'#ffce85',3000:'#ffe2b1',4000:'#fff1df',6500:'#e3eeff'}[kelvin]||'#fff1df');
-export function lightOutput(settings,id){const p=lightControl(settings,id);return {...p,color:lightColour(p.kelvin),power:p.enabled&&settings.lampsOn!==false?p.brightness/75:0};}
+export function lightOutput(settings,id){const p=lightControl(settings,id);if(settings.light==='night'&&!settings.lightControls?.[id])p.kelvin=3000;return {...p,color:lightColour(p.kelvin),power:p.enabled&&settings.lampsOn!==false?p.brightness/75:0};}

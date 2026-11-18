@@ -6,8 +6,8 @@ import {unionFacadePanels} from './facade-veneers.mjs';
 // grey balcony surrounds. Profile sizes and colour are visual estimates; no
 // elevation, named product or exact RAL was supplied. Other building copies
 // retain the existing 4102-based reconstruction and its rotations/reflections.
-export const GREY_FACADE_COLOR='#888b87';
-export const GREY_FACADE_ROUGHNESS=.94;
+export const GREY_FACADE_COLOR='#7e8286';
+export const GREY_FACADE_ROUGHNESS=.85;
 export const FACADE_FRAME={returnWidth:.26,beamHeight:.42,beamDepth:.32,frontOverhang:.16};
 const cache=new Map();
 const bounds=poly=>({minX:Math.min(...poly.map(p=>p[0])),maxX:Math.max(...poly.map(p=>p[0])),minZ:Math.min(...poly.map(p=>p[1])),maxZ:Math.max(...poly.map(p=>p[1]))});

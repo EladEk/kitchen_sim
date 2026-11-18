@@ -1,6 +1,8 @@
 import {furnitureFootprintBoxes} from '../src/furniture-shape.mjs';
 import {FURNITURE_PALETTE,furniturePartColor,furnitureMaterialProperties} from './furniture-palette.mjs';
 import * as T from 'three';
+import {createFurnitureSurfacePalette} from '../src/physical-finishes.mjs';
+import {createContactShadows} from '../src/contact-shadows.mjs';
 import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
 import {dimensionedFurnitureParts} from '../src/dimensioned-furniture.mjs';
 import {cabinetMotions} from '../src/cabinet-motion.mjs';
@@ -12,7 +14,8 @@ import {normalizeWorkspace,parseScope,scopeKey,unitContext,itemInRoom} from './a
 export function createApartmentEditorScene({nav,overrides=null}){
  const group=new T.Group();group.name='local-apartment-furniture';
  const cube=new T.BoxGeometry(1,1,1),soft=new RoundedBoxGeometry(1,1,1,2,.07),mirrors=new Map([[cube,mirroredGeometry(cube,[0,0])],[soft,mirroredGeometry(soft,[0,0])]]),palette={};
- for(const name of Object.keys(FURNITURE_PALETTE)){palette[name]=new T.MeshStandardMaterial({color:'#ffffff',...furnitureMaterialProperties(name)});palette[name].userData={architecturalInterior:true};}
+ const owned=[],surface=createFurnitureSurfacePalette(owned),contacts=createContactShadows(owned);
+ for(const name of Object.keys(FURNITURE_PALETTE)){const kind=['fabric','linen'].includes(name)?'fabric':name==='wood'?'wood':name==='paint'?'paint':null;palette[name]=kind?surface(kind):new T.MeshPhysicalMaterial({color:'#ffffff',...furnitureMaterialProperties(name)});palette[name].userData={...palette[name].userData,architecturalInterior:true,furnitureMaterial:true,...(name==='glass'?{architecturalGlass:true}:{})};}
  const proxy=new T.MeshBasicMaterial({colorWrite:false,depthWrite:false,transparent:true,opacity:1,side:T.DoubleSide}),flip=new T.Matrix4().makeScale(-1,1,1);
  const physicalMeshes=[],placements=[],visualBatches=[],assemblies=[],poses=new Map(),itemsByKey=new Map();
  const ghostMaterials=new Map();let ghostKey="",ghostTime=0;
@@ -42,6 +45,7 @@ export function createApartmentEditorScene({nav,overrides=null}){
    for(const item of record.items){
     const base=transform.clone().multiply(new T.Matrix4().makeTranslation(item.x,context.elevation+.03+(item.y||0),item.z)).multiply(new T.Matrix4().makeRotationY(item.yaw));
     const r={item,scope,key,base,inverse:base.clone().invert(),mirror:b.mirror,root,elevation:context.elevation+(item.y||0),hidden:false,motions:[]};placements.push(r);itemsByKey.set(itemKey(key,item.id),r);
+    if(!item.y&&!/wall|plant|tv|mirror/.test(item.kind)){const contact=contacts.mesh(item.w,item.d);contact.applyMatrix4(base);contact.position.y=context.elevation+.012;root.add(contact);r.contact=contact;}
     const parts=dimensionedFurnitureParts(item),byPart=new Map();
     for(const spec of cabinetMotions(item,parts)){
      const k=itemKey(key,item.id)+'|'+spec.id;used.add(k);const state=poses.get(k)||{progress:0,target:0};poses.set(k,state);if(editing)state.progress=state.target=0;
@@ -70,7 +74,7 @@ export function createApartmentEditorScene({nav,overrides=null}){
   focusedRoom=focused&&state.roomFocus&&state.roomFocus.building===active?state.roomFocus:null;
   for(const root of group.children){const d=root.userData;root.visible=walking?d.editorBuilding===active&&Math.abs(d.editorFloor-floor)<=1:focused?d.editorBuilding===active&&d.editorFloor<=Number(state.level)&&(!target||d.editorUnit===+target[1]&&d.editorFloor===+target[2]):true;}
   const hidden=new Set(state.liveHiddenIds||[]),next=(focusedRoom?`${active}:${focusedRoom.floor}:${focusedRoom.unit}:${focusedRoom.id}`:'all')+'|'+[...hidden].join(',');if(next===viewKey)return;viewKey=next;
-  for(const r of placements)r.hidden=hidden.has(r.item.id);
+  for(const r of placements){r.hidden=hidden.has(r.item.id);if(r.contact)r.contact.visible=!r.hidden&&inRoom(r);}
   for(const b of visualBatches){const selected=focusedRoom&&b.scope.building===active&&b.scope.floor===focusedRoom.floor&&b.scope.unit===focusedRoom.unit,allowed=selected?new Set(b.items.filter(r=>itemInRoom(r,{selectedRoom:focusedRoom,polygons:focusedRoom.polygons})).map(r=>r.id)):null;b.active=[];for(let i=0;i<b.matrices.length;i++)if(!hidden.has(b.ids[i])&&(!allowed||allowed.has(b.ids[i])))b.active.push(i);refreshBatch(b);}
  }
  function occlusion(camera,target,enabled,now=performance.now()){
@@ -118,7 +122,7 @@ export function createApartmentEditorScene({nav,overrides=null}){
   firstHit(ray,options){const hit=index?.firstHit(ray,options)||null;if(hit)hit.buildingId=hit.object.userData.editorBuilding;return closestHit(hit,motionHit(ray,options));},
   getMotionState(scope,id){return (itemsByKey.get(itemKey(typeof scope==='string'?scope:scopeKey(scope),id))?.motions||[]).map(m=>({id:m.spec.id,type:m.spec.type,progress:m.state.progress,target:m.state.target,matrix:m.world.clone(),bounds:m.box.clone()}));},
   get stats(){return {...(index?.stats||{records:0}),assemblies:assemblies.length};},
-  dispose(){if(disposed)return;disposed=true;clear();poses.clear();cube.dispose();soft.dispose();for(const g of mirrors.values())g.dispose();mirrors.clear();for(const m of Object.values(palette))m.dispose();for(const m of ghostMaterials.values())m.dispose();proxy.dispose();group.removeFromParent();}
+  dispose(){if(disposed)return;disposed=true;clear();poses.clear();cube.dispose();soft.dispose();for(const g of mirrors.values())g.dispose();mirrors.clear();for(const m of Object.values(palette))if(!owned.includes(m))m.dispose();for(const resource of owned)resource.dispose();for(const m of ghostMaterials.values())m.dispose();proxy.dispose();group.removeFromParent();}
  };
 }
 export function withApartmentEdits(base,edits){return {canStand:position=>!edits.blocksPosition(position)&&(base.canStand?.(position)??true),firstHit(ray,options={}){const a=base.firstHit(ray,options),b=edits.firstHit(ray,options);return b&&(!a||b.distance<a.distance)?b:a;},refreshVariant:(...a)=>base.refreshVariant(...a),refreshDoors:(...a)=>base.refreshDoors(...a),get memory(){return {...base.memory,indexBytes:(base.memory?.indexBytes||0)+(edits.stats.bufferBytes||0)};},get stats(){return base.stats;},dispose(){base.dispose();}};}

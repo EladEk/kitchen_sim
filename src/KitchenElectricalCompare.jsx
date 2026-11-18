@@ -32,4 +32,4 @@ function KitchenElectricalCompareContent({settings,selectedId,page,onSelect,onPa
  </div>;
 }
 
-export function KitchenElectricalCompare(props){return <DocumentGate lang={props.lang||props.settings?.lang}><KitchenElectricalCompareContent {...props}/></DocumentGate>;}
+export function KitchenElectricalCompare(props){return <DocumentGate referenceMedia lang={props.lang||props.settings?.lang}><KitchenElectricalCompareContent {...props}/></DocumentGate>;}

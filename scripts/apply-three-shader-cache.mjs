@@ -1,3 +1,4 @@
+import {setPatchTarget} from './three-patch-diagnostics.mjs';
 // Narrow r185 cache fixes. Keep per-object matrix bindings and per-context
 // camera/render uniform buffers independent; do not remove context IDs.
 // Naming: https://github.com/mrdoob/three.js/pull/34872
@@ -6,7 +7,7 @@ import {readFile,writeFile,rename,rm} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 import {dirname,resolve} from 'node:path';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),three=resolve(root,'node_modules/three'),marker='HomeStudio R123 shader cache';
-if(JSON.parse(await readFile(resolve(three,'package.json'),'utf8')).version!=='0.185.0')throw Error('Shader-cache backport requires pinned Three.js 0.185.0');
+if(JSON.parse(await readFile(setPatchTarget(resolve(three,'package.json')),'utf8')).version!=='0.185.0')throw Error('Shader-cache backport requires pinned Three.js 0.185.0');
 const replace=(source,before,after,count=1)=>{if(source.split(before).length!==count+1)throw Error('Unexpected r185 shader-cache source: '+before.slice(0,100));return source.split(before).join(after);};
 function patch(source,kind){
  if(source.includes(marker))return source;
@@ -42,7 +43,7 @@ function patch(source,kind){
  return source;
 }
 const files=[['src/nodes/core/NodeBuilder.js','builder'],['src/renderers/webgpu/nodes/WGSLNodeBuilder.js','wgsl'],['src/renderers/common/Renderer.js','renderer'],['build/three.webgpu.js','bundle']],pending=[];
-for(const [file,kind]of files){const path=resolve(three,file),source=await readFile(path,'utf8'),updated=patch(source,kind);if(source!==updated)pending.push({path,updated});}
+for(const [file,kind]of files){const path=setPatchTarget(resolve(three,file)),source=await readFile(path,'utf8'),updated=patch(source,kind);if(source!==updated)pending.push({path,updated});}
 for(const {path,updated}of pending){const temporary=path+'.homestudio-r123-'+process.pid;try{await writeFile(temporary,updated);await rename(temporary,path);}finally{await rm(temporary,{force:true});}}
 if(pending.length)await rm(resolve(root,'node_modules/.vite'),{recursive:true,force:true});
 console.log('Three.js r185 shader-cache fixes '+(pending.length?'applied':'ready')+'.');

@@ -55,11 +55,11 @@ export function buildResidentsClub({parent,resources,settings,cut=false,ceilingV
  for(const y of [.35,1.1,1.9])disk('club-service-pipe-collar',.16,y,z,.065,.04,steel);
  const door=box('club-service-access-door',.46,1.19,z+.22,.035,2.34,.46);door.rotation.y=-.35;
  // Round luminaires observed in the pan. Layout/diameter/ceiling height estimated.
- const on=settings.lampsOn!==false,colour=lightColour(4000),diffuser=material('#fffaf0',{emissive:colour,emissiveIntensity:on?1.2:0});
+ const on=settings.lampsOn!==false,colour=lightColour(4000),diffuser=material('#fffaf0',{emissive:colour,emissiveIntensity:1.2});
  for(const [i,[x,z]] of C.lamps.entries()){
   disk('club-ceiling-light-rim',x,C.ceiling-.035,z,.14,.035,white);
   disk('club-ceiling-light-diffuser',x,C.ceiling-.06,z,.123,.015,diffuser);
-  if(on){const light=new THREE.SpotLight(colour,22,8,Math.PI*.44,.55,2);light.position.set(x,C.ceiling-.09,z);light.target.position.set(x,.1,z);light.userData={fixtureLight:true,kelvin:4000,source:'residents-club-video',positionInferred:true};light.castShadow=i<2;light.shadow.mapSize.set(256,256);light.shadow.camera.near=.05;light.shadow.bias=-.0002;light.shadow.normalBias=.01;resources.push({dispose:()=>light.shadow.dispose()});root.add(light,light.target);}
+  {const light=new THREE.SpotLight(colour,22,8,Math.PI*.44,.55,2);light.position.set(x,C.ceiling-.09,z);light.target.position.set(x,.1,z);light.userData.nominalIntensity=22;light.intensity=on?22:0;light.visible=on;light.userData={...light.userData,fixtureLight:true,kelvin:4000,source:'residents-club-video',positionInferred:true};light.castShadow=i<2;light.shadow.mapSize.set(256,256);light.shadow.camera.near=.05;light.shadow.bias=-.0002;light.shadow.normalBias=.01;resources.push({dispose:()=>light.shadow.dispose()});root.add(light,light.target);}
  }
  // The selected room overview leaves its ceiling open; walk/full-building close it.
  if(ceilingVisible){const cg=fg.clone();resources.push(cg);const cm=surface('plaster',CEILING_COLOR,{...CEILING_MATERIAL,side:THREE.DoubleSide});const ceiling=new THREE.Mesh(cg,cm);ceiling.position.y=C.ceiling;ceiling.name='club-ceiling';ceiling.userData={part:'club-ceiling',buildingFloor:0};ceiling.castShadow=ceiling.receiveShadow=true;root.add(ceiling);}
