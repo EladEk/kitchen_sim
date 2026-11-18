@@ -5,7 +5,7 @@ import {OUTDOOR_KITCHEN} from './home-products.mjs';
 // Metric Hercules assembly from the supplied product sheet: 80 + 150 + 80 cm,
 // about 70 cm deep. Cabinet height and internal hardware are illustrative.
 export function buildOutdoorKitchen({f,parent,box,cylinder,mat,resources,motions,picks,settings}){
- const metal=mat('#232724',{metalness:.5,roughness:.48}),stone=mat('#363a35',{roughness:.85}),steel=mat('#aeb7b3',{metalness:.8,roughness:.28}),black=mat('#121a16'),inside=mat('#61685e'),glass=mat('#72929c',{transparent:true,opacity:.3,metalness:.12,roughness:.1,depthWrite:false}),led=mat(lightColour(4000),{emissive:lightColour(4000),emissiveIntensity:settings.lampsOn===false?0:.45});
+ const metal=mat('#232724',{metalness:.5,roughness:.48}),stone=mat('#363a35',{roughness:.85}),steel=mat('#aeb7b3',{metalness:.8,roughness:.28}),black=mat('#121a16'),inside=mat('#61685e'),glass=mat('#d8dedc',{transparent:true,opacity:.22,metalness:.08,roughness:.08,depthWrite:false}),led=mat(lightColour(4000),{emissive:lightColour(4000),emissiveIntensity:settings.lampsOn===false?0:.45});
  const opened=new Set(settings.openParts),data={action:'furniture',furnitureId:f.id},part=key=>({action:'part',furnitureId:f.id,partId:`${f.id}:${key}`});
  const bodyTop=.86,base=.10,depth=OUTDOOR_KITCHEN.depth;
  parent.userData.productId='hercules';

@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import {installPhotorealRenderer} from './photoreal-renderer.mjs';
+import {createGpuSelection} from '../public-view/gpu-selection.mjs';
+import {estimatePhotoScene,PhotoSceneLimit} from './photoreal-scene.mjs';
 class Element extends THREE.EventDispatcher{
  constructor(){super();this.children=[];this.style={};this.dataset={};this.attributes={};this.clientWidth=800;this.clientHeight=600;}
  append(...v){this.children.push(...v);v.forEach(o=>o.parent=this);}
@@ -21,6 +23,24 @@ function fixture(factory=null){
  return {photo,host,scene,camera,xr,counts,make,button:host.children[0].children[0],finish(){photo.dispose();globalThis.document=previous;scene.children[0].geometry.dispose();scene.children[0].material.dispose();}};
 }
 const flush=async()=>{await new Promise(resolve=>setImmediate(resolve));};
+test('R178 editor entry retires photo rendering and re-enables it only after editing finishes',async()=>{
+ const f=fixture();try{
+  const now=performance.now();f.button.click();f.photo.render(now+1500);f.photo.render(now+3000);await flush();f.photo.render(now+4500);f.photo.render(now+4600);assert(f.photo.capture());
+  f.photo.setEditing(true);assert.equal(f.photo.enabled,false);assert.equal(f.photo.capture(),null);assert.equal(f.button.disabled,true);assert.equal(f.host.children.length,1);
+  f.button.click();assert.equal(f.photo.enabled,false);const prepared=f.counts.prepared;f.photo.render(now+9000);await flush();assert.equal(f.counts.prepared,prepared);
+  f.photo.setEditing(false);assert.equal(f.button.disabled,false);f.button.click();assert(f.photo.enabled);
+ }finally{f.finish();}
+});
+
+test('R178 photo budget uses the cropped apartment before rejecting large GPU source batches',async()=>{
+ const f=fixture(),source=new THREE.Group(),geometry=new THREE.SphereGeometry(.2,8,8),material=new THREE.MeshStandardMaterial(),mesh=new THREE.InstancedMesh(geometry,material,30000);
+ for(let i=0;i<mesh.count;i++)mesh.setMatrixAt(i,new THREE.Matrix4().makeTranslation(i?100+i:2,.2,i?100:2));mesh.userData={level:0,furnitureRender:true};source.add(mesh);
+ const polygon=[[0,0],[4,0],[4,4],[0,4]],nav={storey:3,floors:[{level:0,units:[{number:1,polygon}]}],destinations:[{id:'unit:1:0',unit:1,floor:0}]},selection=createGpuSelection(source,nav);selection.update({level:0,target:'unit:1:0'});f.scene.add(selection.group);
+ try{
+  assert.throws(()=>estimatePhotoScene(f.scene),PhotoSceneLimit);
+  const now=performance.now();f.button.click();f.photo.render(now+1500);f.photo.render(now+3000);for(let i=0;i<5&&!f.counts.prepared;i++)await flush();assert.equal(f.counts.prepared,1);assert(f.photo.enabled);assert.equal(f.button.attributes['aria-pressed'],'true');
+ }finally{f.finish();selection.dispose();mesh.dispose();geometry.dispose();material.dispose();}
+});
 test('progressive mode waits for stillness, hides stale camera images, and releases tracing during native WebXR',async()=>{
  const f=fixture();try{
   const now=performance.now();f.button.click();f.photo.render(now+1500);f.photo.render(now+3000);await flush();

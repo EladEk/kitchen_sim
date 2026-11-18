@@ -15,12 +15,12 @@ export function installCelestialSky({renderer,scene,camera,getSettings=()=>({}),
  const target=new THREE.Object3D();lightRig.add(target);
  const moon=new THREE.DirectionalLight('#c4d5ff',0);moon.target=target;moon.userData={part:'astronomical-moonlight',daylight:true};lightRig.add(moon);
  let sun,fill,shadowInterval=0;const shadowRefresh=createShadowRefresh({distance:mobile?1.2:.6});
- if(ownSun){sun=new THREE.DirectionalLight('#fff1d6',0);sun.target=target;sun.castShadow=true;sun.shadow.autoUpdate=false;sun.shadow.camera.layers.enable(1);sun.shadow.mapSize.set(mobile?2048:4096,mobile?2048:4096);sun.shadow.bias=-.00015;sun.shadow.normalBias=.018;sun.shadow.radius=2;lightRig.add(sun);}
+ if(ownSun){sun=new THREE.DirectionalLight('#fff7eb',0);sun.target=target;sun.castShadow=true;sun.shadow.autoUpdate=false;sun.shadow.camera.layers.enable(1);sun.shadow.mapSize.set(mobile?2048:4096,mobile?2048:4096);sun.shadow.bias=-.00015;sun.shadow.normalBias=.018;sun.shadow.radius=2;lightRig.add(sun);}
  const cascades=sun&&shadowFactory?shadowFactory(renderer,sun,camera,{mobile}):null,atmosphere=atmosphereFactory?.(renderer,scene,camera);
  // A light ground bounce reaches downward-facing ceilings and soffits. It
  // uses the existing solar intensity, so night/lamp-only modes stay dark.
- fill=new THREE.HemisphereLight('#efefec',ownSun?'#dfd7c8':'#666663',0);fill.userData={part:'astronomical-sky-fill',daylight:true};lightRig.add(fill);
- const exteriorFill=new THREE.Color('#f7f1e6'),interiorFill=new THREE.Color('#f8f2e8');
+ fill=new THREE.HemisphereLight('#faf6f0',ownSun?'#e5ddd0':'#666663',0);fill.userData={part:'astronomical-sky-fill',daylight:true};lightRig.add(fill);
+ const exteriorFill=new THREE.Color('#f9f4ec'),interiorFill=new THREE.Color('#faf5ed');
  function update({now=new Date(),focus=camera.position,shadowRadius=55,interior=0}={}){
   if(disposed)return null;
   const settings=getSettings()||{},minute=Math.floor(now.getTime()/60000),nextKey=JSON.stringify([settings.solar,settings.light,settings.solar?.live===true?minute:null]);
@@ -50,7 +50,7 @@ export function installCelestialSky({renderer,scene,camera,getSettings=()=>({}),
   }
   target.position.copy(anchor);moon.position.copy(anchor).addScaledVector(new THREE.Vector3(...state.moon.direction),100);moon.intensity=state.moonIntensity;moon.visible=moon.intensity>0;
   fill.intensity=(state.dark?0:ownSun?state.daylight*1.15+state.twilight*.12+.015:state.daylight>0?0:.015)*(1-Math.max(0,Math.min(1,interior))*.30);fill.visible=fill.intensity>0;
-  if(sun){const distance=Math.max(100,shadowRadius*2+60);sun.intensity=state.sunIntensity;sun.visible=sun.intensity>0;sun.color.set(state.sun.elevation<15?'#ffcf95':'#fff1d6');sun.position.copy(anchor).addScaledVector(sunDirection,distance);Object.assign(sun.shadow.camera,{left:-shadowRadius,right:shadowRadius,top:shadowRadius,bottom:-shadowRadius,near:.1,far:Math.max(220,distance+shadowRadius*2+80)});sun.shadow.camera.updateProjectionMatrix();if(shadowChanged||!sun.shadow.map)sun.shadow.needsUpdate=true;}
+  if(sun){const distance=Math.max(100,shadowRadius*2+60);sun.intensity=state.sunIntensity;sun.visible=sun.intensity>0;sun.color.set(state.sun.elevation<15?'#ffd8ad':'#fff7eb');sun.position.copy(anchor).addScaledVector(sunDirection,distance);Object.assign(sun.shadow.camera,{left:-shadowRadius,right:shadowRadius,top:shadowRadius,bottom:-shadowRadius,near:.1,far:Math.max(220,distance+shadowRadius*2+80)});sun.shadow.camera.updateProjectionMatrix();if(shadowChanged||!sun.shadow.map)sun.shadow.needsUpdate=true;}
   return state;
  }
  return {update,invalidateShadows:()=>{shadowRefresh.invalidate();cascades?.invalidate();},setQuality(profile={}){if(!sun)return;if(cascades){cascades.setQuality(profile);return;}const {shadowSize,shadowInterval:interval=0}=profile;shadowInterval=interval;sun.shadow.autoUpdate=false;sun.shadow.camera.layers.enable(1);if(shadowSize&&resizeShadowTarget(renderer,sun.shadow,shadowSize))shadowRefresh.invalidate();},trim(){if(cascades)cascades.setQuality({tier:2});else if(sun){resizeShadowTarget(renderer,sun.shadow,mobile?1024:2048);refreshShadowTarget(renderer,sun.shadow);shadowRefresh.invalidate();}},get state(){return state;},dispose(){if(disposed)return;disposed=true;cascades?.dispose();atmosphere?.dispose();scene.remove(disks.mesh);disks.dispose();lightingSource?.dispose();if(lightingSource?.source)lightingSource.source.data=null;source?.dispose();if(source?.source)source.source.data=null;filtered?.dispose();source=lightingSource=filtered=null;sun?.shadow.map?.dispose();scene.remove(lightRig);scene.background=original.background;scene.environment=original.environment;scene.userData.photoEnvironment=original.photo;}};

@@ -35,5 +35,5 @@ export function createCameraWallFade(){
    e.amount+=((e.active?.15:1)-e.amount)*(1-Math.exp(-dt/.12));for(const m of e.clones)m.opacity=e.amount;
    if(!e.active&&e.amount>.995){o.material=e.original;e.clones.forEach(m=>m.dispose());entries.delete(o);}
   }
- },dispose:restore};
+ },reset(){restore();lastQuery=-Infinity;lastFrame=0;},dispose:restore};
 }

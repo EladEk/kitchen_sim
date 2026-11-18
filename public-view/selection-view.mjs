@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import {DISTRICT,buildingTransform,districtLocation} from './district.mjs';
 import {PLAN_CENTER} from './district-layout.mjs';
-import {createGpuSelection} from './gpu-selection.mjs';
+import {createFocusedSelection} from './focused-selection.mjs';
 import {createWalkingDisplay} from './walking-display.mjs';
 
 export function createSelectionController({root,model,district,nav,variants=new Map(),doorController=null,mobile=false,nodeMaterialFor=null,onPrepareGroup=null}){
@@ -35,7 +35,11 @@ export function createSelectionController({root,model,district,nav,variants=new 
     source.visible=true;display=createWalkingDisplay(source,{batchShadows:mobile});displays.set(source,display);root.add(display.group);onPrepareGroup?.(display.group);visibilityKey=null;
    }
    if(display){display.group.visible=walking;if(walking)display.update(floor);}source.visible=!focused&&!walking;
-   if(focused){if(!section){section=createGpuSelection(source,nav,{toNodeMaterial:nodeMaterialFor});root.add(section.group);onPrepareGroup?.(section.group);}section.update({...state,level:Number(state.level)},root.matrixWorld);if(doorsChanged)section.sync();section.group.visible=true;}else if(section)section.group.visible=false;
+   if(focused){
+    if(!section){section=createFocusedSelection(source,nav);root.add(section.group);}
+    if(section.update({...state,level:Number(state.level)}))onPrepareGroup?.(section.group);
+    if(doorsChanged)section.sync();section.group.visible=true;
+   }else if(section)section.group.visible=false;
    root.updateMatrixWorld(true);current={content:focused?section.group:walking?display.group:source,building:b,focused,...(focused&&Number.isFinite(state.wallHeight)?{framingTop:Math.max(...section.regions.map(r=>(nav.floors.find(f=>f.level===r.level)?.elevation??r.level*nav.storey)+2.8))}:{})};return current;
   },
   get current(){return current;},

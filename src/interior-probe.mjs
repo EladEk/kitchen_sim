@@ -10,7 +10,7 @@ export function interiorProbePixels({width=1024,height=512}={}){
   const wall=.64+.06*Math.cos(phi*2),ceiling=.88,floor=.46;
   const base=up>0?wall+(ceiling-wall)*up:wall+(floor-wall)*-up;
   const window=Math.pow(Math.max(0,Math.cos(phi-.6)),28)*Math.exp(-up*up*20)*1.8;
-  data.set([base*1.015+window*1.05,base*.995+window*.99,base*.965+window*.91,1],(y*width+x)*4);
+  data.set([base*1.022+window*1.035,base*.996+window*.998,base*.958+window*.945,1],(y*width+x)*4);
  }return {width,height,data};
 }
 // A downward-facing ceiling sees only floor/wall bounce; in the owner's daylight
@@ -28,7 +28,8 @@ export function createInteriorProbe(renderer,{mobile=false,environmentFactory=nu
    for(const m of [object.material].flat().filter(Boolean)){
     const d=m.userData;
     if(materials.has(m)||!m.isMeshStandardMaterial||(!d.wallCavity&&!d.architecturalCeiling&&!d.architecturalInterior&&!['fabric','door','ceramic','plaster'].includes(d.surfaceKind)))continue;
-    materials.set(m,{envMap:m.envMap,intensity:m.envMapIntensity});
+    const onDispose=()=>{materials.delete(m);m.removeEventListener('dispose',onDispose);};
+    materials.set(m,{envMap:m.envMap,intensity:m.envMapIntensity,onDispose});m.addEventListener('dispose',onDispose);
     m.envMap=target.texture;m.envMapIntensity=.8;m.needsUpdate=true;
    }
   });
@@ -43,6 +44,7 @@ export function createInteriorProbe(renderer,{mobile=false,environmentFactory=nu
  function dispose(){
   if(disposed)return;disposed=true;
   for(const [m,old] of materials){
+   m.removeEventListener('dispose',old.onDispose);
    m.envMap=old.envMap;m.envMapIntensity=old.intensity;
    m.needsUpdate=true;
   }

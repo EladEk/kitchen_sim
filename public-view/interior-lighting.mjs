@@ -29,13 +29,13 @@ export function coveredInteriorAt(data,location){
 export function createInteriorLighting(scene,renderer,{mobile=false,environmentFactory=null,manageExposure=true}={}){
  // Downward-facing white ceilings receive this ground hemisphere directly.
  // Match the restrained warm daylight of the shared sky and room probe.
- const night=createArchitecturalNight(scene,renderer);const glass=new Set();let glassTier=0,lastXR=false,captureGlass=false;const updateGlass=()=>{for(const m of glass)setArchitecturalGlassQuality(m,{mobile:mobile&&!captureGlass,tier:glassTier,xr:lastXR});};let probe=null;RectAreaLightUniformsLib.init();const area=new RectAreaLight('#fff5e8',0,1.2,.5);area.name='tour-local-area';scene.add(area);const areaTarget=new Vector3();
- const windowFill=new DirectionalLight('#fff5e0',0),windowTarget=new Object3D();
+ const night=createArchitecturalNight(scene,renderer);const glass=new Set();let glassTier=0,lastXR=false,captureGlass=false;const updateGlass=()=>{for(const m of glass)setArchitecturalGlassQuality(m,{mobile:mobile&&!captureGlass,tier:glassTier,xr:lastXR});};let probe=null;RectAreaLightUniformsLib.init();const area=new RectAreaLight('#fff8ee',0,1.2,.5);area.name='tour-local-area';scene.add(area);const areaTarget=new Vector3();
+ const windowFill=new DirectionalLight('#fff8ee',0),windowTarget=new Object3D();
  windowFill.name='tour-window-bounce';windowFill.target=windowTarget;
  scene.add(windowFill,windowTarget);
- const grazing=new PointLight('#ffe8cc',0,8,2);grazing.name='tour-grazing-fill';scene.add(grazing);
- const bounce=new HemisphereLight('#fffbf5','#eeece6',0),walls=new AmbientLight('#f5f3ee',0);
- const ceiling=new SpotLight('#fff7ec',0,10,Math.PI/3,.85,2),target=new Object3D();
+ const grazing=new PointLight('#fff2e2',0,8,2);grazing.name='tour-grazing-fill';scene.add(grazing);
+ const bounce=new HemisphereLight('#fffaf3','#e8e1d5',0),walls=new AmbientLight('#f8f4ec',0);
+ const ceiling=new SpotLight('#fff9f0',0,10,Math.PI/3,.85,2),target=new Object3D();
  ceiling.name='tour-interior-shadow';ceiling.target=target;ceiling.castShadow=true;ceiling.shadow.mapSize.set(mobile?512:1024,mobile?512:1024);ceiling.shadow.bias=-.00015;ceiling.shadow.normalBias=.007;ceiling.shadow.autoUpdate=false;ceiling.shadow.needsUpdate=true;ceiling.shadow.camera.near=.08;ceiling.shadow.camera.layers.enable(1);
  // A visible manual-update shadow must own a comparison depth texture on the
  // FIRST outdoor frame, even while its light intensity is zero.
@@ -49,7 +49,7 @@ export function createInteriorLighting(scene,renderer,{mobile=false,environmentF
    if(lastXR!==xr){lastXR=xr;updateGlass();}
    const daylight=neutral?1:solar?.dark?0:Math.max(0,solar?.daylight||0),weight=1-Math.exp(-Math.min(.1,dt)/(inside?1.15:.8));
    night.update({night:!neutral&&daylight<.03,focus:focus||(region?new Vector3(...region.position):new Vector3())});
-   ceiling.color.set(daylight<.03?'#ffe2b1':'#fff7ec');
+   ceiling.color.set(daylight<.03?'#ffe2b1':'#fff9f0');
    amount+=((walking&&inside?1:0)-amount)*weight;probe?.update(daylight);
    const areaOn=walking&&inside&&region&&room===region.key&&['kitchen','bathroom','wc'].includes(region.kind);area.intensity=areaOn?amount*shadowAmount*Math.sqrt(daylight)*1.4:0;area.visible=true;if(areaOn){area.position.fromArray(region.position);area.position.y-=.12;area.lookAt(areaTarget.fromArray(region.target));}
    bounce.intensity=amount*Math.sqrt(daylight)*.75;walls.intensity=amount*Math.sqrt(daylight)*.12;

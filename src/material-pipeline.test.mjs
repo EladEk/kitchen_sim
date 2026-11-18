@@ -14,7 +14,7 @@ test('physical TSL finishes retain optical attenuation and isolated role setting
   const source=new MeshPhysicalMaterial(ARCHITECTURAL_MATERIALS[role]);source.userData={architecturalRole:role,...(role==='glass'?{architecturalGlass:true}:{})};sources.push(source);
   const node=createFinishNodeMaterial(source);
   assert(node.isMeshPhysicalNodeMaterial);assert(node.normalNode);assert.notEqual(node,source);
-  if(role==='glass'){assert(node.aoNode);assert(node.attenuationColor.equals(source.attenuationColor));assert.equal(node.attenuationDistance,.65);assert.equal(node.transmission,.9);}
+  if(role==='glass'){assert(node.aoNode);assert(node.attenuationColor.equals(source.attenuationColor));assert.equal(node.attenuationDistance,1.15);assert.equal(node.transmission,.9);}
   else{assert(node.roughnessNode);assert(node.anisotropy>0);assert.equal(source.roughness,ARCHITECTURAL_MATERIALS[role].roughness);}
   node.dispose();
  }

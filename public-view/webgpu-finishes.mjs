@@ -39,7 +39,7 @@ export function turfBladeHeight(p){
  return mix(medium,fine,.7).clamp();
 }
 function glassFinish(source){
- const material=new MeshPhysicalNodeMaterial();material.copy(source);material.userData={...source.userData,tslFinishRevision:176};
+ const material=new MeshPhysicalNodeMaterial();material.copy(source);material.userData={...source.userData,tslFinishRevision:177};
  const wave=sin(positionWorld.x.mul(2.1).add(positionWorld.z.mul(1.7))).mul(.00065);
  material.normalNode=reliefNormal(wave,normalViewGeometry);
  // UV-local borders support merged/instanced panes without CPU callbacks.
@@ -57,7 +57,7 @@ export function createFinishNodeMaterial(source,{steps=uniform(24),mobile=false}
  const physical=source.isMeshPhysicalMaterial||kind==='fabric'||kind==='wood'||kind==='stone'||data.floorRendering||data.publicFinish==='floor'||foliage||metallic||data.siteSurface==='grass';
  const material=foliage?new MeshSSSNodeMaterial():physical?new MeshPhysicalNodeMaterial():new MeshStandardNodeMaterial();
  if(source.isMeshPhysicalMaterial)material.copy(source);else MeshStandardMaterial.prototype.copy.call(material,source);
- material.isMeshStandardMaterial=true;if(physical)material.isMeshPhysicalMaterial=true;material.userData={...data,tslFinishRevision:176};
+ material.isMeshStandardMaterial=true;if(physical)material.isMeshPhysicalMaterial=true;material.userData={...data,tslFinishRevision:177};
  if(kind==='fabric'){material.sheen=.65;material.sheenRoughness=.4;material.sheenColor.set('#e8e3da');material.clearcoat=0;material.metalness=0;}
  if(kind==='wood'){material.clearcoat=.2;material.clearcoatRoughness=.3;material.metalness=0;}
  if(kind==='stone'&&source.roughness<.5&&data.architecturalRole!=='worktop'){material.clearcoat=.12;material.clearcoatRoughness=.3;}
@@ -114,8 +114,8 @@ export function createFinishNodeMaterial(source,{steps=uniform(24),mobile=false}
   const fineFade=float(1).sub(smoothstep(.003,.022,px)),tuftFade=float(1).sub(smoothstep(.018,.14,px));
   const rawBlade=turfBladeHeight(p),clump=valueNoise2(p.mul(14));
   const bladeH=mix(float(.58),mix(clump,rawBlade,fineFade),tuftFade),meadow=valueNoise2(p.mul(.35)).sub(.5);
-  base=mix(uniform(new Color('#24451b')),uniform(new Color('#346324')),smoothstep(.12,.52,bladeH));
-  base=mix(base,uniform(new Color('#4f7e35')),smoothstep(.62,.95,bladeH)).mul(float(1).add(meadow.mul(.08)));
+  base=mix(uniform(new Color('#2b4d1e')),uniform(new Color('#3d6b29')),smoothstep(.12,.52,bladeH));
+  base=mix(base,uniform(new Color('#58873a')),smoothstep(.62,.95,bladeH)).mul(float(1).add(meadow.mul(.08)));
   material.sheen=.35;material.sheenColor.set('#6d9948');material.sheenRoughness=.58;
   material.aoNode=mix(1,mix(.68,1,smoothstep(.1,.85,bladeH)),tuftFade);
   rough=mix(.86,.54,smoothstep(.45,.95,bladeH));height=height.add(bladeH.sub(.5).mul(.0016).mul(fineFade));

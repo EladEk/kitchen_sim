@@ -1,5 +1,6 @@
 import {Vector3,Raycaster} from 'three';
 import {buildingTransform} from './district.mjs';
+import {selectionDestinations} from './selection-destinations.mjs';
 
 // Resolve every spawn against the same physical floor and body clearance used
 // by the tour, including lowered service rooms and rotated/reflected copies.
@@ -20,7 +21,7 @@ export function destinationStandingPose(destination,nav,building,world){
 }
 
 export function safeTourDestination(nav,where,buildings,world){
- const building=buildings.find(b=>b.id===where.building)||buildings[0],candidates=nav.destinations.filter(d=>d.floor===(where.floor||0));
+ const building=buildings.find(b=>b.id===where.building)||buildings[0],candidates=[...selectionDestinations(nav,where.floor||0)];
  candidates.sort((a,b)=>(a.unit===where.unit?-100:0)-(b.unit===where.unit?-100:0));
  for(const destination of candidates){const pose=destinationStandingPose(destination,nav,building,world);if(pose)return pose;}
  return destinationStandingPose(nav.destinations.find(d=>d.id==='lobby')||nav.destinations[0],nav,building,world);

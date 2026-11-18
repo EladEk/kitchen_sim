@@ -37,6 +37,16 @@ import {floorJointMaps} from './floor-joint-maps.mjs';
 import {createPhotoScene} from './photoreal-scene.mjs';
 import {computeViewExposure,stepExposure} from '../public-view/photoreal-quality.mjs';
 import {createElementProjection} from './frame-projection.mjs';
+import {analyticSkyState,sampleAnalyticSky} from './daylight.js';
+import {buildDaylight} from './daylight-scene.js';
+import {traditionalMaterial} from './traditional-material.mjs';
+import {copyGpuClipBinding,createGpuClipState,patchSelectionMaterial} from '../public-view/gpu-selection-clip.mjs';
+import '../public-view/gpu-selection-nodes.mjs';
+import {createCameraWallFade} from '../public-view/wall-fade.mjs';
+import {createLawnDetail} from '../public-view/lawn-detail.mjs';
+import {restorePublicFinishes} from '../public-view/finishes.mjs';
+import {buildBuildingContext} from './building-scene.js';
+import {createShellPreview} from '../public-view/shell-preview.mjs';
 const context=new Proxy({},{get:(o,k)=>o[k]||(()=>{}),set:(o,k,v)=>(o[k]=v,true)});
 globalThis.document={createElement:()=>({getContext:()=>context})};
 const nav={storey:3,floors:[{level:0,elevation:0,units:[{number:4,polygon:[[-2,-2],[2,-2],[2,2],[-2,2]]}]}],destinations:[{id:'unit:4:0',unit:4,floor:0}]};
@@ -276,7 +286,7 @@ test('R175 mobile, reduced-tier and XR glazing retain clear paired panes and sta
  const resources=[],glass=createArchitecturalGlass(resources,{mobile:true});
  try{
   assert.equal(glass.opacity,.075);assert.equal(glass.transmission,0);assert(glass.transparent);assert.equal(glass.depthWrite,false);
-  assert.equal(glass.color.getHexString(),'f6faf8');assert.equal(glass.attenuationColor.getHexString(),'dff0ec');assert.equal(glass.attenuationDistance,.65);
+  assert.equal(glass.color.getHexString(),'f6faf8');assert.equal(glass.attenuationColor.getHexString(),'f5f8f6');assert.equal(glass.attenuationDistance,1.15);
   close(1-(1-glass.opacity)**2,.144375);
   for(const mode of [{mobile:true},{tier:1},{tier:3},{xr:true}]){
    setArchitecturalGlassQuality(glass,mode);assert.equal(glass.opacity,.075);assert.equal(glass.transmission,0);
@@ -284,7 +294,7 @@ test('R175 mobile, reduced-tier and XR glazing retain clear paired panes and sta
   }
   assert(setArchitecturalGlassQuality(glass,{}));assert.equal(glass.transmission,.9);assert.equal(glass.opacity,1);assert.equal(glass.transparent,false);
   const root=new T.Group(),geometry=new T.BoxGeometry(),mesh=new T.Mesh(geometry,glass);root.add(mesh);setArchitecturalGlassQuality(glass,{mobile:true});
-  const owned=applyArchitecturalMaterials(root);try{assert.equal(mesh.material.opacity,.075);assert.equal(mesh.material.attenuationDistance,.65);assert.equal(mesh.material.color.getHexString(),'f6faf8');}finally{owned.forEach(m=>m.dispose());geometry.dispose();}
+  const owned=applyArchitecturalMaterials(root);try{assert.equal(mesh.material.opacity,.075);assert.equal(mesh.material.attenuationDistance,1.15);assert.equal(mesh.material.color.getHexString(),'f6faf8');}finally{owned.forEach(m=>m.dispose());geometry.dispose();}
  }finally{resources.forEach(m=>m.dispose());}
 });
 
@@ -303,9 +313,9 @@ test('R175 glass border and grazing AO retain at least 89.3 percent illumination
 test('R175 daylight IBL retains the specified sky/ground chroma, warm white and source pixels',()=>{
  const pixels={width:1,height:2,data:new Float32Array([.8,.7,.4,1,.3,.6,.9,1])},original=pixels.data.slice();
  const warm=daylightEnvironmentPixels(pixels,{warmGround:true});
- for(const [i,chroma]of [[0,.42],[4,.16]]){
+ for(const [i,chroma]of [[0,.42],[4,.10]]){
   const [r,g,b]=pixels.data.slice(i,i+3),l=r*.2126+g*.7152+b*.0722;
-  [1.03,1.01,.97].forEach((tint,c)=>close(warm.data[i+c],(l+(pixels.data[i+c]-l)*chroma)*tint,1e-7));
+  [1.022,.996,.968].forEach((tint,c)=>close(warm.data[i+c],(l+(pixels.data[i+c]-l)*chroma)*tint,1e-7));
  }
  assert.notEqual(warm.data[4],warm.data[6]);assert(warm.data[4]/warm.data[6]>pixels.data[4]/pixels.data[6]);assert.deepEqual(pixels.data,original);
  const white=daylightEnvironmentPixels({width:1,height:2,data:new Float32Array([1,1,1,1,1,1,1,1])},{warmGround:true});assert(white.data[4]>white.data[6]);
@@ -330,10 +340,10 @@ test('R175 WebGPU and WebGL share warm clear-air fog and retain night/dusk and d
  const physical=createPhysicalAtmosphere({},gpuScene,camera),sky=gpuScene.getObjectByName('physical-atmosphere');
  let settings={};const analytic=installCelestialSky({renderer:{},scene:glScene,camera,getSettings:()=>settings,ownSun:true,mobile:true,environmentFactory:()=>({texture:new T.Texture(),dispose(){this.texture.dispose();}})});
  try{
-  assert.equal(sky.turbidity.value,1.85);assert.equal(sky.rayleigh.value,2.1);assert.equal(sky.cloudCoverage.value,.02);assert.equal(sky.cloudDensity.value,.04);
+  assert.equal(sky.turbidity.value,1.95);assert.equal(sky.rayleigh.value,1.45);assert.equal(sky.cloudCoverage.value,.02);assert.equal(sky.cloudDensity.value,.04);
   for(const interior of [0,.5,1]){
    const state=analytic.update({interior});physical.update(state,{interior});assert(gpuScene.fog.color.equals(glScene.fog.color));close(gpuScene.fog.density,glScene.fog.density);
-   assert.equal(gpuScene.fog.color.getHexString(),'efeae0');close(gpuScene.fog.density,.00008*(1-interior*.95));
+   assert.equal(gpuScene.fog.color.getHexString(),'f4efe6');close(gpuScene.fog.density,.00008*(1-interior*.95));
   }
   settings={light:'night'};const night=analytic.update();physical.update(night);assert.equal(gpuScene.fog.color.getHexString(),'050914');assert.equal(sky.visible,false);
   physical.update({...night,dark:false,sun:{...night.sun,elevation:5}});assert.equal(gpuScene.fog.color.getHexString(),'bcb4b1');
@@ -346,7 +356,7 @@ test('R175 room probe and window bounce stay warm without lighting lamp-only mod
  const scene=new T.Scene(),renderer={toneMappingExposure:1},lighting=createInteriorLighting(scene,renderer,{environmentFactory:()=>({texture:new T.Texture(),dispose(){this.texture.dispose();}})});
  try{
   const window=scene.getObjectByName('tour-window-bounce'),bounce=scene.getObjectByName('tour-floor-bounce'),walls=scene.getObjectByName('tour-wall-bounce');
-  assert.equal(window.color.getHexString(),'fff5e0');assert.equal(bounce.groundColor.getHexString(),'eeece6');assert.equal(walls.color.getHexString(),'f5f3ee');
+  assert.equal(window.color.getHexString(),'fff8ee');assert.equal(bounce.groundColor.getHexString(),'e8e1d5');assert.equal(walls.color.getHexString(),'f8f4ec');
   const result=lighting.update({inside:true,walking:true,solar:{daylight:.81},dt:.1});close(window.intensity,result.amount*.9*2.1);
   lighting.update({inside:true,walking:true,solar:{daylight:1,dark:true}});assert.equal(window.intensity,0);assert.equal(bounce.intensity,0);assert.equal(walls.intensity,0);
  }finally{lighting.dispose();}
@@ -354,7 +364,7 @@ test('R175 room probe and window bounce stay warm without lighting lamp-only mod
 
 test('R175 paint mobile environment uses restrained warm radiance without adding emission',()=>{
  const source=new T.MeshStandardMaterial();source.userData.surfaceKind='plaster';const material=createPaintNodeMaterial(source,{mobile:true});
- try{const value=evaluateTSL(material.envNode,{material});[.97,.94,.89].forEach((v,i)=>close(value[i],v));assert.equal(material.metalness,0);assert.equal(material.emissive.getHex(),0);}finally{material.dispose();source.dispose();}
+ try{const value=evaluateTSL(material.envNode,{material});[.965,.95,.925].forEach((v,i)=>close(value[i],v));assert.equal(material.metalness,0);assert.equal(material.emissive.getHex(),0);}finally{material.dispose();source.dispose();}
 });
 
 test('R175 bottom grout is symmetric around the floor and absent at negative slab offsets',()=>{
@@ -411,4 +421,108 @@ test('R176 dry tiles stay distinct from walls and share wider metre-grid joints 
   assert.equal(DRY_PORCELAIN.joint,FLOOR_RENDERING['dry-floor'].joint);
   assert.equal(FLOOR_RENDERING['wet-floor'].joint,.002);assert.equal(FLOOR_RENDERING['terrace-floor'].joint,.003);
  }finally{source.dispose();generic.dispose();}
+});
+
+test('R177 noon retains solar warmth and warm-white gains avoid a green boost',()=>{
+ const noon=analyticSkyState({sunDirection:[0,1,0]}),low=analyticSkyState({sunDirection:[1,.08,0]}),night=analyticSkyState({sunDirection:[0,-1,0]});
+ close(noon.warm,.18);assert(low.warm>noon.warm);assert(low.warm<=1);
+ const white=daylightEnvironmentPixels({width:1,height:2,data:new Float32Array([1,1,1,1,1,1,1,1])},{warmGround:true});
+ for(const i of [0,4]){close(white.data[i],1.022,1e-7);close(white.data[i+1],.996,1e-7);close(white.data[i+2],.968,1e-7);assert(white.data[i+1]<1);assert(white.data[i]>white.data[i+1]&&white.data[i+1]>white.data[i+2]);}
+ for(const direction of [[0,1,0],[1,0,0],[0,-1,0]]){
+  const daylight=sampleAnalyticSky(noon,...direction),dark=sampleAnalyticSky(night,...direction);
+  assert(daylight.every(v=>Number.isFinite(v)&&v>=0));assert(dark.reduce((a,b)=>a+b)<daylight.reduce((a,b)=>a+b));
+ }
+});
+
+test('R177 standalone and district sun rigs share warm-white noon and low-sun colours',()=>{
+ const group=new T.Group(),scene=new T.Scene(),camera=new T.PerspectiveCamera(),settings={solar:solarDefaults()},resources=[];
+ const update=buildDaylight({group,settings,resources});
+ const sky=installCelestialSky({renderer:{},scene,camera,getSettings:()=>settings,ownSun:true,mobile:true,environmentFactory:()=>({texture:new T.Texture(),dispose(){this.texture.dispose();}})});
+ try{
+  const sun=group.children.find(o=>o.isDirectionalLight),fill=group.children.find(o=>o.isHemisphereLight),districtSun=scene.getObjectByProperty('isDirectionalLight',true);
+  // The district rig also owns moonlight, so select its shadow-casting sun.
+  const lights=[];scene.traverse(o=>{if(o.isDirectionalLight&&o.castShadow)lights.push(o);});assert.equal(lights.length,1);assert(districtSun);
+  update(settings);sky.update();assert.equal(sun.color.getHexString(),'fff7eb');assert.equal(lights[0].color.getHexString(),'fff7eb');assert.equal(fill.groundColor.getHexString(),'e5ddd0');
+  settings.solar={...settings.solar,minutes:360};const state=update(settings);assert(state.sun.elevation<15);sky.update();assert.equal(sun.color.getHexString(),'ffd8ad');assert.equal(lights[0].color.getHexString(),'ffd8ad');
+  settings.light='night';update(settings);sky.update();assert.equal(sun.intensity,0);assert.equal(lights[0].intensity,0);
+ }finally{sky.dispose();}
+});
+
+test('R177 photo floor maps preserve satin roughness, matte wet floors and restrained grout contrast',()=>{
+ const satin=floorJointMaps({size:512}),matte=floorJointMaps({satin:false,size:512}),centre=(256*512+256)*4,edge=256*512*4;
+ try{
+  assert.equal(satin.roughnessMap.image.data[centre+1],Math.round(.25*255));assert.equal(matte.roughnessMap.image.data[centre+1],Math.round(.56*255));
+  assert.equal(satin.roughnessMap.image.data[edge+1],Math.round(.92*255));
+  const ratio=satin.map.image.data[edge]/satin.map.image.data[centre];assert(ratio>.83&&ratio<.88,`grout contrast ${ratio}`);
+  assert.deepEqual(satin.bumpMap.image.data,matte.bumpMap.image.data);
+ }finally{[satin,matte].forEach(m=>Object.values(m).forEach(t=>t.dispose()));}
+ const scene=new T.Scene(),geometry=new T.PlaneGeometry(),materials=[];
+ for(const productId of ['dry-floor','wet-floor']){
+  const m=new T.MeshPhysicalMaterial({roughness:.25,clearcoat:.1});m.userData={publicFinish:'floor',productId,tile:[1,1],floorCourses:{joint:.004}};materials.push(m);scene.add(new T.Mesh(geometry,m));
+ }
+ const photo=createPhotoScene(scene);
+ try{const [dry,wet]=photo.scene.children.map(o=>o.material);assert.notEqual(dry.roughnessMap,wet.roughnessMap);assert.equal(dry.roughness,1);assert.equal(dry.roughnessMap.image.data[centre+1],64);assert.equal(wet.roughnessMap.image.data[centre+1],143);assert.equal(dry.clearcoat,.28);assert.equal(dry.clearcoatRoughness,.3);assert.equal(wet.clearcoat,.1);assert.deepEqual(dry.map.repeat.toArray(),[1,1]);assert.equal(materials[0].clearcoat,.1);}
+ finally{photo.dispose();geometry.dispose();materials.forEach(m=>m.dispose());}
+});
+
+test('R177 restoring legacy physical glazing bounds opacity without reintroducing a cyan tint',()=>{
+ const root=new T.Group(),geometry=new T.PlaneGeometry(),materials=[.075,.12,.34].map(opacity=>new T.MeshPhysicalMaterial({color:'#d1dcd9',transparent:true,opacity,metalness:.4}));
+ materials.forEach(m=>root.add(new T.Mesh(geometry,m)));const restored=restorePublicFinishes(root);
+ try{materials.forEach((m,i)=>{assert.equal(m.opacity,[.075,.12,.14][i]);assert.equal(m.color.getHexString(),'f6faf8');assert.equal(m.roughness,.04);assert.equal(m.metalness,0);assert.equal(m.ior,1.52);assert.equal(m.specularIntensity,1);assert.equal(m.envMapIntensity,1.35);});}
+ finally{restored.dispose();geometry.dispose();materials.forEach(m=>m.dispose());}
+});
+
+test('R177 photo snapshots use warm crystal glazing independently of a legacy live tint',()=>{
+ const scene=new T.Scene(),geometry=new T.PlaneGeometry(),source=new T.MeshStandardMaterial({color:'#72929c',transparent:true,opacity:.22}),mesh=new T.Mesh(geometry,source);mesh.userData.part='fridge-door-glass';scene.add(mesh);const photo=createPhotoScene(scene);
+ try{const m=photo.scene.children[0].material;assert(m.isMeshPhysicalMaterial);assert.equal(m.color.getHexString(),'f6faf8');assert.equal(m.attenuationColor.getHexString(),'f5f8f6');assert.equal(m.attenuationDistance,1.15);assert.equal(m.transmission,.9);assert.equal(m.opacity,1);assert.equal(source.opacity,.22);}
+ finally{photo.dispose();geometry.dispose();source.dispose();}
+});
+
+test('R177 standalone kitchen swatch and building floor metadata share the one-metre dry tile',()=>{
+ const kitchen=createKitchen({...DEFAULTS,floor:'harash'}),group=new T.Group(),resources=[];
+ try{
+  let floor;kitchen.group.traverse(o=>{if(o.userData.productId==='dry-floor')floor=o;});assert(floor);
+  // Photographed albedo carries the swatch; a second material tint would double it.
+  const [r,g,b]=floor.material.map.image.data,albedo=new T.Color().setRGB(r/255,g/255,b/255,T.SRGBColorSpace).multiply(floor.material.color);
+  assert.equal(albedo.getHexString(),DRY_PORCELAIN.color.slice(1));assert.deepEqual(floor.userData.tile,[1,1]);
+  buildBuildingContext({group,resources,settings:DEFAULTS,mode:'building'});const floors=new Set();group.traverse(o=>{for(const m of [o.material].flat().filter(Boolean))if(m.userData.finishInferred&&m.userData.publicFinish==='floor')floors.add(m);});assert(floors.size>0);
+  floors.forEach(m=>{assert.deepEqual(m.userData.tile,[1,1]);assert.deepEqual(m.userData.floorCourses.tile,[1,1]);});
+ }finally{kitchen.dispose();new Set(resources).forEach(r=>r.dispose?.());}
+});
+
+test('R177 nearby lawn instances use the lifted olive palette and leave non-walking scenes empty',()=>{
+ const lawn=createLawnDetail([{y:0,polygons:[[[[-5,-5],[5,-5],[5,5],[-5,5]]]]}],{mobile:true}),colour=new T.Color();
+ try{
+  lawn.update(new T.Vector3(0,1.62,0),1000,{walking:false});assert.equal(lawn.mesh.count,0);
+  lawn.update(new T.Vector3(0,1.62,0),1400,{walking:true});assert(lawn.mesh.count>0);
+  for(let i=0;i<lawn.mesh.count;i++){lawn.mesh.getColorAt(i,colour);const {h,s,l}=colour.getHSL({});assert(h>=.23-1e-6&&h<=.28+1e-6);assert(s>=.38-1e-6&&s<=.52+1e-6);assert(l>=.23-1e-6&&l<=.33+1e-6);assert(colour.g>colour.r&&colour.g>colour.b);}
+  lawn.update(new T.Vector3(0,1.62,0),1800,{walking:false});assert.equal(lawn.mesh.visible,false);
+ }finally{lawn.dispose();}
+});
+
+test('R177 both initial district backgrounds use the same warm ivory',()=>{
+ const shell=createShellPreview({storey:3,floors:[{elevation:0,envelope:[{polygon:[[0,0],[2,0],[2,2],[0,2]],openings:[]}]}]});
+ try{
+  assert.equal(shell.scene.background.getHexString(),'f2eee6');assert.equal(daylightState({solar:solarDefaults()}).background,'#f2eee6');assert(sourceText('../public-view/DistrictViewer.jsx').includes("scene.background=new THREE.Color('#f2eee6')"));
+  const css=sourceText('../public-view/style.css');for(const selector of ['viewport','loading'])assert.match(css,new RegExp('\\.'+selector+'\\{[^}]*background:#f2eee6(?:;|\\})'));
+  assert(!css.includes('#e4ebec'));assert(sourceText('../public-view/index.html').includes('background:#f2eee6'));
+ }
+ finally{shell.dispose();}
+});
+
+test('R177 faded WebGPU walls preserve traditional paint and clipping across chained clones and photo entry',()=>{
+ for(const clipped of [false,true]){
+  const map=new T.DataTexture(new Uint8Array([210,205,198,255]),1,1),original=new T.MeshStandardMaterial({map,color:'#f2efe9'});original.userData.surfaceKind='plaster';
+  const node=createPaintNodeMaterial(original),state=createGpuClipState(),geometry=new T.BoxGeometry(3,2.75,.12),mesh=new T.Mesh(geometry,node),root=new T.Scene(),camera=new T.PerspectiveCamera(),fade=createCameraWallFade();let photo,second;
+  mesh.position.y=1.375;root.add(mesh);camera.position.set(0,1.3,.2);
+  try{
+   if(clipped)assert(patchSelectionMaterial(node,state,{sectionCuttable:true}));
+   fade.update(root,camera,new T.Vector3(0,1.3,-1),true,1000,{walking:true});
+   assert.notEqual(mesh.material,node);assert(mesh.material.transparent);assert(mesh.material.opacity<1);assert.equal(traditionalMaterial(mesh.material),original);
+   second=copyGpuClipBinding(mesh.material,mesh.material.clone());assert.equal(traditionalMaterial(second),original);if(clipped)assert.equal(second.maskNode,node.maskNode);
+   photo=createPhotoScene(root);const painted=photo.scene.children[0].material;assert(!painted.isNodeMaterial);assert.equal(painted.opacity,1);assert.equal(painted.transparent,false);assert.equal(painted.map,map);assert(painted.color.equals(original.color));assert.equal(original.opacity,1);
+   fade.dispose();assert.equal(mesh.material,node);
+  }finally{photo?.dispose();fade.dispose();second?.dispose();geometry.dispose();node.dispose();original.dispose();map.dispose();state.uSelectionRings.value.dispose();}
+ }
+ const plain=new T.MeshStandardMaterial(),copy=copyGpuClipBinding(plain,plain.clone());try{assert.equal(traditionalMaterial(copy),copy);}finally{plain.dispose();copy.dispose();}
 });

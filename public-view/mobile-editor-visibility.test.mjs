@@ -1,26 +1,5 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {scheduleEditorFraming} from './editor-viewport.mjs';
-
-function frames(){let queue=[],id=0,time=0;return {requestFrame:f=>{queue.push({id:++id,f});return id;},cancelFrame:h=>{queue=queue.filter(q=>q.id!==h);},now:()=>time,run(n=1,step=16){for(let i=0;i<n;i++){const q=queue;queue=[];time+=step;q.forEach(e=>e.f());}},get pending(){return queue.length;}};}
-
-test('editor framing waits for the docked layout before refitting once',()=>{
- const f=frames();let calls=0;scheduleEditorFraming(()=>{calls++;return true;},f);
- f.run(2);assert.equal(calls,0,'two settle frames let ResizeObserver apply the bottom sheet / side dock');
- f.run(1);assert.equal(calls,1);f.run(5);assert.equal(calls,1,'framing happens once; later dock toggles never refit');assert.equal(f.pending,0);
-});
-
-test('editor framing retries while the renderer is busy, then gives up',()=>{
- const f=frames();let calls=0,busy=true;scheduleEditorFraming(()=>{calls++;return !busy;},{...f,timeoutMs:100});
- f.run(4);assert.equal(calls,2);busy=false;f.run(1);assert.equal(calls,3);f.run(3);assert.equal(calls,3);
- const g=frames();let tries=0;scheduleEditorFraming(()=>{tries++;return false;},{...g,timeoutMs:100});g.run(30);assert.ok(tries>0&&tries<10);assert.equal(g.pending,0);
-});
-
-test('leaving the editor cancels pending framing',()=>{
- const f=frames();let calls=0;const cancel=scheduleEditorFraming(()=>{calls++;},f);f.run(1);cancel();f.run(5);assert.equal(calls,0);
- assert.doesNotThrow(()=>scheduleEditorFraming(()=>{},{requestFrame:null})());
-});
-
 import {readFileSync} from 'node:fs';
 import {gatedEffect,OPAQUE_OUTPUT_ALPHA,BLOOM_INPUT_LIMIT} from './webgpu-presentation.mjs';
 import {uniform,float} from 'three/tsl';
@@ -40,9 +19,10 @@ test('the 3D canvas is opaque on WebGPU, so the light page background never wash
  assert.match(source('./webgpu-runtime.mjs'),/new WebGPURenderer\(\{antialias:true,alpha:false,/);
 });
 
-test('opening the furniture editor refits the apartment to the viewport left above the panel',()=>{
+test('editor entry and exit refit the apartment through the measured view-preparation path (R178)',()=>{
  const s=source('./DistrictViewer.jsx');
- assert.match(s,/runtime\.current\.frameEditor=\(\)=>\{/);
- assert.match(s,/rendererWork\.resize\(\);try\{photo\.suspend\(\);fitSelectionCamera\(camera,controls,selection\.current\)/);
- assert.match(s,/useEffect\(\(\)=>editing\?scheduleEditorFraming\(/);
+ assert.match(s,/useEffect\(\(\)=>runtime\.current\?\.fit\(\),\[mode,target,building,level,roomFocus,!!liveSession\]\)/);
+ assert.match(s,/fit:\(\)=>\{needsFit=true;return queueViewWork\(/);
+ assert.match(source('./editor-viewport.mjs'),/never refit/,'ordinary dock resizes keep the camera pose');
+ assert.doesNotMatch(s,/frameEditor/,'one refit mechanism only');
 });

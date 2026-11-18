@@ -1,7 +1,7 @@
 // Shared clear-air defaults for physical WebGPU and analytic WebGL skies.
 export const MEDITERRANEAN_ATMOSPHERE=Object.freeze({
- turbidity:1.85,rayleigh:2.1,cloudCoverage:.02,cloudDensity:.04,
- fogColor:'#efeae0',fogDensity:.00008,indoorFogReduction:.95,
+ turbidity:1.95,rayleigh:1.45,cloudCoverage:.02,cloudDensity:.04,
+ fogColor:'#f4efe6',fogDensity:.00008,indoorFogReduction:.95,
 });
 
 export function updateAtmosphereFog(fog,state,{interior=0}={}){

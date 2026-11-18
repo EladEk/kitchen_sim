@@ -37,6 +37,6 @@ export function solarPosition(value,utcOffsetOverride=null){
 export const lampsOnly=settings=>['night','evening'].includes(settings.light);
 export function daylightState(settings){
  const sun=solarPosition(settings.solar),amount=lampsOnly(settings)?0:clamp(Math.sin(sun.elevation*rad),0,1);
- return {sun,amount,intensity:amount>0?3.45*Math.sqrt(amount):0,sky:amount*1.24,environment:amount*.8,background:lampsOnly(settings)||sun.elevation<-6?'#030508':sun.elevation<=0?'#343a48':'#e3e9e9'};
+ return {sun,amount,intensity:amount>0?3.45*Math.sqrt(amount):0,sky:amount*1.24,environment:amount*.8,background:lampsOnly(settings)||sun.elevation<-6?'#030508':sun.elevation<=0?'#343a48':'#f2eee6'};
 }
 export const SHARED_LIGHT_SETTINGS=['solar','light','lampsOn','lightControls','buildingShadows'];

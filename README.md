@@ -1,6 +1,6 @@
-# HOME STUDIO R176 — Clean Source
+# HOME STUDIO R178 — Clean Source
 
-Source commit: 0c13196332fbfa05c5da22ad384d96bb0e577cfc
+Source commit: 79ba5c34a524fa7dcf13b69270949f0fba0eeb62
 
 פרויקט נקי להרצה, עם כל תיקוני הגרסה העדכנית. מנועי WebGPU/WebGL2,
 הטקסטורות והמודלים נשמרו ללא דחיסה נוספת או שינוי באיכות. נכללים גם

@@ -4,7 +4,7 @@ import {buildingTransform,DISTRICT} from './district.mjs';
 
 // Small public-only shell description. Detailed/private models are never inputs.
 export function createShellPreview(data,{aspect=1}={}){
- const scene=new T.Scene(),root=new T.Group(),cube=new T.BoxGeometry(),owned=[cube],rows={walls:[],windows:[],frames:[]};scene.add(root);scene.background=new T.Color('#e4ebec');
+ const scene=new T.Scene(),root=new T.Group(),cube=new T.BoxGeometry(),owned=[cube],rows={walls:[],windows:[],frames:[]};scene.add(root);scene.background=new T.Color('#f2eee6');
  const push=(kind,x,y,z,w,h,d,angle)=>{if(w>.001&&h>.001)rows[kind].push(new T.Matrix4().compose(new T.Vector3(x,y,z),new T.Quaternion().setFromEuler(new T.Euler(0,angle,0)),new T.Vector3(w,h,d)));};
  const plates=[];
  for(const floor of data.floors)for(const path of floor.envelope){
