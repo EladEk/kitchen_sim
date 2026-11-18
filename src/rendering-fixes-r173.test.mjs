@@ -346,7 +346,7 @@ test('R175 room probe and window bounce stay warm without lighting lamp-only mod
  const scene=new T.Scene(),renderer={toneMappingExposure:1},lighting=createInteriorLighting(scene,renderer,{environmentFactory:()=>({texture:new T.Texture(),dispose(){this.texture.dispose();}})});
  try{
   const window=scene.getObjectByName('tour-window-bounce'),bounce=scene.getObjectByName('tour-floor-bounce'),walls=scene.getObjectByName('tour-wall-bounce');
-  assert.equal(window.color.getHexString(),'fff5e0');assert.equal(bounce.groundColor.getHexString(),'e4ddd0');assert.equal(walls.color.getHexString(),'f5f0e6');
+  assert.equal(window.color.getHexString(),'fff5e0');assert.equal(bounce.groundColor.getHexString(),'eeece6');assert.equal(walls.color.getHexString(),'f5f3ee');
   const result=lighting.update({inside:true,walking:true,solar:{daylight:.81},dt:.1});close(window.intensity,result.amount*.9*2.1);
   lighting.update({inside:true,walking:true,solar:{daylight:1,dark:true}});assert.equal(window.intensity,0);assert.equal(bounce.intensity,0);assert.equal(walls.intensity,0);
  }finally{lighting.dispose();}

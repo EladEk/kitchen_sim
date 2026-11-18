@@ -34,7 +34,7 @@ export function createInteriorLighting(scene,renderer,{mobile=false,environmentF
  windowFill.name='tour-window-bounce';windowFill.target=windowTarget;
  scene.add(windowFill,windowTarget);
  const grazing=new PointLight('#ffe8cc',0,8,2);grazing.name='tour-grazing-fill';scene.add(grazing);
- const bounce=new HemisphereLight('#fff9f0','#e4ddd0',0),walls=new AmbientLight('#f5f0e6',0);
+ const bounce=new HemisphereLight('#fffbf5','#eeece6',0),walls=new AmbientLight('#f5f3ee',0);
  const ceiling=new SpotLight('#fff7ec',0,10,Math.PI/3,.85,2),target=new Object3D();
  ceiling.name='tour-interior-shadow';ceiling.target=target;ceiling.castShadow=true;ceiling.shadow.mapSize.set(mobile?512:1024,mobile?512:1024);ceiling.shadow.bias=-.00015;ceiling.shadow.normalBias=.007;ceiling.shadow.autoUpdate=false;ceiling.shadow.needsUpdate=true;ceiling.shadow.camera.near=.08;ceiling.shadow.camera.layers.enable(1);
  // A visible manual-update shadow must own a comparison depth texture on the

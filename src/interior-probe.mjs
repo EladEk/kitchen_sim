@@ -5,10 +5,12 @@ export function interiorProbePixels({width=1024,height=512}={}){
  const data=new Float32Array(width*height*4);
  for(let y=0;y<height;y++)for(let x=0;x<width;x++){
   const up=Math.sin(((y+.5)/height-.5)*Math.PI),phi=(x+.5)/width*Math.PI*2;
-  const wall=.64+.06*Math.cos(phi*2),ceiling=.88,floor=.34;
+  // R177: the light-grey porcelain floor bounces more daylight than .34 implied;
+  // that lower hemisphere is what lights a downward-facing ceiling.
+  const wall=.64+.06*Math.cos(phi*2),ceiling=.88,floor=.46;
   const base=up>0?wall+(ceiling-wall)*up:wall+(floor-wall)*-up;
   const window=Math.pow(Math.max(0,Math.cos(phi-.6)),28)*Math.exp(-up*up*20)*1.8;
-  data.set([base*1.03+window*1.05,base*.99+window*.99,base*.93+window*.91,1],(y*width+x)*4);
+  data.set([base*1.015+window*1.05,base*.995+window*.99,base*.965+window*.91,1],(y*width+x)*4);
  }return {width,height,data};
 }
 export function createInteriorProbe(renderer,{mobile=false,environmentFactory=null}={}){
@@ -32,7 +34,7 @@ export function createInteriorProbe(renderer,{mobile=false,environmentFactory=nu
   const light=Math.max(0,Math.min(1,daylight));
   for(const [m] of materials){
    const paint=m.userData.surfaceKind==='plaster'||m.userData.architecturalCeiling||m.userData.wallCavity;
-   m.envMapIntensity=light*(paint?(m.userData.architecturalCeiling?.65:.8):m.userData.furnitureMaterial?.7:m.userData.publicFinish==='floor'?.6:.8);
+   m.envMapIntensity=light*(paint?(m.userData.architecturalCeiling?1:.8):m.userData.furnitureMaterial?.7:m.userData.publicFinish==='floor'?.6:.8);
   }
  }
  function dispose(){

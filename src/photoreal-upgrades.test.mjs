@@ -37,7 +37,7 @@ test('architectural glazing and coated metals retain physical optical properties
  const root=new Group(),mesh=new Mesh(new BoxGeometry(),new MeshPhysicalMaterial());mesh.userData.part='door-handle';root.add(mesh);
  applyArchitecturalMaterials(root);assert.equal(mesh.material.anisotropy,.65);assert.equal(mesh.material.metalness,.96);
  for(const role of ['frame','fence'])assert.equal(ARCHITECTURAL_MATERIALS[role].clearcoatRoughness,.42);
- assert.equal(ARCHITECTURAL_MATERIALS.wall.color,'#f2efe9');assert.equal(ARCHITECTURAL_MATERIALS.ceiling.color,'#f7f6f2');
+ assert.equal(ARCHITECTURAL_MATERIALS.wall.color,'#f2efe9');assert.equal(ARCHITECTURAL_MATERIALS.ceiling.color,'#f8f8f6');
  resources.forEach(m=>m.dispose());mesh.geometry.dispose();mesh.material.dispose();
 });
 

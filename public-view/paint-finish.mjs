@@ -28,7 +28,8 @@ export function createPaintNodeMaterial(source,{mobile=false}={}){
  material.paintAlbedoMap=source.map;
  const ceiling=source.userData.architecturalCeiling===true;
  material.roughness=ceiling?.94:.82;
- if(mobile)material.envNode=vec3(.97,.94,.89);
+ // R177: ceilings stay neutral white (owner photos); walls keep the warm room fill.
+ if(mobile)material.envNode=ceiling?vec3(.97,.965,.95):vec3(.97,.94,.89);
  material.metalness=0;
  material.sheen=ceiling?0:.1;
  material.sheenColor.set('#ffffff');

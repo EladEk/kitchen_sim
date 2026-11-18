@@ -5,7 +5,7 @@ import {DRY_PORCELAIN} from './floor-appearance.mjs';
 // converted by Three.Color on assignment, not measured spectral material data.
 export const ARCHITECTURAL_MATERIALS=Object.freeze({
  wall:{color:'#f2efe9',roughness:.82,metalness:0,clearcoat:0,envMapIntensity:.8},
- ceiling:{color:'#f7f6f2',roughness:.94,metalness:0,clearcoat:0,envMapIntensity:.65},
+ ceiling:{color:'#f8f8f6',roughness:.94,metalness:0,clearcoat:0,envMapIntensity:1},
  facade:{color:'#e6dfd3',roughness:.82,metalness:0},
  secondary:{color:'#b8bcc0',roughness:.8,metalness:0},
  fascia:{color:'#7e8286',roughness:.85,metalness:0},
