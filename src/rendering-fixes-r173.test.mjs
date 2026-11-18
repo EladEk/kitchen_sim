@@ -497,7 +497,7 @@ test('R177 nearby lawn instances use the lifted olive palette and leave non-walk
  try{
   lawn.update(new T.Vector3(0,1.62,0),1000,{walking:false});assert.equal(lawn.mesh.count,0);
   lawn.update(new T.Vector3(0,1.62,0),1400,{walking:true});assert(lawn.mesh.count>0);
-  for(let i=0;i<lawn.mesh.count;i++){lawn.mesh.getColorAt(i,colour);const {h,s,l}=colour.getHSL({});assert(h>=.23-1e-6&&h<=.28+1e-6);assert(s>=.38-1e-6&&s<=.52+1e-6);assert(l>=.23-1e-6&&l<=.33+1e-6);assert(colour.g>colour.r&&colour.g>colour.b);}
+  for(let i=0;i<lawn.mesh.count;i++){lawn.mesh.getColorAt(i,colour);const {h,s,l}=colour.getHSL({});assert(h>=.23-1e-6&&h<=.28+1e-6);assert(s>=.38-1e-6&&s<=.52+1e-6);assert(l>=.32-1e-6&&l<=.42+1e-6);/* R180: lifted to match the photographed lawn */assert(colour.g>colour.r&&colour.g>colour.b);}
   lawn.update(new T.Vector3(0,1.62,0),1800,{walking:false});assert.equal(lawn.mesh.visible,false);
  }finally{lawn.dispose();}
 });

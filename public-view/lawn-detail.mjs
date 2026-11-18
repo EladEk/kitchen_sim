@@ -12,7 +12,7 @@ function blades(){
  const positions=[],colours=[],indices=[];
  for(let blade=0;blade<3;blade++){
   const angle=blade*Math.PI*2/3,c=Math.cos(angle),s=Math.sin(angle),start=positions.length/3;
-  for(let row=0;row<4;row++){const y=[0,.43,.8,1][row],width=.1*Math.pow(1-y,.65);for(const side of [-1,1]){const x=side*width,lean=y*y*.24;positions.push(x*c+lean*s,y,-x*s+lean*c);const shade=.52+y*.48;colours.push(shade,shade,shade);}}
+  for(let row=0;row<4;row++){const y=[0,.43,.8,1][row],width=.1*Math.pow(1-y,.65);for(const side of [-1,1]){const x=side*width,lean=y*y*.24;positions.push(x*c+lean*s,y,-x*s+lean*c);const shade=.7+y*.3;colours.push(shade,shade,shade);}}
   for(let row=0;row<3;row++){const i=start+row*2;indices.push(i,i+1,i+2,i+1,i+3,i+2);}
  }
  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));g.setAttribute('color',new THREE.Float32BufferAttribute(colours,3));g.setIndex(indices);g.computeVertexNormals();return g;
@@ -34,7 +34,7 @@ export function createLawnDetail(layers,{mobile=false}={}){
    if(Math.max(Math.abs(dx),Math.abs(dz))!==ring)continue;const gx=cx+dx,gz=cz+dz,x=(gx+hash(gx,gz,1))*step,z=(gz+hash(gx,gz,2))*step,distance=Math.hypot(x-position.x,z-position.z);if(distance>radius)continue;const region=lawnAt(regions,x,z);if(!region)continue;
    const fade=Math.min(1,(radius-distance)/1.3),height=(.035+hash(gx,gz,3)*.032)*fade;
    point.set(x,region.y+.001,z);q.setFromAxisAngle(up,hash(gx,gz,4)*Math.PI*2);scale.setScalar(height);matrix.compose(point,q,scale);mesh.setMatrixAt(count,matrix);
-   colour.setHSL(.23+hash(gx,gz,5)*.05,.38+hash(gx,gz,6)*.14,.23+hash(gx,gz,7)*.10);mesh.setColorAt(count,colour);count++;
+   colour.setHSL(.23+hash(gx,gz,5)*.05,.38+hash(gx,gz,6)*.12,.32+hash(gx,gz,7)*.10);mesh.setColorAt(count,colour);count++;
   }
   mesh.count=count;mesh.instanceMatrix.needsUpdate=true;if(mesh.instanceColor)mesh.instanceColor.needsUpdate=true;mesh.computeBoundingSphere();
  },get stats(){return {capacity,count:mesh.count,regions:regions.length};},dispose(){if(disposed)return;disposed=true;mesh.removeFromParent();mesh.dispose();geometry.dispose();material.dispose();mesh.count=0;regions.length=0;}};
