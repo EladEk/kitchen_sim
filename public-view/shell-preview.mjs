@@ -26,7 +26,7 @@ export function createShellPreview(data,{aspect=1}={}){
  return {scene,camera,dispose(){root.traverse(o=>o.isInstancedMesh&&o.dispose());owned.forEach(o=>o.dispose());scene.clear();}};
 }
 export async function showShellPreview(renderer,{revision,signal,aspect,allowed=()=>true}={}){
- const response=await fetch('/baseline/shell.json?v='+revision,{signal,cache:'no-cache'});if(!response.ok)return null;
+ const response=await fetch('/baseline/shell.json?v='+revision,{signal,cache:'default'});if(!response.ok)return null;
  const data=await response.json();if(data.revision!==revision||!allowed())return null;const shell=createShellPreview(data,{aspect});
  try{await renderer.compileAsync(shell.scene,shell.camera);if(signal?.aborted||!allowed()){shell.dispose();return null;}renderer.render(shell.scene,shell.camera);return shell;}catch(error){shell.dispose();throw error;}
 }
