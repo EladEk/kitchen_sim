@@ -1,0 +1,16 @@
+{
+  "asset": "Leafy Grass",
+  "official_page": "https://polyhaven.com/a/leafy_grass",
+  "provider": "Poly Haven",
+  "author": "Charlotte Baglioni",
+  "license": "CC0-1.0",
+  "license_source": "https://polyhaven.com/license",
+  "creation_technique": "Photoscan",
+  "physical_dimensions_m": [2, 2],
+  "files": {
+    "color.jpg": "leafy_grass_diff_1k, graded toward a maintained lawn green (R*.82 G*1.04 B*.72, mild luminance blend, saturation ~1.0)",
+    "normal.jpg": "leafy_grass_nor_gl_1k resized to 512 px",
+    "roughness.jpg": "leafy_grass_rough_1k resized to 512 px"
+  },
+  "note": "R180 replaces the procedural ambientCG Grass004 lawn. JPEG only (no KTX2 encoder in this environment); ~0.45 MB total vs 1.73 MB for the previous KTX2 set."
+}

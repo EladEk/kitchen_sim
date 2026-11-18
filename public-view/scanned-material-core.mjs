@@ -21,7 +21,7 @@ export function createScanMaterialController({scans,mobile=false,signal,loader=l
       // The selected finish remains the albedo authority, including dark wood.
       const pixels=context.getImageData(0,0,canvas.width,canvas.height),data=pixels.data,mean=[0,0,0],count=data.length/4;for(let i=0;i<data.length;i+=4)for(let c=0;c<3;c++)mean[c]+=data[i+c]/count;for(let i=0;i<data.length;i+=4)for(let c=0;c<3;c++)data[i+c]=Math.min(255,236*data[i+c]/Math.max(1,mean[c]));context.putImageData(pixels,0,0);
      }texture.image=canvas;}}
-    texture.colorSpace=channel==='color'?THREE.SRGBColorSpace:THREE.NoColorSpace;texture.wrapS=texture.wrapT=THREE.RepeatWrapping;texture.repeat.setScalar(1/p.metres);texture.anisotropy=16;texture.generateMipmaps=!texture.isCompressedTexture;texture.minFilter=THREE.LinearMipmapLinearFilter;texture.magFilter=THREE.LinearFilter;texture.needsUpdate=true;owned.add(texture);sharedTextures.set(sharedKey,texture);out[channel]=texture;onProgress(++done/channels.length);
+    if(p.technique)texture.userData.scanTechnique=p.technique;texture.colorSpace=channel==='color'?THREE.SRGBColorSpace:THREE.NoColorSpace;texture.wrapS=texture.wrapT=THREE.RepeatWrapping;texture.repeat.setScalar(1/p.metres);texture.anisotropy=16;texture.generateMipmaps=!texture.isCompressedTexture;texture.minFilter=THREE.LinearMipmapLinearFilter;texture.magFilter=THREE.LinearFilter;texture.needsUpdate=true;owned.add(texture);sharedTextures.set(sharedKey,texture);out[channel]=texture;onProgress(++done/channels.length);
    }return out;
   })();maps.set(kind,task);return task;
  }

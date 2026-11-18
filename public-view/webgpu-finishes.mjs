@@ -114,8 +114,18 @@ export function createFinishNodeMaterial(source,{steps=uniform(24),mobile=false}
   const fineFade=float(1).sub(smoothstep(.003,.022,px)),tuftFade=float(1).sub(smoothstep(.018,.14,px));
   const rawBlade=turfBladeHeight(p),clump=valueNoise2(p.mul(14));
   const bladeH=mix(float(.58),mix(clump,rawBlade,fineFade),tuftFade),meadow=valueNoise2(p.mul(.35)).sub(.5);
+  if(source.map?.userData?.scanTechnique==='photoscan'){
+   // R180 photographed lawn: anti-tiled (second rotated, larger-scale tap blended
+   // by low-frequency noise) with ~3 m / ~11 m macro patches and drier spots.
+   // Mirrors lawn-shading.mjs on WebGL. The procedural blades stay as fine relief.
+   source.map.updateMatrix();const m=uniform(source.map.matrix),uvA=m.mul(vec3(p,1)).xy,r=vec2(p.x.mul(.8).sub(p.y.mul(.6)),p.x.mul(.6).add(p.y.mul(.8))),uvB=m.mul(vec3(r,1)).xy.mul(.37).add(vec2(.31,.17));
+   const photo=mix(texture(source.map,uvA).rgb,texture(source.map,uvB).rgb,smoothstep(.3,.7,valueNoise2(p.mul(.21))));
+   const patch=valueNoise2(p.mul(.33)).mul(.65).add(valueNoise2(p.mul(.09).add(7.3)).mul(.35)),dry=smoothstep(.62,.9,valueNoise2(p.mul(.6).add(3.1)));
+   base=photo.mul(mix(.86,1.1,patch));base=mix(base,base.mul(vec3(1.12,1,.78)),dry.mul(.35)).mul(mix(float(.9),float(1.04),smoothstep(.2,.8,bladeH).mul(fineFade)));
+  }else{
   base=mix(uniform(new Color('#2b4d1e')),uniform(new Color('#3d6b29')),smoothstep(.12,.52,bladeH));
   base=mix(base,uniform(new Color('#58873a')),smoothstep(.62,.95,bladeH)).mul(float(1).add(meadow.mul(.08)));
+  }
   material.sheen=.35;material.sheenColor.set('#6d9948');material.sheenRoughness=.58;
   material.aoNode=mix(1,mix(.68,1,smoothstep(.1,.85,bladeH)),tuftFade);
   rough=mix(.86,.54,smoothstep(.45,.95,bladeH));height=height.add(bladeH.sub(.5).mul(.0016).mul(fineFade));

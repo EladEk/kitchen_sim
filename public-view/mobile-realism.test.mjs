@@ -84,3 +84,18 @@ test('photo sky: lazy, daylight-only, sun-aligned', async ()=>{
  const a=2*Math.PI*PHOTO_SKY_SUN_U,yaw=photoSkyYaw([1,0,0]),x=Math.cos(a),z=Math.sin(a);
  assert.ok(Math.abs(x*Math.cos(yaw)+z*Math.sin(yaw)-1)<1e-9,'pano sun lands on the real sun azimuth');
 });
+
+test('lawn: CC0 photoscan, raster-only path, anti-tiled with macro breakup on both backends', ()=>{
+ const scans=readFileSync(new URL('./scanned-materials.mjs',import.meta.url),'utf8');
+ assert.match(scans,/assets\/grass-r180\/color\.jpg/);assert.match(scans,/technique:'photoscan'/);
+ const src=JSON.parse(readFileSync(new URL('./assets/grass-r180/SOURCES.json',import.meta.url),'utf8'));assert.equal(src.license,'CC0-1.0');
+ const loader=readFileSync(new URL('./ktx-material-loader.mjs',import.meta.url),'utf8');assert.match(loader,/ktx2.*return loadSurfaceTexture\(url,options\)/s);
+ const site=readFileSync(new URL('./site-scene.mjs',import.meta.url),'utf8');assert.match(site,/LAWN_MAP_GLSL/);assert.match(site,/district-surface-r180-/);
+ const gpu=readFileSync(new URL('./webgpu-finishes.mjs',import.meta.url),'utf8');assert.match(gpu,/R180 photographed lawn/);
+});
+test('lawn shading GLSL defines its noise and keeps a single extra map tap', async ()=>{
+ const {LAWN_NOISE_GLSL,LAWN_MAP_GLSL,LAWN_MACRO_GLSL}=await import('./lawn-shading.mjs');
+ assert.match(LAWN_NOISE_GLSL,/float lawnNoise\(vec2 p\)/);
+ assert.equal((LAWN_MAP_GLSL.match(/texture2D\(map/g)||[]).length,2);
+ assert.match(LAWN_MACRO_GLSL,/lawnPatch/);
+});
