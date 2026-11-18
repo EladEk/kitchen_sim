@@ -8,7 +8,7 @@
     "dev": "npm run build && node scripts/serve-lite.mjs",
     "build": "node scripts/build-secure-site.mjs",
     "start": "node scripts/serve-lite.mjs",
-    "test": "node --test src/apartment-view-r178.test.mjs src/document-access.test.mjs src/vault-runtime.test.mjs src/scene-state.test.mjs src/kitchen-kinematics.test.mjs src/photoreal-lifecycle.test.mjs src/photoreal-upgrades.test.mjs src/material-pipeline.test.mjs src/rendering-fixes-r173.test.mjs public-view/photo-capture-runtime.test.mjs public-view/gpu-selection.test.mjs public-view/walking-dda.test.mjs public-view/scan-albedo-ktx2.test.mjs src/physical-defines.test.mjs src/ceiling-white.test.mjs public-view/live-shortcuts.test.mjs public-view/mobile-gpu-policy.test.mjs public-view/mobile-editor-visibility.test.mjs public-view/mobile-realism.test.mjs"
+    "test": "node --test src/apartment-view-r178.test.mjs src/document-access.test.mjs src/vault-runtime.test.mjs src/scene-state.test.mjs src/kitchen-kinematics.test.mjs src/photoreal-lifecycle.test.mjs src/photoreal-upgrades.test.mjs src/material-pipeline.test.mjs src/rendering-fixes-r173.test.mjs public-view/photo-capture-runtime.test.mjs public-view/gpu-selection.test.mjs public-view/walking-dda.test.mjs public-view/scan-albedo-ktx2.test.mjs src/physical-defines.test.mjs src/ceiling-white.test.mjs public-view/live-shortcuts.test.mjs public-view/mobile-gpu-policy.test.mjs public-view/mobile-editor-visibility.test.mjs public-view/mobile-realism.test.mjs src/garden-lawn.test.mjs"
   },
   "dependencies": {
     "lucide-react": "1.31.0",

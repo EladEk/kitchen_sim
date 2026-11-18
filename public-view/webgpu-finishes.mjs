@@ -50,11 +50,11 @@ function glassFinish(source){
 }
 export function createFinishNodeMaterial(source,{steps=uniform(24),mobile=false}={}){
  if(source.isNodeMaterial||!source.isMeshStandardMaterial)return source;const data=source.userData;
- const grass=data.siteSurface==='grass',kind=data.surfaceKind||data.scanKind,foliage=data.foliage===true,metallic=source.metalness>.6||data.architecturalRole==='handle';
+ const grass=data.siteSurface==='grass'||data.lawnShading===true,kind=data.surfaceKind||data.scanKind,foliage=data.foliage===true,metallic=source.metalness>.6||data.architecturalRole==='handle';
  if(!data.metricInstancedUVs&&!data.publicFinish&&!data.wallCavity&&!data.siteSurface&&!data.floorRendering&&!kind&&!foliage&&!data.architecturalGlass&&!metallic)return source;
  if(data.architecturalGlass)return glassFinish(source);
  if(kind==='plaster'||data.architecturalCeiling)return createPaintNodeMaterial(source,{mobile});
- const physical=source.isMeshPhysicalMaterial||kind==='fabric'||kind==='wood'||kind==='stone'||data.floorRendering||data.publicFinish==='floor'||foliage||metallic||data.siteSurface==='grass';
+ const physical=source.isMeshPhysicalMaterial||kind==='fabric'||kind==='wood'||kind==='stone'||data.floorRendering||data.publicFinish==='floor'||foliage||metallic||grass;
  const material=foliage?new MeshSSSNodeMaterial():physical?new MeshPhysicalNodeMaterial():new MeshStandardNodeMaterial();
  if(source.isMeshPhysicalMaterial)material.copy(source);else MeshStandardMaterial.prototype.copy.call(material,source);
  material.isMeshStandardMaterial=true;if(physical)material.isMeshPhysicalMaterial=true;material.userData={...data,tslFinishRevision:177};
@@ -121,7 +121,7 @@ export function createFinishNodeMaterial(source,{steps=uniform(24),mobile=false}
    source.map.updateMatrix();const m=uniform(source.map.matrix),uvA=m.mul(vec3(p,1)).xy,r=vec2(p.x.mul(.8).sub(p.y.mul(.6)),p.x.mul(.6).add(p.y.mul(.8))),uvB=m.mul(vec3(r,1)).xy.mul(.37).add(vec2(.31,.17));
    const photo=mix(texture(source.map,uvA).rgb,texture(source.map,uvB).rgb,smoothstep(.3,.7,valueNoise2(p.mul(.21))));
    const patch=valueNoise2(p.mul(.33)).mul(.65).add(valueNoise2(p.mul(.09).add(7.3)).mul(.35)),dry=smoothstep(.62,.9,valueNoise2(p.mul(.6).add(3.1)));
-   base=photo.mul(mix(.86,1.1,patch));base=mix(base,base.mul(vec3(1.12,1,.78)),dry.mul(.35)).mul(mix(float(.9),float(1.04),smoothstep(.2,.8,bladeH).mul(fineFade)));
+   base=photo.mul(mix(.82,1.12,patch));base=mix(base,base.mul(vec3(1.12,1,.78)),dry.mul(.35)).mul(mix(float(.9),float(1.04),smoothstep(.2,.8,bladeH).mul(fineFade)));
   }else{
   base=mix(uniform(new Color('#2b4d1e')),uniform(new Color('#3d6b29')),smoothstep(.12,.52,bladeH));
   base=mix(base,uniform(new Color('#58873a')),smoothstep(.62,.95,bladeH)).mul(float(1).add(meadow.mul(.08)));

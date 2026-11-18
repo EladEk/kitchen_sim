@@ -23,6 +23,7 @@ import {buildBuildingContext} from './building-scene.js';
 import {BUILDING_CENTER,BUILDING_BOUNDS} from './building-layout.mjs';
 import {parseDestination} from './building-navigation.mjs';
 import * as THREE from 'three';
+import {installLawnShading} from '../public-view/lawn-shading.mjs';
 import {facadeSkinRows,appendFacadeVeneers} from './facade-veneers.mjs';
 import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
 import {HOUSE,HOUSE_OUTLINE,PLOT,TERRACE,SERVICE_APRON,PUBLIC_ENTRY,ROOMS,WALLS,CONSTRUCTION_WALLS,DOORS,WINDOWS,SHUTTERS,FURNITURE,furnitureForSettings,GARDEN_PLANTS,HOME_FINISHES,FLOOR_FINISHES,KITCHEN_ANCHOR,GARDEN_LAYOUT,WATER_LAYOUT,LIGHTING_LAYOUT,point,polygonBounds,insidePolygon,roomAt,openingPoint} from './home-model.mjs';
@@ -69,7 +70,7 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
  function plant(x,z,size=1,parent=group){const model=instantiateCompleteFurniture('plant',{w:.6*size,h:1.35*size,d:.64*size});model.position.set(x,0,z);parent.add(model);}
  function roomMaterial(id){const value=settings.rooms[id]||settings.rooms.living;return value?.wall==='ordered-mona'?INTERIOR_WHITE:HOME_FINISHES.find(f=>f.id===value?.wall)?.color||INTERIOR_WHITE;}
  const showerGlass=createArchitecturalGlass(resources,{mobile:settings.xr===true||globalThis.matchMedia?.('(pointer: coarse)').matches===true});
- const green=surface('grass','#90a17b');floor(PLOT,green,-.035);floor(PUBLIC_ENTRY,surface('cement','#b9b9af'),-.01);floor(HOUSE_OUTLINE,mat('#d8d3c5'),0);
+ const green=installLawnShading(surface('grass','#90a17b'));floor(PLOT,green,-.035);floor(PUBLIC_ENTRY,surface('cement','#b9b9af'),-.01);floor(HOUSE_OUTLINE,mat('#d8d3c5'),0);
  if(mode==='walk'){const ceiling=floor(HOUSE_OUTLINE,ceilingFinish,HOUSE.height);ceiling.material.side=THREE.FrontSide;ceiling.castShadow=true;ceiling.userData.part='illustrative-ceiling';}
  else if(!settings.cutaway){const m=new THREE.MeshBasicMaterial({colorWrite:false,depthWrite:false,transparent:true,opacity:0});resources.push(m);const ceiling=floor(HOUSE_OUTLINE,m,HOUSE.height);ceiling.castShadow=true;ceiling.userData.part='solar-ceiling-occluder';}
 
