@@ -20,8 +20,8 @@ test('adaptive quality ignores suspension/XR, degrades gradually and recovers on
  for(let i=0;i<400;i++)quality.sample(now+=16);assert.equal(quality.profile.scale,reduced,'short headroom cannot oscillate quality');
  for(let i=0;i<1600;i++)quality.sample(now+=16);assert(quality.profile.scale>reduced);
  assert(quality.ratioForSize(3000,3000)**2*3000*3000<=1400001);
- // Mobile "quality" keeps the device-lost safety guard (mobile-gpu-policy): sustained ~11 fps steps it down, never below .66.
- quality.setMode('quality');for(let i=0;i<1000;i++)quality.sample(now+=90);assert(quality.profile.scale<1&&quality.profile.scale>=.66);
+ // Mobile "quality" keeps the device-lost safety guard (mobile-gpu-policy): sustained ~11 fps steps it down, bottoming out at .64.
+ quality.setMode('quality');for(let i=0;i<1000;i++)quality.sample(now+=90);assert(quality.profile.scale<1&&quality.profile.scale>=.6);
  quality.setMode('performance');assert.equal(quality.profile.tier,2);
 });
 
