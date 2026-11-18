@@ -48,7 +48,7 @@ export function buildGardenArchitecture({group,box,mat,surface=(kind,color,optio
    const ux=(u.minX+u.maxX)/2,uz=(u.minZ+u.maxZ)/2,w=u.maxX-u.minX,d=u.maxZ-u.minZ;
    box(ux,2.85,uz,w,.2,d,mat('#e5e1d7'),balcony,{...upperTag,part:'upper-balcony-slab'});
    box(u.minX+.025,2.84,uz,.05,.22,d,mat('#92948d'),balcony,{...upperTag,part:'upper-balcony-fascia'});
-   const glass=mat('#bad0d0',{transparent:true,opacity:.19,roughness:.17,depthWrite:false}),rail=mat('#858d88',{metalness:.5});
+   const glass=mat('#eef3f0',{transparent:true,opacity:.16,roughness:.12,depthWrite:false}),rail=mat('#858d88',{metalness:.5});
    box(u.minX+.045,3.43,uz,.014,.94,d-.06,glass,balcony,upperTag);
    for(const z of [u.minZ+.025,u.maxZ-.025])box(ux,3.43,z,w-.06,.94,.014,glass,balcony,upperTag);
    box(u.minX+.045,3.91,uz,.04,.025,d,rail,balcony,upperTag);

@@ -5,7 +5,7 @@ const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
 const smooth=(a,b,x)=>{const t=clamp((x-a)/(b-a));return t*t*(3-2*t);};
 const rgb=hex=>new Color(hex).toArray();
 const blend=(a,b,t)=>a.map((v,i)=>v+(b[i]-v)*t);
-const palette={day:rgb('#7ea8d8'),horizon:rgb('#e6e4de'),cobalt:rgb('#284f96'),amber:rgb('#f2b37c'),sunset:rgb('#e88052'),night:rgb('#141d2b'),urban:rgb('#2c2a30'),groundHorizon:rgb('#b8afa0'),groundNadir:rgb('#9a9183')};
+const palette={day:rgb('#8faed0'),horizon:rgb('#f3eee6'),cobalt:rgb('#385c9c'),amber:rgb('#f2b988'),sunset:rgb('#e88a5c'),night:rgb('#141d2b'),urban:rgb('#2c2a30'),groundHorizon:rgb('#c7bdb0'),groundNadir:rgb('#a89e90')};
 
 // Linear HDR clear-sky approximation. Astronomy supplies the real sun vector;
 // hour is a deterministic fallback for standalone material previews.
@@ -13,7 +13,7 @@ export function analyticSkyState({sunDirection,hour=13.5,turbidity=MEDITERRANEAN
  const h=Number.isFinite(hour)?hour:13.5,angle=(h-6)/12*Math.PI;
  const raw=sunDirection?.isVector3?sunDirection.toArray():sunDirection||[Math.cos(angle),Math.sin(angle),.25];
  const length=Math.hypot(...raw)||1,sun=raw.map(v=>v/length),elevation=sun[1];
- const day=smooth(.02,.45,elevation),twilight=smooth(-.12,.02,elevation),warm=1-smooth(.02,.45,elevation);
+ const day=smooth(.02,.45,elevation),twilight=smooth(-.12,.02,elevation),warm=.18+.82*(1-smooth(.02,.55,elevation));
  const sunset=blend(palette.amber,palette.sunset,1-smooth(.02,.2,elevation));
  return {sun,elevation,altitude:Math.asin(clamp(elevation,-1,1)),azimuth:Math.atan2(sun[0],-sun[2]),turbidity:clamp(Number(turbidity)||MEDITERRANEAN_ATMOSPHERE.turbidity,1,10),
   zenith:blend(palette.night,blend(palette.cobalt,palette.day,day),twilight),horizon:blend(palette.urban,blend(sunset,palette.horizon,day),twilight),warm,day,twilight};
@@ -28,7 +28,7 @@ export function sampleAnalyticSky(state,x,up,z,out=[0,0,0]){
   const haze=clamp((s.turbidity-1)/9)*Math.exp(-up*6)*.12;
   const mie=Math.pow(Math.max(0,mu),24)*2.1*s.warm*s.twilight;
   const corona=Math.pow(Math.max(0,mu),1800)*8*s.day;
-  for(let i=0;i<3;i++)out[i]=s.horizon[i]+(s.zenith[i]-s.horizon[i])*height+rayleigh*[.35,.65,1][i]+haze+mie*[1,.6,.28][i]+corona*[1,.94,.83][i];
+  for(let i=0;i<3;i++)out[i]=s.horizon[i]+(s.zenith[i]-s.horizon[i])*height+rayleigh*[.48,.70,.92][i]+haze*[1.02,1,.96][i]+mie*[1,.82,.65][i]+corona*[1,.96,.90][i];
  }
  return out;
 }

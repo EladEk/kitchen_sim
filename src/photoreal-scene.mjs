@@ -64,7 +64,8 @@ function createPhotoSceneSnapshot(source,{maxTriangles=2500000,maxMeshes=60000,m
    if(!stone){stone=stoneMaps();Object.values(stone).forEach(t=>ownedTexture.add(t));}
    Object.assign(out,stone);out.bumpScale=FACADE_COURSES.recess;out.normalScale.set(1,1);out.roughness=FACADE_ROUGHNESS;
   }
-  if(m.userData.publicFinish==='floor'){const {tile,joint}=porcelainProfile(m.userData),profile={tile,joint},floorKey=JSON.stringify(profile);let maps=floors.get(floorKey);if(!maps){maps=floorJointMaps(profile);floors.set(floorKey,maps);Object.values(maps).forEach(t=>ownedTexture.add(t));}Object.assign(out,maps);out.normalMap=null;out.bumpScale=.0013;out.roughness=1;}
+  // The map supplies face/joint roughness; its material multiplier stays at one.
+  if(m.userData.publicFinish==='floor'){const {tile,joint,satin}=porcelainProfile(m.userData),profile={tile,joint,satin},floorKey=JSON.stringify(profile);let maps=floors.get(floorKey);if(!maps){maps=floorJointMaps(profile);floors.set(floorKey,maps);Object.values(maps).forEach(t=>ownedTexture.add(t));}Object.assign(out,maps);out.normalMap=null;out.bumpScale=.0013;out.roughness=1;if(satin&&out.isMeshPhysicalMaterial){out.clearcoat=.28;out.clearcoatRoughness=.3;}}
   materials.set(key,out);ownedMaterial.add(out);return out;
  };
  const add=(o,matrix,color=null)=>{

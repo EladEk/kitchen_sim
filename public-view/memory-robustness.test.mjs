@@ -8,11 +8,11 @@ import {bindRuntimeLifecycle} from './runtime-lifecycle.mjs';
 
 test('packed shading attributes roundtrip through ObjectLoader while positions and tiled UVs remain exact',async()=>{
  const g=new THREE.BufferGeometry().copy(new THREE.BoxGeometry()),positions=g.attributes.position.array.slice(),normals=g.attributes.normal.array.slice(),uvs=g.attributes.uv.array.slice(),before=Object.values(g.attributes).reduce((n,a)=>n+a.array.byteLength,0);
- compactRenderAttributes(g);assert(g.attributes.normal.array instanceof Int16Array);assert(g.attributes.uv.array instanceof Uint16Array);assert.deepEqual(g.attributes.position.array,positions);
+ compactRenderAttributes(g);assert(g.attributes.normal.array instanceof Float32Array);assert(g.attributes.uv.array instanceof Uint16Array);assert.deepEqual(g.attributes.position.array,positions);
  for(let i=0;i<normals.length;i++)assert(Math.abs(g.attributes.normal.getComponent(Math.floor(i/3),i%3)-normals[i])<=1/32767);
  for(let i=0;i<uvs.length;i++)assert(Math.abs(g.attributes.uv.getComponent(Math.floor(i/2),i%2)-uvs[i])<=1/65535);
  assert(Object.values(g.attributes).reduce((n,a)=>n+a.array.byteLength,0)<before);
- const root=new THREE.Mesh(g,new THREE.MeshStandardMaterial()),restored=await new THREE.ObjectLoader().parseAsync(root.toJSON());assert.equal(restored.geometry.attributes.normal.normalized,true);assert(restored.geometry.attributes.uv.array instanceof Uint16Array);
+ const root=new THREE.Mesh(g,new THREE.MeshStandardMaterial()),restored=await new THREE.ObjectLoader().parseAsync(root.toJSON());assert.equal(restored.geometry.attributes.normal.normalized,false);assert(restored.geometry.attributes.uv.array instanceof Uint16Array);
  const tiled=new THREE.PlaneGeometry();tiled.attributes.uv.setX(0,24);compactRenderAttributes(tiled);assert(tiled.attributes.uv.array instanceof Float32Array);assert.equal(tiled.attributes.uv.getX(0),24);
  g.dispose();root.material.dispose();restored.geometry.dispose();restored.material.dispose();tiled.dispose();
 });

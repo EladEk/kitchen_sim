@@ -54,17 +54,17 @@ test('both actual scenes put the large louvred grille over the hall opening, wit
  }finally{home.dispose();kitchen.dispose();}
 });
 
-test('window-relative sockets face into the photographed rooms and numbered-room matches remain provisional',()=>{
+test('window-relative sockets face into the owner-confirmed numbered rooms and preserve unreadable fittings',()=>{
  const wa=window('bed-a-window'),wb=window('bed-b-window'),wo=window('bed-c-window');
- for(const id of ['A01','A02','A03']){const p=point(id);assert.equal(p.roomId,'bedroom-b');assert(p.roomInferred);assert(p.position[2]<wb.start);assert.deepEqual(p.normal,[1,0]);}
+ for(const id of ['A01','A02','A03']){const p=point(id);assert.equal(p.roomId,'bedroom-b');assert.equal(p.roomInferred,false);assert(p.position[2]<wb.start);assert.deepEqual(p.normal,[1,0]);}
  assert(point('A01').position[2]>point('A02').position[2]);assert(point('A02').position[2]>point('A03').position[2]);
- for(const p of E.points.filter(p=>p.label.startsWith('B'))){assert.equal(p.roomId,'bedroom-a');assert(p.roomInferred);}
+ for(const p of E.points.filter(p=>p.label.startsWith('B'))){assert.equal(p.roomId,'bedroom-a');assert.equal(p.roomInferred,false);}
  assert(point('B03').position[2]>wa.end,'first room fitting stays on the south/right side of its west-facing window');
  assert(point('B01').position[0]>point('B02').position[0]);assert(point('B02').position[0]>point('B04').position[0]);assert(point('B04').position[0]>point('B05').position[0]);
  assert(point('O01').position[0]>wo.end,'image-left is east when looking at the south wall');
  assert(point('O02').position[0]<wo.start+.25);assert(point('O03').position[0]<point('O02').position[0]);
  for(const id of ['O04','O05']){assert.equal(point(id).wallId,'master-east');assert.deepEqual(point(id).normal,[1,0]);}
- for(const id of ['A01','B03','O01'])assert.equal(point(id).kind,'preparation','a bare/unreadable fitting is not promoted to a confirmed switch');
+ for(const id of ['B03','A03','O03'])assert.equal(point(id).kind,'preparation','a bare/unreadable fitting is not promoted to a confirmed switch');
 });
 
 test('safe-room side groups, the main-bedroom rear wall and the hall fitting use the correct wall faces without changing source identities',()=>{
@@ -74,7 +74,7 @@ test('safe-room side groups, the main-bedroom rear wall and the hall fitting use
  assert(point('M04').position[0]<.5,'corner outlet stays beside the west window wall');assert(point('M03').position[0]>2.8,'three rear-wall preparations remain at the other end');
  assert.equal(point('M04').evidence[0].page,24);assert(point('M04').evidence.some(e=>e.page===6),'the original photograph is retained');
  assert.equal(point('H01').wallId,'bed-b-east');assert.deepEqual(point('H01').normal,[1,0]);
- assert.equal(E.points.length,51);assert(!point('K05'));assert.equal(point('K09').height,1.65);
+ assert.equal(E.points.length,56);assert(!point('K05'));assert.equal(point('K09').height,1.65);
 });
 
 test('the review covers every room, retains original-video provenance and links only indoor rooms to video intervals',()=>{

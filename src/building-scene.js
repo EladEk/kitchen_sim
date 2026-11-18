@@ -42,15 +42,15 @@ export function buildBuildingContext({group,resources,settings,mode='overview',p
  const floors=new Map(),cube=new THREE.BoxGeometry(1,1,1);resources.push(cube);const facadeCube=splitWallReturnGeometry(cube);resources.push(facadeCube);
  function material(color,extra={}){const m=shown?new THREE.MeshStandardMaterial({color,roughness:.8,...extra}):new THREE.MeshBasicMaterial({colorWrite:false,depthWrite:false,transparent:true,opacity:0});resources.push(m);return m;}
  const surface=shown?createSurfacePalette(resources):null,finish=(kind,color,extra={})=>shown?surface(kind,color,extra):material(color,extra);
- const limestone=finish('limestone',FACADE_COLOR,{roughness:FACADE_ROUGHNESS}),concrete=finish('cement','#d5d2ca'),deck=finish('porcelain','#d8d2c5'),metal=material('#303b3e',{roughness:.42,metalness:.45}),glass=shown?new THREE.MeshPhysicalMaterial({color:'#d2e1df',roughness:.075,metalness:0,ior:1.5,specularIntensity:1,envMapIntensity:1.15,transparent:true,opacity:.28,depthWrite:false,side:THREE.DoubleSide}):material('#d2e1df'),voidMat=material('#485052',{roughness:.4}),roofMat=finish('cement','#ddd9cc'),insideWall=finish('plaster',INTERIOR_WHITE,{roughness:.9}),doorMat=finish('door','#f3f2ee',{roughness:.55}),interiorFloor=finish('porcelain',DRY_PORCELAIN.color,{roughness:.56}),soffit=finish('plaster',CEILING_COLOR,CEILING_MATERIAL),trimMat=finish('paint','#eeece5',{roughness:.62}),handleMat=material('#a9afad',{metalness:.8,roughness:.27});
-  const balconyGlass=shown?new THREE.MeshPhysicalMaterial({color:'#c5d4d2',roughness:.05,metalness:0,ior:1.5,envMapIntensity:1.15,transparent:true,opacity:.56,depthWrite:false,side:THREE.DoubleSide}):material('#c5d4d2');
+ const limestone=finish('limestone',FACADE_COLOR,{roughness:FACADE_ROUGHNESS}),concrete=finish('cement','#d5d2ca'),deck=finish('porcelain','#d8d2c5'),metal=material('#303b3e',{roughness:.42,metalness:.45}),glass=shown?new THREE.MeshPhysicalMaterial({color:'#f6faf8',roughness:.075,metalness:0,ior:1.5,specularIntensity:1,envMapIntensity:1.15,transparent:true,opacity:.12,depthWrite:false,side:THREE.DoubleSide}):material('#f6faf8'),voidMat=material('#485052',{roughness:.4}),roofMat=finish('cement','#ddd9cc'),insideWall=finish('plaster',INTERIOR_WHITE,{roughness:.9}),doorMat=finish('door','#f3f2ee',{roughness:.55}),interiorFloor=finish('porcelain',DRY_PORCELAIN.color,{roughness:.56}),soffit=finish('plaster',CEILING_COLOR,CEILING_MATERIAL),trimMat=finish('paint','#eeece5',{roughness:.62}),handleMat=material('#a9afad',{metalness:.8,roughness:.27});
+  const balconyGlass=shown?new THREE.MeshPhysicalMaterial({color:'#eef3f0',roughness:.05,metalness:0,ior:1.5,envMapIntensity:1.15,transparent:true,opacity:.22,depthWrite:false,side:THREE.DoubleSide}):material('#eef3f0');
   resources.push(balconyGlass);
  if(shown){
   // Metre-scale stone courses, restrained grain and staggered vertical joints.
   // Colours/profile follow the supplied facade photos; this is no scan claim.
   resources.push(glass);installStoneCourses(limestone);installFloorCourses(interiorFloor,{tile:[1,1]});installWallCavity(insideWall,{storey:BUILDING.storey,height:BUILDING.storey});
   limestone.userData.publicFinish="stone";interiorFloor.userData.publicFinish="floor";
-  interiorFloor.userData={...interiorFloor.userData,finishInferred:true,tile:[.8,.8],productId:null};
+  interiorFloor.userData={...interiorFloor.userData,finishInferred:true,tile:[1,1],productId:null};
   for(const mat of [limestone,concrete,deck,roofMat,insideWall,doorMat,interiorFloor,soffit,trimMat])installBuildingSurfaceUVs(mat);
 
  }

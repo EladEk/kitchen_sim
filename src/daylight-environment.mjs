@@ -8,11 +8,11 @@ export function daylightEnvironmentPixels(pixels,{saturation=0,warmGround=false}
   const luminance=r*.2126+g*.7152+b*.0722;
   // Equirectangular DataTextures start at the nadir. Retain a little warm
   // ground colour and a gentle sky tint instead of a monochrome hemisphere.
-  const chroma=warmGround?Math.max(saturation,i<pixels.width*pixels.height*2?.42:.16):saturation;
+  const chroma=warmGround?Math.max(saturation,i<pixels.width*pixels.height*2?.42:.10):saturation;
   data[i]=luminance+(r-luminance)*chroma;
   data[i+1]=luminance+(g-luminance)*chroma;
   data[i+2]=luminance+(b-luminance)*chroma;
-  if(warmGround){data[i]*=1.03;data[i+1]*=1.01;data[i+2]*=.97;}
+  if(warmGround){data[i]*=1.022;data[i+1]*=.996;data[i+2]*=.968;}
   data[i+3]=pixels.data[i+3];
  }
  return {...pixels,data};

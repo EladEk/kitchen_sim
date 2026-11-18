@@ -20,9 +20,9 @@ test('detailed kitchen reuses the nine corrected kitchen observations with inver
 test('optional 3D layer has correct metre-scale markers, outward camera views and invisible fixture pick targets',()=>{
  const hidden=createKitchen(DEFAULTS),visible=createKitchen({...DEFAULTS,showElectrical:true});
  try{
-  assert.equal(hidden.electricalGroups.size,0);assert.equal(visible.electricalGroups.size,9);visible.group.updateMatrixWorld(true);
+  assert.equal(hidden.electricalGroups.size,P.length);assert([...hidden.electricalGroups.values()].every(g=>g.userData.hasFixture));assert.equal(visible.electricalGroups.size,9);visible.group.updateMatrixWorld(true);
   for(const p of P){const node=visible.electricalGroups.get(p.id);assert(node);node.position.toArray().forEach((v,i)=>near(v,p.position[i]));const plate=node.children.find(m=>m.userData.part==='electrical-faceplate');assert(plate);const size=new THREE.Vector3();plate.geometry.computeBoundingBox();plate.geometry.boundingBox.getSize(size);near(size.x,p.width);near(size.y,p.boxHeight);near(size.z,p.depth);
-   const hit=visible.picks.find(m=>m.userData.electricalId===p.id&&m.userData.part==='electrical-annotation-hit');assert(hit);assert.equal(hit.material.depthTest,true);assert.equal(hit.material.opacity,0);assert.equal(hit.renderOrder,0);assert(!node.children.some(n=>n.userData.part==='electrical-highlight'));assert(!hit.userData.openingId,'electrical clicks are not cabinet opening actions');const view=node.userData.inspectionView;assert(p.relocation?view.from[2]-view.target[2]>1:(view.from[0]-view.target[0])*p.normal[0]+(view.from[2]-view.target[2])*p.normal[1]>1);
+   const hit=visible.picks.find(m=>m.userData.electricalId===p.id&&m.userData.part==='electrical-annotation-hit');assert(hit);assert.equal(hit.material.depthTest,true);assert.equal(hit.material.opacity,0);assert.equal(hit.renderOrder,0);assert(node.children.some(n=>n.userData.electricalHighlightRing&&n.visible));assert(!hit.userData.openingId,'electrical clicks are not cabinet opening actions');const view=node.userData.inspectionView;assert(p.relocation?view.from[2]-view.target[2]>1:(view.from[0]-view.target[0])*p.normal[0]+(view.from[2]-view.target[2])*p.normal[1]>1);
   }
  }finally{hidden.dispose();visible.dispose();}
 });

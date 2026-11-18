@@ -31,7 +31,7 @@ test('porcelain uses the surveyed metre grid and preserves explicit exterior pla
 
 test('architectural glazing and coated metals retain physical optical properties and safe mobile glass',()=>{
  const resources=[],glass=createArchitecturalGlass(resources,{mobile:false});
- assert.equal(glass.transmission,.9);assert.equal(glass.thickness,.024);assert.equal(glass.ior,1.52);assert.equal(glass.attenuationDistance,.65);assert.equal(glass.attenuationColor.getHexString(),'dff0ec');
+ assert.equal(glass.transmission,.9);assert.equal(glass.thickness,.024);assert.equal(glass.ior,1.52);assert.equal(glass.attenuationDistance,1.15);assert.equal(glass.attenuationColor.getHexString(),'f5f8f6');
  setArchitecturalGlassQuality(glass,{mobile:true});assert.equal(glass.transmission,0);assert.equal(glass.opacity,.075);
  setArchitecturalGlassQuality(glass,{});assert.equal(glass.transmission,.9);
  const root=new Group(),mesh=new Mesh(new BoxGeometry(),new MeshPhysicalMaterial());mesh.userData.part='door-handle';root.add(mesh);

@@ -15,7 +15,7 @@ import {createHash} from 'node:crypto';
 const context=new Proxy({},{get:(o,k)=>o[k]||(()=>{}),set:(o,k,v)=>(o[k]=v,true)});
 globalThis.document={createElement:()=>({width:512,height:512,getContext:()=>context})};
 
-test('ordered floors load the actual owner tile RGB rather than the generic atlas, while preserving each scheduled physical size',async()=>{
+test('ordered floors retain the owner photograph detail with the requested floor swatch and each scheduled physical size',async()=>{
  const previousImage=globalThis.Image,previousDocument=globalThis.document,images=[],rects=[],pixels=new Uint8ClampedArray(FLOOR_PHOTO.size**2*4);
  for(let i=0;i<pixels.length;i+=4)pixels.set(i%8===0?[169,157,143,255]:[218,208,194,255],i);
  globalThis.Image=class{set src(value){images.push(value);queueMicrotask(()=>this.onload());}};
@@ -30,7 +30,7 @@ test('ordered floors load the actual owner tile RGB rather than the generic atla
    for(const map of [material.map,material.bumpMap,material.roughnessMap]){assert.equal(map.repeat.x,1/order.dimensions[0]);assert.equal(map.repeat.y,1/order.dimensions[1]);}
   }
   const data=await orderedFloorPhotoData('dry-floor');await Promise.resolve();
-  const expectedImages=[...new Set(Object.values(ORDERED_FLOORS).map(p=>p.photo.runtimeImage||p.photo.image))];assert.deepEqual(images,expectedImages);assert.deepEqual(rects[0],[...FLOOR_PHOTO.runtimeSample,0,0,FLOOR_PHOTO.size,FLOOR_PHOTO.size]);assert.deepEqual(data.color,new Uint8Array(pixels),'actual coloured pixels must not be converted to generic grey/white');
+  const expectedImages=[...new Set(Object.values(ORDERED_FLOORS).map(p=>p.photo.runtimeImage||p.photo.image))];assert.deepEqual(images,expectedImages);assert.deepEqual(rects[0],[...FLOOR_PHOTO.runtimeSample,0,0,FLOOR_PHOTO.size,FLOOR_PHOTO.size]);assert.equal(data.color.length,pixels.length);assert(data.color[0]>175&&data.color[0]<210&&data.color[2]>155&&data.color[2]<190);assert(data.color[0]<data.color[4],'photographed mineral contrast remains');assert.equal(data.lightingCorrection.appearanceSwatch,'#c3bcb0');assert.equal(pixels[0],169,'source image bytes remain unchanged');
   const floor=surface('porcelain','#ff0000',{productId:'dry-floor'});assert.strictEqual(floor.map.image.data,data.color);assert.equal(floor.map.image.width,1024);assert.equal(floor.map.repeat.x,1);assert.equal(floor.map.repeat.y,1);assert.equal(floor.bumpScale,0);assert.equal(floor.map.colorSpace,THREE.SRGBColorSpace);
   const wet=surface('cement','#a4a6a3',{productId:'wet-floor'}),shower=surface('cement','#a4a6a3',{productId:'shower-floor'});assert.notStrictEqual(wet.map,shower.map);assert(shower.roughness>wet.roughness);
  }finally{resources.forEach(r=>r.dispose());globalThis.Image=previousImage;globalThis.document=previousDocument;}

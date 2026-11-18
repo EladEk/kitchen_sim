@@ -34,7 +34,7 @@ export function createLawnDetail(layers,{mobile=false}={}){
    if(Math.max(Math.abs(dx),Math.abs(dz))!==ring)continue;const gx=cx+dx,gz=cz+dz,x=(gx+hash(gx,gz,1))*step,z=(gz+hash(gx,gz,2))*step,distance=Math.hypot(x-position.x,z-position.z);if(distance>radius)continue;const region=lawnAt(regions,x,z);if(!region)continue;
    const fade=Math.min(1,(radius-distance)/1.3),height=(.035+hash(gx,gz,3)*.032)*fade;
    point.set(x,region.y+.001,z);q.setFromAxisAngle(up,hash(gx,gz,4)*Math.PI*2);scale.setScalar(height);matrix.compose(point,q,scale);mesh.setMatrixAt(count,matrix);
-   colour.setHSL(.22+hash(gx,gz,5)*.055,.34+hash(gx,gz,6)*.15,.19+hash(gx,gz,7)*.09);mesh.setColorAt(count,colour);count++;
+   colour.setHSL(.23+hash(gx,gz,5)*.05,.38+hash(gx,gz,6)*.14,.23+hash(gx,gz,7)*.10);mesh.setColorAt(count,colour);count++;
   }
   mesh.count=count;mesh.instanceMatrix.needsUpdate=true;if(mesh.instanceColor)mesh.instanceColor.needsUpdate=true;mesh.computeBoundingSphere();
  },get stats(){return {capacity,count:mesh.count,regions:regions.length};},dispose(){if(disposed)return;disposed=true;mesh.removeFromParent();mesh.dispose();geometry.dispose();material.dispose();mesh.count=0;regions.length=0;}};

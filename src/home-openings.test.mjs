@@ -59,7 +59,8 @@ test('double glazing is modeled at living/bedroom/kitchen openings, while wet an
   scene.group.traverse(o=>{if(o.userData.glazing){const id=o.userData.openingId;panes.set(id,[...(panes.get(id)||[]),o.userData.glazing]);}});
   for(const id of ['bed-a-window','bed-b-window','master-window','bed-c-window','kitchen-window'])assert.deepEqual(panes.get(id),['double','double','double','double']);
   assert.deepEqual(panes.get('patio'),['double','double','double','double']);
-  for(const id of ['ensuite-window','utility-window','safe-window'])assert.deepEqual(panes.get(id),['single']);
+  for(const id of ['ensuite-window','utility-window'])assert.deepEqual(panes.get(id),['single']);
+  assert.deepEqual(panes.get('safe-window'),['single','single'],'two protected-window sashes each have single glazing');
  }finally{scene.dispose();}
  const settings=normalizeHomeSettings({closedShutters:['bed-a-window','bad','bed-a-window'],openDoors:['safe-inner'],openParts:['wardrobe-b:left']});
  assert.deepEqual(settings.closedShutters,['bed-a-window']);assert.deepEqual(settings.openDoors,['safe-inner']);assert.deepEqual(settings.openParts,['wardrobe-b:left']);

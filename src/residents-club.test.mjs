@@ -24,6 +24,6 @@ test('photographed club window replaces only the misclassified ground opening, a
 });
 test('club walking ceiling, four 4000 K luminaires, global lamp switch and cutaway are consistent',()=>{
  for(const [mode,cut,lampsOn] of [['walk',false,true],['walk',false,false],['unit',true,true]]){
-  const group=new THREE.Group(),resources=[];buildBuildingContext({group,resources,settings:{...settings,cutaway:cut,lampsOn},mode});try{const club=group.getObjectByName('residents-club');assert(club);const lights=[];club.traverse(o=>{if(o.isLight)lights.push(o);});assert.equal(lights.length,lampsOn&&!cut?4:0);for(const l of lights)assert.equal(l.userData.kelvin,4000);assert.equal(!!club.getObjectByName('club-ceiling'),mode==='walk');assert.equal(!!club.getObjectByName('club-ac-body'),!cut);}finally{resources.forEach(r=>r.dispose?.());}
+  const group=new THREE.Group(),resources=[];buildBuildingContext({group,resources,settings:{...settings,cutaway:cut,lampsOn},mode});try{const club=group.getObjectByName('residents-club');assert(club);const lights=[];club.traverseVisible(o=>{if(o.isLight&&o.intensity>0)lights.push(o);});assert.equal(lights.length,lampsOn&&!cut?4:0);for(const l of lights)assert.equal(l.userData.kelvin,4000);assert.equal(!!club.getObjectByName('club-ceiling'),mode==='walk');assert.equal(!!club.getObjectByName('club-ac-body'),!cut);}finally{resources.forEach(r=>r.dispose?.());}
  }
 });

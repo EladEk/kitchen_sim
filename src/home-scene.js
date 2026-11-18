@@ -51,7 +51,7 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
  const mat=(color,opts={})=>{const m=new THREE.MeshStandardMaterial({color,roughness:.78,...opts});resources.push(m);return m;};
  const surface=createSurfacePalette(resources);
  const skirtingFinish=surface('porcelain',DRY_PORCELAIN.color,{roughness:.6});
- const entryDoorFinish=surface('door','#454a4e'),doorFinish=surface('door','#f3f2ee'),doorFrame=surface('paint','#f3f2ee'),ceilingFinish=surface('plaster',CEILING_COLOR,{...CEILING_MATERIAL,side:THREE.FrontSide,shadowSide:THREE.DoubleSide}),offwhite=surface('paint','#efebe2'),oak=surface('wood','#ae8b61'),ink=mat('#35463d'),windowInk=mat('#343d3d',{metalness:.3,roughness:.5}),steel=mat('#a7b1ac',{metalness:.55,roughness:.35}),white=mat('#f0f0e8'),dark=mat('#29352f'),glass=mat('#b0c8be',{transparent:true,opacity:.28,roughness:.16,depthWrite:false}),linen=surface('fabric','#c5c5af'),clay=mat('#b58e75'),cap=mat('#c7c9bc');
+ const entryDoorFinish=surface('door','#454a4e'),doorFinish=surface('door','#f3f2ee'),doorFrame=surface('paint','#f3f2ee'),ceilingFinish=surface('plaster',CEILING_COLOR,{...CEILING_MATERIAL,side:THREE.FrontSide,shadowSide:THREE.DoubleSide}),offwhite=surface('paint','#efebe2'),oak=surface('wood','#ae8b61'),ink=mat('#35463d'),windowInk=mat('#343d3d',{metalness:.3,roughness:.5}),steel=mat('#a7b1ac',{metalness:.55,roughness:.35}),white=mat('#f0f0e8'),dark=mat('#29352f'),glass=mat('#f6faf8',{transparent:true,opacity:.12,roughness:.08,depthWrite:false}),linen=surface('fabric','#c5c5af'),clay=mat('#b58e75'),cap=mat('#c7c9bc');
  // Selecting a destination removes upper floors, but must not enable wall cuts.
  const wallCutaway=settings.cutaway===true&&mode!=='walk'&&(mode==='building'?settings.buildingLevel===0:mode==='unit'?parseDestination(settings.tourDestination).floor===0:true);
  const wallHeight=wallCutaway?.86:HOUSE.height;
@@ -59,7 +59,7 @@ export function createHomeScene(settings,{mode='overview',selectedRoom='living',
   const g=round&&material.userData?.surfaceKind==='fabric'?createSoftGeometry(w,h,d,{kind:h<.09?'duvet':'cushion',radius:round}):round?new RoundedBoxGeometry(w,h,d,2,Math.min(round,w/5,h/5,d/5)):new THREE.BoxGeometry(w,h,d);metricSurfaceUVs(g,[x,y,z]);resources.push(g);const m=new THREE.Mesh(g,material);m.position.set(x,y,z);m.castShadow=m.receiveShadow=true;if(data)m.userData={...data};parent.add(m);if(data?.action||data?.blockPick)picks.push(m);return m;
  }
  function glazing(id,y,width,height,parent,data=null){
-  const double=DOUBLE_GLAZED_IDS.includes(id),material=double?mat('#b0c8be',{transparent:true,opacity:.15,roughness:.16,depthWrite:false}):glass;
+  const double=DOUBLE_GLAZED_IDS.includes(id),material=double?mat('#f6faf8',{transparent:true,opacity:.075,roughness:.08,depthWrite:false}):glass;
   for(const z of double?[-.007,.007]:[0]){const pane=box(0,y,z,width,height,.004,material,parent,data);pane.castShadow=false;pane.userData.glazing=double?'double':'single';pane.userData.openingId=id;}
  }
  function cylinder(x,y,z,r,h,material,parent=group,data=null){const g=new THREE.CylinderGeometry(r,r,h,32);metricSurfaceUVs(g,[x,y,z]);resources.push(g);const m=new THREE.Mesh(g,material);m.position.set(x,y,z);m.castShadow=true;if(data)m.userData={...data};parent.add(m);if(data?.action)picks.push(m);return m;}

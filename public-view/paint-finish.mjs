@@ -21,15 +21,15 @@ function paintSample(map,p){
 export function createPaintNodeMaterial(source,{mobile=false}={}){
  const material=new MeshPhysicalNodeMaterial();
  material.copy(source);
- material.userData={...source.userData,tslFinishRevision:176,paintPath:mobile?'physical-mobile-neutral':'physical'};
+ material.userData={...source.userData,tslFinishRevision:177,paintPath:mobile?'physical-mobile-neutral':'physical'};
  // Opaque paint's shadow opacity is independent of the albedo image. Leaving
  // map set makes the shadow pass sample raw geometry UVs, bypassing projection.
  material.map=null;
  material.paintAlbedoMap=source.map;
  const ceiling=source.userData.architecturalCeiling===true;
  material.roughness=ceiling?.94:.82;
- // R177: ceilings stay neutral white (owner photos); walls keep the warm room fill.
- if(mobile)material.envNode=ceiling?vec3(.97,.965,.95):vec3(.97,.94,.89);
+ // R178 warm-white walls; ceilings stay neutral white (owner photos).
+ if(mobile)material.envNode=ceiling?vec3(.97,.965,.95):vec3(.965,.95,.925);
  material.metalness=0;
  material.sheen=ceiling?0:.1;
  material.sheenColor.set('#ffffff');

@@ -1,4 +1,5 @@
 import {Box3,Vector2,Vector3,Uniform,DataTexture,RGBAFormat,FloatType} from 'three';
+import {bindTraditionalMaterial,traditionalMaterial} from '../src/traditional-material.mjs';
 let nodeFactory;
 const bindings=new WeakMap(),snapshots=new WeakMap();
 export const installSelectionNodeFactory=factory=>{nodeFactory=factory;};
@@ -65,7 +66,10 @@ vHomeClipWorld=(modelMatrix*homeClipPosition).xyz;
  }
  bindings.set(material,{state,sectionCuttable});material.needsUpdate=true;return true;
 }
-export function copyGpuClipBinding(source,target){const binding=bindings.get(source);if(binding){if(!!source.isNodeMaterial===!!target.isNodeMaterial){if(source.isNodeMaterial)target.maskNode=source.maskNode;else{target.onBeforeCompile=source.onBeforeCompile;target.customProgramCacheKey=source.customProgramCacheKey;}bindings.set(target,binding);}else patchSelectionMaterial(target,binding.state,{sectionCuttable:binding.sectionCuttable});}return target;}
+export function copyGpuClipBinding(source,target){
+ const original=traditionalMaterial(source);if(original&&original!==source)bindTraditionalMaterial(target,original);
+ const binding=bindings.get(source);if(binding){if(!!source.isNodeMaterial===!!target.isNodeMaterial){if(source.isNodeMaterial)target.maskNode=source.maskNode;else{target.onBeforeCompile=source.onBeforeCompile;target.customProgramCacheKey=source.customProgramCacheKey;}bindings.set(target,binding);}else patchSelectionMaterial(target,binding.state,{sectionCuttable:binding.sectionCuttable});}return target;
+}
 // CPU picks must obey the same discard domain as both GPU implementations.
 export function isPointClippedByGpuSelection(object,worldPoint,margin=.22){
  let clip;for(let p=object;p;p=p.parent)if(p.userData?.gpuSelectionClip){clip=p.userData.gpuSelectionClip;break;}

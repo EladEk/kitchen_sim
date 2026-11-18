@@ -1,3 +1,5 @@
+import {Color} from 'three';
+import {warmDimColor} from './photometric-lighting.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {newHistory,commitDesign,stepHistory} from './design-history.mjs';
@@ -57,7 +59,7 @@ test('per-light choices survive both home/kitchen imports and change only the se
  const id=LIGHTING_LAYOUT.points.find(p=>p.roomId==='kitchen').id,lightControls={[id]:{enabled:true,brightness:35,kelvin:2700}},settings=normalizeHomeSettings({light:'night',lightControls});
  assert.deepEqual(normalizeKitchenDesign({...DEFAULTS,lightControls}).lightControls,settings.lightControls);assert.equal(normalizeLightControls({unknown:{enabled:true}}).unknown,undefined);
  const base=createHomeScene(normalizeHomeSettings({light:'evening'})),edited=createHomeScene(settings),disabled=createKitchen({...DEFAULTS,light:'evening',lightControls:{[id]:{enabled:false}}});
- try{for(const p of LIGHTING_LAYOUT.points){const a=base.gardenGroups.get(p.id).children.find(c=>c.userData.fixtureLight),b=edited.gardenGroups.get(p.id).children.find(c=>c.userData.fixtureLight);if(p.id===id){assert(Math.abs(b.intensity-18*35/75)<1e-8);assert.notEqual(a.color.getHexString(),b.color.getHexString());}else{assert.equal(a.intensity,b.intensity);assert.equal(a.color.getHexString(),b.color.getHexString());}}assert(!disabled.lightingGroups.get(id).children.some(c=>c.userData.fixtureLight));}finally{base.dispose();edited.dispose();disabled.dispose();}
+ try{for(const p of LIGHTING_LAYOUT.points){const a=base.gardenGroups.get(p.id).children.find(c=>c.userData.fixtureLight),b=edited.gardenGroups.get(p.id).children.find(c=>c.userData.fixtureLight);if(p.id===id){assert(Math.abs(b.intensity-18*35/75)<1e-8);assert.notEqual(a.color.getHexString(),b.color.getHexString());}else{assert.equal(a.intensity,b.intensity);assert.equal(b.color.getHexString(),warmDimColor(lightOutput(settings,p.id).color,lightOutput(settings,p.id).power,true).getHexString());}}assert(!disabled.lightingGroups.get(id).children.some(c=>c.userData.fixtureLight&&c.visible&&c.intensity>0));}finally{base.dispose();edited.dispose();disabled.dispose();}
  assert.equal(lightOutput({...settings,light:'day'},id).power,35/75);assert.equal(lightOutput({light:'day'},id).power,1);assert.equal(lightOutput({light:'night',lampsOn:false},id).power,0);
 });
 test('planning sheet is self-contained, reflects selected dimensions and service evidence and escapes text before printing',()=>{

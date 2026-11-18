@@ -1,6 +1,7 @@
 import {createKitchenKinematics} from './kitchen-kinematics.mjs';
 import {createSceneStateUpdater} from './scene-state.mjs';
 import {createArchitecturalGlass} from './architectural-glass.mjs';
+import {DRY_PORCELAIN} from './floor-appearance.mjs';
 import {applyArchitecturalMaterials} from './architectural-materials.mjs';
 import {instantiateCompleteFurniture} from './complete-furniture.mjs';
 import {RectAreaLightUniformsLib} from 'three/addons/lights/RectAreaLightUniformsLib.js';
@@ -42,7 +43,7 @@ export function createKitchen(settings){
  }
  function cylinder(x,y,z,r,h,material,parent=group){const geo=new THREE.CylinderGeometry(r*M,r*M,h*M,24);resources.push(geo);const mesh=new THREE.Mesh(geo,material);mesh.position.set(x*M,y*M,z*M);mesh.castShadow=true;parent.add(mesh);return mesh;}
  // A cutaway room, with an actual opening for the narrow window.
- const floorMesh=box(3275,-55,1640,7000,100,3740,surface('porcelain',settings.floor==='harash'?'#e8e7e4':settings.floor==='cool'?'#d0d1ca':'#d4cec1',settings.floor==='harash'?{productId:'dry-floor'}:{}));if(settings.floor==='harash'){floorMesh.userData.productId='dry-floor';floorMesh.userData.tile=[1,1];}
+ const floorMesh=box(3275,-55,1640,7000,100,3740,surface('porcelain',settings.floor==='harash'?DRY_PORCELAIN.color:settings.floor==='cool'?'#d0d1ca':'#d4cec1',settings.floor==='harash'?{productId:'dry-floor'}:{}));if(settings.floor==='harash'){floorMesh.userData.productId='dry-floor';floorMesh.userData.tile=[1,1];}
  if(settings.floor!=='harash'){
  const tileLine=new THREE.LineBasicMaterial({color:settings.floor==='cool'?'#b8bcb6':'#bcb5a8',transparent:true,opacity:.45});resources.push(tileLine);
  const tileStep=900,tileOrigin=-200;

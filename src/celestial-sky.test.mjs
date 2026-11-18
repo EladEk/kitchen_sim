@@ -38,7 +38,7 @@ test('HDR sky includes finite night illumination and the phase renderer makes a 
 test('the same infinite sky drives the raster and photo renderers, updates once per minute, and respects lamp-only mode',()=>{
  const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(),original=new THREE.Color('white');scene.background=original;let settings={solar:{live:true}},builds=0,disposed=0;
  const sky=installCelestialSky({renderer:{},scene,camera,getSettings:()=>settings,ownSun:true,mobile:true,environmentFactory:()=>{builds++;return {texture:new THREE.Texture(),dispose(){disposed++;}};}});
- const date=new Date('2026-10-28T20:00:00Z');sky.update({now:date});const texture=scene.background;assert(texture.isDataTexture);assert.equal(scene.userData.photoEnvironment,texture);assert(scene.environment);assert.equal(builds,1);
+ const date=new Date('2026-10-28T20:00:00Z');sky.update({now:date});const texture=scene.background;assert(texture.isDataTexture);assert.notEqual(scene.userData.photoEnvironment,texture);assert(scene.userData.photoEnvironment.isDataTexture);assert(scene.environment);assert.equal(builds,1);
  sky.update({now:new Date('2026-10-28T20:00:30Z')});assert.equal(scene.background,texture);assert.equal(builds,1);
  sky.update({now:new Date('2026-10-28T20:01:00Z')});assert.equal(builds,2);assert.equal(disposed,1);
  settings={...settings,light:'night'};sky.update({now:date});assert.equal(scene.environment,null);scene.traverse(o=>{if(o.isLight)assert.equal(o.intensity,0);});
@@ -72,7 +72,7 @@ test('district ceilings receive warm daylight bounce from below without adding l
 
 test('indoor daylight warms smoothly without swapping or rebuilding the sky environment at room boundaries',()=>{
  const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera();let builds=0;const sky=installCelestialSky({renderer:{},scene,camera,getSettings:()=>manual('2026-11-03',720),ownSun:true,mobile:true,environmentFactory:()=>{builds++;return {texture:new THREE.Texture(),dispose(){}};}});
- try{sky.update({interior:0});const environment=scene.environment,intensity=scene.environmentIntensity;let fill;scene.traverse(o=>{if(o.isHemisphereLight)fill=o;});assert(fill.color.b>fill.color.r);for(let i=1;i<=60;i++){sky.update({interior:i/60});assert.equal(scene.environment,environment);}assert.equal(builds,1);assert(fill.color.r>fill.color.b);near(scene.environmentIntensity,intensity*.45);for(let i=0;i<20;i++)sky.update({interior:1});assert.equal(builds,1);assert.equal(scene.environment,environment);}finally{sky.dispose();}
+ try{sky.update({interior:0});const environment=scene.environment,intensity=scene.environmentIntensity;let fill;scene.traverse(o=>{if(o.isHemisphereLight)fill=o;});assert(fill.color.r>=fill.color.b,'daylight fill must not paint white walls blue');for(let i=1;i<=60;i++){sky.update({interior:i/60});assert.equal(scene.environment,environment);}assert.equal(builds,1);assert(fill.color.r>fill.color.b);near(scene.environmentIntensity,intensity*.45);for(let i=0;i<20;i++)sky.update({interior:1});assert.equal(builds,1);assert.equal(scene.environment,environment);}finally{sky.dispose();}
 });
 
 test('opening defaults to noon and old saved live settings cannot turn on the clock implicitly',()=>{

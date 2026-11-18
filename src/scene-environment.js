@@ -10,6 +10,6 @@ export function configureSurfaceRenderer(renderer){
 }
 
 export function installSceneEnvironment(renderer,scene){
- const target=architecturalEnvironment(renderer);scene.environment=target.texture;scene.userData.photoEnvironment=target.sourceEnvironment;scene.environmentIntensity=.38;
+ const target=architecturalEnvironment(renderer);scene.environment=target.texture;scene.userData.photoEnvironment=target.sourceEnvironment;scene.environmentIntensity=.45;
  return ()=>{scene.environment=null;delete scene.userData.photoEnvironment;target.sourceEnvironment?.dispose();target.dispose();};
 }

@@ -10,7 +10,11 @@ export function restorePublicFinishes(root,{mobile=false,stoneUrl=null,signal}={
   if(seen.has(mat))continue;seen.add(mat);
   const kind=mat.userData.publicFinish==='render'?null:mat.userData.publicFinish==='stone'?'limestone':mat.userData.publicFinish==='floor'?'porcelain':mat.userData.surfaceKind;
   if(kind&&!(mat.userData.physicalFinishRevision>=165&&['plaster','paint'].includes(kind)))details.apply(mat,kind);
-  if(mat.isMeshPhysicalMaterial&&mat.transparent){mat.color.set('#d1dcd9');mat.roughness=.105;mat.ior=1.52;mat.envMapIntensity=1.05;mat.opacity=.34;mat.needsUpdate=true;}
+  if(mat.isMeshPhysicalMaterial&&mat.transparent){
+   // Physical reflectivity is derived from IOR; its legacy setter changes IOR.
+   mat.color.set('#f6faf8');mat.roughness=.04;mat.metalness=0;mat.ior=1.52;mat.specularIntensity=1;
+   mat.opacity=Math.min(mat.opacity??.075,.14);mat.envMapIntensity=1.35;mat.needsUpdate=true;
+  }
   if(mat.userData.publicFinish==='stone')installStoneCourses(mat);
   if(mat.userData.publicFinish==='floor')installFloorCourses(mat,mat.userData.floorCourses||{});
   if(mat.userData.wallCavity){const profile=mat.userData.wallCavity;delete mat.userData.wallCavity;installWallCavity(mat,profile);}

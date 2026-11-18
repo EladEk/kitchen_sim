@@ -9,7 +9,7 @@ import {ORDERED_FLOORS} from './ordered-flooring.mjs';
 import {configureSurfaceRenderer} from './scene-environment.js';
 import {FLOOR_SHADER_COMMON} from './floor-material.mjs';
 import {installBuildingSurfaceUVs} from './building-surface-uvs.mjs';
-import {installStoneCourses,installFloorCourses,installWallCavity} from './building-finish-shaders.mjs';
+import {installStoneCourses,installFloorCourses,installWallCavity,FINISH_GRID_GLSL} from './building-finish-shaders.mjs';
 
 const decode=v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4;};
 const encode=v=>Math.round(255*(v<=.0031308?v*12.92:1.055*v**(1/2.4)-.055));
@@ -38,8 +38,8 @@ test('actual ordered materials use non-mirrored photographic tiles, matte dielec
  try{
   for(const [id,p] of Object.entries(ORDERED_FLOORS)){
    const material=surface(p.kind,p.color,{productId:id}),shader={uniforms:{},vertexShader:THREE.ShaderLib.physical.vertexShader,fragmentShader:THREE.ShaderLib.physical.fragmentShader};material.onBeforeCompile(shader);
-   assert(material.isMeshPhysicalMaterial);assert.equal(material.clearcoat,0);assert(material.specularIntensity<1);assert.equal(material.bumpScale,0);assert.equal(material.map.wrapS,THREE.ClampToEdgeWrapping);assert.equal(material.map.anisotropy,16);assert.equal(material.userData.floorRendering.mirrored,false);
-   assert.deepEqual(shader.uniforms.floorTileMetres.value.toArray(),p.tile);assert.equal(shader.uniforms.floorJointMetres.value,id==='terrace-floor'?.003:.002);assert.equal(shader.uniforms.floorQuarterTurns.value,p.tile[0]===p.tile[1]?4:2);assert(shader.fragmentShader.includes('textureGrad(map,floorSourceUV,floorDx,floorDy)'));assert(shader.fragmentShader.includes('textureGrad(roughnessMap,floorSourceUV,floorDx,floorDy)'));assert(shader.fragmentShader.includes('floorRelief'));assert(shader.fragmentShader.includes('roughnessFactor=mix(roughnessFactor,.98,floorJoint)'));
+   assert(material.isMeshPhysicalMaterial);assert.equal(material.clearcoat,id==='dry-floor'?.28:0);assert(material.specularIntensity<1);assert.equal(material.bumpScale,0);assert.equal(material.map.wrapS,THREE.ClampToEdgeWrapping);assert.equal(material.map.anisotropy,16);assert.equal(material.userData.floorRendering.mirrored,false);
+   assert.deepEqual(shader.uniforms.floorTileMetres.value.toArray(),p.tile);assert.equal(shader.uniforms.floorJointMetres.value,id==='dry-floor'?.004:id==='terrace-floor'?.003:.002);assert.equal(shader.uniforms.floorQuarterTurns.value,p.tile[0]===p.tile[1]?4:2);assert(shader.fragmentShader.includes('textureGrad(map,floorSourceUV,floorDx,floorDy)'));assert(shader.fragmentShader.includes('textureGrad(roughnessMap,floorSourceUV,floorDx,floorDy)'));assert(shader.fragmentShader.includes('floorRelief'));assert(shader.fragmentShader.includes('roughnessFactor=mix(roughnessFactor,.98,floorJoint)'));
   }
   const wall=surface('cement','#b2ada9',{productId:'wet-wall'});assert(!wall.isMeshPhysicalMaterial);assert.equal(wall.userData.floorRendering,undefined);
  }finally{resources.forEach(r=>r.dispose());}
@@ -85,4 +85,16 @@ sys.stdout.buffer.write(im.tobytes())`],{cwd:new URL('../',import.meta.url),maxB
  const before=cells(pixels),after=cells(prepared.color),spread=v=>Math.max(...v)-Math.min(...v);assert(spread(before)>40,'test the actual uneven photo rather than a flat synthetic substitute');assert(spread(after)<10,'no broad dark perimeter should be baked into each repeated tile');assert(spread(after)<spread(before)*.15);
  const edge=after.filter((_,i)=>i<8||i>=56||i%8===0||i%8===7),centre=[after[27],after[28],after[35],after[36]],average=v=>v.reduce((a,b)=>a+b,0)/v.length;assert(Math.abs(average(edge)-average(centre))<3);
  assert.deepEqual(pixels,original);assert.equal(prepared.lightingCorrection.calibrated,false);
+});
+
+
+test('fallback porcelain bevel normals and grazing roughness are present in actual GLES3 fragments',t=>{
+ const material=new THREE.MeshStandardMaterial(),shader={vertexShader:'',fragmentShader:'#include <color_fragment>\n/*END_SURFACE*/\n#include <roughnessmap_fragment>\n/*END_ROUGH*/\n#include <normal_fragment_maps>'};installFloorCourses(material);material.onBeforeCompile(shader);material.dispose();
+ const surface=shader.fragmentShader.split('#include <color_fragment>')[1].split('/*END_SURFACE*/')[0],rough=shader.fragmentShader.split('#include <roughnessmap_fragment>')[1].split('/*END_ROUGH*/')[0],normal=shader.fragmentShader.split('#include <normal_fragment_maps>')[1];
+ const vertex='#version 300 es\nvoid main(){vec2 p=vec2(float((gl_VertexID<<1)&2),float(gl_VertexID&2));gl_Position=vec4(p*2.-1.,0.,1.);}',prefix='#version 300 es\nprecision highp float;precision highp int;out vec4 result;\n'+FINISH_GRID_GLSL;
+ const probes=[1,.07].map(z=>({vertex,fragment:prefix+`\nvoid main(){vec3 vInteriorWorld=vec3(.3,0.,.3),vViewPosition=vec3(1.+gl_FragCoord.x*.01,gl_FragCoord.y*.01,${z.toFixed(3)});vec4 diffuseColor=vec4(1.);float roughnessFactor=.25;${surface}${rough}result=vec4(vec3(roughnessFactor),1.);}`}));
+ probes.push({vertex,fragment:prefix+`\nvoid main(){vec3 vInteriorWorld=vec3(.0022+gl_FragCoord.x*.00001,0.,.3),vViewPosition=vec3(-gl_FragCoord.xy*.00001,-1.);vec4 diffuseColor=vec4(1.);vec3 normal=vec3(0.,0.,1.);${surface}${normal}result=vec4(vec3(abs(normal.x)*10.),1.);}`});
+ const run=spawnSync('python',['qa/check-floor-gpu.py'],{cwd:new URL('../',import.meta.url),input:JSON.stringify({programs:[],probes}),encoding:'utf8',timeout:30000,maxBuffer:1000000});
+ if(run.error?.code==='ENOENT'||run.status===77){t.skip('Native EGL unavailable');return;}
+ assert.equal(run.status,0,run.stderr||run.stdout);const [headOn,grazing,bevel]=JSON.parse(run.stdout).probes;assert(grazing.max<headOn.min*.8,JSON.stringify({headOn,grazing}));assert(bevel.max>20,JSON.stringify(bevel));
 });

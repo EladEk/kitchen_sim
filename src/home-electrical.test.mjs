@@ -10,11 +10,11 @@ import {closeAllStudioOpenings} from './studio-state.mjs';
 const near=(a,b)=>assert(Math.abs(a-b)<1e-5,`${a} ≈ ${b}`);
 
 test('every electrical observation has stable identity, source evidence, and explicit estimate flags',()=>{
- assert.equal(E.points.length,51);assert.equal(new Set(E.points.map(p=>p.id)).size,E.points.length);
+ assert.equal(E.points.length,56);assert.equal(new Set(E.points.map(p=>p.id)).size,E.points.length);
  for(const p of E.points){
   assert(electricalPoint(p.id)===p);assert(ELECTRICAL_KINDS[p.kind]);assert(ROOMS.some(r=>r.id===p.roomId));assert(p.positionInferred);assert(p.dimensionsInferred);
   assert(p.evidence.length>0);for(const e of p.evidence){assert(ELECTRICAL_REFERENCES.some(s=>s.page===e.page));const [x,y,w,h]=e.rect;assert(x>=0&&y>=0&&w>0&&h>0&&x+w<=1&&y+h<=1,`${p.label} has a source-normalized rectangle`);}
-  if(['bedroom-a','bedroom-b','bedroom-c'].includes(p.roomId))assert(p.roomInferred,'numbered room assignment remains provisional');
+  if(['bedroom-a','bedroom-b','bedroom-c'].includes(p.roomId))assert.equal(p.roomInferred,false,'numbered room assignment confirmed by owner');
  }
  assert.equal(E.points.filter(p=>p.evidence.some(e=>e.page===3)).length,0,'no invented outlets in the obscured doorway photo');
  assert.equal(electricalPoint('electrical-H04').kind,'preparation','open wired boxes do not become confirmed switches');
@@ -42,8 +42,8 @@ test('electrical layer and provisional-room filter persist through imports and C
  const closed=closeAllStudioOpenings({getItem:()=>null,setItem:()=>{}},{home:again}).home;assert.equal(closed.showElectrical,false);assert.equal(closed.electricalInferred,false);assert.deepEqual(closed.openDoors,[]);
 });
 
-test('actual 3D markers are independently inspectable, permanent with furniture hidden, and hidden by the electrical toggle',()=>{
- const scene=createHomeScene(normalizeHomeSettings({furniture:false}),{mode:'walk'});
+test('electrical markers are inspectable and toggle in place while physical inline fixtures persist',()=>{
+ const scene=createHomeScene({...normalizeHomeSettings({furniture:false}),electricalPresentation:'markers'},{mode:'walk'});
  try{
   scene.group.updateMatrixWorld(true);
   for(const e of E.points){const p=scene.gardenGroups.get(e.id);assert(p);p.position.toArray().forEach((v,i)=>near(v,e.position[i]));assert(scene.picks.some(m=>m.userData.electricalId===e.id));
@@ -52,7 +52,7 @@ test('actual 3D markers are independently inspectable, permanent with furniture 
    assert(!new THREE.Box3().setFromObject(p).isEmpty());
   }
  }finally{scene.dispose();}
- const hidden=createHomeScene(normalizeHomeSettings({showElectrical:false}));try{assert(E.points.every(p=>!hidden.gardenGroups.has(p.id)));assert(hidden.doorGroups.has('service-exit'));}finally{hidden.dispose();}
+ const hidden=createHomeScene(normalizeHomeSettings({showElectrical:false}));try{assert(E.points.every(p=>hidden.gardenGroups.get(p.id)?.userData.hasFixture&&hidden.gardenGroups.get(p.id).visible));assert(hidden.doorGroups.has('service-exit'));}finally{hidden.dispose();}
  const filtered=createHomeScene(normalizeHomeSettings({electricalInferred:false}));try{assert(E.points.every(p=>filtered.gardenGroups.has(p.id)===!p.roomInferred));}finally{filtered.dispose();}
  assert(collisionBoxes().every(b=>!b.electricalId),'annotation layer adds no new walking obstacle');
 });
@@ -67,7 +67,7 @@ test('duplicate source views share one ID and source images, video times and pro
 
 test('the additional 277903 photo has five established IDs, retains original bytes and does not count hidden sockets or a reattached video twice',()=>{
  const source=ELECTRICAL_REFERENCES.find(r=>r.page===21),bytes=readFileSync(new URL(`../public${source.image}`,import.meta.url));assert.equal(createHash('sha256').update(bytes).digest('hex'),source.sha256);assert.equal(source.width,1536);assert.equal(source.height,1152);
- const ids=E.points.filter(p=>p.evidence.some(e=>e.page===21)).map(p=>p.label);assert.deepEqual(ids,['K06','K08','K09','K10','H02']);assert.equal(E.points.length,51);assert(!E.points.find(p=>p.label==='K07').evidence.some(e=>e.page===21));
+ const ids=E.points.filter(p=>p.evidence.some(e=>e.page===21)).map(p=>p.label);assert.deepEqual(ids,['K06','K08','K09','K10','H02']);assert.equal(E.points.length,56);assert(!E.points.find(p=>p.label==='K07').evidence.some(e=>e.page===21));
  const boxes=E.points.flatMap(p=>p.evidence.filter(e=>e.page===21).map(e=>({label:p.label,rect:e.rect})));for(const a of boxes)for(const b of boxes.filter(b=>b!==a)){const [x,y,w,h]=a.rect,[u,v,s,t]=b.rect;assert(Math.min(x+w,u+s)<=Math.max(x,u)||Math.min(y+h,v+t)<=Math.max(y,v));}
  const provenance=JSON.parse(readFileSync(new URL('../public/house/electrical/provenance.json',import.meta.url)));assert.equal(provenance.items.find(i=>i.file==='kitchen-hall-277903.jpg').sha256,source.sha256);const video=readFileSync(new URL('../public/house/photos/walkthrough.mp4',import.meta.url));assert.equal(createHash('sha256').update(video).digest('hex'),provenance.additionalReview.portableVideoSha256);
  for(const id of ['K06','K08','K09','K10'])assert(E.points.find(p=>p.label===id).evidence.some(e=>e.page===1),'earlier evidence remains accessible');
@@ -83,7 +83,7 @@ test('the repeated walkthrough adds the opposite office-wall pair and the separa
  const by=id=>E.points.find(p=>p.label===id),record=JSON.parse(readFileSync(new URL('../public/house/electrical/provenance.json',import.meta.url)));
  assert.deepEqual(record.repeatReview.newPoints,['O06','O07','H05']);assert.equal(record.repeatReview.displaySize[0],540);assert.equal(record.repeatReview.samplingSeconds,.5);
  const video=readFileSync(new URL('../public/house/photos/walkthrough.mp4',import.meta.url));assert.equal(createHash('sha256').update(video).digest('hex'),record.repeatReview.sha256);
- for(const id of ['O06','O07']){const p=by(id);assert.equal(p.roomId,'bedroom-c');assert(p.roomInferred);assert.equal(p.wallId,'bedroom-c-east');assert.deepEqual(p.normal,[-1,0]);assert.equal(p.evidence[0].page,28);assert.equal(p.height,.38);}
+ for(const id of ['O06','O07']){const p=by(id);assert.equal(p.roomId,'bedroom-c');assert.equal(p.roomInferred,false);assert.equal(p.wallId,'bedroom-c-east');assert.deepEqual(p.normal,[-1,0]);assert.equal(p.evidence[0].page,28);assert.equal(p.height,.38);}
  assert.equal(by('O06').kind,'outlet');assert.equal(by('O07').kind,'preparation');assert(by('O06').position[2]<by('O07').position[2]);
  assert.equal(by('H05').wallId,'powder-east');assert.deepEqual(by('H05').normal,[1,0]);assert.equal(by('H05').kind,'preparation');assert.equal(by('H05').evidence[0].page,27);assert.notEqual(by('H05').wallId,by('H04').wallId);
  assert.equal(ELECTRICAL_REFERENCES.find(r=>r.page===27).second,5.25);assert.equal(ELECTRICAL_REFERENCES.find(r=>r.page===28).second,30);
