@@ -53,3 +53,14 @@ test('remembered WebGL2 fallback per device: persists, expires, can be cleared',
  st.setItem(WEBGPU_UNSTABLE_KEY,'not json');assert.equal(readWebGPUUnstable(st,1),false);
  assert.equal(readWebGPUUnstable(null),false);
 });
+
+import {effectiveGraphicsMode,readWebGPUUnstableRecord} from './graphics-recovery.mjs';
+test('a forced engine is always honoured; only the automatic mode adapts to a remembered unstable WebGPU',()=>{
+ assert.equal(effectiveGraphicsMode('webgpu',true),'webgpu');
+ assert.equal(effectiveGraphicsMode('webgl2',false),'webgl2');
+ assert.equal(effectiveGraphicsMode('auto',true),'webgl2');
+ assert.equal(effectiveGraphicsMode('auto',false),'auto');
+ const store=new Map(),storage={getItem:k=>store.get(k)??null,setItem:(k,v)=>store.set(k,v),removeItem:k=>store.delete(k)};
+ assert.equal(readWebGPUUnstableRecord(storage),null);markWebGPUUnstable(storage,Date.now(),'destroyed');
+ assert.equal(readWebGPUUnstableRecord(storage).reason,'destroyed');
+});

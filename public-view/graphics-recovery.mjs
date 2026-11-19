@@ -18,6 +18,13 @@ export function nextDeviceLossAction(losses=[],{now=Date.now(),engine='webgpu'}=
 export function readWebGPUUnstable(storage,now=Date.now()){
  try{const raw=storage?.getItem(WEBGPU_UNSTABLE_KEY);if(!raw)return false;const at=Number(JSON.parse(raw)?.at);if(Number.isFinite(at)&&now-at>=0&&now-at<UNSTABLE_TTL_MS)return true;storage.removeItem(WEBGPU_UNSTABLE_KEY);return false;}catch{return false;}
 }
+// The stored record, for the diagnostic log (when and why WebGPU was retired).
+export function readWebGPUUnstableRecord(storage,now=Date.now()){
+ try{if(!readWebGPUUnstable(storage,now))return null;const raw=JSON.parse(storage.getItem(WEBGPU_UNSTABLE_KEY));return {at:new Date(Number(raw.at)).toISOString(),reason:String(raw.reason||'device-lost').slice(0,80)};}catch{return null;}
+}
+// Only the automatic engine may adapt to a remembered unstable WebGPU device.
+// A forced engine (WebGPU or WebGL2) is always honoured.
+export function effectiveGraphicsMode(mode,webgpuUnstable){return mode==='auto'&&webgpuUnstable?'webgl2':mode;}
 export function markWebGPUUnstable(storage,now=Date.now(),reason='device-lost'){
  try{storage?.setItem(WEBGPU_UNSTABLE_KEY,JSON.stringify({at:now,reason:String(reason).slice(0,80)}));}catch{}
 }
