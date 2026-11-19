@@ -3,13 +3,16 @@ import {BufferAttribute,DoubleSide,FrontSide,Matrix4,Vector3} from 'three';
 const mapKeys=['map','normalMap','bumpMap','roughnessMap','metalnessMap','aoMap','alphaMap','displacementMap','clearcoatNormalMap','clearcoatMap','transmissionMap'];
 function validAttribute(a,size,count){
  if(!a||a.itemSize!==size||a.count!==count||!a.array?.length)return false;
- for(const value of a.array)if(!Number.isFinite(value))return false;
+ // Indexed scan: the iterator form cost ~0.6 s of a phone's district setup.
+ // x-x is 0 for every finite number and NaN for NaN/±Infinity.
+ const array=a.array;for(let i=0,n=array.length;i<n;i++){const value=array[i];if(value-value!==0)return false;}
  return true;
 }
 function validUV(a,count){
  if(!validAttribute(a,2,count))return false;
  let minU=Infinity,maxU=-Infinity,minV=Infinity,maxV=-Infinity;
- for(let i=0;i<a.count;i++){const u=a.getX(i),v=a.getY(i);minU=Math.min(minU,u);maxU=Math.max(maxU,u);minV=Math.min(minV,v);maxV=Math.max(maxV,v);}
+ if(!a.isInterleavedBufferAttribute&&!a.normalized&&a.array.length>=a.count*2){const array=a.array;for(let i=0,n=a.count*2;i<n;i+=2){const u=array[i],v=array[i+1];if(u<minU)minU=u;if(u>maxU)maxU=u;if(v<minV)minV=v;if(v>maxV)maxV=v;}}
+ else for(let i=0;i<a.count;i++){const u=a.getX(i),v=a.getY(i);minU=Math.min(minU,u);maxU=Math.max(maxU,u);minV=Math.min(minV,v);maxV=Math.max(maxV,v);}
  return maxU-minU>1e-8&&maxV-minV>1e-8;
 }
 
