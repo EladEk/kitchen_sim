@@ -52,9 +52,9 @@ test('legacy neutral-lighting preference is retired once; the new key is honoure
  saveReferenceLighting(storage,true);assert.equal(readReferenceLighting(storage),true);
 });
 
-test('fabric and wood scans keep full resolution on phones', async ()=>{
+test('fabric, upholstery and wood scans keep full resolution (1024 px) on phones', async ()=>{
  const {MOBILE_FULL_RES_SCANS}=await import('./scanned-material-core.mjs');
- assert.deepEqual([...MOBILE_FULL_RES_SCANS],['fabric','wood']);
+ assert.deepEqual([...MOBILE_FULL_RES_SCANS],['fabric','upholstery','wood']);
 });
 
 test('alpha glass drops its milky white body and restores it for transmission', async ()=>{

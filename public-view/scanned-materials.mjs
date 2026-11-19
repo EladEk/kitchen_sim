@@ -24,6 +24,10 @@ import roadRough from './assets/pbr-r113/asphalt_03_rough.ktx2?url';
 import grassColor from './assets/grass-r180/color.jpg?url';
 import grassNormal from './assets/grass-r180/normal.jpg?url';
 import grassRough from './assets/grass-r180/roughness.jpg?url';
+// R181: CC0 Poly Haven 'Hessian 380' woven upholstery (see assets/upholstery-r181/SOURCES.json).
+import upholsteryColor from './assets/upholstery-r181/color.jpg?url';
+import upholsteryNormal from './assets/upholstery-r181/normal.jpg?url';
+import upholsteryRough from './assets/upholstery-r181/roughness.jpg?url';
 import {createCompressedMaterialLoader} from './ktx-material-loader.mjs';
 import {createScanMaterialController} from './scanned-material-core.mjs';
 
@@ -37,6 +41,9 @@ const scans={
  door:{normal:woodNormal,roughness:woodRough,metres:1.8,strength:.18,rough:.64,environment:.55},
  grass:{color:grassColor,normal:grassNormal,roughness:grassRough,metres:2,strength:.55,rough:1,environment:.3,naturalColor:true,source:'Poly Haven leafy_grass',technique:'photoscan'},
  fabric:{colorMean:[.540361,.405250,.337280],compressedColorMean:[.839879,.839868,.839895],color:clothColor,normal:clothNormal,roughness:clothRough,metres:.3,strength:.38,rough:.85,environment:.75},
+ // Sofa/armchair cloth: a visible woven slub; tint removed at load (no colorMean),
+ // matte (map mean .9) and capped at 1024 px on phones.
+ upholstery:{color:upholsteryColor,normal:upholsteryNormal,roughness:upholsteryRough,metres:.274,strength:.7,rough:1,environment:.55,source:'Poly Haven hessian_380'},
  wood:{colorMean:[.359834,.211142,.098359],compressedColorMean:[.841074,.828395,.804503],color:woodColor,normal:woodNormal,roughness:woodRough,metres:1.8,strength:.32,rough:.76,environment:.65},
  asphalt:{color:roadColor,normal:roadNormal,roughness:roadRough,metres:2,strength:.7,rough:.97,environment:.4}
 };

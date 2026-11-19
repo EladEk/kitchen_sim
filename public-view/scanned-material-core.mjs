@@ -3,7 +3,9 @@ import {loadSurfaceTexture} from './surface-detail.mjs';
 import {installBuildingSurfaceUVs} from '../src/building-surface-uvs.mjs';
 import {installScanAlbedo} from '../src/scan-albedo.mjs';
 
-export const MOBILE_FULL_RES_SCANS=Object.freeze(['fabric','wood']);
+export const MOBILE_FULL_RES_SCANS=Object.freeze(['fabric','upholstery','wood']);
+export {UPHOLSTERY_FINISH} from '../src/architectural-materials.mjs';
+import {UPHOLSTERY_FINISH} from '../src/architectural-materials.mjs';
 export function createScanMaterialController({scans,mobile=false,signal,loader=loadSurfaceTexture}={}){
  const maps=new Map(),sharedTextures=new Map(),owned=new Set(),bound=new Set(),pending=new Set();let disposed=false;
  async function decodeChannel(p,channel,max,onProgress=()=>{}){
@@ -36,10 +38,10 @@ export function createScanMaterialController({scans,mobile=false,signal,loader=l
  }
  async function apply(root,{onProgress=()=>{},concurrency=3}={}){
   if(disposed||signal?.aborted)return;
-  const groups=new Map();root.traverse(o=>{for(const m of [o.material].flat().filter(Boolean)){const kind=m.userData?.surfaceKind||m.userData?.scanKind;if(!scans[kind]||m.userData.productId||bound.has(m)||m.userData.physicalFinishRevision>=165&&['plaster','paint'].includes(kind))continue;if(!groups.has(kind))groups.set(kind,new Set());groups.get(kind).add(m);}});
+  const groups=new Map();root.traverse(o=>{for(const m of [o.material].flat().filter(Boolean)){const kind=m.userData?.scanKind||m.userData?.surfaceKind;if(!scans[kind]||m.userData.productId||bound.has(m)||m.userData.physicalFinishRevision>=165&&['plaster','paint'].includes(kind))continue;if(!groups.has(kind))groups.set(kind,new Set());groups.get(kind).add(m);}});
   const kinds=[...groups];let finished=0;onProgress(0);if(!kinds.length){if(!disposed&&!signal?.aborted)onProgress(1);return;}
   const bind=async([kind,materials])=>{const p=scans[kind],textures=await load(kind,fraction=>onProgress((finished+fraction)/kinds.length));if(disposed||signal?.aborted)return;
-   for(const m of materials){if(bound.has(m))continue;if(textures.color){m.map=textures.color;if(p.naturalColor)m.color.set('#ffffff');else if(p.colorMean)installScanAlbedo(m,textures.color.isCompressedTexture&&p.compressedColorMean?p.compressedColorMean:p.colorMean);}if(textures.normal){m.normalMap=textures.normal;m.normalScale.setScalar(p.strength);}if(textures.roughness)m.roughnessMap=textures.roughness;m.roughness=p.rough;m.metalness=0;m.envMapIntensity=p.environment;if(m.isMeshPhysicalMaterial&&kind==='fabric'){m.sheen=.65;m.sheenRoughness=.4;m.sheenColor.set('#e8e3da');m.specularIntensity=.3;m.clearcoat=0;}m.userData.scannedPBR={revision:106,source:p.source||'Poly Haven',metres:p.metres,...(p.technique?{technique:p.technique}:{})};installBuildingSurfaceUVs(m);m.needsUpdate=true;bound.add(m);}
+   for(const m of materials){if(bound.has(m))continue;if(textures.color){m.map=textures.color;if(p.naturalColor)m.color.set('#ffffff');else if(p.colorMean)installScanAlbedo(m,textures.color.isCompressedTexture&&p.compressedColorMean?p.compressedColorMean:p.colorMean);}if(textures.normal){m.normalMap=textures.normal;m.normalScale.setScalar(p.strength);}if(textures.roughness)m.roughnessMap=textures.roughness;m.roughness=p.rough;m.metalness=0;m.envMapIntensity=p.environment;if(m.isMeshPhysicalMaterial&&kind==='fabric'){m.sheen=.65;m.sheenRoughness=.4;m.sheenColor.set('#e8e3da');m.specularIntensity=.3;m.clearcoat=0;}if(m.isMeshPhysicalMaterial&&kind==='upholstery'){const f=UPHOLSTERY_FINISH;m.sheen=f.sheen;m.sheenRoughness=f.sheenRoughness;m.sheenColor.set(f.sheenColor);m.specularIntensity=f.specularIntensity;m.clearcoat=f.clearcoat;}m.userData.scannedPBR={revision:106,source:p.source||'Poly Haven',metres:p.metres,...(p.technique?{technique:p.technique}:{})};installBuildingSurfaceUVs(m);m.needsUpdate=true;bound.add(m);}
    onProgress(++finished/kinds.length);
   };
   let next=0;await Promise.all(Array.from({length:Math.min(concurrency,kinds.length)},async()=>{while(next<kinds.length){if(disposed||signal?.aborted)return;const item=kinds[next++];await bind(item);}}));
