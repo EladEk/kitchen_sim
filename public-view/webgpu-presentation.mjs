@@ -29,6 +29,11 @@ export function surfaceReflectionWeight(parameters){
  return parameters.b.mul(reflectance).mul(float(1).sub(parameters.r).pow(2));
 }
 
+// r185: the output quad renders at depth 0 and the scene pass inside it at 1;
+// temporal AA resolves the pass from within its own render, one level deeper.
+export function scenePassRenderDepth({temporal=false}={}){
+ return temporal?2:1;
+}
 export function createNodePresentation(renderer,scene,camera,{mobile=false,enhanced=false,tier=0,capture=false}={}){
  // Keep attachments and shader topology stable across automatic reductions.
  // Initial device/user mode decides temporal AA; no full scene recompile when
@@ -65,6 +70,14 @@ export function createNodePresentation(renderer,scene,camera,{mobile=false,enhan
  else{const antialias=fxaa(renderOutput(vec4(colour,OPAQUE_OUTPUT_ALPHA)));owned.push(antialias);pipeline.outputNode=antialias;}
  pipeline.outputColorTransform=false;
  let preparedKey='',disposed=false,primed=false,temporalActive=!!temporal;
+ // The render context (part of every node/pipeline cache key) depends on the
+ // call depth at which the scene pass renders. Compiling at a different depth
+ // than the real draw builds a second, unused set of render objects and the
+ // first frame then rebuilds every material synchronously. Record the actual
+ // depth from the pass itself; until then use the pipeline's known nesting.
+ let sceneDepth=null;const passUpdate=scenePass.updateBefore.bind(scenePass);
+ scenePass.updateBefore=frame=>{const depth=frame?.renderer?._callDepth;if(Number.isInteger(depth))sceneDepth=depth+1;return passUpdate(frame);};
+ const sceneRenderDepth=()=>sceneDepth??scenePassRenderDepth({temporal:!!temporal});
  const resetHistory=()=>{temporal?._historyRenderTarget.setSize(1,1);};
  function setQuality({tier=0,enhanced=false,effects=true}={}){
   const next=photorealQuality({mobile,enhanced,tier});Object.assign(quality,next);
@@ -90,9 +103,10 @@ export function createNodePresentation(renderer,scene,camera,{mobile=false,enhan
    if(key!==preparedKey){resetHistory();preparedKey=key;}
    const target=renderer.getRenderTarget(),mrt=renderer.getMRT();scenePass.setup({renderer});scenePass.setSize(renderer.domElement.width,renderer.domElement.height);
    renderer.setRenderTarget(scenePass.renderTarget);renderer.setMRT(scenePass.getMRT());
-   try{return await warmup.prepare(key,{...options,draw,onProgress,renderDepth:2,renderFrame:()=>{renderer.setMRT(mrt);renderer.setRenderTarget(target);render();}});}
+   try{return await warmup.prepare(key,{...options,draw,onProgress,renderDepth:sceneRenderDepth(),renderFrame:()=>{renderer.setMRT(mrt);renderer.setRenderTarget(target);render();}});}
    finally{renderer.setMRT(mrt);renderer.setRenderTarget(target);}
   },
+  get sceneRenderDepth(){return sceneRenderDepth();},
   render,dispose(){if(disposed)return;disposed=true;pipeline.dispose();for(const node of owned)node.dispose?.();}
  };
 }
