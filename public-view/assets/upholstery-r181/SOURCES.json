@@ -2,14 +2,21 @@
  "asset": "Hessian 380",
  "official_page": "https://polyhaven.com/a/hessian_380",
  "provider": "Poly Haven",
- "authors": {"colormass": "Photography", "Rico Cilliers": "Processing"},
+ "authors": {
+  "colormass": "Photography",
+  "Rico Cilliers": "Processing"
+ },
  "license": "CC0-1.0",
  "license_source": "https://polyhaven.com/license",
- "physical_dimensions_m": [0.274, 0.274],
+ "physical_dimensions_m": [
+  0.274,
+  0.274
+ ],
  "files": {
-  "color.jpg": "hessian_380_diff_1k (1024 px, re-encoded q82); its mean tint is removed at load so the selected sofa colour stays the albedo authority",
+  "color.jpg": "hessian_380_diff_1k (1024 px), luminance contrast x1.7 so the weave survives mip filtering at walk distance, re-encoded q82; its mean tint is removed at load so the selected sofa colour stays the albedo authority",
   "normal.jpg": "hessian_380_nor_gl_1k (1024 px, OpenGL convention)",
   "roughness.jpg": "hessian_380_rough_1k resized to 512 px and remapped to mean 0.90 (range ~0.79-1.0) so upholstery stays matte (0.8-0.95)"
  },
- "note": "R181 upholstery for sofas and armchairs (editor furniture and the GLB upholstery role). JPEG only; capped at 1024 px on phones via MOBILE_FULL_RES_SCANS."
+ "note": "R181 upholstery for sofas and armchairs (editor furniture and the GLB upholstery role). JPEG only; capped at 1024 px on phones via MOBILE_FULL_RES_SCANS. Tiled at 0.55 m (2x the scan) with full normal strength so it reads as a heavier upholstery weave on a phone at 1-2 m.",
+ "applied_tile_m": 0.55
 }

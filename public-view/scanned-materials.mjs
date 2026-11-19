@@ -43,7 +43,7 @@ const scans={
  fabric:{colorMean:[.540361,.405250,.337280],compressedColorMean:[.839879,.839868,.839895],color:clothColor,normal:clothNormal,roughness:clothRough,metres:.3,strength:.38,rough:.85,environment:.75},
  // Sofa/armchair cloth: a visible woven slub; tint removed at load (no colorMean),
  // matte (map mean .9) and capped at 1024 px on phones.
- upholstery:{color:upholsteryColor,normal:upholsteryNormal,roughness:upholsteryRough,metres:.274,strength:.7,rough:1,environment:.55,source:'Poly Haven hessian_380'},
+ upholstery:{color:upholsteryColor,normal:upholsteryNormal,roughness:upholsteryRough,metres:.55,strength:1,rough:1,environment:.55,source:'Poly Haven hessian_380'},
  wood:{colorMean:[.359834,.211142,.098359],compressedColorMean:[.841074,.828395,.804503],color:woodColor,normal:woodNormal,roughness:woodRough,metres:1.8,strength:.32,rough:.76,environment:.65},
  asphalt:{color:roadColor,normal:roadNormal,roughness:roadRough,metres:2,strength:.7,rough:.97,environment:.4}
 };
