@@ -53,7 +53,9 @@ export function createInteriorLighting(scene,renderer,{mobile=false,environmentF
    ceiling.color.set(daylight<.03?'#ffe2b1':'#f8fafd');
    amount+=((walking&&inside?1:0)-amount)*weight;probe?.update(daylight);
    const areaOn=walking&&inside&&region&&room===region.key&&['kitchen','bathroom','wc'].includes(region.kind);area.intensity=areaOn?amount*shadowAmount*Math.sqrt(daylight)*1.4:0;area.visible=true;if(areaOn){area.position.fromArray(region.position);area.position.y-=.12;area.lookAt(areaTarget.fromArray(region.target));}
-   bounce.intensity=amount*Math.sqrt(daylight)*.75;walls.intensity=amount*Math.sqrt(daylight)*.12;
+   // R181: uniform fills trimmed (.75/.12 -> .5/.06) so shaped light (sun, window,
+   // shadowed ceiling spot, contact AO) gives the room contrast.
+   bounce.intensity=amount*Math.sqrt(daylight)*.5;walls.intensity=amount*Math.sqrt(daylight)*.06;
    windowFill.intensity=amount*Math.sqrt(daylight)*2.1;
    grazing.intensity=amount*Math.sqrt(daylight)*3.5;if(region)grazing.position.fromArray(region.position).add(new Vector3(.3,-.12,0));
    if(region){windowTarget.position.fromArray(region.target).add(new Vector3(0,1.2,0));windowFill.position.copy(windowTarget.position).add(new Vector3(-1.5,2,-4));}

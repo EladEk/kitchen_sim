@@ -27,7 +27,7 @@ import {createApartmentEditorScene,withApartmentEdits} from './apartment-editor-
 import {ElevatorDialog} from './ElevatorDialog.jsx';
 import {createElevatorActions} from './elevator-actions.mjs';
 import {elevatorAt,elevatorLanding} from './tour-elevator.mjs';
-const NEUTRAL_EXPOSURE_SCALE=.92;
+const NEUTRAL_EXPOSURE_SCALE=.92,NEUTRAL_INTERIOR_SCALE=.82;
 import {createPhotoSky} from './photo-sky.mjs';
 import {createReferenceLighting,readReferenceLighting,saveReferenceLighting} from './reference-lighting.mjs';
 import {createGraphicsDiagnostics,captureGraphicsConsole} from './graphics-diagnostics.mjs';
@@ -216,7 +216,11 @@ runtime.current.mapOverrides=editorMapOverrides(nav,appliedEditorWorkspace,varia
   const sunElevation=Math.sin((light?.sun.elevation??45)*Math.PI/180);
   // PBR Neutral keeps base-colour white near 1.0; .92 leaves headroom so sunlit
   // walls read white instead of clipping flat.
-  return reference.enabled?1:NEUTRAL_EXPOSURE_SCALE*computeViewExposure({walking,focused,cameraInside,targetInside,sunElevation,nightMode:!!light?.dark||sunElevation<.02});
+  // R181: the 1.16 indoor target was tuned for AgX, which compresses highlights
+  // far more; under Neutral the stacked room fills sat in the shoulder (walls
+  // ~95% white, no shading). Indoors gets a further .82.
+  const indoors=cameraInside||(!walking&&focused&&targetInside);
+  return reference.enabled?1:NEUTRAL_EXPOSURE_SCALE*(indoors?NEUTRAL_INTERIOR_SCALE:1)*computeViewExposure({walking,focused,cameraInside,targetInside,sunElevation,nightMode:!!light?.dark||sunElevation<.02});
  }
  async function prepareDestination(fallback,{signal,onProgress=()=>{}}={}){
    if(signal?.aborted)return false;syncEditorWorkspace();reference.beginFrame();

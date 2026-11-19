@@ -366,7 +366,7 @@ test('R175 room probe and window bounce stay warm without lighting lamp-only mod
 
 test('R175 paint mobile environment uses restrained warm radiance without adding emission',()=>{
  const source=new T.MeshStandardMaterial();source.userData.surfaceKind='plaster';const material=createPaintNodeMaterial(source,{mobile:true});
- try{const value=evaluateTSL(material.envNode,{material});[.965,.95,.925].forEach((v,i)=>close(value[i],v));assert.equal(material.metalness,0);assert.equal(material.emissive.getHex(),0);}finally{material.dispose();source.dispose();}
+ try{const value=evaluateTSL(material.envNode,{material});[.66,.665,.67].forEach((v,i)=>close(value[i],v));assert.equal(material.metalness,0);assert.equal(material.emissive.getHex(),0);}finally{material.dispose();source.dispose();}
 });
 
 test('R175 bottom grout is symmetric around the floor and absent at negative slab offsets',()=>{

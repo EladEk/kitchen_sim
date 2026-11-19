@@ -26,9 +26,12 @@ test('actual public build preserves paint and ceiling normals through serializat
 test('imported sofa and bedding retain selected colours after scan integration',async()=>{
  const root=new T.Group();for(const [name,color,kind]of [['Derived linen upholstery','#ffffff',null],['HomeStudio fabric','#e8e4d9','fabric']]){const m=new T.MeshPhysicalMaterial({name,color});if(kind)m.userData.surfaceKind=kind;root.add(new T.Mesh(new T.BoxGeometry(),m));}
  applyFurnitureColours(root);
- const scan=createScanMaterialController({scans:{fabric:{color:'cloth',colorMean:[.5,.4,.3],metres:.3,rough:.88,environment:.4}},loader:async()=>new T.DataTexture(new Uint8Array([128,128,128,255]),1,1)});
+ const scan=createScanMaterialController({scans:{fabric:{color:'cloth',colorMean:[.5,.4,.3],metres:.3,rough:.88,environment:.4},upholstery:{color:'weave',metres:.274,rough:1,environment:.55}},loader:async()=>new T.DataTexture(new Uint8Array([128,128,128,255]),1,1)});
  await scan.apply(root);
  assert.equal(root.children[0].material.color.getHexString(),FURNITURE_COLOURS.upholstery.slice(1));assert.equal(root.children[1].material.color.getHexString(),FURNITURE_COLOURS.bedding.slice(1));
- for(const o of root.children){assert.equal(o.material.userData.surfaceKind,'fabric');assert.deepEqual(o.material.userData.scanAlbedoGain,[2,2.5,1/.3]);}
+ for(const o of root.children)assert.equal(o.material.userData.surfaceKind,'fabric');
+ // R181: upholstery binds the woven 'upholstery' scan (tint removed at decode, no gain); bedding keeps the cloth scan gain.
+ const [sofa,bed]=root.children.map(o=>o.material);assert.equal(sofa.userData.scanKind,'upholstery');assert(sofa.map);assert.equal(sofa.userData.scanAlbedoGain,undefined);assert.equal(sofa.specularIntensity,.1);assert.equal(sofa.clearcoat,0);
+ assert.deepEqual(bed.userData.scanAlbedoGain,[2,2.5,1/.3]);
  assert.equal(FURNITURE_PALETTE.fabric,FURNITURE_COLOURS.upholstery);assert.equal(FURNITURE_PALETTE.linen,FURNITURE_COLOURS.bedding);scan.dispose();
 });

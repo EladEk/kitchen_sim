@@ -117,3 +117,15 @@ test('merged scan loader keeps the phone 1024px cap for fabric/wood inside the s
  assert.match(src,/max=mobile&&!MOBILE_FULL_RES_SCANS\.includes\(kind\)\?512:1024,sharedKey=JSON\.stringify\(\[.*,max\]\)/);
  assert.match(src,/if\(p\.technique\)texture\.userData\.scanTechnique=p\.technique/);
 });
+
+test('R181 interiors: phone paint radiance matches the probe, Neutral indoor exposure and flat fills trimmed', async ()=>{
+ const paint=readFileSync(new URL('./paint-finish.mjs',import.meta.url),'utf8');
+ assert.match(paint,/if\(mobile\)material\.envNode=ceiling\?vec3\(\.54,\.545,\.55\):vec3\(\.66,\.665,\.67\)/);
+ assert.doesNotMatch(paint,/vec3\(\.965,\.95,\.925\)/);
+ const viewer=readFileSync(new URL('./DistrictViewer.jsx',import.meta.url),'utf8');
+ assert.match(viewer,/NEUTRAL_INTERIOR_SCALE=\.82/);assert.match(viewer,/NEUTRAL_EXPOSURE_SCALE\*\(indoors\?NEUTRAL_INTERIOR_SCALE:1\)\*computeViewExposure/);
+ const T=await import('three');const {createInteriorLighting}=await import('./interior-lighting.mjs');
+ const scene=new T.Scene(),lighting=createInteriorLighting(scene,{toneMappingExposure:1},{mobile:true,manageExposure:false});
+ try{let r;for(let i=0;i<400;i++)r=lighting.update({inside:true,walking:true,solar:{daylight:1},dt:.1});assert(Math.abs(r.bounce-.5)<.01,'hemisphere bounce '+r.bounce);assert(Math.abs(r.walls-.06)<.002);}finally{lighting.dispose();}
+ const sky=readFileSync(new URL('../src/celestial-sky-scene.mjs',import.meta.url),'utf8');assert.match(sky,/\(1-Math\.max\(0,Math\.min\(1,interior\)\)\*\.6\)/);
+});

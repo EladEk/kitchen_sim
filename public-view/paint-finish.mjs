@@ -29,7 +29,12 @@ export function createPaintNodeMaterial(source,{mobile=false}={}){
  const ceiling=source.userData.architecturalCeiling===true;
  material.roughness=ceiling?.94:.82;
  // R178 warm-white walls; ceilings stay neutral white (owner photos).
- if(mobile)material.envNode=ceiling?vec3(.97,.965,.95):vec3(.965,.95,.925);
+ // R181: phones skip the probe lookup with a constant room radiance. It was a
+ // warm near-white (.965/.95/.925), ~1.4x (walls) and ~1.8x (ceilings) the
+ // irradiance the WebGL interior probe gives the same surfaces, so the phone
+ // (WebGPU) walk view washed out to cream. Match the probe: a horizontal wall
+ // sees wall/ceiling/floor bounce (~.66), a ceiling mostly floor/wall (~.54).
+ if(mobile)material.envNode=ceiling?vec3(.54,.545,.55):vec3(.66,.665,.67);
  material.metalness=0;
  material.sheen=ceiling?0:.1;
  material.sheenColor.set('#ffffff');

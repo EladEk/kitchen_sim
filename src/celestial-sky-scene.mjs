@@ -49,7 +49,7 @@ export function installCelestialSky({renderer,scene,camera,getSettings=()=>({}),
    for(const axis of [right,up]){const at=anchor.dot(axis);anchor.addScaledVector(axis,Math.round(at/texel)*texel-at);}
   }
   target.position.copy(anchor);moon.position.copy(anchor).addScaledVector(new THREE.Vector3(...state.moon.direction),100);moon.intensity=state.moonIntensity;moon.visible=moon.intensity>0;
-  fill.intensity=(state.dark?0:ownSun?state.daylight*1.15+state.twilight*.12+.015:state.daylight>0?0:.015)*(1-Math.max(0,Math.min(1,interior))*.30);fill.visible=fill.intensity>0;
+  fill.intensity=(state.dark?0:ownSun?state.daylight*1.15+state.twilight*.12+.015:state.daylight>0?0:.015)*(1-Math.max(0,Math.min(1,interior))*.6);// R181: unoccluded sky fill flattened interiors (.30 -> .6 indoors)fill.visible=fill.intensity>0;
   if(sun){const distance=Math.max(100,shadowRadius*2+60);sun.intensity=state.sunIntensity;sun.visible=sun.intensity>0;sun.color.set(state.sun.elevation<15?'#ffd8ad':'#fff7eb');sun.position.copy(anchor).addScaledVector(sunDirection,distance);Object.assign(sun.shadow.camera,{left:-shadowRadius,right:shadowRadius,top:shadowRadius,bottom:-shadowRadius,near:.1,far:Math.max(220,distance+shadowRadius*2+80)});sun.shadow.camera.updateProjectionMatrix();if(shadowChanged||!sun.shadow.map)sun.shadow.needsUpdate=true;}
   return state;
  }
