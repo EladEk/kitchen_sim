@@ -49,7 +49,10 @@ export function createSceneWarmup(renderer,scene,camera,{limit=64,maxNativeMs=10
    const nextKey=lightingKey(renderer,scene,renderContext)+':depth:'+(renderDepth??0);if(nextKey!==sceneKey){compiled=new WeakMap();layouts.clear();sceneKey=nextKey;}
    target=nativeCompileList(objects);const candidates=target.children;entries=candidates.map(object=>({object,signature:compileKey(object)})).filter(({object,signature})=>compiled.get(object)!==signature&&(perObject(object)||!layouts.has(signature)));cached=candidates.length-entries.length;target.children=entries.map(e=>e.object);
   }
-  const compileSteps=target?Math.ceil(entries.length/batchSize):1,total=Math.max(1,textures.size+compileSteps+(draw?1:0));let done=0;
+  // Progress follows the real work: one unit per texture, one per compiled
+  // object (advanced batch by batch) and the synchronous first draw weighted by
+  // the shadow/post variants it still builds (~15% of the compiled objects).
+  const compileSteps=target?Math.ceil(entries.length/batchSize):1,compileUnits=target?entries.length:1,drawUnits=draw?Math.max(1,Math.round(objects.length*.15)):0,total=Math.max(1,textures.size+compileUnits+drawUnits);let done=0;
   const report=()=>{if(valid())onProgress(Math.min(1,done/total));};diagnose('texture-upload',{textures:textures.size,drawObjects:objects.length,compileObjects:entries.length,cachedObjects:cached,compileBatches:compileSteps,viewOnly:!!frustum,neighborhood:!!near});report();
   state.phase='texture-upload';const uploadStarted=clock();
   for(const t of textures){if(!valid())return false;await renderer.initTexture?.(t);if(!valid())return false;uploaded.add(t);done++;report();}
@@ -74,7 +77,7 @@ export function createSceneWarmup(renderer,scene,camera,{limit=64,maxNativeMs=10
     // batches that are successfully making progress.
     if(batchElapsedMs>maxNativeMs && i+batchSize<entries.length)throw Object.assign(Error('A native compilation batch exceeded device budget'),{name:'SceneDrawError',code:'WEBGPU_PREPARATION_BUDGET',details:{elapsedMs:Math.round(clock()-started),batchElapsedMs:Math.round(batchElapsedMs),budgetMs:maxNativeMs,budgetScope:'single-compilation-batch',completedBatches:Math.floor(i/batchSize)+1,totalBatches:compileSteps,drawObjects:objects.length,compileObjects:entries.length,cachedObjects:cached}});
     for(const {object}of batch)remember(object);
-    done++;report();diagnose('shader-compilation',{completedBatches:Math.floor(i/batchSize)+1,compileBatches:compileSteps,elapsedMs:Math.round(clock()-started),compileObjects:entries.length,cachedObjects:cached});
+    done+=batch.length;report();diagnose('shader-compilation',{completedBatches:Math.floor(i/batchSize)+1,compileBatches:compileSteps,elapsedMs:Math.round(clock()-started),compileObjects:entries.length,cachedObjects:cached});
    }}finally{target.children=[];for(const [shadow,auto,update]of shadows){shadow.autoUpdate=auto;shadow.needsUpdate=update;}}
   }else{
    const target={traverse:fn=>objects.forEach(fn),traverseVisible:()=>{}};if(renderer.compileAsync)await renderer.compileAsync(target,camera,scene,renderDepth);else renderer.compile?.(target,camera,scene);done++;report();
