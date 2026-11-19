@@ -20,7 +20,7 @@ export const ARCHITECTURAL_MATERIALS=Object.freeze({
  floor:{color:DRY_PORCELAIN.color,roughness:.25,metalness:0,clearcoat:.28,envMapIntensity:.9},
  worktop:{metalness:0,clearcoat:.18,clearcoatRoughness:.25},
  cabinet:{roughness:.38,metalness:0,clearcoat:.2,clearcoatRoughness:.3},
- fabric:{roughness:.85,metalness:0,sheen:.65,sheenRoughness:.4,sheenColor:'#e8e3da'}
+ fabric:{roughness:.85,metalness:0,sheen:.65,sheenRoughness:.4,sheenColor:'#e8e3da',specularIntensity:.3,clearcoat:0}
 });
 export function architecturalRole(object,material){
  const part=object.userData.part||'',data=material.userData||{};
@@ -44,6 +44,10 @@ export function architecturalRole(object,material){
  if(data.surfaceKind==='paint'&&data.furnitureMaterial)return 'cabinet';
  return null;
 }
+// R181 matte woven upholstery (sofas/armchairs): broad, dim sheen and almost no
+// specular lobe, so the cloth reads woven instead of satin plastic. Shared by
+// the WebGL conversion, the scan binding and the WebGPU node adapter.
+export const UPHOLSTERY_FINISH=Object.freeze({roughness:1,sheen:.35,sheenRoughness:.85,sheenColor:'#aaa398',specularIntensity:.1,clearcoat:0});
 export function applyArchitecturalMaterials(root){
  const cache=new Map();
  root.traverse(object=>{
@@ -56,7 +60,7 @@ export function applyArchitecturalMaterials(root){
    // Standard copy() replaces defines with {STANDARD}; WebGL2 needs PHYSICAL (IOR) for transmission glass.
    material.defines={...source.defines,STANDARD:'',PHYSICAL:''};
    material.onBeforeCompile=source.onBeforeCompile;material.customProgramCacheKey=source.customProgramCacheKey;
-   const values={...ARCHITECTURAL_MATERIALS[role]};if(source.userData.selectedFinishColor)delete values.color;if(role==='glass'&&source.userData.architecturalGlass)Object.assign(values,{transmission:source.transmission,transparent:source.transparent,opacity:source.opacity});material.setValues(values);
+   const values={...ARCHITECTURAL_MATERIALS[role],...(role==='fabric'&&source.userData.scanKind==='upholstery'?{...UPHOLSTERY_FINISH,roughness:source.roughnessMap?1:.9}:{})};if(source.userData.selectedFinishColor)delete values.color;if(role==='glass'&&source.userData.architecturalGlass)Object.assign(values,{transmission:source.transmission,transparent:source.transparent,opacity:source.opacity});material.setValues(values);
    material.userData={...source.userData,architecturalRole:role};
    if(role==='secondary')Object.assign(material.userData,{publicFinish:'stone',surfaceKind:'limestone'});
    if(role==='entranceFloor')Object.assign(material.userData,{publicFinish:'floor',floorCourses:{tile:[.2,1.2],joint:.003}});
