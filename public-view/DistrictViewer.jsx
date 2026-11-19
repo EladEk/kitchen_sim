@@ -277,8 +277,9 @@ runtime.current.mapOverrides=editorMapOverrides(nav,appliedEditorWorkspace,varia
    // CPU frame time hides GPU-side shader compilation. Record when the GPU
    // actually finished the first interactive frame.
    const presented=source=>{if(!disposed)diagnostics.info('first-frame-presented','GPU finished the first interactive frame',{gpuWaitMs:Math.round(performance.now()-submitted),sinceStartMs:Math.round(performance.now()-sessionStarted),source});};
-   const nextFrames=()=>requestAnimationFrame(()=>requestAnimationFrame(()=>presented('animation-frame')));
-   try{if(!queue?.onSubmittedWorkDone)throw Error('no queue');queue.onSubmittedWorkDone().then(()=>presented('gpu-queue'),nextFrames);}catch{nextFrames();}}
+   const nextFrames=()=>requestAnimationFrame(()=>requestAnimationFrame(()=>once('animation-frame')));
+   let reported=false;const once=source=>{if(!reported){reported=true;presented(source);}};
+   try{if(!queue?.onSubmittedWorkDone)throw Error('no queue');queue.onSubmittedWorkDone().then(()=>once('gpu-queue'),()=>nextFrames());setTimeout(()=>once('gpu-queue-timeout'),30000);}catch{nextFrames();}}
   if(readyRef&&!runtime.current.firstFrame){runtime.current.firstFrame=true;diagnostics.stage('first-frame-ready');progress.complete();setReady(true);setTransition('');}
   }catch(error){lifecycle.fail(error);}
  }
