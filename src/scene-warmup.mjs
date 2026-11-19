@@ -14,12 +14,25 @@ export function nativeCompileList(objects){
 function drawable(o){return (o.isMesh||o.isLine||o.isPoints||o.isSprite)&&!o.userData.furnitureCollisionProxy&&(!o.isInstancedMesh||o.count>0)&&o.geometry?.drawRange?.count!==0&&[o.material].flat().some(m=>m&&m.visible!==false&&m.opacity!==0);}
 function lightingKey(renderer,scene,{mrt,target}){const lights=[];scene.traverseVisible(o=>{if(o.isLight)lights.push([o.uuid,o.type,!!o.castShadow]);});return JSON.stringify([lights,scene.environment?.uuid,scene.fog?.type,scene.overrideMaterial?.uuid,!!renderer.shadowMap?.enabled,renderer.shadowMap?.type,mrt?.uuid,target?.samples,target?.textures?.map(t=>[t.name,t.type,t.format])]);}
 
-export function createSceneWarmup(renderer,scene,camera,{limit=64,maxNativeMs=10000,clock=()=>performance.now(),batchSize=24,viewOnly=false,onDiagnostic=()=>{}}={}){
+export function createSceneWarmup(renderer,scene,camera,{limit=64,maxNativeMs=10000,clock=()=>performance.now(),batchSize=24,viewOnly=false,onDiagnostic=()=>{},counters=()=>({})}={}){
  let disposed=false,epoch=0,uploaded=new WeakSet(),compiled=new WeakMap(),sceneKey='',serial=null;const prepared=new Set(),layouts=new Set();
  const diagnose=(event,details={})=>{try{onDiagnostic({event,details});}catch{}};
+ // Pipeline/node counters (WebGPU) so a phone's diagnostic log shows how much
+ // the compile pass covered and how many pipelines its first draw still built.
+ const count=()=>{try{return counters()||{};}catch{return {};}};
+ const delta=(before,after,prefix)=>{const out={};for(const key of ['nodeBuilds','syncPipelines','asyncPipelines'])if(Number.isFinite(after[key])&&Number.isFinite(before[key]))out[prefix+key[0].toUpperCase()+key.slice(1)]=after[key]-before[key];return out;};
  const remember=object=>{const signature=compileKey(object);compiled.set(object,signature);if(!perObject(object)){layouts.add(signature);if(layouts.size>2048)layouts.delete(layouts.values().next().value);}};
- async function prepareScene(key,{signal,all=false,draw=false,renderDepth,neighborhood,preparationObjects=[],beforeReady=()=>{},renderFrame=()=>renderer.render(scene,camera),onProgress=()=>{}}={}){
-  if(disposed||signal?.aborted)return false;if(prepared.has(key)&&!renderer.isWebGPURenderer){onProgress(1);return false;}
+ async function prepareScene(key,options={}){
+  const at=clock(),before=count(),state={phase:'collect',epoch,stats:{}};
+  const result=await prepareSceneSteps(key,options,state);
+  // A preparation that silently stops leaves its first visible frame to build
+  // every pipeline synchronously. Make that visible in the diagnostic log.
+  if(result===false&&state.phase!=='cached')diagnose('scene-preparation-abandoned',{phase:state.phase,reason:disposed?'disposed':options.signal?.aborted?'aborted':epoch!==state.epoch?'reset':'invalid',elapsedMs:Math.round(clock()-at),...delta(before,count(),'')});
+  else if(result===true)diagnose('scene-preparation-timing',{elapsedMs:Math.round(clock()-at),...state.stats,...delta(before,count(),'total')});
+  return result;
+ }
+ async function prepareSceneSteps(key,{signal,all=false,draw=false,renderDepth,neighborhood,preparationObjects=[],beforeReady=()=>{},renderFrame=()=>renderer.render(scene,camera),onProgress=()=>{}}={},state={stats:{}}){
+  if(disposed||signal?.aborted)return false;if(prepared.has(key)&&!renderer.isWebGPURenderer){state.phase='cached';onProgress(1);return false;}
   const version=epoch,objects=[],textures=new Set(),valid=()=>!disposed&&!signal?.aborted&&epoch===version;
   // The display callback restores the canvas after drawing post processing.
   // Cache the scene pass's actual attachments, not that restored output target.
@@ -36,9 +49,14 @@ export function createSceneWarmup(renderer,scene,camera,{limit=64,maxNativeMs=10
    const nextKey=lightingKey(renderer,scene,renderContext)+':depth:'+(renderDepth??0);if(nextKey!==sceneKey){compiled=new WeakMap();layouts.clear();sceneKey=nextKey;}
    target=nativeCompileList(objects);const candidates=target.children;entries=candidates.map(object=>({object,signature:compileKey(object)})).filter(({object,signature})=>compiled.get(object)!==signature&&(perObject(object)||!layouts.has(signature)));cached=candidates.length-entries.length;target.children=entries.map(e=>e.object);
   }
-  const compileSteps=target?Math.ceil(entries.length/batchSize):1,total=Math.max(1,textures.size+compileSteps+(draw?1:0));let done=0;
+  // Progress follows the real work: one unit per texture, one per compiled
+  // object (advanced batch by batch) and the synchronous first draw weighted by
+  // the shadow/post variants it still builds (~15% of the compiled objects).
+  const compileSteps=target?Math.ceil(entries.length/batchSize):1,compileUnits=target?entries.length:1,drawUnits=draw?Math.max(1,Math.round(objects.length*.15)):0,total=Math.max(1,textures.size+compileUnits+drawUnits);let done=0;
   const report=()=>{if(valid())onProgress(Math.min(1,done/total));};diagnose('texture-upload',{textures:textures.size,drawObjects:objects.length,compileObjects:entries.length,cachedObjects:cached,compileBatches:compileSteps,viewOnly:!!frustum,neighborhood:!!near});report();
+  state.phase='texture-upload';const uploadStarted=clock();
   for(const t of textures){if(!valid())return false;await renderer.initTexture?.(t);if(!valid())return false;uploaded.add(t);done++;report();}
+  state.stats.uploadMs=Math.round(clock()-uploadStarted);state.phase='shader-compilation';const compileStarted=clock(),compileBefore=count();
   diagnose('shader-compilation',{compileBatches:compileSteps,compileObjects:entries.length,cachedObjects:cached});
   if(renderer.isWebGPURenderer){
    const shadows=[],started=clock();
@@ -59,12 +77,14 @@ export function createSceneWarmup(renderer,scene,camera,{limit=64,maxNativeMs=10
     // batches that are successfully making progress.
     if(batchElapsedMs>maxNativeMs && i+batchSize<entries.length)throw Object.assign(Error('A native compilation batch exceeded device budget'),{name:'SceneDrawError',code:'WEBGPU_PREPARATION_BUDGET',details:{elapsedMs:Math.round(clock()-started),batchElapsedMs:Math.round(batchElapsedMs),budgetMs:maxNativeMs,budgetScope:'single-compilation-batch',completedBatches:Math.floor(i/batchSize)+1,totalBatches:compileSteps,drawObjects:objects.length,compileObjects:entries.length,cachedObjects:cached}});
     for(const {object}of batch)remember(object);
-    done++;report();diagnose('shader-compilation',{completedBatches:Math.floor(i/batchSize)+1,compileBatches:compileSteps,elapsedMs:Math.round(clock()-started),compileObjects:entries.length,cachedObjects:cached});
+    done+=batch.length;report();diagnose('shader-compilation',{completedBatches:Math.floor(i/batchSize)+1,compileBatches:compileSteps,elapsedMs:Math.round(clock()-started),compileObjects:entries.length,cachedObjects:cached});
    }}finally{target.children=[];for(const [shadow,auto,update]of shadows){shadow.autoUpdate=auto;shadow.needsUpdate=update;}}
   }else{
    const target={traverse:fn=>objects.forEach(fn),traverseVisible:()=>{}};if(renderer.compileAsync)await renderer.compileAsync(target,camera,scene,renderDepth);else renderer.compile?.(target,camera,scene);done++;report();
   }
   if(!valid())return false;
+  Object.assign(state.stats,{compileMs:Math.round(clock()-compileStarted),compileObjects:entries.length,cachedObjects:cached,drawObjects:objects.length},delta(compileBefore,count(),'compile'));
+  state.phase='first-frame-draw';const drawStarted=clock(),drawBefore=count();
   if(draw){diagnose('first-frame-draw');const gl=renderer.getContext?.();if(gl?.getError)for(let i=0;i<8&&gl.getError()!==0;i++){}const culling=[],shadowOnly=new Set(),selected=new Set(objects),previousFunction=renderer.getRenderObjectFunction?.();
    // The sun can see distant facade casters which the walking camera cannot.
    // Prime those real shadow variants while retaining ordinary beauty culling.
@@ -72,6 +92,8 @@ export function createSceneWarmup(renderer,scene,camera,{limit=64,maxNativeMs=10
    const filter=shadowOnly.size&&renderer.setRenderObjectFunction;
    try{for(const [object]of culling)object.frustumCulled=false;if(filter)renderer.setRenderObjectFunction((object,...args)=>{if(!shadowOnly.has(object))(previousFunction||renderer.renderObject).call(renderer,object,...args);});renderFrame();}
    finally{if(filter)renderer.setRenderObjectFunction(previousFunction);for(const [object,culled]of culling)object.frustumCulled=culled;}const error=gl?.getError?.();if(error&&error!==0x9242)throw Object.assign(Error('The first scene draw failed'),{name:'SceneDrawError',code:error});if(!renderer.isWebGPURenderer&&renderer.shadowMap?.enabled)scene.traverseVisible(o=>{if(o.isLight&&o.castShadow&&o.shadow&&!o.shadow.map)throw Object.assign(Error('A visible shadow has no render target'),{name:'SceneDrawError'});});}
+  if(draw)Object.assign(state.stats,{drawMs:Math.round(clock()-drawStarted),drawCalls:renderer.info?.render?.drawCalls},delta(drawBefore,count(),'draw'));
+  state.phase='ready';
   if(!valid())return false;beforeReady();if(!valid())return false;if(renderer.isWebGPURenderer&&draw){for(const {object}of entries)remember(object);sceneKey=lightingKey(renderer,scene,renderContext)+':depth:'+(renderDepth??0);}done=total;report();diagnose('scene-preparation-ready');prepared.add(key);if(prepared.size>limit)prepared.delete(prepared.values().next().value);return true;
  }
  async function prepare(key,options={}){
