@@ -1,11 +1,13 @@
+import {installStaleBuildRecovery,reloadingImport} from './stale-build.mjs';
+installStaleBuildRecovery();
 import {LoadingIndicator} from './LoadingIndicator.jsx';
 import React,{Suspense,lazy,useEffect,useState} from 'react';
 import {createRoot} from 'react-dom/client';
-const HomeApp=lazy(()=>import('./HomeApp.jsx'));
+const HomeApp=lazy(reloadingImport(()=>import('./HomeApp.jsx')));
 import './base.css';
 import './private-shell.css';
 import {DocumentAccessProvider,useDocumentAccess} from './DocumentAccess.jsx';
-const KitchenApp=lazy(()=>import('./KitchenApp.jsx'));
+const KitchenApp=lazy(reloadingImport(()=>import('./KitchenApp.jsx')));
 function App(){
  const access=useDocumentAccess();
  useEffect(()=>{if(!access.checking&&!access.authorized)window.location.replace('/');},[access.checking,access.authorized]);

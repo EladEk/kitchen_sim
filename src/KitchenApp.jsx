@@ -1,3 +1,4 @@
+import {reloadingImport} from './stale-build.mjs';
 import {ProtectedImage} from './DocumentAccess.jsx';
 import {KitchenLighting} from './HomeLighting.jsx';
 import {SunlightControls} from './SunlightControls.jsx';
@@ -48,7 +49,7 @@ export default function KitchenApp({onHome}){
  useEffect(()=>{const fn=e=>{if(e.key==='Escape'){if(modelRef.current?.isVRActive()){e.preventDefault();void modelRef.current.endVR();return;}setModal(null);setExportOpen(false);setSelectedElectricalId(null);setInspecting(false);setSelectedPart(null);change('selected',null);}};window.addEventListener('keydown',fn);return()=>window.removeEventListener('keydown',fn);},[]);
  const getPair=()=>cleanDesignPair(s.homeDraft||readHomeDesign(localStorage),s);
  const loadAlternative=v=>{const pair=cleanDesignPair(v.home,v.kitchen);setS({...pair.kitchen,lang:s.lang,cleanView:false,homeDraft:pair.home});};
- const exportPlanning=async()=>{try{const {downloadPlanningSheet}=await import('./export-planning.jsx');downloadPlanningSheet(getPair());notify(t('Planning sheet downloaded. Open it to print / save as PDF.','דף התכנון הורד. פתחו אותו להדפסה / שמירה כ־PDF.'));}catch{notify(t('Could not create planning sheet.','הפקת דף התכנון נכשלה.'));}};
+ const exportPlanning=async()=>{try{const {downloadPlanningSheet}=await reloadingImport(()=>import('./export-planning.jsx'))();downloadPlanningSheet(getPair());notify(t('Planning sheet downloaded. Open it to print / save as PDF.','דף התכנון הורד. פתחו אותו להדפסה / שמירה כ־PDF.'));}catch{notify(t('Could not create planning sheet.','הפקת דף התכנון נכשלה.'));}};
  const select=id=>{setSelectedElectricalId(null);change('selected',id);setSelectedPart(null);if(!id)setInspecting(false);};const selected=getModule(s.selected);const selectedSpec=getSpecification(s.selected);const selectedOpening=getOpening(selectedPart);const setView=view=>{change('view',view);setZoom(1);setInspecting(false);};
  const togglePart=id=>{
   setSelectedElectricalId(null);
