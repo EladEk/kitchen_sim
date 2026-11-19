@@ -29,10 +29,10 @@ export function surfaceReflectionWeight(parameters){
  return parameters.b.mul(reflectance).mul(float(1).sub(parameters.r).pow(2));
 }
 
-// r185: the output quad renders at depth 0 and the scene pass inside it at 1;
-// temporal AA resolves the pass from within its own render, one level deeper.
-export function scenePassRenderDepth({temporal=false}={}){
- return temporal?2:1;
+// r185: the output quad renders at depth 0 and the scene pass inside it at 1
+// (measured with and without temporal AA; its shadow maps render at 2).
+export function scenePassRenderDepth(){
+ return 1;
 }
 export function createNodePresentation(renderer,scene,camera,{mobile=false,enhanced=false,tier=0,capture=false}={}){
  // Keep attachments and shader topology stable across automatic reductions.
@@ -77,7 +77,7 @@ export function createNodePresentation(renderer,scene,camera,{mobile=false,enhan
  // depth from the pass itself; until then use the pipeline's known nesting.
  let sceneDepth=null;const passUpdate=scenePass.updateBefore.bind(scenePass);
  scenePass.updateBefore=frame=>{const depth=frame?.renderer?._callDepth;if(Number.isInteger(depth))sceneDepth=depth+1;return passUpdate(frame);};
- const sceneRenderDepth=()=>sceneDepth??scenePassRenderDepth({temporal:!!temporal});
+ const sceneRenderDepth=()=>sceneDepth??scenePassRenderDepth();
  const resetHistory=()=>{temporal?._historyRenderTarget.setSize(1,1);};
  function setQuality({tier=0,enhanced=false,effects=true}={}){
   const next=photorealQuality({mobile,enhanced,tier});Object.assign(quality,next);
