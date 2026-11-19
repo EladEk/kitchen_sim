@@ -242,6 +242,9 @@ runtime.current.mapOverrides=editorMapOverrides(nav,appliedEditorWorkspace,varia
    if(indoors&&quality.profile.effects&&!reflections.has(lightingRegion?.key))reflections.prepare(lightingRegion,selectedBuilding,{environment:!reference.enabled});
    reflections.activate(lightingRegion?.key,{environment:!reference.enabled});reflections.update(now,{inside:indoors,effects:quality.profile.effects,xr:vr.active,environment:!reference.enabled});
    reference.bind(scene);reference.apply({focus});renderer.toneMappingExposure=viewExposure(light,walking);
+   // Interior spot lights enable shadows per view: give them the shared
+   // shadow-pass key before compiling, not after their first shadow draw.
+   session.shareShadows?.(scene);
    return selectionBackdrop.render(selection?.current?.focused,()=>presentation.prepare(location?.key||fallback,warmup,{signal,draw:true,onProgress,...(walking?{neighborhood:walkingPreparationNeighborhood(nav.storey),preparationObjects:district.preparationObjects}:{}),effects:quality.profile.effects,enhanced:latest.current.qualityMode!=='performance'&&indoors}));
   }
  function frame(now,xrFrame){
