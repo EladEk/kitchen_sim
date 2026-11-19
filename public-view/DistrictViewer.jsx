@@ -201,7 +201,12 @@ export function DistrictViewer({createVariant=null,initialView={},banner=null,op
   function syncEditorWorkspace(){
    if(!editorScene||appliedEditorWorkspace===latest.current.editorWorkspace)return;
    appliedEditorWorkspace=latest.current.editorWorkspace;
-   try{editorScene.sync(appliedEditorWorkspace);runtime.current.mapOverrides=editorMapOverrides(nav,appliedEditorWorkspace,variant?.mapOverrides);session.adapt(editorScene.group);interior.bind(editorScene.group);reference.bind(editorScene.group);if(!latest.current.liveSession)warmup.reset();sky.invalidateShadows();interior.invalidateShadows();presentation.resetHistory();setDoorRevision(v=>v+1);
+   try{editorScene.sync(appliedEditorWorkspace);
+    // Editor furniture is built after the startup scan pass: bind the woven
+    // upholstery/wood scans to its (still un-adapted) palette materials, then
+    // rebuild once they land so WebGPU node materials pick up the maps.
+    {const group=editorScene.group,before=scans.stats.materials;scans.apply(group).then(()=>{if(disposed||editorScene?.group!==group||scans.stats.materials===before)return;appliedEditorWorkspace=null;syncEditorWorkspace();}).catch(()=>{});}
+runtime.current.mapOverrides=editorMapOverrides(nav,appliedEditorWorkspace,variant?.mapOverrides);session.adapt(editorScene.group);interior.bind(editorScene.group);reference.bind(editorScene.group);if(!latest.current.liveSession)warmup.reset();sky.invalidateShadows();interior.invalidateShadows();presentation.resetHistory();setDoorRevision(v=>v+1);
 
    }catch(error){setActionStatus(error.message||'לא ניתן לטעון את עריכת הריהוט.');}
   }

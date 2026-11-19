@@ -1,6 +1,7 @@
 import {furnitureFootprintBoxes} from '../src/furniture-shape.mjs';
 import {FURNITURE_PALETTE,furniturePartColor,furnitureMaterialProperties} from './furniture-palette.mjs';
 import * as T from 'three';
+import {UPHOLSTERY_FINISH} from './scanned-material-core.mjs';
 import {createFurnitureSurfacePalette} from '../src/physical-finishes.mjs';
 import {createContactShadows} from '../src/contact-shadows.mjs';
 import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
@@ -15,7 +16,7 @@ export function createApartmentEditorScene({nav,overrides=null}){
  const group=new T.Group();group.name='local-apartment-furniture';
  const cube=new T.BoxGeometry(1,1,1),soft=new RoundedBoxGeometry(1,1,1,2,.07),mirrors=new Map([[cube,mirroredGeometry(cube,[0,0])],[soft,mirroredGeometry(soft,[0,0])]]),palette={};
  const owned=[],surface=createFurnitureSurfacePalette(owned),contacts=createContactShadows(owned);
- for(const name of Object.keys(FURNITURE_PALETTE)){const kind=['fabric','linen'].includes(name)?'fabric':name==='wood'?'wood':name==='paint'?'paint':null;palette[name]=kind?surface(kind):new T.MeshPhysicalMaterial({color:'#ffffff',...furnitureMaterialProperties(name)});palette[name].userData={...palette[name].userData,architecturalInterior:true,furnitureMaterial:true,...(name==='glass'?{architecturalGlass:true}:{})};}
+ for(const name of Object.keys(FURNITURE_PALETTE)){const kind=['fabric','linen'].includes(name)?'fabric':name==='wood'?'wood':name==='paint'?'paint':null;palette[name]=kind?surface(kind):new T.MeshPhysicalMaterial({color:'#ffffff',...furnitureMaterialProperties(name)});palette[name].userData={...palette[name].userData,architecturalInterior:true,furnitureMaterial:true,...(name==='glass'?{architecturalGlass:true}:{}),...(name==='fabric'?{scanKind:'upholstery'}:{})};if(name==='fabric'){const f=UPHOLSTERY_FINISH,m=palette[name];m.roughness=.9;m.sheen=f.sheen;m.sheenRoughness=f.sheenRoughness;m.sheenColor.set(f.sheenColor);m.specularIntensity=f.specularIntensity;m.clearcoat=f.clearcoat;}}
  const proxy=new T.MeshBasicMaterial({colorWrite:false,depthWrite:false,transparent:true,opacity:1,side:T.DoubleSide}),flip=new T.Matrix4().makeScale(-1,1,1);
  const physicalMeshes=[],placements=[],visualBatches=[],assemblies=[],poses=new Map(),itemsByKey=new Map();
  const ghostMaterials=new Map();let ghostKey="",ghostTime=0;

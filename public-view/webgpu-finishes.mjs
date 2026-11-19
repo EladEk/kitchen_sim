@@ -1,3 +1,4 @@
+import {UPHOLSTERY_FINISH} from './scanned-material-core.mjs';
 import {materialProperty as reference} from './material-property.mjs';
 import './gpu-selection-nodes.mjs';
 import {copyGpuClipBinding} from './gpu-selection-clip.mjs';
@@ -58,7 +59,7 @@ export function createFinishNodeMaterial(source,{steps=uniform(24),mobile=false}
  const material=foliage?new MeshSSSNodeMaterial():physical?new MeshPhysicalNodeMaterial():new MeshStandardNodeMaterial();
  if(source.isMeshPhysicalMaterial)material.copy(source);else MeshStandardMaterial.prototype.copy.call(material,source);
  material.isMeshStandardMaterial=true;if(physical)material.isMeshPhysicalMaterial=true;material.userData={...data,tslFinishRevision:177};
- if(kind==='fabric'){material.sheen=.65;material.sheenRoughness=.4;material.sheenColor.set('#e8e3da');material.clearcoat=0;material.metalness=0;}
+ if(kind==='fabric'){const f=data.scanKind==='upholstery'?UPHOLSTERY_FINISH:null;material.sheen=f?f.sheen:.65;material.sheenRoughness=f?f.sheenRoughness:.4;material.sheenColor.set(f?f.sheenColor:'#e8e3da');if(f)material.specularIntensity=f.specularIntensity;material.clearcoat=0;material.metalness=0;}
  if(kind==='wood'){material.clearcoat=.2;material.clearcoatRoughness=.3;material.metalness=0;}
  if(kind==='stone'&&source.roughness<.5&&data.architecturalRole!=='worktop'){material.clearcoat=.12;material.clearcoatRoughness=.3;}
  if(foliage){material.thicknessColorNode=reference('color','color');material.thicknessScaleNode=float(2);material.thicknessAttenuationNode=float(.18);material.thicknessAmbientNode=float(0);}
@@ -145,6 +146,11 @@ export function createFinishNodeMaterial(source,{steps=uniform(24),mobile=false}
 }
 export function createFinishAdapter({renderer,mobile=false}={}){
  const steps=uniform(photorealQuality({mobile}).pomSteps),converted=new Map(),bindings=new Map(),profileMaterials=new Set();let disposed=false;
- const convert=m=>{if(!m)return m;sharpenMaterialTextures(m,textureAnisotropy(renderer));if(m.isNodeMaterial)return m;if(!converted.has(m))converted.set(m,copyGpuClipBinding(m,createFinishNodeMaterial(m,{steps,mobile})));return converted.get(m);};
+ const convert=m=>{if(!m)return m;sharpenMaterialTextures(m,textureAnisotropy(renderer));if(m.isNodeMaterial)return m;// Scanned maps can arrive after a material was first adapted (editor
+ // furniture, late loads). Rebuild when the source's texture set changed, or
+ // the cached node graph keeps rendering the flat, map-less colour.
+ const signature=m.map?.uuid+'|'+m.normalMap?.uuid+'|'+m.roughnessMap?.uuid+'|'+m.bumpMap?.uuid,cached=converted.get(m);
+ if(cached&&cached.userData.sourceMaps!==signature&&cached!==m){cached.dispose();converted.delete(m);}
+ if(!converted.has(m)){const next=copyGpuClipBinding(m,createFinishNodeMaterial(m,{steps,mobile}));if(next!==m)next.userData.sourceMaps=signature;converted.set(m,next);}return converted.get(m);};
  return {setQuality(profile){steps.value=photorealQuality({mobile,...profile}).pomSteps;},apply(root){if(disposed)return;const originals=new Map();root.traverse(o=>{if(o.material)originals.set(o,o.material);});prepareSceneGeometry(root);for(const m of applyArchitecturalMaterials(root).values())profileMaterials.add(m);root.traverse(o=>{if(!o.material)return;const before=o.material,after=Array.isArray(before)?before.map(convert):convert(before);if(Array.isArray(before)?after.some((m,i)=>m!==before[i]):after!==before){if(!bindings.has(o))bindings.set(o,originals.get(o)||before);o.material=after;}});},dispose(){if(disposed)return;disposed=true;for(const [o,m]of bindings)o.material=m;for(const [s,m]of converted)if(m!==s)m.dispose();for(const m of profileMaterials)m.dispose();profileMaterials.clear();bindings.clear();converted.clear();}};
 }
