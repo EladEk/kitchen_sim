@@ -8,7 +8,17 @@ export function createArchitecturalPresentation(renderer,scene,camera,{mobile=fa
  const ensure=enhanced=>{enhanced=enhanced&&!mobile;if(enhancedState!==enhanced){enhancedState=enhanced;if(!renderer.isWebGPURenderer)drop();}if(!pipeline){pipeline=pipelineFactory(renderer,scene,camera,{mobile,enhanced,tier});stats.created++;size();}};
  return {stats,setQuality(profile){if(tier!==profile.tier){tier=profile.tier;if(renderer.isWebGPURenderer)pipeline?.setQuality?.({tier,enhanced:enhancedState});else drop();}},reconfigure(){drop();},resetHistory(){pipeline?.resetHistory?.();},resize(w,h){width=Math.max(1,w);height=Math.max(1,h);size();},suspend(){previous=0;slow=fast=0;drop();},trim(now=performance.now()){reducedUntil=now+15000;slow=fast=0;drop();},
  async prepare(key,warmup,{effects=true,enhanced=false,...options}={}){
-  if(!renderer.isWebGPURenderer||failed||renderer.xr.isPresenting)return warmup.prepare(key,options);
+  if(failed||renderer.xr.isPresenting)return warmup.prepare(key,options);
+  if(!renderer.isWebGPURenderer){
+   // Prepare exactly the path the next real frame takes. Through the composer
+   // the scene renders into a HalfFloat buffer without renderer tone mapping,
+   // so its WebGL programs differ from a direct canvas draw: preparing on the
+   // canvas compiled every program twice (once here, once in the first frame).
+   const now=performance.now(),reduced=!!(reducedUntil&&(now<reducedUntil||fast<180));
+   if(!effects||reduced)return warmup.prepare(key,options);
+   try{ensure(enhanced);}catch{failed=true;drop();return warmup.prepare(key,options);}
+   return warmup.prepare(key,{...options,compileTarget:pipeline.sceneTarget,renderFrame:()=>this.render(performance.now(),{effects,enhanced})});
+  }
   ensure(enhanced);pipeline.setQuality?.({tier,enhanced,effects});return pipeline.prepare(key,warmup,options);
  },render(now=performance.now(),{effects=true,enhanced=false}={}){
   if(disposed)return;enhanced=enhanced&&!mobile;if(enhancedState!==enhanced){enhancedState=enhanced;if(!renderer.isWebGPURenderer)drop();}const dt=previous?now-previous:0;previous=now;
