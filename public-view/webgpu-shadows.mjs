@@ -1,6 +1,6 @@
 import {Vector3,Quaternion} from 'three';
 import {CSMShadowNode} from 'three/addons/csm/CSMShadowNode.js';
-import {Fn,If,Loop,Break,float,vec2,vec4,ivec2,uniform,reference,textureLoad,max,min,cos,sin,sqrt,floor,fract,mix,getShadowMaterial} from 'three/tsl';
+import {Fn,If,Loop,Break,float,vec2,ivec2,uniform,reference,textureLoad,max,min,cos,sin,sqrt,floor,fract,mix} from 'three/tsl';
 import {photorealQuality} from './photoreal-quality.mjs';
 import {resizeShadowTarget} from '../src/shadow-target.mjs';
 
@@ -37,18 +37,6 @@ export function contactHardeningFilter({samples=uniform(16),blockers=uniform(8)}
  });
 }
 
-// r185 gives every shadow-casting light its own depth material, each with a
-// fresh vec4 colour node. Node ids are part of the material cache key, so one
-// mesh needed a separate node build per cascade (5 per caster, ~700 builds in
-// the first frame). Equivalent shadow materials share one key with one node.
-const SHADOW_PASS_COLOR=vec4(0,0,0,1);
-export function shareShadowMaterial(light){
- // CSM cascades are lightweight Object3D lights (no isLight) with a shadow.
- if(!light?.castShadow||!light.shadow)return false;
- const material=getShadowMaterial(light);if(material.colorNode===SHADOW_PASS_COLOR)return false;
- material.colorNode=SHADOW_PASS_COLOR;material.needsUpdate=true;return true;
-}
-export function shareShadowMaterials(root){let shared=0;root?.traverse?.(o=>{if(o.isLight&&shareShadowMaterial(o))shared++;});return shared;}
 export function createCascadedSun(renderer,light,camera,{mobile=false,clock=()=>performance.now()}={}){
  let quality=photorealQuality({mobile}),disposed=false,key='',dirty=true,lastRefresh=-Infinity,interval=mobile?80:33;
  const lastPosition=new Vector3(Infinity,0,0),lastRotation=new Quaternion(),lastDirection=new Vector3(),direction=new Vector3();
@@ -56,7 +44,7 @@ export function createCascadedSun(renderer,light,camera,{mobile=false,clock=()=>
  class ArchitecturalCSM extends CSMShadowNode{
   _init(builder){
    super._init(builder);
-   for(const l of this.lights){shareShadowMaterial(l);l.shadow.filterNode=filter;l.shadow.autoUpdate=false;l.shadow.needsUpdate=true;l.shadow.normalBias=.012;l.shadow.camera.layers.enable(1);l.shadow.camera.near=.1;l.shadow.camera.far=700;l.shadow.camera.updateProjectionMatrix();}
+   for(const l of this.lights){l.shadow.filterNode=filter;l.shadow.autoUpdate=false;l.shadow.needsUpdate=true;l.shadow.normalBias=.012;l.shadow.camera.layers.enable(1);l.shadow.camera.near=.1;l.shadow.camera.far=700;l.shadow.camera.updateProjectionMatrix();}
   }
   updateBefore(builder){
    const now=clock();direction.subVectors(light.target.position,light.position).normalize();

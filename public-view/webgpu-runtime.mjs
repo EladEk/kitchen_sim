@@ -4,7 +4,7 @@ import {RectAreaLightTexturesLib} from 'three/addons/lights/RectAreaLightTexture
 import {Fn,uniform,vec2,vec3,vec4,float,positionGeometry,cameraViewMatrix,cameraProjectionMatrix,normalize,dot,cross,max,sqrt,sin,cos,smoothstep,mix,varying,reflector} from 'three/tsl';
 import {createNodePresentation} from './webgpu-presentation.mjs';
 export {createNodePresentation} from './webgpu-presentation.mjs';
-import {createCascadedSun,shareShadowMaterials} from './webgpu-shadows.mjs';
+import {createCascadedSun} from './webgpu-shadows.mjs';
 import {createPhysicalAtmosphere} from './webgpu-atmosphere.mjs';
 import {createFinishAdapter} from './webgpu-finishes.mjs';
 import {installNativePreparation} from './native-preparation.mjs';
@@ -29,5 +29,5 @@ export async function createWebGPUTourRenderer(parameters={}){
  const environmentFactory=source=>{const g=new PMREMGenerator(renderer);try{return g.fromEquirectangular(source);}finally{g.dispose();}};
  const probeFactory=(scene,position,mobile)=>{const cube=new CubeRenderTarget(mobile?128:256,{type:HalfFloatType,generateMipmaps:false}),capture=new CubeCamera(.08,24,cube),g=new PMREMGenerator(renderer),old=renderer.shadowMap.autoUpdate,xr=renderer.xr.enabled;capture.position.copy(position);renderer.shadowMap.autoUpdate=false;renderer.xr.enabled=false;try{capture.update(renderer,scene);return g.fromCubemap(cube.texture);}finally{renderer.shadowMap.autoUpdate=old;renderer.xr.enabled=xr;g.dispose();cube.dispose();}};
  const mirrorFactory=geometry=>{const node=reflector({resolutionScale:.35,bounces:false}),material=new MeshBasicNodeMaterial();material.colorNode=node.mul(vec3(.95));const mesh=new Mesh(geometry,material);mesh.add(node.target);const update=node.reflector.updateBefore.bind(node.reflector);let last=-Infinity;node.reflector.updateBefore=frame=>{const now=performance.now();if(renderer.xr.isPresenting||frame.scene.overrideMaterial||now-last<100)return;last=now;return update(frame);};mesh.dispose=()=>{node.dispose();material.dispose();};return mesh;};
- return {renderer,compilationStats:()=>({...compilation}),native:true,backend:'webgpu',reason:'supported',environmentFactory,disksFactory:createNodeCelestialDisks,pipelineFactory:createNodePresentation,shadowFactory:createCascadedSun,atmosphereFactory:createPhysicalAtmosphere,setQuality:profile=>finishes.setQuality(profile),probeFactory,mirrorFactory,adapt:root=>{const result=finishes.apply(root);shareShadowMaterials(root);return result;},shareShadows:root=>shareShadowMaterials(root),restoreMaterials:()=>finishes.dispose(),dispose};
+ return {renderer,compilationStats:()=>({...compilation}),native:true,backend:'webgpu',reason:'supported',environmentFactory,disksFactory:createNodeCelestialDisks,pipelineFactory:createNodePresentation,shadowFactory:createCascadedSun,atmosphereFactory:createPhysicalAtmosphere,setQuality:profile=>finishes.setQuality(profile),probeFactory,mirrorFactory,adapt:root=>finishes.apply(root),restoreMaterials:()=>finishes.dispose(),dispose};
 }
