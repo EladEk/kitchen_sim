@@ -105,14 +105,10 @@ export function createDistrictSite(source,{mobile=false,includeFence=()=>true,in
  const bodies2D=DISTRICT.map(b=>districtFootprint(b,2)),points=[],forbidden=layout.gardens.map(g=>g.plot).concat(layout.parking.map(b=>b.polygon),layout.sidewalks.map(w=>w.polygon));
  for(let x=west+12;x<east-8;x+=11)for(let z=layout.bounds.north+8;z<south-6;z+=12){if(layout.landscape.parks.some(p=>p.polygons.some(([ring])=>inside([x,z],ring)))||layout.landscape.courtyards.beds.some(b=>b.polygons.some(([ring])=>inside([x,z],ring)))||bodies2D.some(r=>contains(r,[x,z]))||layout.roads.some(r=>contains({...r,minX:r.minX-2,maxX:r.maxX+2,minZ:r.minZ-2,maxZ:r.maxZ+2},[x,z]))||forbidden.some(p=>intersects({minX:x-2.4,maxX:x+2.4,minZ:z-2.4,maxZ:z+2.4},bounds(p))))continue;points.push([x,z]);}
  points.push(...layout.landscape.trees,...layout.landscape.courtyards.trees,...layout.context.trees);
- // R185: hedges inside each ground-floor garden behind its perimeter fence,
- // and a distant tree belt on the surrounding ground (both CC0 impostors).
- const hedges=[];for(const f of layout.fences.filter(includeFence)){if(f.divider)continue;const g=layout.gardens.find(g=>g.building===f.building&&f.units.includes(g.unit));if(!g)continue;
-  const dx=f.b[0]-f.a[0],dz=f.b[1]-f.a[1],len=Math.hypot(dx,dz);if(len<1.2)continue;const c=g.plot.reduce((s,p)=>[s[0]+p[0]/g.plot.length,s[1]+p[1]/g.plot.length],[0,0]);let nx=-dz/len,nz=dx/len;const mx=(f.a[0]+f.b[0])/2,mz=(f.a[1]+f.b[1])/2;if((c[0]-mx)*nx+(c[1]-mz)*nz<0){nx=-nx;nz=-nz;}
-  // R190: ~1.9 m continuous modules spanning the fence run (0.3 m clear at each end).
-  const run=len-.6,n=Math.max(1,Math.round(run/1.9)),length=run/n;for(let i=0;i<n;i++){const t=(.3+length*(i+.5))/len;hedges.push({x:f.a[0]+dx*t+nx*.5,z:f.a[1]+dz*t+nz*.5,angle:-Math.atan2(dz,dx)+(i%2?Math.PI:0),height:1.15,length});}}
+ // R190: no garden hedges along the yard/shared-area fences (owner request);
+ // the fences, lawns and trees stay. A distant tree belt rings the site.
  const backdrop=[],rows=mobile?[16,38]:[14,30,50];{const {west:w,east:e,north:n,south:s}=layout.bounds;rows.forEach((d,row)=>{const x0=w-d,x1=e+d,z0=n-d,z1=s+d,edges=[[[x0,z0],[x1,z0]],[[x1,z0],[x1,z1]],[[x1,z1],[x0,z1]],[[x0,z1],[x0,z0]]];let k=0;for(const [a,b] of edges){const len=Math.hypot(b[0]-a[0],b[1]-a[1]),step=mobile?17:13;for(let t=(row*5)%step;t<len;t+=step){const i=backdrop.length,j=(Math.sin(i*12.9898)*43758.5453)%1,jj=(Math.sin(i*78.233)*43758.5453)%1,size=1.15+Math.abs(j)*.6;backdrop.push({x:a[0]+(b[0]-a[0])*t/len+jj*4,z:a[1]+(b[1]-a[1])*t/len+j*4,y:-.1,angle:i*2.39996,scale:[size,size*(.9+Math.abs(jj)*.25),size]});k++;}}});}
- const props=createRealisticProps({trees:points,cars,hedges,backdrop,mobile});group.add(props.group);
+ const props=createRealisticProps({trees:points,cars,backdrop,mobile});group.add(props.group);
  const landscape=createLandscapeDetails(layout.landscape);group.add(landscape.group);
  const context=createDistrictContext(layout.context,layout.utilities);group.add(context.group);
  const lawn=createLawnDetail([...cover.grass,...lawnRegions],{mobile});group.add(lawn.mesh);
