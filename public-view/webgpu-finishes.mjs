@@ -97,9 +97,9 @@ export function createFinishNodeMaterial(source,{steps=uniform(24),mobile=false}
  }
  if(data.scanAlbedoGain)base=base.mul(vec3(...data.scanAlbedoGain));
  if(data.publicFinish==='stone'){
-  const p=vec3(coordinates.x,coordinates.y,0),horizontal=coordinates.x,row=floor(p.y.div(.48)),offset=row.mod(2).mul(.47),u=horizontal.add(offset),distance=vec2(abs(fract(u.div(.94).add(.5)).sub(.5)).mul(.94),abs(fract(p.y.div(.48).add(.5)).sub(.5)).mul(.48)),pixel=vec2(footprint(horizontal),footprint(p.y)),grout=joint2(distance,pixel,.007,[.94,.48]),grain=sin(horizontal.mul(89)).mul(sin(p.y.mul(83))).mul(.0015).mul(float(1).sub(smoothstep(.002,.012,max(pixel.x,pixel.y))));
-  const stoneTone=mix(fract(sin(floor(u.div(.94)).mul(127.1).add(row.mul(311.7))).mul(43758.5453)),.5,smoothstep(.12,.48,max(pixel.x,pixel.y)));
-  base=mix(base.mul(float(FACADE_COURSES.toneMin).add(stoneTone.mul(FACADE_COURSES.toneRange)).add(grain)),uniform(new Color('#c8c0b2')),grout);material.aoNode=mix(1,.6,grout);rough=mix(.82,.92,grout);height=height.add(sin(horizontal.mul(12.566)).mul(sin(p.y.mul(12.566))).mul(.0003)).add(grain.mul(.02));height=height.add(stoneHeight(coordinates).mul(.0045));
+  const p=vec3(coordinates.x,coordinates.y,0),horizontal=coordinates.x,{width:courseW,height:courseH,joint:courseJoint}=FACADE_COURSES,row=floor(p.y.div(courseH)),offset=row.mod(2).mul(courseW/2),u=horizontal.add(offset),distance=vec2(abs(fract(u.div(courseW).add(.5)).sub(.5)).mul(courseW),abs(fract(p.y.div(courseH).add(.5)).sub(.5)).mul(courseH)),pixel=vec2(footprint(horizontal),footprint(p.y)),grout=joint2(distance,pixel,courseJoint,[courseW,courseH]),grain=sin(horizontal.mul(89)).mul(sin(p.y.mul(83))).mul(.0015).mul(float(1).sub(smoothstep(.002,.012,max(pixel.x,pixel.y))));
+  const stoneTone=mix(fract(sin(floor(u.div(courseW)).mul(127.1).add(row.mul(311.7))).mul(43758.5453)),.5,smoothstep(.12,.48,max(pixel.x,pixel.y)));
+  base=mix(base.mul(float(FACADE_COURSES.toneMin).add(stoneTone.mul(FACADE_COURSES.toneRange)).add(grain)),uniform(new Color('#bfbab1')),grout);material.aoNode=mix(1,.7,grout);rough=mix(.87,.93,grout);height=height.add(sin(horizontal.mul(12.566)).mul(sin(p.y.mul(12.566))).mul(.0003)).add(grain.mul(.02));height=height.add(stoneHeight(coordinates).mul(.0045));
  }
  if(data.wallCavity){
   const {onSkirt,groutMask,contact}=wallCavityNodes(data.wallCavity);

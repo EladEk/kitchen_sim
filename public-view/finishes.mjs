@@ -8,6 +8,8 @@ export function restorePublicFinishes(root,{mobile=false,stoneUrl=null,signal}={
  root.traverse(o=>{for(const mat of [o.material].flat().filter(Boolean))for(const value of Object.values(mat))if(value?.isTexture)previous.add(value);});
  const seen=new Set();root.traverse(o=>{for(const mat of [o.material].flat().filter(Boolean)){
   if(seen.has(mat))continue;seen.add(mat);
+  // Older baselines stored the balcony returns as stone; they are anthracite render.
+  if(mat.userData.architecturalRole==='secondary'&&mat.userData.publicFinish==='stone'){mat.userData.publicFinish='render';delete mat.userData.surfaceKind;for(const key of ['map','normalMap','roughnessMap','bumpMap','aoMap'])mat[key]=null;mat.needsUpdate=true;}
   const kind=mat.userData.publicFinish==='render'?null:mat.userData.publicFinish==='stone'?'limestone':mat.userData.publicFinish==='floor'?'porcelain':mat.userData.surfaceKind;
   if(kind&&!(mat.userData.physicalFinishRevision>=165&&['plaster','paint'].includes(kind)))details.apply(mat,kind);
   if(mat.isMeshPhysicalMaterial&&mat.transparent){
