@@ -1,3 +1,4 @@
+import {reloadingImport} from './stale-build.mjs';
 import * as THREE from 'three';
 import {createPhotoScene,photoSceneSignature,photoCameraSignature,PhotoSceneLimit} from './photoreal-scene.mjs';
 import {cancelableBVHWorker,retirePhotoResources} from './photo-resources.mjs';
@@ -19,13 +20,13 @@ export function installPhotorealRenderer({renderer,scene,camera,host,lang=()=> '
  button.addEventListener('click',()=>{if(editing)return;if(enabled){off();return;}enabled=true;lastError='';stableAt=performance.now();dirty=true;updateButton();say('עצור את המבט לחישוב התמונה','Hold the view still to render');});updateButton();
  async function createBackend(){
   if(globalThis.navigator?.gpu){let r;
-   try{const [{WebGPURenderer},{WebGPUPathTracer}]=await Promise.all([import('three/webgpu'),import('three-gpu-pathtracer/webgpu')]);
+   try{const [{WebGPURenderer},{WebGPUPathTracer}]=await reloadingImport(()=>Promise.all([import('three/webgpu'),import('three-gpu-pathtracer/webgpu')]))();
     r=new WebGPURenderer({antialias:false,alpha:false});await r.init();if(!r.backend?.isWebGPUBackend)throw Error('No native WebGPU');
     const t=new WebGPUPathTracer(r);t.maxBounces=mobile()?5:10;t.maxTransparentBounces=mobile()?4:8;t.frameBudget=mobile()?16000:250000;t.maxSamples=512;t.dynamicLowRes=false;t.renderDelay=0;
     return {renderer:r,tracer:t,backend:'WebGPU'};
    }catch{r?.dispose();}
   }
-  const [{WebGLPathTracer},{GenerateMeshBVHWorker}]=await Promise.all([import('three-gpu-pathtracer'),import('three-mesh-bvh/worker')]);
+  const [{WebGLPathTracer},{GenerateMeshBVHWorker}]=await reloadingImport(()=>Promise.all([import('three-gpu-pathtracer'),import('three-mesh-bvh/worker')]))();
   const r=new THREE.WebGLRenderer({antialias:false,alpha:false,preserveDrawingBuffer:true});
   if(!r.extensions.has('EXT_color_buffer_float')){retirePhotoResources({renderer:r});throw Error('Float targets unsupported');}
   const t=new WebGLPathTracer(r),w=cancelableBVHWorker(new GenerateMeshBVHWorker());t.setBVHWorker(w);t.bounces=8;t.transmissiveBounces=8;t.textureSize.set(mobile()?512:1024,mobile()?512:1024);t.tiles.set(mobile()?3:2,mobile()?3:2);t.dynamicLowRes=false;t.renderDelay=0;t.fadeDuration=0;t.minSamples=1;

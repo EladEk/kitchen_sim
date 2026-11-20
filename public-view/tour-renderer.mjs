@@ -1,4 +1,5 @@
 import {WebGLRenderer} from 'three';
+import {isChunkLoadError} from '../src/stale-build.mjs';
 import {prepareSceneGeometry} from '../src/geometry-safety.mjs';
 import {applyArchitecturalMaterials} from '../src/architectural-materials.mjs';
 const aborted=()=>new DOMException('Canceled','AbortError');
@@ -10,7 +11,7 @@ export function boundedGraphicsTask(task,{signal,timeout=8000,retire=()=>{}}={})
   Promise.resolve().then(task).then(value=>{if(!finish(resolve,value))retire(value);},error=>finish(reject,error));
  });
 }
-export async function createTourRenderer({mode='auto',preferXR=false,signal,navigator:nav=globalThis.navigator,secure=globalThis.isSecureContext,loadGPU=()=>import('./webgpu-runtime.mjs'),createGL=()=>new WebGLRenderer({antialias:true,powerPreference:'high-performance'}),timeout=8000,onDiagnostic=()=>{}}={}){
+export async function createTourRenderer({mode='auto',preferXR=false,signal,navigator:nav=globalThis.navigator,secure=globalThis.isSecureContext,loadGPU=()=>import('./webgpu-runtime.mjs'),createGL=()=>new WebGLRenderer({antialias:true,powerPreference:'high-performance'}),timeout=8000,onDiagnostic=()=>{},onStaleBuild=()=>false}={}){
  const emit=(event,error=null,details={})=>{try{onDiagnostic({event,error,details});}catch{}};emit('graphics-support-check',null,{requestedEngine:mode,secureContext:!!secure,webgpuAPI:!!nav?.gpu,preferXR:!!preferXR});
  if(signal?.aborted)throw aborted();let reason=preferXR&&mode!=='webgpu'?'xr-requested':mode==='webgl2'?'selected':'unavailable';
  if(mode==='webgpu'&&(!nav?.gpu||!secure)){const error=Object.assign(Error(!secure?'WebGPU requires a secure context (HTTPS)':'navigator.gpu is unavailable in this browser'),{code:'WEBGPU_UNAVAILABLE'});emit('webgpu-support-failed',error);throw error;}
@@ -19,7 +20,11 @@ export async function createTourRenderer({mode='auto',preferXR=false,signal,navi
   try{
    const session=await boundedGraphicsTask(async()=>{emit('webgpu-module-loading');const api=await loadGPU();emit('webgpu-initialization');return api.createWebGPUTourRenderer({onDiagnostic});},{signal,timeout,retire:s=>s.dispose()});
    if(signal?.aborted){session.dispose();throw aborted();}return session;
-  }catch(error){if(signal?.aborted)throw error;emit('webgpu-initialization-failed',error);if(mode==='webgpu')throw Object.assign(Error('Forced WebGPU initialization failed',{cause:error}),{code:'WEBGPU_FAILED'});reason='driver';emit('webgl-fallback',error);}
+  }catch(error){if(signal?.aborted)throw error;
+   // A missing chunk after a redeploy is not a WebGPU failure: no fallback, no
+   // unstable flag; the page reloads once into the current build.
+   if(isChunkLoadError(error)&&onStaleBuild(error))throw Object.assign(Error('The page is from an older deployment; reloading',{cause:error}),{code:'STALE_BUILD_RELOAD'});
+   emit('webgpu-initialization-failed',error);if(mode==='webgpu')throw Object.assign(Error('Forced WebGPU initialization failed',{cause:error}),{code:'WEBGPU_FAILED'});reason='driver';emit('webgl-fallback',error);}
  }
  if(signal?.aborted)throw aborted();emit('webgl-initialization',null,{reason});const renderer=createGL(),ownedMaterials=new Set();let disposed=false;
  return {renderer,native:false,backend:'webgl2',reason,compilationStats:()=>({programs:renderer.info?.programs?.length??0}),adapt(root){if(!root||disposed)return;prepareSceneGeometry(root);for(const m of applyArchitecturalMaterials(root).values())ownedMaterials.add(m);},dispose(){if(disposed)return;disposed=true;for(const m of ownedMaterials)m.dispose();ownedMaterials.clear();renderer.dispose();renderer.forceContextLoss?.();renderer.domElement?.remove?.();}};

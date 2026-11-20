@@ -1,3 +1,4 @@
+import {reloadingImport} from './stale-build.mjs';
 import {personalTourUrl,personalSelectionUrl,saveBeforeDistrictTour} from './personal-district-state.mjs';
 import {SecurityCameraPlanner} from './SecurityCameraPlanner.jsx';
 import {DocumentGate} from './DocumentAccess.jsx';
@@ -118,7 +119,7 @@ export default function HomeApp({onKitchen,initialRoom='living',initialMode,init
  const importSettings=async e=>{const file=e.target.files?.[0];if(!file)return;try{const value=JSON.parse(await file.text());if(![1,2].includes(value.schema)||!value.rooms)throw Error();setSettings(normalizeHomeSettings(migrateHomeFloorSchedule(value)));notify(t('עיצוב הבית נטען.','Home design loaded.'));}catch{notify(t('יש לבחור קובץ עיצוב בית שיוצא מהסימולטור.','Choose a home design exported from this simulator.'));}e.target.value='';};
  const getPair=()=>cleanDesignPair(settings,ks);
  const loadAlternative=variant=>{const pair=cleanDesignPair(variant.home,variant.kitchen);setSettings({...pair.home,lang:settings.lang,cleanView:false,kitchenDraft:pair.kitchen});setKs(pair.kitchen);};
- const exportPlanning=async()=>{try{const {downloadPlanningSheet}=await import('./export-planning.jsx');downloadPlanningSheet(getPair(),view.current?.capture?.());notify(t('דף התכנון הורד. פתחו אותו להדפסה או לשמירה כ־PDF.','Planning sheet downloaded. Open it to print or save as PDF.'));}catch{notify(t('הפקת דף התכנון נכשלה.','Could not create planning sheet.'));}};
+ const exportPlanning=async()=>{try{const {downloadPlanningSheet}=await reloadingImport(()=>import('./export-planning.jsx'))();downloadPlanningSheet(getPair(),view.current?.capture?.());notify(t('דף התכנון הורד. פתחו אותו להדפסה או לשמירה כ־PDF.','Planning sheet downloaded. Open it to print or save as PDF.'));}catch{notify(t('הפקת דף התכנון נכשלה.','Could not create planning sheet.'));}};
  const visibleRooms=ROOMS.filter(r=>`${r.he} ${r.en}`.toLowerCase().includes(query.toLowerCase()));
  const roomDoors=DOORS.filter(d=>d.rooms.includes(activeRoom));
  const roomShutters=SHUTTERS.filter(s=>s.opening.rooms.includes(activeRoom));

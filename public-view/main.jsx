@@ -1,3 +1,5 @@
+import {installStaleBuildRecovery} from '../src/stale-build.mjs';
+installStaleBuildRecovery();
 import React from 'react';
 import {createRoot} from 'react-dom/client';
 import {DocumentAccessProvider} from '../src/DocumentAccess.jsx';
