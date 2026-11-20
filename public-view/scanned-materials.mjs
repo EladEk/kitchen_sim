@@ -2,6 +2,11 @@ import treeImpostor from './assets/vegetation-r185/tree_jacaranda.ktx2?url';
 import treeImpostorFallback from './assets/vegetation-r185/tree_jacaranda.webp?url';
 import shrubImpostor from './assets/vegetation-r185/shrub_searsia.ktx2?url';
 import shrubImpostorFallback from './assets/vegetation-r185/shrub_searsia.webp?url';
+// R190: tileable hedge atlas rendered from the CC0 Poly Haven searsia_lucida shrubs.
+import hedgeColor from './assets/vegetation-r190/hedge_color.ktx2?url';
+import hedgeColorFallback from './assets/vegetation-r190/hedge_color.webp?url';
+import hedgeNormal from './assets/vegetation-r190/hedge_normal.ktx2?url';
+import hedgeNormalFallback from './assets/vegetation-r190/hedge_normal.webp?url';
 import wallNormalFallback from './assets/pbr-r104/beige_wall_001_nor_gl.jpg?url';
 import wallNormal from './assets/pbr-r113/beige_wall_001_nor_gl.ktx2?url';
 import wallRoughFallback from './assets/pbr-r104/beige_wall_001_rough.jpg?url';
@@ -79,6 +84,7 @@ const scans={
  // R185: rendered CC0 Poly Haven plant impostor atlases (assets/vegetation-r185);
  // atlas UVs, not metric tiling; the instance colour stays the tint.
  treeImpostor:{color:treeImpostor,metres:1,naturalColor:true,keepFinish:true,atlas:true,source:'Poly Haven jacaranda_tree',technique:'impostor'},
+ hedgeFoliage:{color:hedgeColor,normal:hedgeNormal,metres:1,strength:.8,naturalColor:true,keepFinish:true,atlas:true,source:'Poly Haven searsia_lucida',technique:'impostor'},
  shrubImpostor:{color:shrubImpostor,metres:1,naturalColor:true,keepFinish:true,atlas:true,source:'Poly Haven searsia_lucida',technique:'impostor'},
  // R189 porcelain floors and wall tiles: polished relief and wipe roughness only; colour, base roughness and grout courses stay the finish's own.
  porcelainFinish:{normal:porcelainNormal,roughness:porcelainRough,metres:1.2,strength:.35,keepFinish:true,source:'ambientCG Terrazzo005'},
@@ -87,5 +93,5 @@ const scans={
  asphalt:{color:roadColor,normal:roadNormal,roughness:roadRough,metres:2,strength:.7,rough:.97,environment:.4}
 };
 
-const fallbacks=new Map([[parquetColor,parquetColorFallback],[parquetNormal,parquetNormalFallback],[parquetRough,parquetRoughFallback],[porcelainNormal,porcelainNormalFallback],[porcelainRough,porcelainRoughFallback],[treeImpostor,treeImpostorFallback],[shrubImpostor,shrubImpostorFallback],[wallNormal,wallNormalFallback],[wallRough,wallRoughFallback],[clothColor,clothColorFallback],[clothNormal,clothNormalFallback],[clothRough,clothRoughFallback],[woodColor,woodColorFallback],[woodNormal,woodNormalFallback],[woodRough,woodRoughFallback],[roadColor,roadColorFallback],[roadNormal,roadNormalFallback],[roadRough,roadRoughFallback],[plasterNormal,plasterNormalFallback],[plasterRough,plasterRoughFallback],[worktopColor,worktopColorFallback],[worktopNormal,worktopNormalFallback],[worktopRough,worktopRoughFallback]]);
+const fallbacks=new Map([[hedgeColor,hedgeColorFallback],[hedgeNormal,hedgeNormalFallback],[parquetColor,parquetColorFallback],[parquetNormal,parquetNormalFallback],[parquetRough,parquetRoughFallback],[porcelainNormal,porcelainNormalFallback],[porcelainRough,porcelainRoughFallback],[treeImpostor,treeImpostorFallback],[shrubImpostor,shrubImpostorFallback],[wallNormal,wallNormalFallback],[wallRough,wallRoughFallback],[clothColor,clothColorFallback],[clothNormal,clothNormalFallback],[clothRough,clothRoughFallback],[woodColor,woodColorFallback],[woodNormal,woodNormalFallback],[woodRough,woodRoughFallback],[roadColor,roadColorFallback],[roadNormal,roadNormalFallback],[roadRough,roadRoughFallback],[plasterNormal,plasterNormalFallback],[plasterRough,plasterRoughFallback],[worktopColor,worktopColorFallback],[worktopNormal,worktopNormalFallback],[worktopRough,worktopRoughFallback]]);
 export function createScannedMaterials(options={}){const compressed=options.renderer?createCompressedMaterialLoader(options.renderer,fallbacks):null,controller=createScanMaterialController({...options,scans, ...(compressed?{loader:compressed.load}:{})});return {apply:controller.apply,get textures(){return controller.textures;},get stats(){return controller.stats;},dispose(){controller.dispose();compressed?.dispose();}};}

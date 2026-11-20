@@ -44,6 +44,28 @@ export function impostorCards({R,H},{sides=[0,1,2],tops=[]}={}){
  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(nor,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));g.setIndex(idx);g.computeBoundingBox();g.computeBoundingSphere();return g;
 }
 
+// R190 hedge module (metres; instance scale x = module length / 2, y = height / HEDGE.top):
+// an opaque leafy core so nothing shows through, wrapped by alpha-tested front,
+// back, end and top cards from the tileable hedge atlas (front tile: top
+// 1024x640 = x 0..2 m, y 0..1.3 m; top tile: bottom 1024x384 = z -0.4..0.4 m).
+export const HEDGE=Object.freeze({width:2,tile:1.3,depth:.8,top:1.05});
+export function hedgeModule({core=false}={}){
+ const pos=[],nor=[],uv=[],idx=[],I=2/1024,F0=.375+I,F1=1-I,T0=I,T1=.375-I,{width:W,tile:H,depth:D}=HEDGE,hw=W/2,hd=D/2-.04;
+ const fv=y=>F0+(F1-F0)*y/H,quad=(c,u,n)=>{const b=pos.length/3;const nn=new THREE.Vector3(...n).normalize();c.forEach((p,i)=>{pos.push(...p);nor.push(nn.x,nn.y,nn.z);uv.push(...u[i]);});idx.push(b,b+1,b+2,b,b+2,b+3);};
+ if(core){const ch=.84,cd=D/2-.15,cw=hw-.02,v1=fv(ch);
+  quad([[-cw,0,cd],[cw,0,cd],[cw,ch,cd],[-cw,ch,cd]],[[0,F0],[1,F0],[1,v1],[0,v1]],[0,.2,1]);
+  quad([[cw,0,-cd],[-cw,0,-cd],[-cw,ch,-cd],[cw,ch,-cd]],[[0,F0],[1,F0],[1,v1],[0,v1]],[0,.2,-1]);
+  quad([[-cw,ch,cd],[cw,ch,cd],[cw,ch,-cd],[-cw,ch,-cd]],[[0,T0],[1,T0],[1,T1],[0,T1]],[0,1,0]);
+ }else{const u1=1,ue=D/W;
+  quad([[-hw,0,hd],[hw,0,hd],[hw,H,hd],[-hw,H,hd]],[[0,F0],[u1,F0],[u1,F1],[0,F1]],[0,.3,1]);
+  quad([[hw,0,-hd],[-hw,0,-hd],[-hw,H,-hd],[hw,H,-hd]],[[0,F0],[u1,F0],[u1,F1],[0,F1]],[0,.3,-1]);
+  quad([[hw,0,hd],[hw,0,-hd],[hw,H,-hd],[hw,H,hd]],[[.3,F0],[.3+ue,F0],[.3+ue,F1],[.3,F1]],[1,.3,0]);
+  quad([[-hw,0,-hd],[-hw,0,hd],[-hw,H,hd],[-hw,H,-hd]],[[.6,F0],[.6+ue,F0],[.6+ue,F1],[.6,F1]],[-1,.3,0]);
+  const y=.93;quad([[-hw,y,hd],[hw,y,hd],[hw,y,-hd],[-hw,y,-hd]],[[0,T0],[1,T0],[1,T1],[0,T1]],[0,1,0]);
+ }
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(nor,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));g.setIndex(idx);g.computeBoundingBox();g.computeBoundingSphere();return g;
+}
+
 /** Shared near/middle/far assets. All positions, hues and dimensions remain
  * identical across the detail tiers; only the geometry budget changes. */
 export function createRealisticProps({trees=[],cars=[],hedges=[],backdrop=[],mobile=false}={}){
@@ -89,8 +111,8 @@ export function createRealisticProps({trees=[],cars=[],hedges=[],backdrop=[],mob
   // The scan controller swaps the procedural leaf texture for the rendered
   // atlas before warmup; the card UVs address the 2x2 atlas tiles.
   const bark=material(new THREE.MeshStandardMaterial({color:'#5d4a3a',roughness:.97}));
-  const leaves=material(new THREE.MeshStandardMaterial({color:'#ffffff',map:leafMap,alphaTest:.47,alphaToCoverage:true,roughness:.9}));
-  const shrubLeaves=material(new THREE.MeshStandardMaterial({color:'#ffffff',map:leafMap,alphaTest:.47,alphaToCoverage:true,roughness:.92}));
+  const leaves=material(new THREE.MeshStandardMaterial({color:'#ffffff',map:leafMap,alphaTest:.5,roughness:.9}));
+  const shrubLeaves=material(new THREE.MeshStandardMaterial({color:'#ffffff',map:leafMap,alphaTest:.5,roughness:.92}));
   leaves.userData={foliage:true,scanKind:'treeImpostor',impostorRevision:185};shrubLeaves.userData={foliage:true,scanKind:'shrubImpostor',impostorRevision:185};
   const TREE={R:2.7,H:6.1},SHRUB={R:.44,H:.95};
   const treeTemplates=[];
@@ -105,7 +127,12 @@ export function createRealisticProps({trees=[],cars=[],hedges=[],backdrop=[],mob
   family('tree',placements,treeTemplates);contactShadows('tree',placements,p=>3.6*p.scale[0],p=>3.6*p.scale[2],-.079);
   // Hedges behind garden fences and a distant tree belt: static batches, one draw each.
   const statics=(name,list,g,m,shadow)=>{if(!list.length)return;const mesh=new THREE.InstancedMesh(geometry(g),m,list.length);list.forEach((p,i)=>{quaternion.setFromAxisAngle(THREE.Object3D.DEFAULT_UP,p.angle);position.set(p.x,p.y||0,p.z);scale.set(...p.scale);matrix.compose(position,quaternion,scale);mesh.setMatrixAt(i,matrix);mesh.setColorAt(i,p.color);});mesh.name=name;mesh.castShadow=shadow;mesh.receiveShadow=true;mesh.computeBoundingSphere();mesh.computeBoundingBox();mesh.userData={propType:name,propPart:'foliage',visualOnly:true,static:true};group.add(mesh);};
-  statics('hedge',hedges.map((h,i)=>({...h,scale:[1.35,h.height/SHRUB.H*(.92+random(i,71)*.16),.8],color:new THREE.Color(HEDGE_COLORS[i%HEDGE_COLORS.length])})),impostorCards(SHRUB,{sides:[0,1,2],tops:[.8]}),shrubLeaves,!mobile);
+  // R190: continuous hedge modules (opaque leafy core + alpha-tested cards), overlapping 6%.
+  const hedgeLeaves=material(new THREE.MeshStandardMaterial({color:'#ffffff',map:leafMap,alphaTest:.5,roughness:.88}));hedgeLeaves.userData={foliage:true,scanKind:'hedgeFoliage',impostorRevision:190};
+  const hedgeCore=material(new THREE.MeshStandardMaterial({color:'#ffffff',map:leafMap,roughness:.95}));hedgeCore.userData={foliage:true,scanKind:'hedgeFoliage',impostorRevision:190,hedgeCore:true};
+  const modules=hedges.map((h,i)=>{const length=h.length||.85,height=h.height*(.96+random(i,71)*.08);return {...h,scale:[length*1.06/HEDGE.width,height/HEDGE.top,1],color:new THREE.Color(HEDGE_COLORS[i%HEDGE_COLORS.length])};});
+  statics('hedge',modules,hedgeModule(),hedgeLeaves,!mobile);
+  statics('hedge-core',modules.map(m=>({...m,color:m.color.clone().multiplyScalar(.62)})),hedgeModule({core:true}),hedgeCore,!mobile);
   statics('backdrop',backdrop.map((p,i)=>({...p,color:new THREE.Color(TREE_COLORS[i%TREE_COLORS.length]).lerp(new THREE.Color('#9fb0a0'),.18)})),impostorCards(TREE,{sides:[0,1],tops:[]}),leaves,false);
  }
 
