@@ -20,7 +20,7 @@ BASISU=<basisu> python3 scripts/lightmaps/package.py .site-private/lightmaps/f<f
 
 - Each unit costs about 260 KB: the irradiance KTX2 is about 156 KB and `uv2.json` about 101 KB.
 - The AO atlas is baked but not loaded, because it greyed whole walls in the walk-through.
-- The building has 40 units (4 on the ground floor, 6 on floors 1–6, 2 on floors 7–8), so baking all of them and loading them eagerly would add about 10 MB. That breaks the phone budget.
+- The building has 44 units (4 on the ground floor, 6 on each of floors 1–6, 2 on each of floors 7–8), so baking all of them and loading them eagerly would add about 11 MB. That breaks the phone budget.
 - Covering more units needs **lazy per-unit loading**:
   1. Fetch a unit's atlas only when `bakedCoverage()` reports the walker entering it, and drop it when they leave.
   2. Swap the receiving meshes to the baked clones at that point.
