@@ -1,3 +1,4 @@
+import {FACADE_COLOR} from '../src/facade-finish.mjs';
 import * as T from 'three';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 import {buildingTransform,DISTRICT} from './district.mjs';
@@ -17,7 +18,7 @@ export function createShellPreview(data,{aspect=1}={}){
    segment(cursor,length,0,data.storey);
   });
  }
- for(const [kind,color]of Object.entries({walls:'#e6dfd3',windows:'#a3b5b5',frames:'#2d3136'})){
+ for(const [kind,color]of Object.entries({walls:FACADE_COLOR,windows:'#a3b5b5',frames:'#2d3136'})){
   const material=new T.MeshLambertMaterial({color}),mesh=new T.InstancedMesh(cube,material,rows[kind].length);rows[kind].forEach((m,i)=>mesh.setMatrixAt(i,m));root.add(mesh);owned.push(material);mesh.computeBoundingSphere();
  }
  if(plates.length){const geometry=mergeGeometries(plates),material=new T.MeshLambertMaterial({color:'#b8bcc0',side:T.DoubleSide});root.add(new T.Mesh(geometry,material));owned.push(geometry,material);plates.forEach(g=>g.dispose());}

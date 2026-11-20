@@ -1,15 +1,18 @@
 import {MeshPhysicalMaterial,MeshStandardMaterial} from 'three';
 import {DRY_PORCELAIN} from './floor-appearance.mjs';
+import {ANTHRACITE,FACADE_COLOR,FACADE_ROUGHNESS} from './facade-finish.mjs';
 
 // Author-specified appearance targets. These are sRGB paint/stone swatches,
 // converted by Three.Color on assignment, not measured spectral material data.
 export const ARCHITECTURAL_MATERIALS=Object.freeze({
  wall:{color:'#f2efe9',roughness:.82,metalness:0,clearcoat:0,envMapIntensity:.8},
  ceiling:{color:'#f8f8f6',roughness:.94,metalness:0,clearcoat:0,specularIntensity:.15,envMapIntensity:1.1},
- facade:{color:'#e6dfd3',roughness:.82,metalness:0},
- secondary:{color:'#b8bcc0',roughness:.8,metalness:0},
- fascia:{color:'#7e8286',roughness:.85,metalness:0},
- soffit:{color:'#f2f1ed',roughness:.94,metalness:0},
+ facade:{color:FACADE_COLOR,roughness:FACADE_ROUGHNESS,metalness:0},
+ // One shared anthracite for the balcony band: returns, beams and slab edges.
+ secondary:{color:ANTHRACITE,roughness:.8,metalness:0},
+ fascia:{color:ANTHRACITE,roughness:.8,metalness:0},
+ // Balcony undersides read light grey in the photos, not ceiling white.
+ soffit:{color:'#dcdcd8',roughness:.94,metalness:0},
  frame:{color:'#2d3136',roughness:.36,metalness:.85,clearcoat:.1,clearcoatRoughness:.42},
  fence:{color:'#2a2d32',roughness:.38,metalness:.85,clearcoat:.1,clearcoatRoughness:.42},
  glass:{color:'#f6faf8',transmission:.9,ior:1.52,thickness:.024,attenuationColor:'#f5f8f6',attenuationDistance:1.15,roughness:.035,specularIntensity:1,metalness:0,envMapIntensity:1.35,transparent:false,opacity:1,depthWrite:false},
@@ -62,7 +65,8 @@ export function applyArchitecturalMaterials(root){
    material.onBeforeCompile=source.onBeforeCompile;material.customProgramCacheKey=source.customProgramCacheKey;
    const values={...ARCHITECTURAL_MATERIALS[role],...(role==='fabric'&&source.userData.scanKind==='upholstery'?{...UPHOLSTERY_FINISH,roughness:source.roughnessMap?1:.9}:{})};if(source.userData.selectedFinishColor)delete values.color;if(role==='glass'&&source.userData.architecturalGlass)Object.assign(values,{transmission:source.transmission,transparent:source.transparent,opacity:source.opacity});material.setValues(values);
    material.userData={...source.userData,architecturalRole:role};
-   if(role==='secondary')Object.assign(material.userData,{publicFinish:'stone',surfaceKind:'limestone'});
+   // The balcony band is smooth anthracite render, not stone courses.
+   if(role==='secondary'){Object.assign(material.userData,{publicFinish:'render'});delete material.userData.surfaceKind;}
    if(role==='entranceFloor')Object.assign(material.userData,{publicFinish:'floor',floorCourses:{tile:[.2,1.2],joint:.003}});
    if(role==='glass')Object.assign(material.userData,{architecturalGlass:true,transmissionBase:.9});
    // R177: lowered hallway ceilings/HVAC bulkheads get the ceiling role from their part
