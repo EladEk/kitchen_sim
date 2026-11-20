@@ -1,0 +1,49 @@
+{
+ "revision": 185,
+ "provenance": "SOURCES.json",
+ "codec": "Basis Universal ETC1S with alpha, complete mip chain, y-flipped",
+ "layout": "2x2 atlas: top-left side 0deg, top-right side 60deg, bottom-left side 120deg, bottom-right top view; orthographic, tile spans [-R,R] x [0,H] (sides) and [-R,R]^2 (top)",
+ "atlases": [
+  {
+   "source": "jacaranda_tree",
+   "webp": "tree_jacaranda.webp",
+   "ktx2": "tree_jacaranda.ktx2",
+   "size": [
+    1024,
+    1024
+   ],
+   "tiles": [
+    "side 0deg",
+    "side 60deg",
+    "side 120deg",
+    "top"
+   ],
+   "radius_m": 12.452695198059082,
+   "height_m": 19.663563786000015,
+   "render_sha256": "2c9969e9ef88adaa68c4f114a5187839e99cc8a08ca473d9b6c127f35fdafd43",
+   "webp_bytes": 214102,
+   "ktx2_bytes": 239032
+  },
+  {
+   "source": "searsia_lucida",
+   "node": "searsia_lucida_c_LOD0",
+   "webp": "shrub_searsia.webp",
+   "ktx2": "shrub_searsia.ktx2",
+   "size": [
+    1024,
+    1024
+   ],
+   "tiles": [
+    "side 0deg",
+    "side 60deg",
+    "side 120deg",
+    "top"
+   ],
+   "radius_m": 0.769549115896225,
+   "height_m": 1.696638688184321,
+   "render_sha256": "a886dbb8bb182c7573c118454b215b99aed22f1181394e29bf82a9ab2a1fb8d0",
+   "webp_bytes": 222284,
+   "ktx2_bytes": 259426
+  }
+ ]
+}
