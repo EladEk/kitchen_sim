@@ -14,6 +14,6 @@ test('R183 scans are CC0 with recorded provenance, compressed with raster fallba
  const sources=JSON.parse(fs.readFileSync(new URL('../public-view/assets/pbr-r183/SOURCES.json',import.meta.url)));
  for(const a of sources.assets){assert.equal(a.license,'CC0-1.0');for(const f of a.files)assert.ok(fs.existsSync(new URL('../public-view/assets/pbr-r183/'+f,import.meta.url)),f);}
  const src=fs.readFileSync(new URL('../public-view/scanned-materials.mjs',import.meta.url),'utf8');
- assert.match(src,/wallPaint:\{normal:plasterNormal,roughness:plasterRough,metres:2,[^}]*keepFinish:true/);
+ assert.match(src,/wallPaint:\{normal:plasterNormal,roughness:plasterRough,metres:2,[^}]*keepFinish:true,replaceDetail:true/);
  for(const n of ['plasterNormal','plasterRough','worktopColor','worktopNormal','worktopRough'])assert.match(src,new RegExp(`\\[${n},${n}Fallback\\]`));
 });

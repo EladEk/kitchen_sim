@@ -57,7 +57,7 @@ const scans={
  upholstery:{color:upholsteryColor,normal:upholsteryNormal,roughness:upholsteryRough,metres:.55,strength:1,rough:1,environment:.55,source:'Poly Haven hessian_380'},
  wood:{colorMean:[.359834,.211142,.098359],compressedColorMean:[.841074,.828395,.804503],color:woodColor,normal:woodNormal,roughness:woodRough,metres:1.8,strength:.32,rough:.76,environment:.65},
  // R183 walls/ceilings: real roller-paint relief at 2 m, colour and roughness stay the finish's own.
- wallPaint:{normal:plasterNormal,roughness:plasterRough,metres:2,strength:.9,keepFinish:true,source:'Poly Haven painted_plaster_wall'},
+ wallPaint:{normal:plasterNormal,roughness:plasterRough,metres:2,strength:.9,keepFinish:true,replaceDetail:true,source:'Poly Haven painted_plaster_wall'},
  // R183 worktops: veined stone detail at an estimated 1.2 m slab scale; the selected stone colour stays.
  worktop:{color:worktopColor,normal:worktopNormal,roughness:worktopRough,metres:1.2,strength:.35,rough:.32,environment:.9,source:'ambientCG Marble014'},
  asphalt:{color:roadColor,normal:roadNormal,roughness:roadRough,metres:2,strength:.7,rough:.97,environment:.4}
