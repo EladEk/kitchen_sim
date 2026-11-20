@@ -1,3 +1,7 @@
+import treeImpostor from './assets/vegetation-r185/tree_jacaranda.ktx2?url';
+import treeImpostorFallback from './assets/vegetation-r185/tree_jacaranda.webp?url';
+import shrubImpostor from './assets/vegetation-r185/shrub_searsia.ktx2?url';
+import shrubImpostorFallback from './assets/vegetation-r185/shrub_searsia.webp?url';
 import wallNormalFallback from './assets/pbr-r104/beige_wall_001_nor_gl.jpg?url';
 import wallNormal from './assets/pbr-r113/beige_wall_001_nor_gl.ktx2?url';
 import wallRoughFallback from './assets/pbr-r104/beige_wall_001_rough.jpg?url';
@@ -45,8 +49,12 @@ const scans={
  // matte (map mean .9) and capped at 1024 px on phones.
  upholstery:{color:upholsteryColor,normal:upholsteryNormal,roughness:upholsteryRough,metres:.55,strength:1,rough:1,environment:.55,source:'Poly Haven hessian_380'},
  wood:{colorMean:[.359834,.211142,.098359],compressedColorMean:[.841074,.828395,.804503],color:woodColor,normal:woodNormal,roughness:woodRough,metres:1.8,strength:.32,rough:.76,environment:.65},
+ // R185: rendered CC0 Poly Haven plant impostor atlases (assets/vegetation-r185);
+ // atlas UVs, not metric tiling; the instance colour stays the tint.
+ treeImpostor:{color:treeImpostor,metres:1,naturalColor:true,keepFinish:true,atlas:true,source:'Poly Haven jacaranda_tree',technique:'impostor'},
+ shrubImpostor:{color:shrubImpostor,metres:1,naturalColor:true,keepFinish:true,atlas:true,source:'Poly Haven searsia_lucida',technique:'impostor'},
  asphalt:{color:roadColor,normal:roadNormal,roughness:roadRough,metres:2,strength:.7,rough:.97,environment:.4}
 };
 
-const fallbacks=new Map([[wallNormal,wallNormalFallback],[wallRough,wallRoughFallback],[clothColor,clothColorFallback],[clothNormal,clothNormalFallback],[clothRough,clothRoughFallback],[woodColor,woodColorFallback],[woodNormal,woodNormalFallback],[woodRough,woodRoughFallback],[roadColor,roadColorFallback],[roadNormal,roadNormalFallback],[roadRough,roadRoughFallback]]);
+const fallbacks=new Map([[treeImpostor,treeImpostorFallback],[shrubImpostor,shrubImpostorFallback],[wallNormal,wallNormalFallback],[wallRough,wallRoughFallback],[clothColor,clothColorFallback],[clothNormal,clothNormalFallback],[clothRough,clothRoughFallback],[woodColor,woodColorFallback],[woodNormal,woodNormalFallback],[woodRough,woodRoughFallback],[roadColor,roadColorFallback],[roadNormal,roadNormalFallback],[roadRough,roadRoughFallback]]);
 export function createScannedMaterials(options={}){const compressed=options.renderer?createCompressedMaterialLoader(options.renderer,fallbacks):null,controller=createScanMaterialController({...options,scans, ...(compressed?{loader:compressed.load}:{})});return {apply:controller.apply,get textures(){return controller.textures;},get stats(){return controller.stats;},dispose(){controller.dispose();compressed?.dispose();}};}
