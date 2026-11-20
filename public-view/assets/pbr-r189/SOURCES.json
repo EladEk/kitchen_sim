@@ -20,6 +20,32 @@
    "applied_tile_m": 1.2,
    "use": "Interior porcelain floors and porcelain wall tiles: polished surface relief and wipe/smudge roughness variation only. The selected finish colour, its roughness and the grout courses stay authoritative",
    "preparation": "1k JPG: OpenGL normal and roughness resized to 512 px; roughness recentred to mean 0.89 with 1.5x contrast (it multiplies the finish roughness)"
+  },
+  {
+   "files": [
+    "parquet_diff.jpg",
+    "parquet_diff.ktx2",
+    "parquet_nor_gl.jpg",
+    "parquet_nor_gl.ktx2",
+    "parquet_rough.jpg",
+    "parquet_rough.ktx2"
+   ],
+   "asset": "Laminate Floor 03",
+   "provider": "Poly Haven",
+   "official_page": "https://polyhaven.com/a/laminate_floor_03",
+   "authors": {
+    "Charlotte Baglioni": "Photography",
+    "Dario Barresi": "Processing"
+   },
+   "license": "CC0-1.0",
+   "license_source": "https://polyhaven.com/license",
+   "physical_dimensions_m": [
+    2.08,
+    2.08
+   ],
+   "applied_tile_m": 2.08,
+   "use": "Wood / parquet / laminate floor finishes (plank grain, relief and roughness); mean tint removed so the selected floor colour stays the albedo authority",
+   "preparation": "1k JPG: colour neutralised to mean 236 (1024 px), OpenGL normal and roughness 512 px; roughness recentred to mean 0.92"
   }
  ],
  "codec": "Basis Universal ETC1S roughness, UASTC (RDO 1.5) linear normal, full mips; JPEG fallbacks for the raster path"

@@ -28,6 +28,45 @@
    "source_sha256": "196ce8dd1f9fdf558790f0612fe19e658c446d17c0f9d5305d9d08fb10526231",
    "jpeg_bytes": 43565,
    "ktx2_bytes": 57839
+  },
+  {
+   "source": "laminate_floor_03_diff_1k.jpg",
+   "jpeg": "parquet_diff.jpg",
+   "ktx2": "parquet_diff.ktx2",
+   "channel": "color",
+   "size": [
+    1024,
+    1024
+   ],
+   "source_sha256": "ce2813cdc714fc5a2d816c9b79a0b4aece71c8d5bf56db52331cf413d950eae3",
+   "jpeg_bytes": 274961,
+   "ktx2_bytes": 210799
+  },
+  {
+   "source": "laminate_floor_03_nor_gl_1k.jpg",
+   "jpeg": "parquet_nor_gl.jpg",
+   "ktx2": "parquet_nor_gl.ktx2",
+   "channel": "normal",
+   "size": [
+    512,
+    512
+   ],
+   "source_sha256": "8fc982ef3aaffcd3ace508334bbefb02ffefa748658914733ad8b235b9522d7a",
+   "jpeg_bytes": 9182,
+   "ktx2_bytes": 81499
+  },
+  {
+   "source": "laminate_floor_03_rough_1k.jpg",
+   "jpeg": "parquet_rough.jpg",
+   "ktx2": "parquet_rough.ktx2",
+   "channel": "roughness",
+   "size": [
+    512,
+    512
+   ],
+   "source_sha256": "ab02e47fcc399e84f99be3c2c99104da944541cdb48ae149da94cee86e67ca67",
+   "jpeg_bytes": 12933,
+   "ktx2_bytes": 15500
   }
  ]
 }

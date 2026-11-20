@@ -1,5 +1,6 @@
 # R189 interior porcelain floors and wall tiles: polished-surface relief and
-# wipe/smudge roughness variation (colour stays the selected finish).
+# wipe/smudge roughness variation (colour stays the selected finish), and a
+# Poly Haven laminate/parquet scan for any wood floor finish (grain neutralised).
 # Sources (CC0) are downloaded to .site-private/pbr-r189-src (not committed);
 # this writes JPEG fallbacks and Basis KTX2 (ETC1S colour/roughness, UASTC
 # normals, full mips, multiple-of-four sizes for WebGPU) to public-view/assets/pbr-r189.
@@ -11,7 +12,8 @@ src=root/'.site-private/pbr-r189-src';out=root/'public-view/assets/pbr-r189';out
 tmp=root/'.site-private/pbr-encode-r189';tmp.mkdir(parents=True,exist_ok=True)
 import os
 encoder=Path(os.environ.get('BASISU',root/'node_modules/@gpu-tex-enc/basis/bin/linux-x64/basisu'))
-jobs=[('Terrazzo005_1K-JPG_NormalGL.jpg','porcelain_nor_gl','normal',512),('Terrazzo005_1K-JPG_Roughness.jpg','porcelain_rough','roughness',512)]
+jobs=[('Terrazzo005_1K-JPG_NormalGL.jpg','porcelain_nor_gl','normal',512),('Terrazzo005_1K-JPG_Roughness.jpg','porcelain_rough','roughness',512),
+      ('laminate_floor_03_diff_1k.jpg','parquet_diff','color',1024),('laminate_floor_03_nor_gl_1k.jpg','parquet_nor_gl','normal',512),('laminate_floor_03_rough_1k.jpg','parquet_rough','roughness',512)]
 rows=[]
 for name,stem,channel,size in jobs:
  im=Image.open(src/name).convert('RGB');im.thumbnail((size,size),Image.Resampling.LANCZOS)
@@ -21,7 +23,7 @@ for name,stem,channel,size in jobs:
  if channel=='roughness':
   # Multiplied by the material roughness at runtime: centre the map on a
   # factor near 1 (walls) / .8 (polished stone) and keep its variation.
-  target,gain={'porcelain_rough':(226,1.5)}[stem];im=im.convert('L');mean=ImageStat.Stat(im).mean[0];im=im.point(lambda v:max(0,min(255,round(target+(v-mean)*gain)))).convert('RGB')
+  target,gain={'porcelain_rough':(226,1.5),'parquet_rough':(235,1.0)}[stem];im=im.convert('L');mean=ImageStat.Stat(im).mean[0];im=im.point(lambda v:max(0,min(255,round(target+(v-mean)*gain)))).convert('RGB')
  jpg=out/(stem+'.jpg');im.save(jpg,quality=85)
  png=tmp/(stem+'.png');im.save(png);dest=out/(stem+'.ktx2')
  args=[str(encoder),'-file',str(png),'-ktx2','-mipmap','-output_file',str(dest),'-no_multithreading']

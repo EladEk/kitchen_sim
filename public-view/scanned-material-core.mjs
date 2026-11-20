@@ -15,7 +15,9 @@ export function scanKindFor(data,scans){
  if(kind==='stone'||data.architecturalRole==='worktop')return scans.worktop?'worktop':null;
  // R189: interior porcelain floors and porcelain wall tiles keep their selected colour
  // and procedural albedo; the scan adds polished relief and wipe/smudge roughness.
- if(data.publicFinish==='floor'||data.architecturalRole==='floor'||kind==='porcelain')return scans.porcelainFinish?'porcelainFinish':null;
+ const floor=data.publicFinish==='floor'||data.architecturalRole==='floor';
+ if(floor&&['wood','parquet','laminate'].includes(kind))return scans.parquet?'parquet':null;
+ if(floor||kind==='porcelain')return scans.porcelainFinish?'porcelainFinish':null;
  return scans[kind]?kind:null;
 }
 export function createScanMaterialController({scans,mobile=false,signal,loader=loadSurfaceTexture}={}){
