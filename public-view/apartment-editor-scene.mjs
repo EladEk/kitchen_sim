@@ -7,11 +7,19 @@ import {createContactShadows} from '../src/contact-shadows.mjs';
 import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
 import {dimensionedFurnitureParts} from '../src/dimensioned-furniture.mjs';
 import {cabinetMotions} from '../src/cabinet-motion.mjs';
+import {completeFurnitureParts} from '../src/complete-furniture.mjs';
 import {walkingInstanceCapacity} from './walking-display.mjs';
 import {createSpatialCollisionIndex} from './walking-world.mjs';
 import {DISTRICT,buildingTransform,mirroredGeometry} from './district.mjs';
 import {normalizeWorkspace,parseScope,scopeKey,unitContext,itemInRoom} from './apartment-editing.mjs';
 
+// R184: editor kinds drawn with the shared CC0/authored furniture library once it
+// is bound, instead of dimensioned boxes. The model is scaled to the item's own
+// envelope; picking, collision, saving and clearances keep the box proxies.
+// Items with opening doors/drawers keep their animated box parts.
+export const EDITOR_MODELS=Object.freeze({sofa:'sofa',loveseat:'sofa',armchair:'armchair',bed:'bed-single',double_bed:'bed-double',chair:'dining-chair',bar_stool:'barstool',office_chair:'office-chair',coffee:'coffee',dining:'dining',desk:'desk',side_table:'nightstand',ottoman:'ottoman',bookcase:'bookcase',cube_storage:'bookcase',media:'media',tv_stand:'tv',plant:'plant',succulent:'succulent',rug:'rug',curtain:'curtain',ceiling_lamp:'ceiling-lamp',cushions:'cushions'});
+export const editorModelHeight=item=>item.kind==='rug'?Math.min(.015,item.h):item.h;
+const RECOLOURED_ROLES=new Set(['upholstery','bedding']);
 export function createApartmentEditorScene({nav,overrides=null}){
  const group=new T.Group();group.name='local-apartment-furniture';
  const cube=new T.BoxGeometry(1,1,1),soft=new RoundedBoxGeometry(1,1,1,2,.07),mirrors=new Map([[cube,mirroredGeometry(cube,[0,0])],[soft,mirroredGeometry(soft,[0,0])]]),palette={};
@@ -19,6 +27,11 @@ export function createApartmentEditorScene({nav,overrides=null}){
  for(const name of Object.keys(FURNITURE_PALETTE)){const kind=['fabric','linen'].includes(name)?'fabric':name==='wood'?'wood':name==='paint'?'paint':null;palette[name]=kind?surface(kind):new T.MeshPhysicalMaterial({color:'#ffffff',...furnitureMaterialProperties(name)});palette[name].userData={...palette[name].userData,architecturalInterior:true,furnitureMaterial:true,...(name==='glass'?{architecturalGlass:true}:{}),...(name==='fabric'?{scanKind:'upholstery'}:{})};if(name==='fabric'){const f=UPHOLSTERY_FINISH,m=palette[name];m.roughness=.9;m.sheen=f.sheen;m.sheenRoughness=f.sheenRoughness;m.sheenColor.set(f.sheenColor);m.specularIntensity=f.specularIntensity;m.clearcoat=f.clearcoat;}}
  const proxy=new T.MeshBasicMaterial({colorWrite:false,depthWrite:false,transparent:true,opacity:1,side:T.DoubleSide}),flip=new T.Matrix4().makeScale(-1,1,1);
  const physicalMeshes=[],placements=[],visualBatches=[],assemblies=[],poses=new Map(),itemsByKey=new Map();
+ const modelMirrors=new Map(),modelMaterials=new Map();
+ // A chosen colour tints the upholstery/bedding through instance colour: one shared
+ // white copy per library material, never a material per item.
+ const modelMaterial=(material,color)=>{if(!color||Array.isArray(material)||!RECOLOURED_ROLES.has(material.userData?.furnitureColourRole))return material;if(!modelMaterials.has(material)){const m=material.clone();m.color.set('#ffffff');if(m.sheenColor)m.sheenColor.set('#ffffff');m.userData={...material.userData};modelMaterials.set(material,m);}return modelMaterials.get(material);};
+ const modelGeometry=(geometry,mirror)=>{if(!mirror)return geometry;if(!modelMirrors.has(geometry))modelMirrors.set(geometry,mirroredGeometry(geometry,[0,0]));return modelMirrors.get(geometry);};
  const ghostMaterials=new Map();let ghostKey="",ghostTime=0;
  let index=null,disposed=false,focusedRoom=null,viewKey=null,editing=false;
  const itemKey=(scope,id)=>scope+'|'+id;
@@ -56,7 +69,9 @@ export function createApartmentEditorScene({nav,overrides=null}){
      const physical=base.clone().multiply(new T.Matrix4().makeTranslation(x,item.h/2,z)).multiply(new T.Matrix4().makeScale(w,item.h,d));if(b.mirror)physical.multiply(flip);
      const ref=add(b.mirror?mirrors.get(cube):cube,proxy,physical,true,item.id);r.proxy=ref;
     }
-    for(const part of parts){
+    const model=!r.motions.length&&EDITOR_MODELS[item.kind]?completeFurnitureParts(EDITOR_MODELS[item.kind]):null;
+    if(model){const local=new T.Matrix4().makeScale(item.w,editorModelHeight(item),item.d);for(const part of model){const material=modelMaterial(part.material,item.color),matrix=base.clone().multiply(local);if(b.mirror)matrix.multiply(flip);add(modelGeometry(part.geometry,b.mirror),material,matrix,false,item.id,material!==part.material?item.color:'#ffffff');}}
+    else for(const part of parts){
      const [x,y,z,w,h,d]=part.box,geometry=/pillow|duvet|mattress|seat|back|arm/.test(part.part)?soft:cube,local=new T.Matrix4().makeTranslation(x,y,z).multiply(new T.Matrix4().makeScale(w,h,d)),motion=byPart.get(part.part),matrix=(motion?.world||base).clone().multiply(local);if(b.mirror)matrix.multiply(flip);
      const ref=add(b.mirror?mirrors.get(geometry):geometry,palette[part.material],matrix,false,item.id,furniturePartColor(item,part));if(motion)motion.visuals.push({...ref,local});
     }
@@ -123,7 +138,7 @@ export function createApartmentEditorScene({nav,overrides=null}){
   firstHit(ray,options){const hit=index?.firstHit(ray,options)||null;if(hit)hit.buildingId=hit.object.userData.editorBuilding;return closestHit(hit,motionHit(ray,options));},
   getMotionState(scope,id){return (itemsByKey.get(itemKey(typeof scope==='string'?scope:scopeKey(scope),id))?.motions||[]).map(m=>({id:m.spec.id,type:m.spec.type,progress:m.state.progress,target:m.state.target,matrix:m.world.clone(),bounds:m.box.clone()}));},
   get stats(){return {...(index?.stats||{records:0}),assemblies:assemblies.length};},
-  dispose(){if(disposed)return;disposed=true;clear();poses.clear();cube.dispose();soft.dispose();for(const g of mirrors.values())g.dispose();mirrors.clear();for(const m of Object.values(palette))if(!owned.includes(m))m.dispose();for(const resource of owned)resource.dispose();for(const m of ghostMaterials.values())m.dispose();proxy.dispose();group.removeFromParent();}
+  dispose(){if(disposed)return;disposed=true;clear();poses.clear();cube.dispose();soft.dispose();for(const g of mirrors.values())g.dispose();mirrors.clear();for(const g of modelMirrors.values())g.dispose();modelMirrors.clear();for(const m of modelMaterials.values())m.dispose();modelMaterials.clear();for(const m of Object.values(palette))if(!owned.includes(m))m.dispose();for(const resource of owned)resource.dispose();for(const m of ghostMaterials.values())m.dispose();proxy.dispose();group.removeFromParent();}
  };
 }
 export function withApartmentEdits(base,edits){return {canStand:position=>!edits.blocksPosition(position)&&(base.canStand?.(position)??true),firstHit(ray,options={}){const a=base.firstHit(ray,options),b=edits.firstHit(ray,options);return b&&(!a||b.distance<a.distance)?b:a;},refreshVariant:(...a)=>base.refreshVariant(...a),refreshDoors:(...a)=>base.refreshDoors(...a),get memory(){return {...base.memory,indexBytes:(base.memory?.indexBytes||0)+(edits.stats.bufferBytes||0)};},get stats(){return base.stats;},dispose(){base.dispose();}};}

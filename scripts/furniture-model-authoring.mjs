@@ -31,6 +31,10 @@ export function authoredFurniture(){
  const faucet=new T.Group();cylinder(faucet,metal,0,.008,0,.023,.016);cylinder(faucet,metal,0,.11,0,.018,.21);tube(faucet,metal,[[0,.17,0],[0,.27,0],[0,.32,.055],[0,.31,.14],[0,.265,.165]],.015);cylinder(faucet,metal,0,.258,.165,.015,.022);cylinder(faucet,metal,.025,.13,0,.022,.035);tube(faucet,metal,[[.025,.14,0],[.045,.2,.015]],.009);models.set('faucet',faucet);
  const tv=new T.Group();rounded(tv,dark,0,.02,0,.43,.03,.22,.009);rounded(tv,metal,0,.15,-.035,.035,.26,.035,.007);rounded(tv,dark,0,.51,-.04,1.25,.71,.055,.011);rounded(tv,screen,0,.51,-.009,1.21,.672,.003,.006);models.set('tv',tv);
  const media=new T.Group();for(const x of [-.65,.65])for(const z of [-.15,.15])cylinder(media,dark,x,.07,z,.016,.14);rounded(media,wood,0,.32,0,1.6,.40,.44,.008);for(const x of [-.53,0,.53]){rounded(media,wood,x,.32,.228,.515,.34,.018,.004);rounded(media,metal,x,.4,.242,.12,.009,.015,.003);}const mediaTv=tv.clone(true);mediaTv.position.y=.535;media.add(mediaTv);models.set('media',media);
+ // R184 rug: a low woven slab with rounded, slightly curled edges (cloth helper).
+ const rug=new T.Group();cloth(rug,white,0,.006,0,2,.012,1.4,{folds:.12,sag:0});models.set('rug',rug);
+ // R184 curtain: one pleated drape (sine folds deepening towards the hem), with a thin rod.
+ {const curtain=new T.Group(),w=1.4,h=2.4,g=new T.PlaneGeometry(w,h,96,12),p=g.attributes.position;for(let i=0;i<p.count;i++){const x=p.getX(i),y=p.getY(i),t=.55+.45*(h/2-y)/h;p.setZ(i,.035*t*Math.sin((x/w+.5)*Math.PI*2*9)+.006*Math.sin(y*3.1+x*1.7));p.setY(i,y+h/2);}g.computeVertexNormals();const drape=white.clone();drape.side=T.DoubleSide;drape.userData={...white.userData};mesh(curtain,g,drape,0,0,0);cylinder(curtain,metal,0,h+.02,0,.011,w+.1).rotation.z=Math.PI/2;models.set('curtain',curtain);}
  // Legacy cloth components remain in the same GLB for non-furniture textiles.
  for(const kind of ['cushion','duvet']){const root=new T.Group();cloth(root,kind==='duvet'?duvet:white,0,0,0,1,1,1,{folds:1,sag:.05});models.set(kind,root);}
  models.set('kitchen-faucet',createVeredKitchenTap([],{authoring:true}));

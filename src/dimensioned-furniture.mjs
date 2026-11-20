@@ -55,5 +55,10 @@ export function dimensionedFurnitureParts(item){
   if(kind==='fridge'){add('seam','metal',0,h*.38,d/2-board/2,w,board*.4,board);add('handle','metal',w*.35,h*.65,d/2-board/4,board,h*.25,board/2);}
   else{add('panel','metal',0,h*.88,d/2-board/2,w*.85,h*.10,board);add(kind==='dishwasher'?'handle':'screen','screen',0,h*(kind==='dishwasher'?.70:.45),d/2-board/4,w*.68,h*(kind==='dishwasher'?.03:.48),board/2);}
  }
+ else if(kind==='plant'||kind==='succulent'){add('pot','paint',0,h*.15,0,w*.55,h*.3,d*.55);add('foliage','fabric',0,h*.64,0,w,h*.7,d);}
+ else if(kind==='rug')add('rug','linen',0,Math.min(.015,h)/2,0,w,Math.min(.015,h),d);
+ else if(kind==='curtain'){add('rod','metal',0,h-.012,0,w,.024,Math.min(.03,d));add('drape','linen',0,(h-.03)/2,0,w,h-.03,Math.min(.06,d));}
+ else if(kind==='ceiling_lamp'){add('cord','metal',0,h*.7,0,Math.min(.01,w),h*.6,Math.min(.01,d));add('shade','paint',0,h*.2,0,w,h*.4,d);}
+ else if(kind==='cushions')for(const s of [-1,1])add('pillow-'+s,'fabric',s*w/4,h/2,0,w*.46,h,d*.4);
  return withDrawerTrays(item,parts);
 }
