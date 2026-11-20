@@ -15,7 +15,7 @@ test('disabled WebGPU effects are selected out instead of multiplied by a zero w
 
 test('the 3D canvas is opaque on WebGPU, so the light page background never washes out the scene',()=>{
  assert.equal(OPAQUE_OUTPUT_ALPHA,1);assert.ok(BLOOM_INPUT_LIMIT>1&&BLOOM_INPUT_LIMIT<65504);
- const s=source('./webgpu-presentation.mjs');assert.doesNotMatch(s,/renderOutput\(vec4\(colour,beauty\.a\)\)/);assert.match(s,/renderOutput\(vec4\(colour,OPAQUE_OUTPUT_ALPHA\)\)/);
+ const s=source('./webgpu-presentation.mjs');assert.doesNotMatch(s,/renderOutput\(vec4\(colour,beauty\.a\)\)/);assert.match(s,/renderOutput\(vec4\(colour,OPAQUE_OUTPUT_ALPHA\)[,)]/);assert.match(s,/renderOutput\(vec4\(graded,OPAQUE_OUTPUT_ALPHA\)/);
  assert.match(source('./webgpu-runtime.mjs'),/new WebGPURenderer\(\{antialias:true,alpha:false,/);
 });
 
