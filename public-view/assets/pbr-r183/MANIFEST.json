@@ -1,0 +1,72 @@
+{
+ "revision": 183,
+ "provenance": "SOURCES.json",
+ "codec": "Basis Universal ETC1S colour/roughness, UASTC linear normals, complete mip chain",
+ "textures": [
+  {
+   "source": "painted_plaster_wall_nor_gl.jpg",
+   "jpeg": "plaster_nor_gl.jpg",
+   "ktx2": "plaster_nor_gl.ktx2",
+   "channel": "normal",
+   "size": [
+    1024,
+    1024
+   ],
+   "source_sha256": "8eb01647d126eb5341e2c325821ad48c8ca11349dbef53447c95422c5d91cc9d",
+   "jpeg_bytes": 209966,
+   "ktx2_bytes": 1085895
+  },
+  {
+   "source": "painted_plaster_wall_rough.jpg",
+   "jpeg": "plaster_rough.jpg",
+   "ktx2": "plaster_rough.ktx2",
+   "channel": "roughness",
+   "size": [
+    512,
+    512
+   ],
+   "source_sha256": "e0564c297b22ab1cf4ef02a82157b84ce3b92eb4fd49d9c64b7256a8b300af82",
+   "jpeg_bytes": 9005,
+   "ktx2_bytes": 12530
+  },
+  {
+   "source": "Marble014_1K-JPG_Color.jpg",
+   "jpeg": "worktop_diff.jpg",
+   "ktx2": "worktop_diff.ktx2",
+   "channel": "color",
+   "size": [
+    1024,
+    1024
+   ],
+   "source_sha256": "5142dca26a12163508683b9af17bd2762b05c85c53f29dd805f260cce6733bf9",
+   "jpeg_bytes": 247783,
+   "ktx2_bytes": 192702
+  },
+  {
+   "source": "Marble014_1K-JPG_NormalGL.jpg",
+   "jpeg": "worktop_nor_gl.jpg",
+   "ktx2": "worktop_nor_gl.ktx2",
+   "channel": "normal",
+   "size": [
+    1024,
+    1024
+   ],
+   "source_sha256": "8f87eaa48a30a4b08449d8bdccb19f5cb3dec4ff110f817f319dc5079105a796",
+   "jpeg_bytes": 17020,
+   "ktx2_bytes": 359314
+  },
+  {
+   "source": "Marble014_1K-JPG_Roughness.jpg",
+   "jpeg": "worktop_rough.jpg",
+   "ktx2": "worktop_rough.ktx2",
+   "channel": "roughness",
+   "size": [
+    512,
+    512
+   ],
+   "source_sha256": "47d625968f127f649b0fd120d463bbb3607cef88054d417b45377e3257d3d559",
+   "jpeg_bytes": 53913,
+   "ktx2_bytes": 60546
+  }
+ ]
+}
