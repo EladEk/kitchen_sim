@@ -21,3 +21,6 @@ main>header:has(.photo-header-slot){flex-wrap:wrap;gap:12px}
 .photo-controls[aria-busy=true] .photo-status::before{content:'';display:inline-block;width:12px;height:12px;border:2px solid #cdd8c7;border-top-color:#3e6146;border-radius:50%;margin-inline-end:6px;vertical-align:middle;animation:photo-loading-spin .9s linear infinite}
 @keyframes photo-loading-spin{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){.photo-controls[aria-busy=true] .photo-status::before{animation:none;border-style:dotted}}
+/* R187: download the finished/refining photo-mode image */
+.photo-download{pointer-events:auto;min-height:44px;border:1px solid #b1beae;border-radius:10px;background:#fffffff2;color:#294733;padding:10px 14px;box-shadow:0 4px 18px #152b3920;font:600 13px system-ui,sans-serif;touch-action:manipulation;cursor:pointer}
+.photo-download:focus-visible{outline:3px solid #6f9c78;outline-offset:2px}
