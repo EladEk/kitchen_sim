@@ -1,0 +1,30 @@
+{
+ "revision": 188,
+ "baker": "Blender 4.2.3 LTS Cycles (CPU), uniform white sky, DIFFUSE direct+indirect without albedo, AO 0.6 m",
+ "floor": 0,
+ "unit": 4,
+ "receivers": 146,
+ "textures": [
+  {
+   "name": "indirect",
+   "size": [
+    1024,
+    1024
+   ],
+   "colorSpace": "srgb",
+   "png_bytes": 217631,
+   "ktx2_bytes": 155940
+  },
+  {
+   "name": "ao",
+   "size": [
+    1024,
+    1024
+   ],
+   "colorSpace": "linear",
+   "png_bytes": 270484,
+   "ktx2_bytes": 143019
+  }
+ ],
+ "uv2_sha256": "e8fb4a3292b6044175628854e0f344e956a81af80945d7ae804a2618ce9b9e43"
+}
