@@ -8,6 +8,7 @@ export const COMPLETE_FURNITURE_KINDS=Object.freeze(['bed-double','bed-single','
  // R184 CC0 models and authored textiles for the editor's decor and storage.
  'ottoman','succulent','cushions','ceiling-lamp','bookcase','rug','curtain']);
 let library=null;
+export const completeFurnitureParts=kind=>library?.get(kind)||null;
 export const hasCompleteFurniture=kind=>!!library?.get(kind)?.length;
 const proxyGeometry=new T.BoxGeometry(1,1,1).translate(0,.5,0),proxyMaterial=new T.MeshBasicMaterial({colorWrite:false,depthWrite:false,transparent:true,side:T.DoubleSide});
 export function bindCompleteFurniture(value){library=value;return()=>{if(library===value)library=null;};}
