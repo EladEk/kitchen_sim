@@ -1,3 +1,4 @@
+import {BAKED_FILL_SCALE} from './baked-lightmap-core.mjs';
 import {createArchitecturalNight} from '../src/architectural-night.mjs';
 import {AmbientLight,PointLight,DirectionalLight,HemisphereLight,SpotLight,Object3D} from 'three';
 import {setArchitecturalGlassQuality,dimAlphaGlazing} from '../src/architectural-glass.mjs';
@@ -45,7 +46,7 @@ export function createInteriorLighting(scene,renderer,{mobile=false,environmentF
  let amount=0,exposure=.98,room=null,wanted=null,shadowAmount=0,disposed=false;
  return {
   bind:root=>{night.bind(root);probe??=createInteriorProbe(renderer,{mobile,environmentFactory});probe.bind(root);root.traverse(o=>{for(const m of [o.material].flat().filter(Boolean))if(m.userData.architecturalGlass)glass.add(m);else dimAlphaGlazing(m);});updateGlass();},
-  update({inside=false,walking=false,solar,dt=.016,region=null,focus=null,xr=false,neutral=false}={}){
+  update({inside=false,walking=false,solar,dt=.016,region=null,baked=false,focus=null,xr=false,neutral=false}={}){
    if(disposed)return {amount:0,exposure,bounce:0,walls:0,shadow:0};
    if(lastXR!==xr){lastXR=xr;updateGlass();}
    const daylight=neutral?1:solar?.dark?0:Math.max(0,solar?.daylight||0),weight=1-Math.exp(-Math.min(.1,dt)/(inside?1.15:.8));
@@ -55,9 +56,11 @@ export function createInteriorLighting(scene,renderer,{mobile=false,environmentF
    const areaOn=walking&&inside&&region&&room===region.key&&['kitchen','bathroom','wc'].includes(region.kind);area.intensity=areaOn?amount*shadowAmount*Math.sqrt(daylight)*1.4:0;area.visible=true;if(areaOn){area.position.fromArray(region.position);area.position.y-=.12;area.lookAt(areaTarget.fromArray(region.target));}
    // R181: uniform fills trimmed (.75/.12 -> .5/.06) so shaped light (sun, window,
    // shadowed ceiling spot, contact AO) gives the room contrast.
-   bounce.intensity=amount*Math.sqrt(daylight)*.5;walls.intensity=amount*Math.sqrt(daylight)*.06;
+   // R188: inside a Blender-baked unit the lightmap supplies the bounce light.
+   const fill=baked?BAKED_FILL_SCALE:{bounce:1,walls:1,grazing:1};
+   bounce.intensity=amount*Math.sqrt(daylight)*.5*fill.bounce;walls.intensity=amount*Math.sqrt(daylight)*.06*fill.walls;
    windowFill.intensity=amount*Math.sqrt(daylight)*2.1;
-   grazing.intensity=amount*Math.sqrt(daylight)*3.5;if(region)grazing.position.fromArray(region.position).add(new Vector3(.3,-.12,0));
+   grazing.intensity=amount*Math.sqrt(daylight)*3.5*fill.grazing;if(region)grazing.position.fromArray(region.position).add(new Vector3(.3,-.12,0));
    if(region){windowTarget.position.fromArray(region.target).add(new Vector3(0,1.2,0));windowFill.position.copy(windowTarget.position).add(new Vector3(-1.5,2,-4));}
    bounce.visible=true;walls.visible=true;
    wanted=walking&&inside?region:null;
