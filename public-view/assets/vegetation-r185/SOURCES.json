@@ -1,0 +1,41 @@
+{
+ "revision": 185,
+ "license": "CC0-1.0",
+ "licenseURL": "https://creativecommons.org/publicdomain/zero/1.0/",
+ "attribution_required": false,
+ "assets": [
+  {
+   "asset": "jacaranda_tree",
+   "provider": "Poly Haven",
+   "official_page": "https://polyhaven.com/a/jacaranda_tree",
+   "authors": [
+    "Rob Tuytel",
+    "Rico Cilliers"
+   ],
+   "license": "CC0-1.0",
+   "download": "api.polyhaven.com glTF 1k",
+   "used_for": [
+    "tree_jacaranda.ktx2",
+    "tree_jacaranda.webp"
+   ],
+   "processing": "Rendered orthographically (3 sides + top) by scripts/vegetation-impostors/render.mjs; colour bled into transparent texels; Basis ETC1S+alpha."
+  },
+  {
+   "asset": "searsia_lucida (variant c)",
+   "provider": "Poly Haven",
+   "official_page": "https://polyhaven.com/a/searsia_lucida",
+   "authors": [
+    "James Ray Cock",
+    "Jenelle van Heerden"
+   ],
+   "license": "CC0-1.0",
+   "download": "api.polyhaven.com glTF 1k",
+   "used_for": [
+    "shrub_searsia.ktx2",
+    "shrub_searsia.webp"
+   ],
+   "processing": "Same impostor pipeline, node searsia_lucida_c_LOD0 only."
+  }
+ ],
+ "license_summary": "Poly Haven assets are CC0: public domain, no attribution required, commercial use and redistribution permitted (https://polyhaven.com/license)."
+}
