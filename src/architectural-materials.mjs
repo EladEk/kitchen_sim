@@ -13,7 +13,7 @@ export const ARCHITECTURAL_MATERIALS=Object.freeze({
  fascia:{color:ANTHRACITE,roughness:.8,metalness:0},
  // Balcony undersides read light grey in the photos, not ceiling white.
  soffit:{color:'#dcdcd8',roughness:.94,metalness:0},
- frame:{color:'#2d3136',roughness:.36,metalness:.85,clearcoat:.1,clearcoatRoughness:.42},
+ frame:{color:'#2e3236',roughness:.36,metalness:.85,clearcoat:.1,clearcoatRoughness:.42},
  fence:{color:'#2a2d32',roughness:.38,metalness:.85,clearcoat:.1,clearcoatRoughness:.42},
  glass:{color:'#f6faf8',transmission:.9,ior:1.52,thickness:.024,attenuationColor:'#f5f8f6',attenuationDistance:1.15,roughness:.035,specularIntensity:1,metalness:0,envMapIntensity:1.35,transparent:false,opacity:1,depthWrite:false},
  entranceFloor:{color:'#5a5856',roughness:.45,metalness:0},
