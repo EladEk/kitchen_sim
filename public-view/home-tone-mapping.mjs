@@ -1,5 +1,6 @@
 import {Effect,BlendFunction} from 'postprocessing';
 import {Uniform} from 'three';
+import {COLOUR_GRADE_GLSL} from './colour-grade.mjs';
 
 // Self-contained AgX for the WebGL composer, with an explicit exposure uniform
 // fed from renderer.toneMappingExposure each frame, so WebGL matches the WebGPU
@@ -10,6 +11,8 @@ import {Uniform} from 'three';
 export const HOME_AGX_GLSL=`
 uniform float homeExposure;
 uniform float homeNeutral;
+uniform float homeGradeWeight;
+${COLOUR_GRADE_GLSL}
 const mat3 HOME_REC2020_TO_SRGB = mat3(
 	vec3( 1.6605, - 0.1246, - 0.0182 ),
 	vec3( - 0.5876, 1.1329, - 0.1006 ),
@@ -120,14 +123,16 @@ vec3 homeNeutralCurve( vec3 color ) {
 
 void mainImage(const in vec4 inputColor,const in vec2 uv,out vec4 outputColor){
  vec3 c=max(inputColor.rgb,vec3(0.));
- outputColor=vec4(homeNeutral>.5?homeNeutralCurve(c):homeAgX(c),inputColor.a);
+ outputColor=vec4(homeGrade(homeNeutral>.5?homeNeutralCurve(c):homeAgX(c),uv,homeGradeWeight),inputColor.a);
 }
 `;
 export class HomeToneMappingEffect extends Effect{
- constructor({exposure=1}={}){super('HomeToneMappingEffect',HOME_AGX_GLSL,{blendFunction:BlendFunction.SRC,uniforms:new Map([['homeExposure',new Uniform(exposure)],['homeNeutral',new Uniform(0)]])});}
+ constructor({exposure=1}={}){super('HomeToneMappingEffect',HOME_AGX_GLSL,{blendFunction:BlendFunction.SRC,uniforms:new Map([['homeExposure',new Uniform(exposure)],['homeNeutral',new Uniform(0)],['homeGradeWeight',new Uniform(0)]])});}
  get exposure(){return this.uniforms.get('homeExposure').value;}
  set exposure(value){this.uniforms.get('homeExposure').value=Number.isFinite(value)?value:1;}
  // Follows renderer.toneMapping: NeutralToneMapping selects the PBR Neutral curve.
  set neutral(value){this.uniforms.get('homeNeutral').value=value?1:0;}
+ set grade(value){this.uniforms.get('homeGradeWeight').value=Math.max(0,Math.min(1,Number(value)||0));}
+ get grade(){return this.uniforms.get('homeGradeWeight').value;}
  get neutral(){return this.uniforms.get('homeNeutral').value>.5;}
 }

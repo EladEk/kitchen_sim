@@ -8,6 +8,7 @@ export const FURNITURE_CATEGORIES=Object.freeze([
  {id:'tables',he:'שולחנות',cover:'desk',kinds:['desk','dining','coffee','side_table','console_table']},
  {id:'television',he:'טלוויזיות ושידות',cover:'media',kinds:['tv_console','media','tv_wall','tv_stand']},
  {id:'kitchen',he:'מטבח',cover:'kitchen_base',kinds:['kitchen_base','kitchen_base_doors','kitchen_sink','kitchen_corner','kitchen_pantry','kitchen_oven_tower','kitchen_wall','kitchen_wall_glass','kitchen_hood_cabinet','kitchen_open_shelf','kitchen_tall','kitchen_island']},
+ {id:'decor',he:'עיצוב ואביזרים',cover:'plant',kinds:['plant','succulent','rug','curtain','ceiling_lamp','cushions']},
  {id:'appliances',he:'מכשירי חשמל',cover:'fridge',kinds:['fridge','oven','washer','dishwasher']}
 ]);
 export const categoryForKind=kind=>FURNITURE_CATEGORIES.find(c=>c.kinds.includes(kind))?.id||null;

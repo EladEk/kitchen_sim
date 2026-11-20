@@ -4,8 +4,11 @@ import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 import {applyFurnitureColours,FURNITURE_COLOURS} from './furniture-colours.mjs';
 // Runtime templates are loaded once from the shared GLB. These keys are public
 // asset identities; owner IDs, positions and plan dimensions are never stored here.
-export const COMPLETE_FURNITURE_KINDS=Object.freeze(['bed-double','bed-single','sofa','armchair','coffee','dining','desk','dining-chair','office-chair','barstool','nightstand','plant','faucet','kitchen-faucet','media','tv']);
+export const COMPLETE_FURNITURE_KINDS=Object.freeze(['bed-double','bed-single','sofa','armchair','coffee','dining','desk','dining-chair','office-chair','barstool','nightstand','plant','faucet','kitchen-faucet','media','tv',
+ // R184 CC0 models and authored textiles for the editor's decor and storage.
+ 'ottoman','succulent','cushions','ceiling-lamp','bookcase','rug','curtain']);
 let library=null;
+export const completeFurnitureParts=kind=>library?.get(kind)||null;
 export const hasCompleteFurniture=kind=>!!library?.get(kind)?.length;
 const proxyGeometry=new T.BoxGeometry(1,1,1).translate(0,.5,0),proxyMaterial=new T.MeshBasicMaterial({colorWrite:false,depthWrite:false,transparent:true,side:T.DoubleSide});
 export function bindCompleteFurniture(value){library=value;return()=>{if(library===value)library=null;};}

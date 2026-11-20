@@ -1,0 +1,21 @@
+<!doctype html><html><body style="margin:0;background:transparent"><script type="importmap">{"imports":{"three":"/three/build/three.module.js","three/addons/":"/three/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+const q=new URLSearchParams(location.search),model=q.get('m'),tile=+(q.get('tile')||512);
+const views=JSON.parse(q.get('views')||'[0,60,120]');
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});renderer.setPixelRatio(1);
+const cols=2,rows=2;renderer.setSize(tile*cols,tile*rows);renderer.setClearColor(0x000000,0);renderer.outputColorSpace=THREE.SRGBColorSpace;document.body.appendChild(renderer.domElement);
+const scene=new THREE.Scene();
+scene.add(new THREE.HemisphereLight(0xffffff,0x6f6a5a,2.4));const d=new THREE.DirectionalLight(0xffffff,.9);d.position.set(.3,1,.4);scene.add(d);
+const g=await new GLTFLoader().loadAsync(`/src/${model}/src/${model}.gltf`);const root=g.scene;const keep=q.get('node');if(keep){const drop=[];root.traverse(o=>{if(o.isMesh&&o.name!==keep&&o.parent?.name!==keep&&!keep.split(',').includes(o.name)&&!keep.split(',').includes(o.parent?.name))drop.push(o);});drop.forEach(o=>o.removeFromParent());}
+root.traverse(o=>{if(o.isMesh){const s=[o.material].flat()[0];o.material=new THREE.MeshLambertMaterial({map:s.map,side:THREE.DoubleSide,alphaTest:.5,transparent:false});}});
+scene.add(root);root.updateMatrixWorld(true);const box=new THREE.Box3().setFromObject(root),c=box.getCenter(new THREE.Vector3()),sz=box.getSize(new THREE.Vector3());
+root.position.x-=c.x;root.position.z-=c.z;root.position.y-=box.min.y;root.updateMatrixWorld(true);
+const R=Math.max(sz.x,sz.z)/2*1.02,H=sz.y*1.01;
+renderer.setScissorTest(true);
+const out={R,H,views};
+views.forEach((deg,i)=>{const a=deg*Math.PI/180,cam=new THREE.OrthographicCamera(-R,R,H,0,-100,100);cam.position.set(Math.sin(a)*50,0,Math.cos(a)*50);cam.lookAt(0,0,0);cam.position.set(Math.sin(a)*50,0,Math.cos(a)*50);cam.updateMatrixWorld();
+ const x=(i%cols)*tile,y=(rows-1-Math.floor(i/cols))*tile;renderer.setViewport(x,y,tile,tile);renderer.setScissor(x,y,tile,tile);renderer.render(scene,cam);});
+{const cam=new THREE.OrthographicCamera(-R,R,R,-R,-100,100);cam.position.set(0,60,0);cam.up.set(0,0,-1);cam.lookAt(0,0,0);const i=3,x=(i%cols)*tile,y=(rows-1-Math.floor(i/cols))*tile;renderer.setViewport(x,y,tile,tile);renderer.setScissor(x,y,tile,tile);renderer.render(scene,cam);}
+window.__out=out;window.__png=renderer.domElement.toDataURL('image/png');
+</script></body></html>

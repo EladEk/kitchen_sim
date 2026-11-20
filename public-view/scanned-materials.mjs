@@ -1,3 +1,7 @@
+import treeImpostor from './assets/vegetation-r185/tree_jacaranda.ktx2?url';
+import treeImpostorFallback from './assets/vegetation-r185/tree_jacaranda.webp?url';
+import shrubImpostor from './assets/vegetation-r185/shrub_searsia.ktx2?url';
+import shrubImpostorFallback from './assets/vegetation-r185/shrub_searsia.webp?url';
 import wallNormalFallback from './assets/pbr-r104/beige_wall_001_nor_gl.jpg?url';
 import wallNormal from './assets/pbr-r113/beige_wall_001_nor_gl.ktx2?url';
 import wallRoughFallback from './assets/pbr-r104/beige_wall_001_rough.jpg?url';
@@ -39,6 +43,18 @@ import worktopNormalFallback from './assets/pbr-r183/worktop_nor_gl.jpg?url';
 import worktopNormal from './assets/pbr-r183/worktop_nor_gl.ktx2?url';
 import worktopRoughFallback from './assets/pbr-r183/worktop_rough.jpg?url';
 import worktopRough from './assets/pbr-r183/worktop_rough.ktx2?url';
+// R189: ambientCG Terrazzo005 relief + roughness for porcelain floors and wall tiles (assets/pbr-r189/SOURCES.json).
+import porcelainNormalFallback from './assets/pbr-r189/porcelain_nor_gl.jpg?url';
+import porcelainNormal from './assets/pbr-r189/porcelain_nor_gl.ktx2?url';
+import porcelainRoughFallback from './assets/pbr-r189/porcelain_rough.jpg?url';
+import porcelainRough from './assets/pbr-r189/porcelain_rough.ktx2?url';
+// R189: Poly Haven laminate_floor_03 photoscan for wood/parquet floor finishes (loaded only if one is present).
+import parquetColorFallback from './assets/pbr-r189/parquet_diff.jpg?url';
+import parquetColor from './assets/pbr-r189/parquet_diff.ktx2?url';
+import parquetNormalFallback from './assets/pbr-r189/parquet_nor_gl.jpg?url';
+import parquetNormal from './assets/pbr-r189/parquet_nor_gl.ktx2?url';
+import parquetRoughFallback from './assets/pbr-r189/parquet_rough.jpg?url';
+import parquetRough from './assets/pbr-r189/parquet_rough.ktx2?url';
 import {createCompressedMaterialLoader} from './ktx-material-loader.mjs';
 import {createScanMaterialController} from './scanned-material-core.mjs';
 
@@ -60,8 +76,16 @@ const scans={
  wallPaint:{normal:plasterNormal,roughness:plasterRough,metres:2,strength:.9,keepFinish:true,replaceDetail:true,source:'Poly Haven painted_plaster_wall'},
  // R183 worktops: veined stone detail at an estimated 1.2 m slab scale; the selected stone colour stays.
  worktop:{color:worktopColor,normal:worktopNormal,roughness:worktopRough,metres:1.2,strength:.35,rough:.32,environment:.9,source:'ambientCG Marble014'},
+ // R185: rendered CC0 Poly Haven plant impostor atlases (assets/vegetation-r185);
+ // atlas UVs, not metric tiling; the instance colour stays the tint.
+ treeImpostor:{color:treeImpostor,metres:1,naturalColor:true,keepFinish:true,atlas:true,source:'Poly Haven jacaranda_tree',technique:'impostor'},
+ shrubImpostor:{color:shrubImpostor,metres:1,naturalColor:true,keepFinish:true,atlas:true,source:'Poly Haven searsia_lucida',technique:'impostor'},
+ // R189 porcelain floors and wall tiles: polished relief and wipe roughness only; colour, base roughness and grout courses stay the finish's own.
+ porcelainFinish:{normal:porcelainNormal,roughness:porcelainRough,metres:1.2,strength:.35,keepFinish:true,source:'ambientCG Terrazzo005'},
+ // R189 wood/parquet floors: plank grain, neutralised so the selected floor colour stays the tint; ~2.08 m scan.
+ parquet:{color:parquetColor,normal:parquetNormal,roughness:parquetRough,metres:2.08,strength:.5,keepFinish:true,source:'Poly Haven laminate_floor_03'},
  asphalt:{color:roadColor,normal:roadNormal,roughness:roadRough,metres:2,strength:.7,rough:.97,environment:.4}
 };
 
-const fallbacks=new Map([[wallNormal,wallNormalFallback],[wallRough,wallRoughFallback],[clothColor,clothColorFallback],[clothNormal,clothNormalFallback],[clothRough,clothRoughFallback],[woodColor,woodColorFallback],[woodNormal,woodNormalFallback],[woodRough,woodRoughFallback],[roadColor,roadColorFallback],[roadNormal,roadNormalFallback],[roadRough,roadRoughFallback],[plasterNormal,plasterNormalFallback],[plasterRough,plasterRoughFallback],[worktopColor,worktopColorFallback],[worktopNormal,worktopNormalFallback],[worktopRough,worktopRoughFallback]]);
+const fallbacks=new Map([[parquetColor,parquetColorFallback],[parquetNormal,parquetNormalFallback],[parquetRough,parquetRoughFallback],[porcelainNormal,porcelainNormalFallback],[porcelainRough,porcelainRoughFallback],[treeImpostor,treeImpostorFallback],[shrubImpostor,shrubImpostorFallback],[wallNormal,wallNormalFallback],[wallRough,wallRoughFallback],[clothColor,clothColorFallback],[clothNormal,clothNormalFallback],[clothRough,clothRoughFallback],[woodColor,woodColorFallback],[woodNormal,woodNormalFallback],[woodRough,woodRoughFallback],[roadColor,roadColorFallback],[roadNormal,roadNormalFallback],[roadRough,roadRoughFallback],[plasterNormal,plasterNormalFallback],[plasterRough,plasterRoughFallback],[worktopColor,worktopColorFallback],[worktopNormal,worktopNormalFallback],[worktopRough,worktopRoughFallback]]);
 export function createScannedMaterials(options={}){const compressed=options.renderer?createCompressedMaterialLoader(options.renderer,fallbacks):null,controller=createScanMaterialController({...options,scans, ...(compressed?{loader:compressed.load}:{})});return {apply:controller.apply,get textures(){return controller.textures;},get stats(){return controller.stats;},dispose(){controller.dispose();compressed?.dispose();}};}

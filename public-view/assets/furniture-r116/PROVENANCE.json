@@ -2,9 +2,9 @@
   "revision": 116,
   "format": "glTF 2.0 / GLB",
   "compression": "EXT_meshopt_compression; EXT_texture_webp",
-  "bytes": 2913560,
-  "sha256": "d78d459e65b4dae83a4109f7eb60ce96c830cec225555f464db9c77f7c253921",
-  "textureBytes": 1086194,
+  "bytes": 4149112,
+  "sha256": "1027bc40211dc9e6c49273fff9112c815f3f03e4efe4d867605d39a759a91436",
+  "textureBytes": 1694620,
   "coordinates": {
     "units": "normalised envelope, dimensions applied from existing plan",
     "up": "+Y",
@@ -69,20 +69,6 @@
         0.5949999997019768,
         1.0033167232833136,
         0.5568303419049119
-      ],
-      "front": "+Z",
-      "supportY": 0
-    },
-    {
-      "id": "coffee",
-      "type": "authored complete furniture",
-      "author": "HomeStudio",
-      "source": "scripts/furniture-model-authoring.mjs",
-      "trianglesBeforeCompression": 1816,
-      "nativeDimensions": [
-        1.100000023841858,
-        0.40421016000211235,
-        0.800000011920929
       ],
       "front": "+Z",
       "supportY": 0
@@ -158,6 +144,34 @@
       "supportY": 0
     },
     {
+      "id": "rug",
+      "type": "authored complete furniture",
+      "author": "HomeStudio",
+      "source": "scripts/furniture-model-authoring.mjs",
+      "trianglesBeforeCompression": 3216,
+      "nativeDimensions": [
+        2,
+        0.01597833540290594,
+        1.399999976158142
+      ],
+      "front": "+Z",
+      "supportY": 0
+    },
+    {
+      "id": "curtain",
+      "type": "authored complete furniture",
+      "author": "HomeStudio",
+      "source": "scripts/furniture-model-authoring.mjs",
+      "trianglesBeforeCompression": 2384,
+      "nativeDimensions": [
+        1.5,
+        2.431000047624112,
+        0.07906678318977356
+      ],
+      "front": "+Z",
+      "supportY": 0
+    },
+    {
       "id": "cushion",
       "type": "authored complete furniture",
       "author": "HomeStudio",
@@ -207,7 +221,7 @@
       "source": "https://polyhaven.com/a/modern_arm_chair_01",
       "license": "CC0-1.0",
       "licenseURL": "https://creativecommons.org/publicdomain/zero/1.0/",
-      "originalSHA256": "2c02cde1c1a10f14bd4730f8ef8500cd2a7f23ef41f6f3c06cd42044ee2d6a58",
+      "originalSHA256": "db9a499bf9639f9fde61bd2194912d368f21f6cb1660245f10761af701eebace",
       "nativeDimensions": [
         0.8203444182872772,
         1.0228520567470696,
@@ -225,7 +239,7 @@
       "source": "https://polyhaven.com/a/dining_chair_02",
       "license": "CC0-1.0",
       "licenseURL": "https://creativecommons.org/publicdomain/zero/1.0/",
-      "originalSHA256": "63f22f21a65010d3f3ac66eeef90a12e2ff98ea3f991f526b13159dc5a44daba",
+      "originalSHA256": "2ce22759b3ae5e7085c2ecec1ebac784a3abf7be14de46fc14190410102e1824",
       "nativeDimensions": [
         0.4335707724094391,
         0.9733776897192001,
@@ -243,7 +257,7 @@
       "source": "https://polyhaven.com/a/potted_plant_01",
       "license": "CC0-1.0",
       "licenseURL": "https://creativecommons.org/publicdomain/zero/1.0/",
-      "originalSHA256": "796a9e374206f354c94e69e50d24731b609fecd1e8abce8af6af882fec32db10",
+      "originalSHA256": "f39a58417f4953aa469bdcf52a68928107e74e92e7dd9aa008302bc0112d810f",
       "nativeDimensions": [
         0.5870751887559891,
         1.335848034810624,
@@ -261,7 +275,7 @@
       "source": "https://polyhaven.com/a/side_table_01",
       "license": "CC0-1.0",
       "licenseURL": "https://creativecommons.org/publicdomain/zero/1.0/",
-      "originalSHA256": "106a04b45e6338a5e0026618d3fc0003e2c784095674bfa60a0974e7b7e354fe",
+      "originalSHA256": "a1283a401dc1cdd9e62c3efa83c04314b146fa698bcd5b25ca585fdf45b081a6",
       "nativeDimensions": [
         0.5500000715255737,
         0.5506622816901654,
@@ -279,7 +293,7 @@
       "source": "https://polyhaven.com/a/bar_chair_round_01",
       "license": "CC0-1.0",
       "licenseURL": "https://creativecommons.org/publicdomain/zero/1.0/",
-      "originalSHA256": "fc5aa51641e802d7023a0e8dcf91b1c15f969e68377ccfb4fd0dddcf9457c51c",
+      "originalSHA256": "1ed201a4f820865fee00df05dc444610204cb52d31abc7cccc7bc9dcd65efd0e",
       "nativeDimensions": [
         0.483150263971177,
         0.7505484623070515,
@@ -288,6 +302,122 @@
       "front": "+Z",
       "supportY": 0,
       "simplificationRatio": 0.75
+    },
+    {
+      "id": "coffee",
+      "type": "licensed complete model",
+      "originalId": "modern_coffee_table_01",
+      "author": "Amin",
+      "source": "https://polyhaven.com/a/modern_coffee_table_01",
+      "license": "CC0-1.0",
+      "licenseURL": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "originalSHA256": "e4546c8b97aa96ec465b638a629f7dcfea3639a782310960d37f49f10e3449dc",
+      "nativeDimensions": [
+        1.2018300294876099,
+        0.38999998569488525,
+        0.6000000238418579
+      ],
+      "front": "+Z",
+      "supportY": 0,
+      "simplificationRatio": 0.75
+    },
+    {
+      "id": "ottoman",
+      "type": "licensed complete model",
+      "originalId": "Ottoman_01",
+      "author": "Caspian Fortune",
+      "source": "https://polyhaven.com/a/Ottoman_01",
+      "license": "CC0-1.0",
+      "licenseURL": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "originalSHA256": "ec3e515949d5653922c3367bb143b36df44f462a4c4dfedd64b916b8edeaff25",
+      "nativeDimensions": [
+        0.8845577836036682,
+        0.6243239195573551,
+        0.6211484670639038
+      ],
+      "front": "+Z",
+      "supportY": 0,
+      "simplificationRatio": 0.75
+    },
+    {
+      "id": "succulent",
+      "type": "licensed complete model",
+      "originalId": "potted_plant_04",
+      "author": "James Ray Cock",
+      "source": "https://polyhaven.com/a/potted_plant_04",
+      "license": "CC0-1.0",
+      "licenseURL": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "originalSHA256": "fb7bf1ab634a7941e6082110a5ac8bb2f357c46e87ad6220035794066d618ec2",
+      "nativeDimensions": [
+        0.16788632422685623,
+        0.2674576655845158,
+        0.18475142866373062
+      ],
+      "front": "+Z",
+      "supportY": 0,
+      "simplificationRatio": 0.5
+    },
+    {
+      "id": "cushions",
+      "type": "licensed complete model",
+      "originalId": "throw_pillows_01",
+      "author": "Serhii Khromov",
+      "source": "https://polyhaven.com/a/throw_pillows_01",
+      "license": "CC0-1.0",
+      "licenseURL": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "originalSHA256": "35dfc626f9b64dd5d36b3c567235490aee4b57dfadc0606ffe7f648eb672e9be",
+      "nativeDimensions": [
+        0.9400650532965764,
+        0.4501592620377952,
+        0.45186097984792933
+      ],
+      "front": "+Z",
+      "supportY": 0,
+      "simplificationRatio": 0.5
+    },
+    {
+      "id": "ceiling-lamp",
+      "type": "licensed complete model",
+      "originalId": "modern_ceiling_lamp_01",
+      "author": "James Ray Cock",
+      "source": "https://polyhaven.com/a/modern_ceiling_lamp_01",
+      "license": "CC0-1.0",
+      "licenseURL": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "originalSHA256": "e2004e2e27c7e1fc745e8724ed99025c7e8272e7229c5c0f734e89e27efd33d3",
+      "nativeDimensions": [
+        0.4316493272781372,
+        0.9515514969825745,
+        0.4316607564687729
+      ],
+      "front": "+Z",
+      "supportY": 0,
+      "simplificationRatio": 0.75
+    },
+    {
+      "id": "bookcase",
+      "type": "licensed complete model",
+      "originalId": "wooden_display_shelves_01",
+      "author": "James Ray Cock",
+      "source": "https://polyhaven.com/a/wooden_display_shelves_01",
+      "license": "CC0-1.0",
+      "licenseURL": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "originalSHA256": "64834821c06c6f88198a20e3767805f77bc6f6e3aa52340c12621a89a99455be",
+      "nativeDimensions": [
+        1.077760934829712,
+        1.5561838150024414,
+        0.3715096414089203
+      ],
+      "front": "+Z",
+      "supportY": 0,
+      "simplificationRatio": 0.75,
+      "props": [
+        {
+          "source": "https://polyhaven.com/a/book_encyclopedia_set_01",
+          "author": "John Malcolm",
+          "license": "CC0-1.0",
+          "copies": 3
+        }
+      ]
     }
   ],
   "limitations": "Models are visual representations, not scans of the owner’s purchased furniture. Architectural cabinetry, sanitary products, engineering dimensions and navigation envelopes remain authoritative."

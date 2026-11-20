@@ -44,10 +44,8 @@ test('placement, scale and instance colors remain stable through every tier',()=
     for(let i=0;i<mesh.count;i++){mesh.getColorAt(i,color);color.toArray().forEach((v,k)=>close(v,members[i].color[k]));}
    }
   }
-  const leaf=props.resources.materials.find(m=>m.alphaTest>.4),canopy=props.resources.materials.find(m=>m.roughness===.95&&!m.map);
-  assert(leaf&&canopy);let mean=0,weight=0;
-  for(let i=0;i<leaf.map.image.data.length;i+=4){const a=leaf.map.image.data[i+3]/255;if(a<leaf.alphaTest)continue;const v=leaf.map.image.data[i]/255;mean+=new THREE.Color(v,v,v).convertSRGBToLinear().r*a;weight+=a;}
-  close(canopy.color.r,mean/weight,1e-5);
+  // R185: every foliage tier uses the scanned impostor atlases (no flat canopy blobs).
+  const leaves=props.resources.materials.filter(m=>m.alphaTest>.4);assert.deepEqual(leaves.map(m=>m.userData.scanKind).sort(),['shrubImpostor','treeImpostor']);
  }finally{props.dispose();}
 });
 

@@ -8,6 +8,9 @@ import {bloom} from 'three/addons/tsl/display/BloomNode.js';
 import {fxaa} from 'three/addons/tsl/display/FXAANode.js';
 import {traa} from 'three/addons/tsl/display/TRAANode.js';
 import {photorealQuality} from './photoreal-quality.mjs';
+import {NoToneMapping,LinearSRGBColorSpace} from 'three';
+import {COLOUR_GRADE,colourGradeWeight} from './colour-grade.mjs';
+import {screenUV,pow,clamp,smoothstep,length,dot,vec2} from 'three/tsl';
 
 export function presentationAOWeight({effects=true,ao=true,enhanced=false}={}){
  return effects&&ao?(enhanced ? .52 : .42):0;
@@ -34,6 +37,12 @@ export function surfaceReflectionWeight(parameters){
 export function scenePassRenderDepth(){
  return 1;
 }
+export function gradeOutput(c,weight){
+ const [r,g,b]=COLOUR_GRADE.warmth;let x=c.mul(vec3(r,g,b));const l=dot(x,vec3(.2126,.7152,.0722));x=max(mix(vec3(l),x,COLOUR_GRADE.saturation),vec3(0));
+ const s=clamp(pow(clamp(x,0,1),vec3(1/2.2)).sub(.5).mul(COLOUR_GRADE.contrast).add(.5),0,1);x=pow(s,vec3(2.2));
+ const v=smoothstep(.38,.98,length(screenUV.sub(.5).mul(vec2(1,.82))).mul(1.414));x=x.mul(float(1).sub(v.mul(COLOUR_GRADE.vignette)));
+ return mix(c,x,weight);
+}
 export function createNodePresentation(renderer,scene,camera,{mobile=false,enhanced=false,tier=0,capture=false}={}){
  // Keep attachments and shader topology stable across automatic reductions.
  // Initial device/user mode decides temporal AA; no full scene recompile when
@@ -47,7 +56,7 @@ export function createNodePresentation(renderer,scene,camera,{mobile=false,enhan
  })();
  scenePass.setMRT(mrt({output,normal:normalView,...(!mobile?{surface}:{}),...(quality.temporal?{velocity}:{})}));
  const beauty=scenePass.getTextureNode('output'),normal=scenePass.getTextureNode('normal'),depth=scenePass.getTextureNode('depth');
- const weights={temporal:uniform(quality.temporal?1:0),ao:uniform(presentationAOWeight({ao:quality.ao,enhanced})),gi:uniform(quality.gi?1:0),ssr:uniform(quality.ssr?1:0),bloom:uniform(quality.bloom?1:0)};
+ const weights={grade:uniform(colourGradeWeight({tier})),temporal:uniform(quality.temporal?1:0),ao:uniform(presentationAOWeight({ao:quality.ao,enhanced})),gi:uniform(quality.gi?1:0),ssr:uniform(quality.ssr?1:0),bloom:uniform(quality.bloom?1:0)};
  const group=(name,...nodes)=>{owned.push(...nodes);groups.push({name,nodes:nodes.map(node=>({node,type:node.updateBeforeType}))});};
  let temporal=null,colour=beauty.rgb;
  if(quality.temporal){temporal=traa(beauty,depth,scenePass.getTextureNode('velocity'),camera);group('temporal',temporal);colour=gatedEffect(weights.temporal,mix(beauty.rgb,temporal.rgb,weights.temporal),beauty.rgb);}
@@ -66,8 +75,10 @@ export function createNodePresentation(renderer,scene,camera,{mobile=false,enhan
   colour=colour.add(gatedEffect(weights.ssr,reflection.rgb.mul(surfaceReflectionWeight(parameters)).mul(weights.ssr),vec3(0)));
  }
  const glow=bloom(vec4(min(max(colour,vec3(0)),vec3(BLOOM_INPUT_LIMIT)),OPAQUE_OUTPUT_ALPHA),.035,.2,1.1);glow.setResolutionScale(.25);group('bloom',glow);colour=colour.add(gatedEffect(weights.bloom,glow.rgb.mul(weights.bloom),vec3(0)));
- if(temporal)pipeline.outputNode=renderOutput(vec4(colour,OPAQUE_OUTPUT_ALPHA));
- else{const antialias=fxaa(renderOutput(vec4(colour,OPAQUE_OUTPUT_ALPHA)));owned.push(antialias);pipeline.outputNode=antialias;}
+ // R186: the shared display grade on the tone-mapped linear frame, then encode.
+ const graded=gradeOutput(renderOutput(vec4(colour,OPAQUE_OUTPUT_ALPHA),null,LinearSRGBColorSpace).rgb,weights.grade),finalColour=renderOutput(vec4(graded,OPAQUE_OUTPUT_ALPHA),NoToneMapping,null);
+ if(temporal)pipeline.outputNode=finalColour;
+ else{const antialias=fxaa(finalColour);owned.push(antialias);pipeline.outputNode=antialias;}
  pipeline.outputColorTransform=false;
  let preparedKey='',disposed=false,primed=false,temporalActive=!!temporal;
  // The render context (part of every node/pipeline cache key) depends on the
@@ -82,7 +93,7 @@ export function createNodePresentation(renderer,scene,camera,{mobile=false,enhan
  function setQuality({tier=0,enhanced=false,effects=true}={}){
   const next=photorealQuality({mobile,enhanced,tier});Object.assign(quality,next);
   const taa=!!temporal&&effects&&next.temporal;if(taa&&!temporalActive)resetHistory();temporalActive=taa;
-  weights.temporal.value=taa?1:0;weights.ao.value=presentationAOWeight({effects,ao:next.ao,enhanced});weights.gi.value=effects&&next.gi?1:0;weights.ssr.value=effects&&next.ssr?1:0;weights.bloom.value=effects&&next.bloom?1:0;
+  weights.temporal.value=taa?1:0;weights.grade.value=colourGradeWeight({effects,tier});weights.ao.value=presentationAOWeight({effects,ao:next.ao,enhanced});weights.gi.value=effects&&next.gi?1:0;weights.ssr.value=effects&&next.ssr?1:0;weights.bloom.value=effects&&next.bloom?1:0;
   cavity.samples.value=next.aoSamples;
   if(reflection){reflection.resolutionScale=next.ssrScale;reflection.quality.value=next.ssrQuality;}
  }

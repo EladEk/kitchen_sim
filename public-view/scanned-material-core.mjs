@@ -13,6 +13,11 @@ export function scanKindFor(data,scans){
  const kind=data.scanKind||data.surfaceKind;
  if(data.physicalFinishRevision>=165&&['plaster','paint'].includes(kind))return scans.wallPaint?'wallPaint':null;
  if(kind==='stone'||data.architecturalRole==='worktop')return scans.worktop?'worktop':null;
+ // R189: interior porcelain floors and porcelain wall tiles keep their selected colour
+ // and procedural albedo; the scan adds polished relief and wipe/smudge roughness.
+ const floor=data.publicFinish==='floor'||data.architecturalRole==='floor';
+ if(floor&&['wood','parquet','laminate'].includes(kind))return scans.parquet?'parquet':null;
+ if(floor||kind==='porcelain')return scans.porcelainFinish?'porcelainFinish':null;
  return scans[kind]?kind:null;
 }
 export function createScanMaterialController({scans,mobile=false,signal,loader=loadSurfaceTexture}={}){
@@ -25,7 +30,7 @@ export function createScanMaterialController({scans,mobile=false,signal,loader=l
     // The selected finish remains the albedo authority, including dark wood.
     const pixels=context.getImageData(0,0,canvas.width,canvas.height),data=pixels.data,mean=[0,0,0],count=data.length/4;for(let i=0;i<data.length;i+=4)for(let c=0;c<3;c++)mean[c]+=data[i+c]/count;for(let i=0;i<data.length;i+=4)for(let c=0;c<3;c++)data[i+c]=Math.min(255,236*data[i+c]/Math.max(1,mean[c]));context.putImageData(pixels,0,0);
    }texture.image=canvas;}}
-  if(p.technique)texture.userData.scanTechnique=p.technique;texture.colorSpace=channel==='color'?THREE.SRGBColorSpace:THREE.NoColorSpace;texture.wrapS=texture.wrapT=THREE.RepeatWrapping;texture.repeat.setScalar(1/p.metres);texture.anisotropy=16;texture.generateMipmaps=!texture.isCompressedTexture;texture.minFilter=THREE.LinearMipmapLinearFilter;texture.magFilter=THREE.LinearFilter;texture.needsUpdate=true;owned.add(texture);return texture;
+  if(p.technique)texture.userData.scanTechnique=p.technique;texture.colorSpace=channel==='color'?THREE.SRGBColorSpace:THREE.NoColorSpace;texture.wrapS=texture.wrapT=p.atlas?THREE.ClampToEdgeWrapping:THREE.RepeatWrapping;texture.repeat.setScalar(p.atlas?1:1/p.metres);texture.anisotropy=16;texture.generateMipmaps=!texture.isCompressedTexture;texture.minFilter=THREE.LinearMipmapLinearFilter;texture.magFilter=THREE.LinearFilter;texture.needsUpdate=true;owned.add(texture);return texture;
  }
  function shareChannel(p,channel,kind,onProgress=()=>{}){
   // Fabric and wood weave is the detail that keeps upholstery and veneer
@@ -53,7 +58,7 @@ export function createScanMaterialController({scans,mobile=false,signal,loader=l
    for(const m of materials){if(bound.has(m))continue;
     // R183: the scan replaces the baseline's 64 px procedural paint tile, whose
     // repeat showed as a blotch lattice; the finish colour stays the albedo.
-    if(p.replaceDetail){m.map=null;m.bumpMap=null;}if(textures.color){m.map=textures.color;if(p.naturalColor)m.color.set('#ffffff');else if(p.colorMean)installScanAlbedo(m,textures.color.isCompressedTexture&&p.compressedColorMean?p.compressedColorMean:p.colorMean);}if(textures.normal){m.normalMap=textures.normal;m.normalScale.setScalar(p.strength);}if(textures.roughness)m.roughnessMap=textures.roughness;if(!p.keepFinish){m.roughness=p.rough;m.metalness=0;m.envMapIntensity=p.environment;}if(m.isMeshPhysicalMaterial&&kind==='fabric'){m.sheen=.65;m.sheenRoughness=.4;m.sheenColor.set('#e8e3da');m.specularIntensity=.3;m.clearcoat=0;}if(m.isMeshPhysicalMaterial&&kind==='upholstery'){const f=UPHOLSTERY_FINISH;m.sheen=f.sheen;m.sheenRoughness=f.sheenRoughness;m.sheenColor.set(f.sheenColor);m.specularIntensity=f.specularIntensity;m.clearcoat=f.clearcoat;}m.userData.scannedPBR={revision:106,source:p.source||'Poly Haven',metres:p.metres,...(p.technique?{technique:p.technique}:{})};installBuildingSurfaceUVs(m);m.needsUpdate=true;bound.add(m);}
+    if(p.replaceDetail){m.map=null;m.bumpMap=null;}if(textures.color){m.map=textures.color;if(p.naturalColor)m.color.set('#ffffff');else if(p.colorMean)installScanAlbedo(m,textures.color.isCompressedTexture&&p.compressedColorMean?p.compressedColorMean:p.colorMean);}if(textures.normal){m.normalMap=textures.normal;m.normalScale.setScalar(p.strength);}if(textures.roughness)m.roughnessMap=textures.roughness;if(!p.keepFinish){m.roughness=p.rough;m.metalness=0;m.envMapIntensity=p.environment;}if(m.isMeshPhysicalMaterial&&kind==='fabric'){m.sheen=.65;m.sheenRoughness=.4;m.sheenColor.set('#e8e3da');m.specularIntensity=.3;m.clearcoat=0;}if(m.isMeshPhysicalMaterial&&kind==='upholstery'){const f=UPHOLSTERY_FINISH;m.sheen=f.sheen;m.sheenRoughness=f.sheenRoughness;m.sheenColor.set(f.sheenColor);m.specularIntensity=f.specularIntensity;m.clearcoat=f.clearcoat;}m.userData.scannedPBR={revision:106,source:p.source||'Poly Haven',metres:p.metres,...(p.technique?{technique:p.technique}:{})};if(!p.atlas)installBuildingSurfaceUVs(m);m.needsUpdate=true;bound.add(m);}
    onProgress(++finished/kinds.length);
   };
   let next=0;await Promise.all(Array.from({length:Math.min(concurrency,kinds.length)},async()=>{while(next<kinds.length){if(disposed||signal?.aborted)return;const item=kinds[next++];await bind(item);}}));
