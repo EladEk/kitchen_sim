@@ -15,20 +15,20 @@ export function installStoneCourses(limestone){
   limestone.onBeforeCompile=shader=>{
    shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vBuildingWorld;\nvarying vec3 vBuildingSurfaceNormal;').replace('#include <worldpos_vertex>','#include <worldpos_vertex>\nvec4 bw=vec4(transformed,1.0);\n#ifdef USE_INSTANCING\nbw=instanceMatrix*bw;\n#endif\nvBuildingWorld=(modelMatrix*bw).xyz;\nvBuildingSurfaceNormal=inverseTransformDirection(transformedNormal,viewMatrix);');
    shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nvarying vec3 vBuildingWorld;\nvarying vec3 vBuildingSurfaceNormal;\n'+FINISH_GRID_GLSL).replace('#include <color_fragment>',`#include <color_fragment>
-    float course=floor(vBuildingWorld.y/.48);
+    float course=floor(vBuildingWorld.y/${FACADE_COURSES.height});
     vec3 n=normalize(vBuildingSurfaceNormal);
     float horizontal=abs(n.x)>abs(n.z)?vBuildingWorld.z:vBuildingWorld.x;
-    float row=abs(fract(vBuildingWorld.y/.48+.5)-.5)*.48;
-    float col=abs(fract((horizontal+mod(course,2.0)*.47)/.94+.5)-.5)*.94;
+    float row=abs(fract(vBuildingWorld.y/${FACADE_COURSES.height}+.5)-.5)*${FACADE_COURSES.height};
+    float col=abs(fract((horizontal+mod(course,2.0)*${FACADE_COURSES.width}*.5)/${FACADE_COURSES.width}+.5)-.5)*${FACADE_COURSES.width};
     float aa=max(fwidth(horizontal),fwidth(vBuildingWorld.y));
     // The photographed facade has crisp, recessed-looking grout. The old
     // 2 mm / 4% treatment almost disappeared at normal viewing distances.
-    float rowCoverage=finishGridCoverage(row,fwidth(vBuildingWorld.y),.0035,.48);
-    float colCoverage=finishGridCoverage(col,fwidth(horizontal),.0035,.94);
+    float rowCoverage=finishGridCoverage(row,fwidth(vBuildingWorld.y),${FACADE_COURSES.joint/2},${FACADE_COURSES.height});
+    float colCoverage=finishGridCoverage(col,fwidth(horizontal),${FACADE_COURSES.joint/2},${FACADE_COURSES.width});
     float joint=1.0-(1.0-rowCoverage)*(1.0-colCoverage);
     // Slight per-stone variation matches the natural limestone blocks while
     // keeping the selected ivory facade colour stable across private/public.
-    vec2 stoneId=vec2(floor(horizontal/.94+mod(course,2.0)*.5),course);
+    vec2 stoneId=vec2(floor(horizontal/${FACADE_COURSES.width}+mod(course,2.0)*.5),course);
     float stoneTone=mix(fract(sin(dot(stoneId,vec2(127.1,311.7)))*43758.5453),.5,smoothstep(.12,.48,aa));
     float grain=sin(horizontal*89.0)*sin(vBuildingWorld.y*83.0)*.003*(1.0-smoothstep(.002,.012,aa));
     vec3 mineralGrain=clamp(diffuseColor.rgb/max(diffuse,vec3(.0001)),vec3(.94),vec3(1.04));

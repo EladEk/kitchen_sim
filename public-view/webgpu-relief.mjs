@@ -1,3 +1,4 @@
+import {FACADE_COURSES} from '../src/facade-finish.mjs';
 import {Fn,If,Loop,Break,float,vec2,vec3,texture,uniform,positionView,normalViewGeometry,max,min,abs,fract,floor,sin,dot,smoothstep,mix} from 'three/tsl';
 
 export const surfaceHash=p=>fract(sin(dot(p,vec2(127.1,311.7))).mul(43758.5453));
@@ -23,7 +24,7 @@ export function triplanarTexture(map,position,normal){
 }
 
 export function stoneHeight(p){
- const row=floor(p.y.div(.48)),q=vec2(p.x.add(row.mod(2).mul(.47)),p.y),f=fract(q.div(vec2(.94,.48)).add(.5)),d=abs(f.sub(.5)).mul(vec2(.94,.48));
+ const {width:w,height:h}=FACADE_COURSES,row=floor(p.y.div(h)),q=vec2(p.x.add(row.mod(2).mul(w/2)),p.y),f=fract(q.div(vec2(w,h)).add(.5)),d=abs(f.sub(.5)).mul(vec2(w,h));
  return smoothstep(.002,.005,min(d.x,d.y));
 }
 

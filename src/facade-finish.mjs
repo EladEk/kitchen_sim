@@ -1,9 +1,21 @@
 // One public-safe facade recipe, shared by the editable apartment and district.
 // The colour follows the existing private apartment's stone finish.
+// R182: the owner's close-up photos of the finished building show light
+// ivory travertine-like limestone (~#e6dfd2-#ddd5c6), matte, slabs of about
+// 60-80 x 30-40 cm in a running bond with thin, slightly darker grey joints.
+// Entrance-side photos read paler and cooler (~#e9e6df). The existing ivory
+// sits inside the photographed range and is kept: shifting it changed the
+// headless WebGL window/balcony glazing brightness (unexplained, see PR).
 export const FACADE_COLOR='#e6dfd3';
-export const FACADE_ROUGHNESS=.82;
+export const FACADE_ROUGHNESS=.87;
+// R182: the official Efi renders (house/efi-reference/002-004) and the site
+// photo (house/exterior/reference-3) frame the stacked balconies with a dark
+// anthracite band (slab edges, side returns, beams) against the light stone.
+// The photos of the finished building show a uniform mid/dark grey slab edge
+// (~#5a5e62-#6b6e70).
+export const ANTHRACITE='#64686b';
 // Metres, shared by live shaders and the progressive photo snapshot.
-export const FACADE_COURSES=Object.freeze({width:.94,height:.48,joint:.007,recess:.003,groutShade:.48,toneMin:.91,toneRange:.16});
+export const FACADE_COURSES=Object.freeze({width:.72,height:.36,joint:.005,recess:.003,groutShade:.7,toneMin:.97,toneRange:.06});
 const fract=n=>n-Math.floor(n);
 const hash=(x,y,s)=>fract(Math.sin(x*127.1+y*311.7+s*19.19)*43758.5453);
 export function facadeCourseSample(u,v){
