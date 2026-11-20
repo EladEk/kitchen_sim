@@ -43,6 +43,11 @@ import worktopNormalFallback from './assets/pbr-r183/worktop_nor_gl.jpg?url';
 import worktopNormal from './assets/pbr-r183/worktop_nor_gl.ktx2?url';
 import worktopRoughFallback from './assets/pbr-r183/worktop_rough.jpg?url';
 import worktopRough from './assets/pbr-r183/worktop_rough.ktx2?url';
+// R189: ambientCG Terrazzo005 relief + roughness for porcelain floors and wall tiles (assets/pbr-r189/SOURCES.json).
+import porcelainNormalFallback from './assets/pbr-r189/porcelain_nor_gl.jpg?url';
+import porcelainNormal from './assets/pbr-r189/porcelain_nor_gl.ktx2?url';
+import porcelainRoughFallback from './assets/pbr-r189/porcelain_rough.jpg?url';
+import porcelainRough from './assets/pbr-r189/porcelain_rough.ktx2?url';
 import {createCompressedMaterialLoader} from './ktx-material-loader.mjs';
 import {createScanMaterialController} from './scanned-material-core.mjs';
 
@@ -68,8 +73,10 @@ const scans={
  // atlas UVs, not metric tiling; the instance colour stays the tint.
  treeImpostor:{color:treeImpostor,metres:1,naturalColor:true,keepFinish:true,atlas:true,source:'Poly Haven jacaranda_tree',technique:'impostor'},
  shrubImpostor:{color:shrubImpostor,metres:1,naturalColor:true,keepFinish:true,atlas:true,source:'Poly Haven searsia_lucida',technique:'impostor'},
+ // R189 porcelain floors and wall tiles: polished relief and wipe roughness only; colour, base roughness and grout courses stay the finish's own.
+ porcelainFinish:{normal:porcelainNormal,roughness:porcelainRough,metres:1.2,strength:.35,keepFinish:true,source:'ambientCG Terrazzo005'},
  asphalt:{color:roadColor,normal:roadNormal,roughness:roadRough,metres:2,strength:.7,rough:.97,environment:.4}
 };
 
-const fallbacks=new Map([[treeImpostor,treeImpostorFallback],[shrubImpostor,shrubImpostorFallback],[wallNormal,wallNormalFallback],[wallRough,wallRoughFallback],[clothColor,clothColorFallback],[clothNormal,clothNormalFallback],[clothRough,clothRoughFallback],[woodColor,woodColorFallback],[woodNormal,woodNormalFallback],[woodRough,woodRoughFallback],[roadColor,roadColorFallback],[roadNormal,roadNormalFallback],[roadRough,roadRoughFallback],[plasterNormal,plasterNormalFallback],[plasterRough,plasterRoughFallback],[worktopColor,worktopColorFallback],[worktopNormal,worktopNormalFallback],[worktopRough,worktopRoughFallback]]);
+const fallbacks=new Map([[porcelainNormal,porcelainNormalFallback],[porcelainRough,porcelainRoughFallback],[treeImpostor,treeImpostorFallback],[shrubImpostor,shrubImpostorFallback],[wallNormal,wallNormalFallback],[wallRough,wallRoughFallback],[clothColor,clothColorFallback],[clothNormal,clothNormalFallback],[clothRough,clothRoughFallback],[woodColor,woodColorFallback],[woodNormal,woodNormalFallback],[woodRough,woodRoughFallback],[roadColor,roadColorFallback],[roadNormal,roadNormalFallback],[roadRough,roadRoughFallback],[plasterNormal,plasterNormalFallback],[plasterRough,plasterRoughFallback],[worktopColor,worktopColorFallback],[worktopNormal,worktopNormalFallback],[worktopRough,worktopRoughFallback]]);
 export function createScannedMaterials(options={}){const compressed=options.renderer?createCompressedMaterialLoader(options.renderer,fallbacks):null,controller=createScanMaterialController({...options,scans, ...(compressed?{loader:compressed.load}:{})});return {apply:controller.apply,get textures(){return controller.textures;},get stats(){return controller.stats;},dispose(){controller.dispose();compressed?.dispose();}};}

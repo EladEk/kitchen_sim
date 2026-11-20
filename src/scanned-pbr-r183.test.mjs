@@ -7,7 +7,7 @@ test('R183 painted walls and ceilings take the plaster scan, stone worktops the 
  assert.equal(scanKindFor({surfaceKind:'stone'},scans),'worktop');
  assert.equal(scanKindFor({architecturalRole:'worktop',surfaceKind:'porcelain'},scans),'worktop');
  assert.equal(scanKindFor({surfaceKind:'wood'},scans),'wood');
- assert.equal(scanKindFor({surfaceKind:'porcelain'},scans),null,'owner-ordered floor photos stay authoritative');
+ assert.equal(scanKindFor({surfaceKind:'porcelain'},scans),null,'without the R189 scan porcelain keeps its procedural detail');
  assert.equal(scanKindFor({surfaceKind:'plaster',physicalFinishRevision:165},{}),null);
 });
 test('R183 scans are CC0 with recorded provenance, compressed with raster fallbacks, and keep the finish',()=>{

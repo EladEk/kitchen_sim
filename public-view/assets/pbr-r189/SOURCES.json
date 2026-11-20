@@ -1,0 +1,26 @@
+{
+ "revision": 189,
+ "assets": [
+  {
+   "files": [
+    "porcelain_nor_gl.jpg",
+    "porcelain_nor_gl.ktx2",
+    "porcelain_rough.jpg",
+    "porcelain_rough.ktx2"
+   ],
+   "asset": "Terrazzo 005",
+   "provider": "ambientCG",
+   "official_page": "https://ambientcg.com/view?id=Terrazzo005",
+   "authors": {
+    "Lennart Demes (ambientCG)": "All"
+   },
+   "license": "CC0-1.0",
+   "license_source": "https://docs.ambientcg.com/license/",
+   "physical_dimensions_m": null,
+   "applied_tile_m": 1.2,
+   "use": "Interior porcelain floors and porcelain wall tiles: polished surface relief and wipe/smudge roughness variation only. The selected finish colour, its roughness and the grout courses stay authoritative",
+   "preparation": "1k JPG: OpenGL normal and roughness resized to 512 px; roughness recentred to mean 0.89 with 1.5x contrast (it multiplies the finish roughness)"
+  }
+ ],
+ "codec": "Basis Universal ETC1S roughness, UASTC (RDO 1.5) linear normal, full mips; JPEG fallbacks for the raster path"
+}

@@ -29,3 +29,7 @@ test('inside a baked unit the faked-GI fills are reduced; elsewhere unchanged',(
  const plain=run(false),baked=run(true);assert(Math.abs(baked.bounce-plain.bounce*BAKED_FILL_SCALE.bounce)<1e-6);
  const grazing=scene.getObjectByName('tour-grazing-fill');assert(grazing.intensity>0);lights.dispose?.();
 });
+test('baked material clones keep the finish shader hooks (metric UVs, floor courses)',()=>{
+ const src=fs.readFileSync(new URL('./baked-lightmaps.mjs',import.meta.url),'utf8');
+ assert.match(src,/c\.onBeforeCompile=src\.onBeforeCompile;c\.customProgramCacheKey=src\.customProgramCacheKey;/);
+});

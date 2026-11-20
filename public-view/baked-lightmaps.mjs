@@ -28,7 +28,8 @@ export function createBakedLightmaps({renderer=null,signal,loader=null}={}){
    const meshes=applyBakedUVs(root,data.receivers,{level:bake.floor});meshes.forEach(o=>geometries.add(o.geometry));if(!meshes.length)continue;
    const [irr,ao]=await Promise.all([load(bake.indirect,{signal}),load(bake.ao,{signal})]);if(disposed||signal?.aborted||!irr||!ao){irr?.dispose();ao?.dispose();return {matched:total};}
    irr.colorSpace=THREE.SRGBColorSpace;ao.colorSpace=THREE.NoColorSpace;for(const t of [irr,ao]){t.channel=1;t.flipY=t.isCompressedTexture?false:t.flipY;t.needsUpdate=true;textures.add(t);}
-   for(const o of meshes){const list=[o.material].flat(),next=list.map(src=>{const key=src.uuid+':'+bake.unit;if(!clones.has(key)){const c=src.clone();c.lightMap=irr;c.lightMapIntensity=LIGHTMAP_INTENSITY;c.aoMap=ao;c.aoMapIntensity=LIGHTMAP_AO_INTENSITY;c.userData={...src.userData,bakedLightmap:{revision:188,floor:bake.floor,unit:bake.unit}};clones.set(key,c);}return clones.get(key);});o.material=Array.isArray(o.material)?next:next[0];}
+   for(const o of meshes){const list=[o.material].flat(),next=list.map(src=>{const key=src.uuid+':'+bake.unit;if(!clones.has(key)){const c=src.clone();// Material.clone drops the instance shader hooks (metric UVs, floor courses, wall cavity).
+     c.onBeforeCompile=src.onBeforeCompile;c.customProgramCacheKey=src.customProgramCacheKey;c.lightMap=irr;c.lightMapIntensity=LIGHTMAP_INTENSITY;c.aoMap=ao;c.aoMapIntensity=LIGHTMAP_AO_INTENSITY;c.userData={...src.userData,bakedLightmap:{revision:188,floor:bake.floor,unit:bake.unit}};clones.set(key,c);}return clones.get(key);});o.material=Array.isArray(o.material)?next:next[0];}
    total+=meshes.length;
   }
   return {matched:total};
