@@ -18,6 +18,10 @@ for name,stem,channel,size in jobs:
  if channel=='color':
   # Remove the mean tint: the selected stone colour stays the albedo authority.
   mean=ImageStat.Stat(im).mean;im=Image.merge('RGB',tuple(c.point(lambda v,m=m:min(255,round(236*v/max(1,m)))) for c,m in zip(im.split(),mean)))
+ if channel=='roughness':
+  # Multiplied by the material roughness at runtime: centre the map on a
+  # factor near 1 (walls) / .8 (polished stone) and keep its variation.
+  target,gain={'plaster_rough':(246,1.0),'worktop_rough':(205,1.6)}[stem];im=im.convert('L');mean=ImageStat.Stat(im).mean[0];im=im.point(lambda v:max(0,min(255,round(target+(v-mean)*gain)))).convert('RGB')
  jpg=out/(stem+'.jpg');im.save(jpg,quality=85)
  png=tmp/(stem+'.png');im.save(png);dest=out/(stem+'.ktx2')
  args=[str(encoder),'-file',str(png),'-ktx2','-mipmap','-output_file',str(dest),'-no_multithreading']

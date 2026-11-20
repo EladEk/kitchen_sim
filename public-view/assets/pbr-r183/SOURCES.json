@@ -12,7 +12,7 @@
    "physical_dimensions_m": [2, 2],
    "applied_tile_m": 2,
    "use": "Interior walls and ceilings (fine roller-painted plaster relief and roughness only; the selected paint colour stays the albedo)",
-   "preparation": "1k OpenGL normal and roughness; roughness resized to 512 px"
+   "preparation": "1k OpenGL normal and roughness; roughness resized to 512 px and recentred to mean 0.96 (it multiplies the paint roughness)"
   },
   {
    "files": ["worktop_diff.jpg", "worktop_diff.ktx2", "worktop_nor_gl.jpg", "worktop_nor_gl.ktx2", "worktop_rough.jpg", "worktop_rough.ktx2"],
@@ -25,7 +25,7 @@
    "physical_dimensions_m": null,
    "applied_tile_m": 1.2,
    "use": "Kitchen worktops (ivory quartzite-like veining); mean tint removed so the selected stone colour stays the albedo authority",
-   "preparation": "1k JPG: colour neutralised to mean 236, normal (OpenGL), roughness resized to 512 px. ambientCG gives no physical size; 1.2 m is an estimate from slab vein spacing"
+   "preparation": "1k JPG: colour neutralised to mean 236, normal (OpenGL), roughness resized to 512 px and recentred to mean 0.8 with 1.6x contrast (multiplies the 0.32 worktop roughness). ambientCG gives no physical size; 1.2 m is an estimate from slab vein spacing"
   }
  ],
  "codec": "Basis Universal ETC1S colour/roughness, UASTC (RDO 1.5) linear normals, full mips; JPEG fallbacks for the raster path"

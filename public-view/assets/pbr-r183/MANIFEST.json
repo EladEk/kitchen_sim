@@ -26,8 +26,8 @@
     512
    ],
    "source_sha256": "e0564c297b22ab1cf4ef02a82157b84ce3b92eb4fd49d9c64b7256a8b300af82",
-   "jpeg_bytes": 9003,
-   "ktx2_bytes": 9658
+   "jpeg_bytes": 9005,
+   "ktx2_bytes": 12530
   },
   {
    "source": "Marble014_1K-JPG_Color.jpg",
@@ -65,8 +65,8 @@
     512
    ],
    "source_sha256": "47d625968f127f649b0fd120d463bbb3607cef88054d417b45377e3257d3d559",
-   "jpeg_bytes": 40427,
-   "ktx2_bytes": 56474
+   "jpeg_bytes": 53913,
+   "ktx2_bytes": 60546
   }
  ]
 }
