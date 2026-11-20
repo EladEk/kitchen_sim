@@ -25,3 +25,7 @@ test('WebGPU finishes keep the map alpha for alpha-tested materials',()=>{
  const src=fs.readFileSync(new URL('./webgpu-finishes.mjs',import.meta.url),'utf8');
  assert.match(src,/if\(source\.map&&source\.alphaTest>0\)material\.opacityNode=reference\('opacity','float'\)\.mul\(sample\(source\.map,coordinates\)\.a\)/);
 });
+test('the site places no garden hedges along the fences (owner request); trees and the tree belt remain',()=>{
+ const src=fs.readFileSync(new URL('./site-scene.mjs',import.meta.url),'utf8');
+ assert.doesNotMatch(src,/hedges\.push|createRealisticProps\(\{[^}]*hedges/);assert.match(src,/createRealisticProps\(\{trees:points,cars,backdrop,mobile\}\)/);
+});
