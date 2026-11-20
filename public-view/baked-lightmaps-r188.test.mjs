@@ -33,3 +33,7 @@ test('baked material clones keep the finish shader hooks (metric UVs, floor cour
  const src=fs.readFileSync(new URL('./baked-lightmaps.mjs',import.meta.url),'utf8');
  assert.match(src,/c\.onBeforeCompile=src\.onBeforeCompile;c\.customProgramCacheKey=src\.customProgramCacheKey;/);
 });
+test('only the irradiance atlas is loaded (the AO atlas greyed whole walls)',()=>{
+ const src=fs.readFileSync(new URL('./baked-lightmaps.mjs',import.meta.url),'utf8');
+ assert.doesNotMatch(src,/ao\.ktx2\?url|aoMap=/);assert.match(src,/c\.lightMap=irr;/);
+});
