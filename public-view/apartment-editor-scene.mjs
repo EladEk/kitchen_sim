@@ -18,12 +18,20 @@ import {normalizeWorkspace,parseScope,scopeKey,unitContext,itemInRoom} from './a
 // envelope; picking, collision, saving and clearances keep the box proxies.
 // Items with opening doors/drawers keep their animated box parts.
 export const EDITOR_MODELS=Object.freeze({sofa:'sofa',loveseat:'sofa',armchair:'armchair',bed:'bed-single',double_bed:'bed-double',chair:'dining-chair',bar_stool:'barstool',office_chair:'office-chair',coffee:'coffee',dining:'dining',desk:'desk',side_table:'nightstand',ottoman:'ottoman',bookcase:'bookcase',cube_storage:'bookcase',media:'media',tv_stand:'tv',plant:'plant',succulent:'succulent',rug:'rug',curtain:'curtain',ceiling_lamp:'ceiling-lamp',cushions:'cushions'});
+// R190: the finished floor top sits FLOOR_TOP above the storey elevation; the
+// placement frame keeps its historic +.03 (collisions, clearances), but visuals
+// stand on the floor so pieces no longer hover 18 mm above their contact shadow.
+export const FLOOR_TOP=.012,PLACEMENT_LIFT=.03;
+const seat=item=>new T.Matrix4().makeTranslation(0,item.y?0:FLOOR_TOP-PLACEMENT_LIFT,0);
+// Flat or hanging decor never gets a floor contact (a rug's decal read as a hard
+// grey slab around it; curtains and lamps are not floor-standing pieces).
+export const hasContactShadow=item=>!item.y&&!/wall|plant|succulent|tv|mirror|rug|curtain|lamp|cushion/.test(item.kind);
 export const editorModelHeight=item=>item.kind==='rug'?Math.min(.015,item.h):item.h;
 const RECOLOURED_ROLES=new Set(['upholstery','bedding']);
 export function createApartmentEditorScene({nav,overrides=null}){
  const group=new T.Group();group.name='local-apartment-furniture';
  const cube=new T.BoxGeometry(1,1,1),soft=new RoundedBoxGeometry(1,1,1,2,.07),mirrors=new Map([[cube,mirroredGeometry(cube,[0,0])],[soft,mirroredGeometry(soft,[0,0])]]),palette={};
- const owned=[],surface=createFurnitureSurfacePalette(owned),contacts=createContactShadows(owned);
+ const owned=[],surface=createFurnitureSurfacePalette(owned),contacts=createContactShadows(owned,{inset:0,peak:.5});
  for(const name of Object.keys(FURNITURE_PALETTE)){const kind=['fabric','linen'].includes(name)?'fabric':name==='wood'?'wood':name==='paint'?'paint':null;palette[name]=kind?surface(kind):new T.MeshPhysicalMaterial({color:'#ffffff',...furnitureMaterialProperties(name)});palette[name].userData={...palette[name].userData,architecturalInterior:true,furnitureMaterial:true,...(name==='glass'?{architecturalGlass:true}:{}),...(name==='fabric'?{scanKind:'upholstery'}:{})};if(name==='fabric'){const f=UPHOLSTERY_FINISH,m=palette[name];m.roughness=.9;m.sheen=f.sheen;m.sheenRoughness=f.sheenRoughness;m.sheenColor.set(f.sheenColor);m.specularIntensity=f.specularIntensity;m.clearcoat=f.clearcoat;}}
  const proxy=new T.MeshBasicMaterial({colorWrite:false,depthWrite:false,transparent:true,opacity:1,side:T.DoubleSide}),flip=new T.Matrix4().makeScale(-1,1,1);
  const physicalMeshes=[],placements=[],visualBatches=[],assemblies=[],poses=new Map(),itemsByKey=new Map();
@@ -59,7 +67,7 @@ export function createApartmentEditorScene({nav,overrides=null}){
    for(const item of record.items){
     const base=transform.clone().multiply(new T.Matrix4().makeTranslation(item.x,context.elevation+.03+(item.y||0),item.z)).multiply(new T.Matrix4().makeRotationY(item.yaw));
     const r={item,scope,key,base,inverse:base.clone().invert(),mirror:b.mirror,root,elevation:context.elevation+(item.y||0),hidden:false,motions:[]};placements.push(r);itemsByKey.set(itemKey(key,item.id),r);
-    if(!item.y&&!/wall|plant|tv|mirror/.test(item.kind)){const contact=contacts.mesh(item.w,item.d);contact.applyMatrix4(base);contact.position.y=context.elevation+.012;root.add(contact);r.contact=contact;}
+    if(hasContactShadow(item)){const contact=contacts.footprint(item.w,item.d);contact.applyMatrix4(base);contact.position.y=context.elevation+FLOOR_TOP+.003;root.add(contact);r.contact=contact;}
     const parts=dimensionedFurnitureParts(item),byPart=new Map();
     for(const spec of cabinetMotions(item,parts)){
      const k=itemKey(key,item.id)+'|'+spec.id;used.add(k);const state=poses.get(k)||{progress:0,target:0};poses.set(k,state);if(editing)state.progress=state.target=0;
@@ -70,9 +78,9 @@ export function createApartmentEditorScene({nav,overrides=null}){
      const ref=add(b.mirror?mirrors.get(cube):cube,proxy,physical,true,item.id);r.proxy=ref;
     }
     const model=!r.motions.length&&EDITOR_MODELS[item.kind]?completeFurnitureParts(EDITOR_MODELS[item.kind]):null;
-    if(model){const local=new T.Matrix4().makeScale(item.w,editorModelHeight(item),item.d);for(const part of model){const material=modelMaterial(part.material,item.color),matrix=base.clone().multiply(local);if(b.mirror)matrix.multiply(flip);add(modelGeometry(part.geometry,b.mirror),material,matrix,false,item.id,material!==part.material?item.color:'#ffffff');}}
+    if(model){const local=seat(item).multiply(new T.Matrix4().makeScale(item.w,editorModelHeight(item),item.d));for(const part of model){const material=modelMaterial(part.material,item.color),matrix=base.clone().multiply(local);if(b.mirror)matrix.multiply(flip);add(modelGeometry(part.geometry,b.mirror),material,matrix,false,item.id,material!==part.material?item.color:'#ffffff');}}
     else for(const part of parts){
-     const [x,y,z,w,h,d]=part.box,geometry=/pillow|duvet|mattress|seat|back|arm/.test(part.part)?soft:cube,local=new T.Matrix4().makeTranslation(x,y,z).multiply(new T.Matrix4().makeScale(w,h,d)),motion=byPart.get(part.part),matrix=(motion?.world||base).clone().multiply(local);if(b.mirror)matrix.multiply(flip);
+     const [x,y,z,w,h,d]=part.box,geometry=/pillow|duvet|mattress|seat|back|arm/.test(part.part)?soft:cube,local=seat(item).multiply(new T.Matrix4().makeTranslation(x,y,z)).multiply(new T.Matrix4().makeScale(w,h,d)),motion=byPart.get(part.part),matrix=(motion?.world||base).clone().multiply(local);if(b.mirror)matrix.multiply(flip);
      const ref=add(b.mirror?mirrors.get(geometry):geometry,palette[part.material],matrix,false,item.id,furniturePartColor(item,part));if(motion)motion.visuals.push({...ref,local});
     }
    }
