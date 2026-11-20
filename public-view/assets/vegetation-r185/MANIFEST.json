@@ -45,5 +45,23 @@
    "webp_bytes": 222284,
    "ktx2_bytes": 259426
   }
- ]
+ ],
+ "edgeCleanup": {
+  "revision": 190,
+  "script": "scripts/prepare-vegetation-r190.py",
+  "atlases": [
+   {
+    "atlas": "tree_jacaranda",
+    "render_sha256": "2c9969e9ef88adaa68c4f114a5187839e99cc8a08ca473d9b6c127f35fdafd43",
+    "webp_bytes": 173722,
+    "ktx2_bytes": 238058
+   },
+   {
+    "atlas": "shrub_searsia",
+    "render_sha256": "a886dbb8bb182c7573c118454b215b99aed22f1181394e29bf82a9ab2a1fb8d0",
+    "webp_bytes": 178766,
+    "ktx2_bytes": 261075
+   }
+  ]
+ }
 }
