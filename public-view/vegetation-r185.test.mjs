@@ -17,8 +17,8 @@ test('hedges and the distant tree belt are single static batches that never coll
  const props=createRealisticProps({trees:[[0,10]],hedges,backdrop,mobile:true});
  try{const h=props.group.children.find(o=>o.name==='hedge'),b=props.group.children.find(o=>o.name==='backdrop');
   assert.equal(h.count,50);assert.equal(b.count,30);assert(h.userData.visualOnly&&b.userData.visualOnly);assert(!b.castShadow);assert(!h.castShadow,'phones skip hedge shadows');
-  assert.equal(h.material.userData.scanKind,'shrubImpostor');assert.equal(b.material.userData.scanKind,'treeImpostor');
-  const m=new THREE.Matrix4();h.getMatrixAt(0,m);const s=new THREE.Vector3();m.decompose(new THREE.Vector3(),new THREE.Quaternion(),s);assert(s.y*.95>1&&s.y*.95<1.3);
+  assert.equal(h.material.userData.scanKind,'hedgeFoliage');assert.equal(b.material.userData.scanKind,'treeImpostor');
+  const m=new THREE.Matrix4();h.getMatrixAt(0,m);const s=new THREE.Vector3();m.decompose(new THREE.Vector3(),new THREE.Quaternion(),s);assert(s.y*1.05>1&&s.y*1.05<1.3,'R190 module height 1.1 m');
   props.update(new THREE.Vector3(0,1.7,0),1000);assert.equal(h.count,50);
   const far=props.group.children.find(o=>o.name==='tree-far-branches');assert(far,'far trunks remain the walking collider');
  }finally{props.dispose();}

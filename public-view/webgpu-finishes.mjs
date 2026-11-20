@@ -142,6 +142,9 @@ export function createFinishNodeMaterial(source,{steps=uniform(24),mobile=false}
   rough=mix(mix(rough.mul(.72),rough,fresnel),.92,groutNode);material.clearcoatNode=mix(.42,.28,fresnel).mul(float(1).sub(groutNode));
  }
  if(foliage)material.thicknessColorNode=base.mul(.65);
+ // R190: a vec3 colorNode drops the map's alpha, so alpha-tested cutouts (tree/shrub
+ // impostors, hedge cards) rendered as opaque squares. Feed the map alpha back in.
+ if(source.map&&source.alphaTest>0)material.opacityNode=reference('opacity','float').mul(sample(source.map,coordinates).a);
  material.colorNode=base;material.roughnessNode=rough;material.normalNode=reliefNormal(height,normal);bindTraditionalMaterial(material,source);return material;
 }
 export function createFinishAdapter({renderer,mobile=false}={}){

@@ -45,7 +45,7 @@ test('placement, scale and instance colors remain stable through every tier',()=
    }
   }
   // R185: every foliage tier uses the scanned impostor atlases (no flat canopy blobs).
-  const leaves=props.resources.materials.filter(m=>m.alphaTest>.4);assert.deepEqual(leaves.map(m=>m.userData.scanKind).sort(),['shrubImpostor','treeImpostor']);
+  const leaves=props.resources.materials.filter(m=>m.alphaTest>.4);assert.deepEqual(leaves.map(m=>m.userData.scanKind).sort(),['hedgeFoliage','shrubImpostor','treeImpostor']);
  }finally{props.dispose();}
 });
 

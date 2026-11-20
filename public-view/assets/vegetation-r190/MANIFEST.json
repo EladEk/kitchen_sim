@@ -1,0 +1,20 @@
+{
+ "revision": 190,
+ "provenance": "SOURCES.json",
+ "codec": "Basis Universal ETC1S (colour with alpha; normal linear), complete mip chain, y-flipped",
+ "layout": "1024x1024: top 1024x640 = front view, x 0..2 m, y 0..1.3 m; bottom 1024x384 = top view, x 0..2 m, z -0.4..0.4 m; both wrap horizontally",
+ "textures": [
+  {
+   "texture": "hedge_color",
+   "render_sha256": "516c7484eabdd8652916a0a064551615bb08e70b3ea745587db4ac2440f4d088",
+   "webp_bytes": 358192,
+   "ktx2_bytes": 267580
+  },
+  {
+   "texture": "hedge_normal",
+   "render_sha256": "35096afdd5a8e88fd4e925d061b91ab6ffed2eb6116d1158f34f063e56c176f0",
+   "webp_bytes": 154810,
+   "ktx2_bytes": 93825
+  }
+ ]
+}

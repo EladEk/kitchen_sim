@@ -1,0 +1,25 @@
+{
+ "revision": 190,
+ "assets": [
+  {
+   "asset": "searsia_lucida (LOD0 variants a-g)",
+   "provider": "Poly Haven",
+   "official_page": "https://polyhaven.com/a/searsia_lucida",
+   "authors": [
+    "James Ray Cock",
+    "Jenelle van Heerden"
+   ],
+   "license": "CC0-1.0",
+   "download": "api.polyhaven.com glTF 1k",
+   "files": [
+    "hedge_color.ktx2",
+    "hedge_color.webp",
+    "hedge_normal.ktx2",
+    "hedge_normal.webp"
+   ],
+   "use": "Garden hedges: tileable 2 m hedge panel (front + top view) rendered from the seven searsia_lucida LOD0 shrubs with scripts/vegetation-impostors/render-hedge.html; colour+alpha and view-space normals",
+   "preparation": "scripts/prepare-vegetation-r190.py: colour bled from opaque texels into every non-opaque texel, alpha steepened around 0.5, normal 512 px; ETC1S KTX2 + WebP fallbacks",
+   "license_source": "https://polyhaven.com/license"
+  }
+ ]
+}
