@@ -1,4 +1,4 @@
-import {Group,Frustum,Matrix4,Box3,Vector3} from 'three';
+import {Group,Frustum,Matrix4,Box3,Vector3,Vector4} from 'three';
 
 // Keep actual instanced/skinned object identities: r185 binds their per-object
 // buffers when building node materials. Static panels can share shader layouts.
@@ -14,13 +14,13 @@ export function nativeCompileList(objects){
 function drawable(o){return (o.isMesh||o.isLine||o.isPoints||o.isSprite)&&!o.userData.furnitureCollisionProxy&&(!o.isInstancedMesh||o.count>0)&&o.geometry?.drawRange?.count!==0&&[o.material].flat().some(m=>m&&m.visible!==false&&m.opacity!==0);}
 function lightingKey(renderer,scene,{mrt,target}){const lights=[];scene.traverseVisible(o=>{if(o.isLight)lights.push([o.uuid,o.type,!!o.castShadow]);});return JSON.stringify([lights,scene.environment?.uuid,scene.fog?.type,scene.overrideMaterial?.uuid,!!renderer.shadowMap?.enabled,renderer.shadowMap?.type,mrt?.uuid,target?.samples,target?.textures?.map(t=>[t.name,t.type,t.format])]);}
 
-export function createSceneWarmup(renderer,scene,camera,{limit=64,maxNativeMs=10000,clock=()=>performance.now(),batchSize=24,viewOnly=false,onDiagnostic=()=>{},counters=()=>({})}={}){
+export function createSceneWarmup(renderer,scene,camera,{limit=64,maxNativeMs=10000,clock=()=>performance.now(),batchSize=24,glBatch=8,viewOnly=false,onDiagnostic=()=>{},counters=()=>({})}={}){
  let disposed=false,epoch=0,uploaded=new WeakSet(),compiled=new WeakMap(),sceneKey='',serial=null;const prepared=new Set(),layouts=new Set();
  const diagnose=(event,details={})=>{try{onDiagnostic({event,details});}catch{}};
  // Pipeline/node counters (WebGPU) so a phone's diagnostic log shows how much
  // the compile pass covered and how many pipelines its first draw still built.
  const count=()=>{try{return counters()||{};}catch{return {};}};
- const delta=(before,after,prefix)=>{const out={};for(const key of ['nodeBuilds','syncPipelines','asyncPipelines'])if(Number.isFinite(after[key])&&Number.isFinite(before[key]))out[prefix+key[0].toUpperCase()+key.slice(1)]=after[key]-before[key];return out;};
+ const delta=(before,after,prefix)=>{const out={};for(const key of ['nodeBuilds','syncPipelines','asyncPipelines','programs'])if(Number.isFinite(after[key])&&Number.isFinite(before[key]))out[prefix+key[0].toUpperCase()+key.slice(1)]=after[key]-before[key];return out;};
  const remember=object=>{const signature=compileKey(object);compiled.set(object,signature);if(!perObject(object)){layouts.add(signature);if(layouts.size>2048)layouts.delete(layouts.values().next().value);}};
  async function prepareScene(key,options={}){
   const at=clock(),before=count(),state={phase:'collect',epoch,stats:{}};
@@ -31,7 +31,7 @@ export function createSceneWarmup(renderer,scene,camera,{limit=64,maxNativeMs=10
   else if(result===true)diagnose('scene-preparation-timing',{elapsedMs:Math.round(clock()-at),...state.stats,...delta(before,count(),'total')});
   return result;
  }
- async function prepareSceneSteps(key,{signal,all=false,draw=false,renderDepth,neighborhood,preparationObjects=[],beforeReady=()=>{},renderFrame=()=>renderer.render(scene,camera),onProgress=()=>{}}={},state={stats:{}}){
+ async function prepareSceneSteps(key,{signal,all=false,draw=false,renderDepth,neighborhood,preparationObjects=[],beforeReady=()=>{},renderFrame=()=>renderer.render(scene,camera),compileTarget,onProgress=()=>{}}={},state={stats:{}}){
   if(disposed||signal?.aborted)return false;if(prepared.has(key)&&!renderer.isWebGPURenderer){state.phase='cached';onProgress(1);return false;}
   const version=epoch,objects=[],textures=new Set(),valid=()=>!disposed&&!signal?.aborted&&epoch===version;
   // The display callback restores the canvas after drawing post processing.
@@ -44,7 +44,10 @@ export function createSceneWarmup(renderer,scene,camera,{limit=64,maxNativeMs=10
   const additional=new Set(preparationObjects);
   const collect=o=>{if(!drawable(o))return;if(frustum&&o.frustumCulled!==false&&!(o.isSprite?frustum.intersectsSprite(o):frustum.intersectsObject(o))&&!nearby(o)&&!additional.has(o))return;objects.push(o);for(const m of[o.material].flat().filter(Boolean))for(const t of Object.values(m))if(t?.isTexture&&!t.isRenderTargetTexture&&!uploaded.has(t))textures.add(t);};
   (all?scene.traverse:scene.traverseVisible).call(scene,collect);
-  let target=null,entries=[],cached=0;
+  let target=null,entries=[],cached=0,glEntries=[];
+  // WebGL: one representative per program-relevant layout; three.js shares the
+  // program between the rest, so compiling them all only costs CPU.
+  if(!renderer.isWebGPURenderer)glEntries=nativeCompileList(objects).children;
   if(renderer.isWebGPURenderer){
    const nextKey=lightingKey(renderer,scene,renderContext)+':depth:'+(renderDepth??0);if(nextKey!==sceneKey){compiled=new WeakMap();layouts.clear();sceneKey=nextKey;}
    target=nativeCompileList(objects);const candidates=target.children;entries=candidates.map(object=>({object,signature:compileKey(object)})).filter(({object,signature})=>compiled.get(object)!==signature&&(perObject(object)||!layouts.has(signature)));cached=candidates.length-entries.length;target.children=entries.map(e=>e.object);
@@ -52,12 +55,12 @@ export function createSceneWarmup(renderer,scene,camera,{limit=64,maxNativeMs=10
   // Progress follows the real work: one unit per texture, one per compiled
   // object (advanced batch by batch) and the synchronous first draw weighted by
   // the shadow/post variants it still builds (~15% of the compiled objects).
-  const compileSteps=target?Math.ceil(entries.length/batchSize):1,compileUnits=target?entries.length:1,drawUnits=draw?Math.max(1,Math.round(objects.length*.15)):0,total=Math.max(1,textures.size+compileUnits+drawUnits);let done=0;
-  const report=()=>{if(valid())onProgress(Math.min(1,done/total));};diagnose('texture-upload',{textures:textures.size,drawObjects:objects.length,compileObjects:entries.length,cachedObjects:cached,compileBatches:compileSteps,viewOnly:!!frustum,neighborhood:!!near});report();
+  const compileSteps=target?Math.ceil(entries.length/batchSize):Math.max(1,Math.ceil(glEntries.length/glBatch)),compileUnits=target?entries.length:Math.max(1,glEntries.length),drawUnits=draw?Math.max(1,Math.round(objects.length*.15)):0,total=Math.max(1,textures.size+compileUnits+drawUnits);let done=0;
+  const report=()=>{if(valid())onProgress(Math.min(1,done/total));};diagnose('texture-upload',{textures:textures.size,drawObjects:objects.length,compileObjects:target?entries.length:glEntries.length,cachedObjects:cached,compileBatches:compileSteps,viewOnly:!!frustum,neighborhood:!!near});report();
   state.phase='texture-upload';const uploadStarted=clock();
   for(const t of textures){if(!valid())return false;await renderer.initTexture?.(t);if(!valid())return false;uploaded.add(t);done++;report();}
   state.stats.uploadMs=Math.round(clock()-uploadStarted);state.phase='shader-compilation';const compileStarted=clock(),compileBefore=count();
-  diagnose('shader-compilation',{compileBatches:compileSteps,compileObjects:entries.length,cachedObjects:cached});
+  diagnose('shader-compilation',{compileBatches:compileSteps,compileObjects:target?entries.length:glEntries.length,cachedObjects:cached});
   if(renderer.isWebGPURenderer){
    const shadows=[],started=clock();
    // Keep the real lights/environment, parent pointers, instancing buffers and
@@ -80,10 +83,41 @@ export function createSceneWarmup(renderer,scene,camera,{limit=64,maxNativeMs=10
     done+=batch.length;report();diagnose('shader-compilation',{completedBatches:Math.floor(i/batchSize)+1,compileBatches:compileSteps,elapsedMs:Math.round(clock()-started),compileObjects:entries.length,cachedObjects:cached});
    }}finally{target.children=[];for(const [shadow,auto,update]of shadows){shadow.autoUpdate=auto;shadow.needsUpdate=update;}}
   }else{
-   const target={traverse:fn=>objects.forEach(fn),traverseVisible:()=>{}};if(renderer.compileAsync)await renderer.compileAsync(target,camera,scene,renderDepth);else renderer.compile?.(target,camera,scene);done++;report();
+   // WebGL links programs lazily: compile() only queues them and, without
+   // KHR_parallel_shader_compile, the driver finishes them inside the first
+   // draw, as one long stall. Compile in batches against the target the real
+   // frame renders into (the post-processing scene buffer has its own tone
+   // mapping/colour space program keys), force each batch's link with the
+   // program's first-use query and yield, so progress moves and the first
+   // frame reuses every program.
+   // Some drivers (and SwiftShader) still finish a program on its first draw.
+   // Draw each batch once into a single scissored pixel of the same target,
+   // with only the batch and the lights on a private layer and shadow maps
+   // frozen, so that work also happens batch by batch.
+   let shadowWarm=false;const warmDraw=renderer.render&&camera.layers&&renderer.shadowMap?batchObjects=>{
+    const layer=31,mask=camera.layers.mask,toggled=[],shadow=[renderer.shadowMap.autoUpdate,renderer.shadowMap.needsUpdate],rt=renderer.getRenderTarget?.()??null,scissor=rt?[rt.scissor.clone(),rt.scissorTest]:null,canvasScissor=!rt&&renderer.getScissor?[renderer.getScissor(new Vector4()),renderer.getScissorTest()]:null;
+    const enable=o=>{if(!o.layers.isEnabled(layer)){o.layers.enable(layer);toggled.push(o);}};
+    for(const o of batchObjects)enable(o);scene.traverse(o=>{if(o.isLight)enable(o);});
+    try{camera.layers.set(layer);
+     // The first warm draw also renders the shadow maps (their casters use the
+     // shadow cameras' own layers), so later batches sample real shadow textures.
+     const shadowsReady=shadowWarm;shadowWarm=true;if(shadowsReady){renderer.shadowMap.autoUpdate=false;renderer.shadowMap.needsUpdate=false;}
+     if(rt){rt.scissor.set(0,0,1,1);rt.scissorTest=true;}else if(canvasScissor){renderer.setScissor(0,0,1,1);renderer.setScissorTest(true);}
+     renderer.render(scene,camera);}
+    finally{camera.layers.mask=mask;for(const o of toggled)o.layers.disable(layer);[renderer.shadowMap.autoUpdate,renderer.shadowMap.needsUpdate]=shadow;if(rt){rt.scissor.copy(scissor[0]);rt.scissorTest=scissor[1];}else if(canvasScissor){renderer.setScissor(canvasScissor[0]);renderer.setScissorTest(canvasScissor[1]);}}
+   }:null;
+   const batch=[],previousTarget=renderer.getRenderTarget?.()??null,started=clock(),flush=async()=>{
+    if(!batch.length)return true;const list={traverse:fn=>batch.forEach(fn),traverseVisible:()=>{}};
+    if(compileTarget!==undefined)renderer.setRenderTarget(compileTarget);
+    try{const materials=renderer.compile?.(list,camera,scene);for(const m of materials||[]){try{renderer.properties?.get(m)?.currentProgram?.getUniforms?.();}catch{}}if(warmDraw)warmDraw(batch);}
+    finally{if(compileTarget!==undefined)renderer.setRenderTarget(previousTarget);}
+    done+=batch.length;batch.length=0;report();await new Promise(resolve=>setTimeout(resolve,0));return valid();
+   };
+   let completed=0;for(const object of glEntries){batch.push(object);if(batch.length>=glBatch){if(!await flush())return false;completed++;diagnose('shader-compilation',{completedBatches:completed,compileBatches:compileSteps,elapsedMs:Math.round(clock()-started),compileObjects:glEntries.length});}}
+   if(!await flush())return false;
   }
   if(!valid())return false;
-  Object.assign(state.stats,{compileMs:Math.round(clock()-compileStarted),compileObjects:entries.length,cachedObjects:cached,drawObjects:objects.length},delta(compileBefore,count(),'compile'));
+  Object.assign(state.stats,{compileMs:Math.round(clock()-compileStarted),compileObjects:target?entries.length:glEntries.length,cachedObjects:cached,drawObjects:objects.length},delta(compileBefore,count(),'compile'));
   state.phase='first-frame-draw';const drawStarted=clock(),drawBefore=count();
   if(draw){diagnose('first-frame-draw');const gl=renderer.getContext?.();if(gl?.getError)for(let i=0;i<8&&gl.getError()!==0;i++){}const culling=[],shadowOnly=new Set(),selected=new Set(objects),previousFunction=renderer.getRenderObjectFunction?.();
    // The sun can see distant facade casters which the walking camera cannot.

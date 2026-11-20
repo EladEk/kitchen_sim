@@ -17,7 +17,7 @@ export function createWebGLPresentation(renderer,scene,camera,{mobile=false}={})
   // mapped centre it returned the raw texel, so the frame shipped un-tone-mapped.
   composer.addPass(new EffectPass(camera,aa));
   const draw=ao.render.bind(ao),hidden=[];ao.render=(...args)=>{scene.traverseVisible(o=>{if(o.isMesh&&(o.userData.celestialBackground||[o.material].flat().some(m=>m?.alphaTest>0||m?.transparent&&m.opacity<.98))){hidden.push(o);o.visible=false;}});try{draw(...args);}finally{for(const o of hidden)o.visible=true;hidden.length=0;}};
-  return {resize(w,h){for(const target of [composer.inputBuffer,composer.outputBuffer,composer.depthRenderTarget])target?.setSize(w,h);for(const pass of composer.passes)pass.setSize(w,h);},render(){
+  return {get sceneTarget(){return composer.inputBuffer;},resize(w,h){for(const target of [composer.inputBuffer,composer.outputBuffer,composer.depthRenderTarget])target?.setSize(w,h);for(const pass of composer.passes)pass.setSize(w,h);},render(){
    // The composer owns tone mapping (HomeToneMappingEffect, fed the renderer's
    // exposure). The renderer itself must not map the final pass again.
    const mapping=renderer.toneMapping;tone.exposure=renderer.toneMappingExposure;tone.neutral=mapping===NeutralToneMapping;renderer.toneMapping=NoToneMapping;
